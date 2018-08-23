@@ -1,3 +1,77 @@
-<p>
-  e-qtl works!
-</p>
+<div id="eqtl-container">
+  <!-- Inputs -->
+  <div class="row p-2" id="inputs">
+    <!-- Choose Files -->
+    <div class="col-5 border border-dark rounded" id="input-files">
+      <!-- Expression Data File -->
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="d-flex flex-wrap">Expression Data File*</div>
+        <div class="d-flex flex-wrap">
+          <label for="file-input" class="sr-only">
+            File Input
+          </label>
+          <input
+            type="file"
+            class="sr-only"
+            id="file-input"
+            name="file-input"
+            accept=".txt, .csv, .xls, .xlsx"
+            (change)="updateFiles($event.target.files)"
+            #inputFile>
+          <button>Choose File</button>
+        </div>
+        <div class="d-flex flex-wrap">Download Sample</div>
+      </div>
+      <!-- Genotype Data File -->
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="d-flex flex-wrap">Genotype Data File*</div>
+        <div class="d-flex flex-wrap">
+          <label for="file-input" class="sr-only">
+              File Input
+            </label>
+            <input
+              type="file"
+              class="sr-only"
+              id="file-input"
+              name="file-input"
+              accept=".txt, .csv, .xls, .xlsx"
+              (change)="updateFiles($event.target.files)"
+              #inputFile>
+            <button>Choose File</button>
+        </div>
+        <div class="d-flex flex-wrap">Download Sample</div>
+      </div>
+      <!-- Association Data File -->
+      <div class="d-flex flex-wrap align-items-center">
+        <div class="d-flex flex-wrap">Association Data File*</div>
+        <div class="d-flex flex-wrap">
+          <label for="file-input" class="sr-only">
+              File Input
+            </label>
+            <input
+              type="file"
+              class="sr-only"
+              id="file-input"
+              name="file-input"
+              accept=".txt, .csv, .xls, .xlsx"
+              (change)="updateFiles($event.target.files)"
+              #inputFile>
+            <button>Choose File</button>
+        </div>
+        <div class="d-flex flex-wrap">Download Sample</div>
+      </div>
+    </div>
+    <!-- Input Parameters -->
+    <div class="col-7 border border-dark rounded" id="input-parameters">
+      input parameters
+    </div>
+  </div>
+  <!-- Results -->
+  <div class="row p-2" id="results">
+    <div class="col vh-100 border border-dark rounded" id="result-main">
+      results
+    </div>
+  </div>
+</div>
+
+

@@ -12,4 +12,11 @@ export class EQTLComponent implements OnInit {
   ngOnInit() {
   }
 
+  // $scope.uploadFile = function(){
+  //   var file = $scope.myFile; // $scope.myFile is set buy the directive
+  //   console.log('file is ' + $scope.myFile.name ); 
+  //   var uploadUrl = "/fileUpload";
+  //   fileUpload.uploadFileToUrl(file, uploadUrl);
+  // };
+
 }
