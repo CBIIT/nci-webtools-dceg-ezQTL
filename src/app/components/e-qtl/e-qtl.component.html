@@ -2,68 +2,100 @@
   <!-- Inputs -->
   <div class="row p-2" id="inputs">
     <!-- Choose Files -->
-    <div class="col-5 border border-dark rounded" id="input-files">
+
+    <!-- Only display material grid when window size >= medium -->
+    <div class="col d-none d-md-block border border-dark rounded" id="input-files">
+      <mat-grid-list cols="3" rowHeight="3:1" role="list">
+        <!-- Expression Data File -->
+        <mat-grid-tile role="listitem">
+            <div class="mat-grid-text">Expression Data File<span style="color:red">*</span></div>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <button mat-raised-button>Choose File</button>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <a href="/src/assets/files/1q21_3.expression.txt" download>Download Sample</a>
+        </mat-grid-tile>
+        <!-- Genotype Data File -->
+        <mat-grid-tile role="listitem">
+            <div class="mat-grid-text">Genotype Data File<span style="color:red">*</span></div>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <button mat-raised-button>Choose File</button></mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <a href="/src/assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
+        </mat-grid-tile>
+        <!-- Association Data File -->
+        <mat-grid-tile role="listitem">
+            <div class="mat-grid-text">Association Data File<span style="color:red">*</span></div>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <button mat-raised-button>Choose File</button>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <a href="/src/assets/files/1q21_3.eQTL.txt" download>Download Sample</a>
+        </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+
+    <!-- Only display bootstrap row/col when window size < medium -->
+    <div class="col-md-auto d-md-none border border-dark rounded" id="input-files">
       <!-- Expression Data File -->
-      <div class="d-flex flex-wrap align-items-center">
-        <div class="d-flex flex-wrap">Expression Data File*</div>
-        <div class="d-flex flex-wrap">
-          <label for="file-input" class="sr-only">
-            File Input
-          </label>
-          <input
-            type="file"
-            class="sr-only"
-            id="file-input"
-            name="file-input"
-            accept=".txt, .csv, .xls, .xlsx"
-            (change)="updateFiles($event.target.files)"
-            #inputFile>
-          <button>Choose File</button>
+      <div class="row p-2 justify-content-between">
+        <div class="col-md-auto">Expression Data File<span style="color:red">*</span></div>
+        <div class="col-md-auto">
+          <button mat-raised-button>Choose File</button>
         </div>
-        <div class="d-flex flex-wrap">Download Sample</div>
+        <div class="col-md-auto"><a href="/src/assets/files/1q21_3.expression.txt" download>Download Sample</a></div>
       </div>
       <!-- Genotype Data File -->
-      <div class="d-flex flex-wrap align-items-center">
-        <div class="d-flex flex-wrap">Genotype Data File*</div>
-        <div class="d-flex flex-wrap">
-          <label for="file-input" class="sr-only">
-              File Input
-            </label>
-            <input
-              type="file"
-              class="sr-only"
-              id="file-input"
-              name="file-input"
-              accept=".txt, .csv, .xls, .xlsx"
-              (change)="updateFiles($event.target.files)"
-              #inputFile>
-            <button>Choose File</button>
+      <div class="row p-2 justify-content-between">
+        <div class="col-md-auto">Genotype Data File<span style="color:red">*</span></div>
+        <div class="col-md-auto">
+          <button mat-raised-button>Choose File</button>
         </div>
-        <div class="d-flex flex-wrap">Download Sample</div>
+        <div class="col-md-auto"><a href="/src/assets/files/1q21_3.genotyping.txt" download>Download Sample</a></div>
       </div>
       <!-- Association Data File -->
-      <div class="d-flex flex-wrap align-items-center">
-        <div class="d-flex flex-wrap">Association Data File*</div>
-        <div class="d-flex flex-wrap">
-          <label for="file-input" class="sr-only">
-              File Input
-            </label>
-            <input
-              type="file"
-              class="sr-only"
-              id="file-input"
-              name="file-input"
-              accept=".txt, .csv, .xls, .xlsx"
-              (change)="updateFiles($event.target.files)"
-              #inputFile>
-            <button>Choose File</button>
+      <div class="row p-2 justify-content-between">
+        <div class="col-md-auto">Association Data File<span style="color:red">*</span></div>
+        <div class="col-md-auto">
+          <button mat-raised-button>Choose File</button>
         </div>
-        <div class="d-flex flex-wrap">Download Sample</div>
+        <div class="col-md-auto"><a href="/src/assets/files/1q21_3.eQTL.txt" download>Download Sample</a></div>
       </div>
     </div>
+
     <!-- Input Parameters -->
-    <div class="col-7 border border-dark rounded" id="input-parameters">
-      input parameters
+    <div class="col border border-dark rounded" id="input-parameters">
+      <mat-grid-list cols="2" rowHeight="3:1" role="list">
+        <mat-grid-tile role="listitem">
+            <!-- <div class="mat-grid-text">Reference Gene<span style="color:red">*</span></div> -->
+            <mat-form-field>
+              <mat-select placeholder="Reference Gene" [formControl]="geneControl" required>
+                <mat-option>--</mat-option>
+                <mat-option *ngFor="let gene of genes" [value]="gene.value">
+                  {{gene.viewValue}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="geneControl.hasError('required')">Please choose a gene</mat-error>
+            </mat-form-field>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+          <button class="mr-2" mat-raised-button color="primary">Calculate</button>
+          <button class="ml-2" mat-raised-button >Reset</button>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+            <!-- <div class="mat-grid-text">Number of Genes (for Plot)</div> -->
+          <form class="example-form">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Number of Genes (for Plot)" value="All">
+            </mat-form-field>
+          </form>
+        </mat-grid-tile>
+        <mat-grid-tile role="listitem">
+        </mat-grid-tile>
+      </mat-grid-list>
     </div>
   </div>
   <!-- Results -->

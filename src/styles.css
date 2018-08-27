@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* Angular Material's Prebuilt Theme */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 body {
   height: 100vh;
@@ -17,7 +19,7 @@ body {
 }
 
 a {
-  color: #2f6fb3;
+  color: #00A2EC;
 }
 
 .bg-light {

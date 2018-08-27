@@ -1,0 +1,13 @@
+#inputs {
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+/* #input-files{
+    font-weight: bold;
+} */
+
+.mat-grid-text {
+    position: absolute;
+    left: 20px;
+}
