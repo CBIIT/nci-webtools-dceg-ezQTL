@@ -1,10 +1,11 @@
 <div id="eqtl-container">
+
   <!-- Inputs -->
-  <div class="row p-2" id="inputs">
+  <div class="row p-3" id="inputs">
     <!-- Choose Files -->
 
     <!-- Only display material grid when window size >= medium -->
-    <div class="col d-none d-md-block border border-dark rounded" id="input-files">
+    <div class="col d-none d-md-block border border-light rounded" id="input-files">
       <mat-grid-list cols="3" rowHeight="3:1" role="list">
         <!-- Expression Data File -->
         <mat-grid-tile role="listitem">
@@ -39,7 +40,7 @@
     </div>
 
     <!-- Only display bootstrap row/col when window size < medium -->
-    <div class="col-md-auto d-md-none border border-dark rounded" id="input-files">
+    <div class="col-md-auto d-md-none border border-light rounded" id="input-files">
       <!-- Expression Data File -->
       <div class="row p-2 justify-content-between">
         <div class="col-md-auto">Expression Data File<span style="color:red">*</span></div>
@@ -67,10 +68,11 @@
     </div>
 
     <!-- Input Parameters -->
-    <div class="col border border-dark rounded" id="input-parameters">
+
+    <!-- Only display material grid when window size >= large -->
+    <div class="col d-none d-lg-block border border-light rounded" id="input-parameters">
       <mat-grid-list cols="2" rowHeight="3:1" role="list">
         <mat-grid-tile role="listitem">
-            <!-- <div class="mat-grid-text">Reference Gene<span style="color:red">*</span></div> -->
             <mat-form-field>
               <mat-select placeholder="Reference Gene" [formControl]="geneControl" required>
                 <mat-option>--</mat-option>
@@ -86,7 +88,6 @@
           <button class="ml-2" mat-raised-button >Reset</button>
         </mat-grid-tile>
         <mat-grid-tile role="listitem">
-            <!-- <div class="mat-grid-text">Number of Genes (for Plot)</div> -->
           <form class="example-form">
             <mat-form-field class="example-full-width">
               <input matInput placeholder="Number of Genes (for Plot)" value="All">
@@ -97,13 +98,64 @@
         </mat-grid-tile>
       </mat-grid-list>
     </div>
-  </div>
-  <!-- Results -->
-  <div class="row p-2" id="results">
-    <div class="col border border-dark rounded" id="result-main">
-      results
+
+    <!-- Only display bootstrap row/col when window size < large -->
+    <div class="col border d-lg-none border-light rounded" id="input-parameters">
+      <div class="row p-2 justify-content-between">
+        <div class="col-md-auto">
+          <mat-form-field>
+            <mat-select placeholder="Reference Gene" [formControl]="geneControl" required>
+              <mat-option>--</mat-option>
+              <mat-option *ngFor="let gene of genes" [value]="gene.value">
+                {{gene.viewValue}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="geneControl.hasError('required')">Please choose a gene</mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-auto">
+          <button class="mr-2" mat-raised-button color="primary">Calculate</button>
+          <button class="ml-2" mat-raised-button >Reset</button>
+        </div>
+      </div>
+      <div class="row p-2 justify-content-between">
+        <div class="col-md-auto">
+          <form class="example-form">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Number of Genes (for Plot)" value="All">
+            </mat-form-field>
+          </form>
+        </div>
+      </div>
     </div>
+
   </div>
+
+
+  <!-- Results -->
+  <div id="results">
+    <mat-tab-group>
+      <div class="row">
+        <mat-tab label="Gene Expressions"> 
+          <div class="col border border-light rounded" id="result-main">
+            Gene Expressions - results
+          </div>
+        </mat-tab>
+        <mat-tab label="Locuszoom Plots"> 
+          <div class="col border border-light rounded" id="result-main">
+            Locuszoom Plots - results
+          </div>
+        </mat-tab>
+        <mat-tab label="Table"> 
+          <div class="col border border-light rounded" id="result-main">
+            Table - results
+          </div>
+        </mat-tab>
+      </div>
+    </mat-tab-group>
+  </div>
+
+
 </div>
 
 
