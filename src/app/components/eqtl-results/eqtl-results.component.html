@@ -1,0 +1,35 @@
+<div id="results">
+  <mat-tab-group>
+    <div class="row">
+      <mat-tab label="Gene Expressions"> 
+        <div class="col border border-light rounded" id="result-main">
+          Gene Expressions - results
+          <form class="example-form">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Number of Genes (for Plot)" value="All">
+            </mat-form-field>
+          </form>
+        </div>
+      </mat-tab>
+      <mat-tab label="Locuszoom Plots"> 
+        <div class="col border border-light rounded" id="result-main">
+          Locuszoom Plots - results
+          <mat-form-field>
+            <mat-select placeholder="Reference Gene" [formControl]="geneControl" required>
+              <mat-option>--</mat-option>
+              <mat-option *ngFor="let gene of genes" [value]="gene.value">
+                {{gene.viewValue}}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="geneControl.hasError('required')">Please choose a gene</mat-error>
+          </mat-form-field>
+        </div>
+      </mat-tab>
+      <mat-tab label="Table"> 
+        <div class="col border border-light rounded" id="result-main">
+          Table - results
+        </div>
+      </mat-tab>
+    </div>
+  </mat-tab-group>
+</div>

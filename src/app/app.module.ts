@@ -21,6 +21,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule, MatInput } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
+import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
+import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
 
 
 
@@ -36,7 +38,9 @@ import { MatTabsModule } from '@angular/material/tabs';
     HelpComponent,
     NavbarComponent,
     FooterComponent,
-    HomeComponent
+    HomeComponent,
+    EqtlInputsComponent,
+    EqtlResultsComponent
   ],
   imports: [
     BrowserModule,
