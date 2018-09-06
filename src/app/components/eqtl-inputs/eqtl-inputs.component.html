@@ -1,68 +1,120 @@
 <!-- Inputs -->
 <div class="container border border-light rounded p-3" id="inputs">
   <div class="row" id="input-files">
-  <!-- Choose Files -->
 
-      <!-- Expression Data File -->
-      <div class="col">
-        <div class="row" id="input-files">
-          <div class="col-sm">
-            Expression Data File<span style="color:red">*</span>
-            <div class="d-block d-md-none w-100"></div>
-            <button class="ml-3 mr-3" mat-raised-button>Choose File</button>
-            <div class="d-block d-md-none w-100"></div>
-            <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.expression.txt" download>Sample</a>
-          </div>
+    <!-- Expression Data File -->
+    <div class="col">
+      <div class="row" id="input-files">
+        <div class="col-sm">
+          Expression Data File<span style="color:red">*</span>
+          <div class="d-block d-md-none w-100"></div>
+          <input required 
+            type="file" 
+            class="ng-hide" 
+            id="expression-file" 
+            name="input-files" 
+            accept=".txt" 
+            hidden 
+            #expressionFile>
+          <button 
+            (click)="expressionFile.click()" 
+            class="ml-3 mr-3" 
+            mat-raised-button>
+            Choose File
+          </button>
+          <div class="d-block d-md-none w-100"></div>
+          <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.expression.txt" download>Sample</a>
         </div>
       </div>
+    </div>
 
-      <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
+    <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
 
-      <!-- Genotype Data File -->
-      <div class="col">
-        <div class="row" id="input-files">
-          <div class="col-sm">
-            Genotype Data File<span style="color:red">*</span>
-            <div class="d-block d-md-none w-100"></div>
-            <button class="ml-3 mr-3" mat-raised-button>Choose File</button>
-            <div class="d-block d-md-none w-100"></div>
-            <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.genotyping.txt" download>Sample</a>
-          </div>
+    <!-- Genotype Data File -->
+    <div class="col">
+      <div class="row" id="input-files">
+        <div class="col-sm">
+          Genotype Data File<span style="color:red">*</span>
+          <div class="d-block d-md-none w-100"></div>
+          <input required 
+            type="file" 
+            class="ng-hide" 
+            id="genotype-file" 
+            name="input-files" 
+            accept=".txt" 
+            hidden 
+            #genotypeFile>
+          <button 
+            (click)="genotypeFile.click()" 
+            class="ml-3 mr-3" 
+            mat-raised-button>
+            Choose File
+          </button>
+          <div class="d-block d-md-none w-100"></div>
+          <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.genotyping.txt" download>Sample</a>
         </div>
       </div>
+    </div>
 
-      <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
+    <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
 
-      <!-- Association Data File -->
-      <div class="col">
-        <div class="row" id="input-files">
-          <div class="col-sm">
-            Association Data File<span style="color:red">*</span>
-            <div class="d-block d-md-none w-100"></div>
-            <button class="ml-3 mr-3" mat-raised-button>Choose File</button>
-            <div class="d-block d-md-none w-100"></div>
-            <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.eQTL.txt" download>Sample</a>
-          </div>
+    <!-- Association Data File -->
+    <div class="col">
+      <div class="row" id="input-files">
+        <div class="col-sm">
+          Association Data File<span style="color:red">*</span>
+          <div class="d-block d-md-none w-100"></div>
+          <input required 
+            type="file" 
+            class="ng-hide" 
+            id="association-file" 
+            name="input-files" 
+            accept=".txt" 
+            hidden 
+            required 
+            #associationFile>
+          <button 
+            (click)="associationFile.click()" 
+            class="ml-3 mr-3" 
+            mat-raised-button>
+            Choose File
+          </button>
+          <div class="d-block d-md-none w-100"></div>
+          <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.eQTL.txt" download>Sample</a>
         </div>
       </div>
+    </div>
 
-      <div class="w-100"></div>
+    <div class="w-100"></div>
 
-      <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
+    <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
 
-      <div class="col-sm">
-
-      </div>
-      <div class="col-sm">
-        
-      </div>
-      <div class="col-sm">
-        <button class="mt-3 ml-4 mr-3" mat-raised-button color="primary">Calculate</button>
-        <button class="mt-3"mat-raised-button>Reset</button>
-      </div>
+    <div class="col-sm">
 
     </div>
+    <div class="col-sm">
+      
+    <!-- Submit and Reset Button   -->
+    </div>
+    <div class="col-sm">
+      <input 
+        (click)="submit(expressionFile.files[0], genotypeFile.files[0], associationFile.files[0])"
+        type="submit" 
+        class="ng-hide"
+        id="calculate-button" 
+        hidden
+        #calculateButton>
+      <button 
+        (click)="calculateButton.click()" 
+        class="mt-3 ml-4 mr-3" 
+        mat-raised-button color="primary">
+        Calculate
+      </button>
+      <button class="mt-3"mat-raised-button>Reset</button>
+    </div>
+
   </div>
+</div>
 
 
  

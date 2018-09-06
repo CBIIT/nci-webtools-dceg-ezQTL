@@ -12,6 +12,11 @@ import { AppRoutingModule } from './router/app-routing.module';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
+import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
+import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
+import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
+import { EqtlResultsLocusZoomComponent } from './components/eqtl-results-locus-zoom/eqtl-results-locus-zoom.component';
+import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatCheckboxModule } from '@angular/material'; // import needed UI modules
@@ -21,8 +26,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule, MatInput } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
-import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
-import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
+
+
+
+
 
 
 
@@ -40,7 +47,10 @@ import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.com
     FooterComponent,
     HomeComponent,
     EqtlInputsComponent,
-    EqtlResultsComponent
+    EqtlResultsComponent,
+    EqtlResultsGeneExpressionsComponent,
+    EqtlResultsLocusZoomComponent,
+    EqtlResultsTableComponent
   ],
   imports: [
     BrowserModule,
