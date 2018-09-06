@@ -1,5 +1,6 @@
 var express = require('express');
 var multer = require('multer');
+// var fs = require('fs');
 
 const { readFileSync, writeFileSync } = require('fs');
 const { spawn } = require('child_process');
@@ -7,13 +8,15 @@ const { fileSync } = require('tmp');
 
 const rscript = require('./r/r-wrapper.js');
 
-var app = express()
+var app = express();
 
 // Upload files with file extension and original name
 // var upload = multer({dest: 'uploads/'})
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, 'uploads/')
+      const dir = 'uploads/'
+      // fs.mkdir(dir, err => cb(err, dir))
+      cb(null, dir)
   },
   filename: function (req, file, cb) {
       let ext = ''; // set default extension (if any)
@@ -24,7 +27,7 @@ var storage = multer.diskStorage({
       }
       cb(null, fname + ext)
   }
-})
+});
 var upload = multer({ storage: storage });
 
 // var requestTime = function (req, res, next) {
@@ -97,6 +100,6 @@ app.get('/', function (req, res) {
     </script>
   `
   res.send(responseText)
-})
+});
 
-app.listen(3000)
+app.listen(3000);
