@@ -23,7 +23,7 @@ var storage = multer.diskStorage({
       let fname = Date.now();
       if (file.originalname.split(".").length > 1) {// checking if there is an extension or not.
           ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
-          fname = file.originalname.split(".")[0];
+          fname = file.originalname.split(".").slice(0,-1).join('.');
       }
       cb(null, fname + ext)
   }
