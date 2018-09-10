@@ -43,17 +43,6 @@ export class EqtlInputsComponent implements OnInit {
 
     console.log(await response.text());
 
-
-
-
-
-    // for (var i = 0; i < files.length; i++) {
-    //   console.log(files[i].name);
-    //   formData.append('input-files[]', files[i]);
-    // }
-    // });
-    // console.log(await response);
-    // console.log(await response.text());
   }  
 
   onSubmit() {
