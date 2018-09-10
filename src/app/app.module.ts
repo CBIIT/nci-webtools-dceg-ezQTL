@@ -17,20 +17,17 @@ import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.com
 import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
 import { EqtlResultsLocusZoomComponent } from './components/eqtl-results-locus-zoom/eqtl-results-locus-zoom.component';
 import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
+import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatCheckboxModule } from '@angular/material'; // import needed UI modules
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule, MatInput } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 
-
-
-
-
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 
 
@@ -50,7 +47,8 @@ import { MatTabsModule } from '@angular/material/tabs';
     EqtlResultsComponent,
     EqtlResultsGeneExpressionsComponent,
     EqtlResultsLocusZoomComponent,
-    EqtlResultsTableComponent
+    EqtlResultsTableComponent,
+    FileValueAccessorDirective
   ],
   imports: [
     BrowserModule,
@@ -61,10 +59,10 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatGridListModule,
     MatSelectModule,
     MatFormFieldModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatInputModule,
-    MatTabsModule
+    MatTabsModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

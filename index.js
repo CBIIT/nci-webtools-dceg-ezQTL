@@ -54,7 +54,10 @@ app.use(function(req, res, next) {
 // });
 
 app.post('/upload-file', upload.any(), (request, response) => {
-  response.send(request + ' has been uploaded');
+  request.files.forEach(function(file) {
+    console.log(file.originalname + ' has been uploaded');
+  });
+  response.send('Files have been uploaded');
 });
 
 async function test() {
@@ -62,7 +65,7 @@ async function test() {
   console.log(result);
 }
 
-test();
+// test();
 
 app.get('/', function (req, res) {
   var responseText = 'Hello World!<br>'

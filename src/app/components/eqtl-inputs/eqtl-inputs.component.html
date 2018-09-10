@@ -1,6 +1,6 @@
 <!-- Inputs -->
 <div class="container border border-light rounded p-3" id="inputs">
-  <div class="row" id="input-files">
+  <form class="row" [formGroup]="eqtlForm" id="input-files">
 
     <!-- Expression Data File -->
     <div class="col">
@@ -10,17 +10,22 @@
           <div class="d-block d-md-none w-100"></div>
           <input required 
             type="file" 
+            formControlName="expressionFile"  
             class="ng-hide" 
             id="expression-file" 
             name="input-files" 
             accept=".txt" 
             hidden 
-            #expressionFile>
+            #expressionInput>
           <button 
-            (click)="expressionFile.click()" 
+            (click)="expressionInput.click()" 
             class="ml-3 mr-3" 
             mat-raised-button>
-            Choose File
+            <!-- {{ eqtlForm.value?.expressionFile[0]?.name || 'Choose File' }} -->
+            <!-- {{ eqtlForm.value.expressionFile[0]
+                ? eqtlForm.value.expressionFile[0].name.substring(0, 11)
+                : 'Choose File' }} -->
+            {{ !eqtlForm.value.expressionFile ? 'Choose File' : (eqtlForm.value?.expressionFile[0]?.name || 'Choose File') }}
           </button>
           <div class="d-block d-md-none w-100"></div>
           <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.expression.txt" download>Sample</a>
@@ -38,17 +43,18 @@
           <div class="d-block d-md-none w-100"></div>
           <input required 
             type="file" 
+            formControlName="genotypeFile" 
             class="ng-hide" 
             id="genotype-file" 
             name="input-files" 
             accept=".txt" 
             hidden 
-            #genotypeFile>
+            #genotypeInput>
           <button 
-            (click)="genotypeFile.click()" 
+            (click)="genotypeInput.click()" 
             class="ml-3 mr-3" 
             mat-raised-button>
-            Choose File
+            {{ !eqtlForm.value.genotypeFile ? 'Choose File' : (eqtlForm.value?.genotypeFile[0]?.name || 'Choose File') }}
           </button>
           <div class="d-block d-md-none w-100"></div>
           <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.genotyping.txt" download>Sample</a>
@@ -66,18 +72,19 @@
           <div class="d-block d-md-none w-100"></div>
           <input required 
             type="file" 
+            formControlName="associationFile"
             class="ng-hide" 
             id="association-file" 
             name="input-files" 
             accept=".txt" 
             hidden 
             required 
-            #associationFile>
+            #associationInput>
           <button 
-            (click)="associationFile.click()" 
+            (click)="associationInput.click()" 
             class="ml-3 mr-3" 
             mat-raised-button>
-            Choose File
+            {{ !eqtlForm.value.associationFile ? 'Choose File' : (eqtlForm.value?.associationFile[0]?.name || 'Choose File') }}
           </button>
           <div class="d-block d-md-none w-100"></div>
           <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.eQTL.txt" download>Sample</a>
@@ -94,26 +101,29 @@
     </div>
     <div class="col-sm">
       
-    <!-- Submit and Reset Button   -->
-    </div>
-    <div class="col-sm">
-      <input 
-        (click)="submit(expressionFile.files[0], genotypeFile.files[0], associationFile.files[0])"
-        type="submit" 
-        class="ng-hide"
-        id="calculate-button" 
-        hidden
-        #calculateButton>
-      <button 
-        (click)="calculateButton.click()" 
-        class="mt-3 ml-4 mr-3" 
-        mat-raised-button color="primary">
-        Calculate
-      </button>
-      <button class="mt-3"mat-raised-button>Reset</button>
     </div>
 
-  </div>
+    <!-- Submit and Reset Button   -->
+    <div class="col-sm">
+      <button 
+        type="submit" 
+        class="mt-3 ml-4 mr-3" 
+        [disabled]="!eqtlForm.valid" 
+        mat-raised-button color="primary" 
+        (click)="submit()">
+        Calculate
+      </button>
+      <button 
+        type="reset"
+        class="mt-3" 
+        mat-raised-button>
+        Reset
+      </button>
+    </div>
+  </form>
+  <p>
+    Form Status: {{ eqtlForm.status }}
+  </p>
 </div>
 
 
