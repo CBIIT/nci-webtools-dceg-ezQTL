@@ -23,9 +23,9 @@ export class EqtlInputsComponent implements OnInit {
     })
   }
 
-  log(...values: any[]) {
-    console.log(...values);
-  }
+  // log(...values: any[]) {
+  //   console.log(...values);
+  // }
 
   async submit() {
     const { expressionFile, genotypeFile, associationFile } = this.eqtlForm.value;
@@ -45,9 +45,9 @@ export class EqtlInputsComponent implements OnInit {
 
   }  
 
-  onSubmit() {
-    // TODO: Use EventEmitter with form value
-    console.log("Form has been submitted.");
-    console.warn(this.eqtlForm.value);
-  }
+  // onSubmit() {
+  //   // TODO: Use EventEmitter with form value
+  //   console.log("Form has been submitted.");
+  //   console.warn(this.eqtlForm.value);
+  // }
 }
