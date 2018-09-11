@@ -23,10 +23,6 @@ export class EqtlInputsComponent implements OnInit {
     })
   }
 
-  // log(...values: any[]) {
-  //   console.log(...values);
-  // }
-
   async submit() {
     const { expressionFile, genotypeFile, associationFile } = this.eqtlForm.value;
     console.log(expressionFile, genotypeFile, associationFile);
