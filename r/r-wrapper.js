@@ -1,32 +1,37 @@
 const { readFileSync, writeFileSync } = require('fs');
-const { spawn } = require('child_process');
+const { spawn, exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function rscript(rfile, input) {
+// function rscript(rfile, input) {
+function rscript(rfile) {
     return new Promise((resolve, reject) => {
 
-        input = JSON.stringify(JSON.stringify(input));
+        // input = JSON.stringify(JSON.stringify(input));
         const code = readFileSync(rfile).toString();
+        // const rcode = `
+        //     input = jsonlite::fromJSON(${input});
+        //     suppressWarnings(
+        //         jsonlite::toJSON({${code}}, auto_unbox=T)
+        //     )
+        // `;
         const rcode = `
-            input = jsonlite::fromJSON(${input});
-            suppressWarnings(
+            suppressWarnings(suppressMessages(suppressPackageStartupMessages(
                 jsonlite::toJSON({${code}}, auto_unbox=T)
-            )
+            )))
         `;
-
-        // console.log(rcode);
 
         const tmpFile = fileSync();
         writeFileSync(tmpFile.name, rcode);
 
-        const process = spawn('Rscript', ['--vanilla', tmpFile.name]);
-        // process.stdout.on('data', e => resolve(JSON.parse(e.toString())));
-        process.stdout.on('data', e =>
-            // console.log(e.toString())
-            resolve(JSON.parse(e.toString()))
-            // resolve(e.toString())
+        const process = exec(
+            `Rscript --vanilla "${tmpFile.name}"`, 
+            { maxBuffer: 100 * 1024 * 1024 },
+            (error, stdout, stderr) => {
+                if (error) reject(error);
+                if (stderr) reject(stderr);
+                resolve(JSON.parse(stdout.toString()));
+            }
         );
-        process.stderr.on('data', e => reject(e.toString()));
     });
 }
 

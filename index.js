@@ -1,6 +1,5 @@
 var express = require('express');
 var multer = require('multer');
-// var fs = require('fs');
 
 const { readFileSync, writeFileSync } = require('fs');
 const { spawn } = require('child_process');
@@ -38,34 +37,24 @@ var upload = multer({ storage: storage });
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+
   next();
 });
 
-// app.use(requestTime);
+app.post('/upload-file', upload.any(), async (request, response) => {
 
-// app.get('/r-script', (req, res) => {
-//     var out = R("r/script.r")
-//     .data("hello world", 20)
-//     .callSync();
-    
-//     console.log(out);
-
-//     res.send(out);
-// });
-
-app.post('/upload-file', upload.any(), (request, response) => {
   request.files.forEach(function(file) {
     console.log(file.originalname + ' has been uploaded');
   });
-  response.send('Files have been uploaded');
+  const data = await rscript('./r/gene-expressions.r');
+  response.json(data)
 });
 
-async function test() {
-  const result = await rscript('./r/test.r', 'hello');
-  console.log(result);
-}
-
-// test();
+// async function test() {
+//   const result = await rscript('./r/gene-expressions.r');
+//   console.log(result);
+//   return result;
+// }
 
 app.get('/', function (req, res) {
   var responseText = 'Hello World!<br>'

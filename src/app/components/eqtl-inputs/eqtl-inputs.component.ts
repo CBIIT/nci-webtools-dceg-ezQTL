@@ -43,7 +43,7 @@ export class EqtlInputsComponent implements OnInit {
 
     console.log(await response.text());
 
-  }  
+  } 
 
   // onSubmit() {
   //   // TODO: Use EventEmitter with form value
