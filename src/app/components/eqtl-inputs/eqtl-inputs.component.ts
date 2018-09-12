@@ -62,6 +62,7 @@ export class EqtlInputsComponent implements OnInit {
 
   reset() {
     this.data.changeresultsStatus(false);
+    this.data.changeMessage('');
   }
 
   // onSubmit() {

@@ -1,11 +1,10 @@
 
 <div *ngIf="resultsStatus">
-  <!-- <div class="mt-5 d-flex justify-content-center" *ngIf="message.length <= 0" id="results">
+  <div class="mt-5 d-flex justify-content-center" *ngIf="message.length <= 0" id="results">
     <mat-spinner></mat-spinner>
-  </div> -->
+  </div>
 
-  <!-- <div *ngIf="message.length > 0" id="results"> -->
-  <div id="results">
+  <div *ngIf="message.length > 0" id="results">
     <mat-tab-group>
       <div class="row">
 
@@ -19,7 +18,7 @@
               </mat-form-field>
             </form>
             
-            <div class="mt-5 d-flex justify-content-center" id="eqtl-gene-expressions-plot">
+            <div class="d-flex justify-content-center" id="eqtl-gene-expressions-plot">
                 <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
             </div>
 

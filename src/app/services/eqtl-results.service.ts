@@ -9,7 +9,7 @@ export class EqtlResultsService {
   private messageSource = new BehaviorSubject('');
   currentMessage = this.messageSource.asObservable();
 
-  private showresultsStatus = new BehaviorSubject(true);
+  private showresultsStatus = new BehaviorSubject(false);
   currentresultsStatus = this.showresultsStatus.asObservable();
 
   constructor() { }
