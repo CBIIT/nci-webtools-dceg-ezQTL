@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { EqtlResultsComponent } from '../eqtl-results/eqtl-results.component';
+import { EqtlResultsService } from '../../services/eqtl-results.service';
+
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 
@@ -11,19 +14,34 @@ import { environment } from '../../../environments/environment';
 })
 
 export class EqtlInputsComponent implements OnInit {
+
   eqtlForm = new FormGroup({
     expressionFile: new FormControl('', Validators.required), 
     genotypeFile: new FormControl('', Validators.required), 
     associationFile: new FormControl('', Validators.required)
   });
 
+  message: string;
+  resultsStatus: boolean;
+
+  constructor(private data: EqtlResultsService) { }
+
   ngOnInit() {
     this.eqtlForm.valueChanges.subscribe(formValue => {
       console.log(formValue);
-    })
+    });
+
+    this.data.currentMessage.subscribe(message => this.message = message);
+    this.data.currentresultsStatus.subscribe(resultsStatus => this.resultsStatus = resultsStatus);
   }
 
+  // newMessage() {
+  //   this.data.changeMessage("Hello from Sibling");
+  // }
+
   async submit() {
+    this.data.changeresultsStatus(true);
+
     const { expressionFile, genotypeFile, associationFile } = this.eqtlForm.value;
     console.log(expressionFile, genotypeFile, associationFile);
 
@@ -37,9 +55,14 @@ export class EqtlInputsComponent implements OnInit {
       body: formData
     });
 
-    console.log(await response.text());
+    // console.log(await response.text());
 
+    this.data.changeMessage(await response.json());
   } 
+
+  reset() {
+    this.data.changeresultsStatus(false);
+  }
 
   // onSubmit() {
   //   // TODO: Use EventEmitter with form value

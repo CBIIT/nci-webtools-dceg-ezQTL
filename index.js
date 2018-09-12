@@ -50,6 +50,8 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   response.json(data);
 });
 
+// app.route('/upload-file').get((req, res))
+
 // async function test() {
 //   const result = await rscript('./r/gene-expressions.r');
 //   console.log(result);

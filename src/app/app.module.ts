@@ -14,9 +14,7 @@ import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
 import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
 import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
-import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
-import { EqtlResultsLocusZoomComponent } from './components/eqtl-results-locus-zoom/eqtl-results-locus-zoom.component';
-import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
+
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -26,9 +24,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule, MatInput } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
-
+import { PlotlyModule } from 'angular-plotly.js';
 
 
 @NgModule({
@@ -45,9 +43,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     HomeComponent,
     EqtlInputsComponent,
     EqtlResultsComponent,
-    EqtlResultsGeneExpressionsComponent,
-    EqtlResultsLocusZoomComponent,
-    EqtlResultsTableComponent,
     FileValueAccessorDirective
   ],
   imports: [
@@ -62,7 +57,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatInputModule,
     MatTabsModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    PlotlyModule
   ],
   providers: [],
   bootstrap: [AppComponent]
