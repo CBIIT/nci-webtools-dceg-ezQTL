@@ -43,7 +43,7 @@ export class EqtlInputsComponent implements OnInit {
     this.data.changeresultsStatus(true);
 
     const { expressionFile, genotypeFile, associationFile } = this.eqtlForm.value;
-    console.log(expressionFile, genotypeFile, associationFile);
+    console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
 
     const formData = new FormData();
     formData.append('expression-file', expressionFile[0]);

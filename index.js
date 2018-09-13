@@ -5,7 +5,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { spawn } = require('child_process');
 const { fileSync } = require('tmp');
 
-const rscript = require('./r/r-wrapper.js');
+const rscript = require('./r-calculations/r-wrapper.js');
 
 var app = express();
 
@@ -13,7 +13,7 @@ var app = express();
 // var upload = multer({dest: 'uploads/'})
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      const dir = 'uploads/'
+      const dir = 'r-calculations/uploads/'
       // fs.mkdir(dir, err => cb(err, dir))
       cb(null, dir)
   },
@@ -43,10 +43,14 @@ app.use(function(req, res, next) {
 
 app.post('/upload-file', upload.any(), async (request, response) => {
 
-  request.files.forEach(function(file) {
-    console.log(file.originalname + ' has been uploaded');
-  });
-  const data = await rscript('./r/gene-expressions.r');
+  // request.files.forEach(function(file) {
+  //   console.log(file.originalname + ' has been uploaded');
+  // });
+  // console.log('Files uploaded: ', request.files[0].originalname, request.files[1].originalname, request.files[2].originalname);
+  var expressionFile = request.files[0].originalname;
+  var genotypeFile = request.files[1].originalname;
+  var associationFile = request.files[2].originalname;
+  const data = await rscript('./r-calculations/gene-expressions.r', expressionFile, genotypeFile, associationFile);
   response.json(data);
 });
 

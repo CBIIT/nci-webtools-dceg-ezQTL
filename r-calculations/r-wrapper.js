@@ -3,17 +3,32 @@ const { spawn, exec } = require('child_process');
 const { fileSync } = require('tmp');
 
 // function rscript(rfile, input) {
-function rscript(rfile) {
+function rscript(rfile, expressionFile, genotypeFile, associationFile) {
+    console.log('Files reached R-Wrapper: ', expressionFile, genotypeFile, associationFile);
     return new Promise((resolve, reject) => {
 
-        // input = JSON.stringify(JSON.stringify(input));
-        const code = readFileSync(rfile).toString();
+        // expressionFile = JSON.stringify(JSON.stringify(expressionFile));
+        // genotypeFile = JSON.stringify(JSON.stringify(genotypeFile));
+        // associationFile = JSON.stringify(JSON.stringify(associationFile));
+
+        // const code = readFileSync(rfile).toString();
+        var code = readFileSync(rfile).toString();
+        
         // const rcode = `
         //     input = jsonlite::fromJSON(${input});
         //     suppressWarnings(
         //         jsonlite::toJSON({${code}}, auto_unbox=T)
         //     )
         // `;
+
+        // genotypeFile = jsonlite::fromJSON(${genotypeFile});
+        // associationFile = jsonlite::fromJSON(${associationFile});
+
+        code = code.replace(/expressionFile/g, expressionFile);
+        code = code.replace(/genotypeFile/g, genotypeFile);
+        code = code.replace(/associationFile/g, associationFile);
+        console.log(code);
+
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(
                 jsonlite::toJSON({${code}}, auto_unbox=T)

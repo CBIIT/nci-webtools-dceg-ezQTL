@@ -1,6 +1,6 @@
-# options(warn=-1)
+# setwd('C:\\Users\\jiangk3\\Desktop\\vQTL R_package')
 
-setwd('C:\\Users\\jiangk3\\Desktop\\vQTL R_package')
+setwd('C:\\Users\\jiangk3\\Desktop\\nci-webtools-dceg-vQTL\\r-calculations')
 
 library(tidyverse)
 library(hrbrthemes)
@@ -10,10 +10,14 @@ library(forcats)
 library(jsonlite)
 
 
-locus <- "1q21_3"
-gdatafile <- paste0(locus,'.genotyping.txt')
-edatafile <- paste0(locus,'.expression.txt')
-qdatafile <- paste0(locus,'.eQTL.txt')
+# locus <- "1q21_3"
+# gdatafile <- paste0('uploads\\', '1q21_3.genotyping.txt')
+# edatafile <- paste0('uploads\\', '1q21_3.expression.txt')
+# qdatafile <- paste0('uploads\\', '1q21_3.eQTL.txt')
+
+gdatafile <- paste0('uploads\\', 'genotypeFile')
+edatafile <- paste0('uploads\\', 'expressionFile')
+qdatafile <- paste0('uploads\\', 'associationFile')
 
 gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
 edata <- read_delim(edatafile,delim = "\t",col_names = T)
@@ -21,10 +25,6 @@ qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(varian
 qdata <- qdata %>% arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% group_by(gene_id,variant_id,rsnum,ref,alt) %>% slice(1) %>% ungroup()
 
 chromosome <- qdata$chr[1]
-
-
-
-
 
 rcdatafile <- paste0('Recombination_Rate_CEU/CEU-',chromosome,'-final.txt.gz')
 rcdata <- read_delim(rcdatafile,delim = "\t",col_names = T)
@@ -44,7 +44,3 @@ edata_boxplot <- edata_boxplot %>% left_join(
   mutate(gene_symbol=fct_reorder(gene_symbol,(pval_nominal)))
 
 setNames(as.data.frame(edata_boxplot),c("chr","start","end","gene_id","Sample","exp","gene_symbol","mean","pval_nominal"))
-
-#edata_boxplot_json <- toJSON(setNames(as.data.frame(edata_boxplot),c("chr","start","end","gene_id","Sample","exp","gene_symbol","mean","pval_nominal")))
-
-#edata_boxplot_json
