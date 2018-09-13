@@ -1,7 +1,3 @@
-<p>
-  eqtl-results-gene-expressions works!
-</p>
-
 <form class="example-form">
   <mat-form-field class="example-full-width">
     <input matInput placeholder="Number of Genes (for Plot)" value="All">
@@ -9,7 +5,8 @@
 </form>
 
 <div class="d-flex justify-content-center" id="eqtl-gene-expressions-plot" *ngIf="graph">
-    <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
+    <plotly-plot [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
 </div>
 
-<pre>{{ message | json }}</pre>
+<br>
+<!-- <pre>{{ message | json }}</pre> -->

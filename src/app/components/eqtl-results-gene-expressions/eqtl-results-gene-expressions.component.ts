@@ -42,29 +42,27 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     return uniqueGenes;
   }
 
+  getGeneYData(geneData, xData) {
+    var yData = [];
+    for (var i = 0; i <xData.length; i++) {
+      var tmp = [];
+      for (var j = 0; j < geneData.length; j++) {
+        if (xData[i] == geneData[j]['gene_symbol']) {
+          tmp.push(Math.log2(geneData[j]['exp']) + 0.1);
+        } 
+      }
+      yData.push(tmp);
+    }
+    return yData;
+  }
+
   exampleBoxPlot(geneData) {
-    var xData = ['Carmelo<br>Anthony', 'Dwyane<br>Wade',
-      'Deron<br>Williams', 'Brook<br>Lopez',
-      'Damian<br>Lillard', 'David<br>West',
-      'Blake<br>Griffin', 'David<br>Lee',
-      'Demar<br>Derozan'];
 
-    var x1Data = this.getGeneSymbols(geneData);
-    console.log(x1Data);
+    var xData = this.getGeneSymbols(geneData);
+    console.log(xData);
 
-    var yData = [
-      this.getrandom(10 ,10),
-      this.getrandom(30, 20),
-      this.getrandom(30, 25),
-      this.getrandom(30, 40),
-      this.getrandom(30, 45),
-      this.getrandom(30, 30),
-      this.getrandom(30, 20),
-      this.getrandom(30, 15),
-      this.getrandom(30, 43)
-    ];
-
-    // var colors = ['rgba(93, 164, 214, 0.5)', 'rgba(255, 144, 14, 0.5)', 'rgba(44, 160, 101, 0.5)', 'rgba(255, 65, 54, 0.5)', 'rgba(207, 114, 255, 0.5)', 'rgba(127, 96, 0, 0.5)', 'rgba(255, 140, 184, 0.5)', 'rgba(79, 90, 117, 0.5)', 'rgba(222, 223, 0, 0.5)'];
+    var yData = this.getGeneYData(geneData, xData);
+    console.log(yData);
 
     var pdata = [];
 
@@ -88,7 +86,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     };
 
     var playout = {
-        title: 'Points Scored by the Top 9 Scoring NBA Players in 2012',
+        // title: 'Gene Expressions',
         width: 1000,
         height: 600,
         yaxis: {
@@ -96,24 +94,24 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           autorange: true,
           showgrid: true,
           zeroline: true,
-          dtick: 5,
-          gridcolor: 'rgb(255, 255, 255)',
-          gridwidth: 1,
-          zerolinecolor: 'rgb(255, 255, 255)',
-          zerolinewidth: 2
+          dtick: 4,
+          // gridcolor: 'rgb(255, 255, 255)',
+          gridwidth: 1
+          // zerolinecolor: 'rgb(255, 255, 255)',
+          // zerolinewidth: 2
         },
         margin: {
           l: 40,
-          r: 30,
+          r: 10,
           b: 80,
-          t: 100
+          t: 40
         },
         // paper_bgcolor: 'rgb(243, 243, 243)',
         // plot_bgcolor: 'rgb(243, 243, 243)',
         showlegend: false
     };
 
-    return { data: pdata, layout: playout };
+    return { data: pdata, layout: playout, config: {displaylogo: false} };
 
   }
 
