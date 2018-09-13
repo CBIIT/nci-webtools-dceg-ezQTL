@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { EQTLComponent } from './components/e-qtl/e-qtl.component';
@@ -14,6 +15,9 @@ import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
 import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
 import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
+import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
+import {EqtlResultsLocuszoomComponent } from './components/eqtl-results-locuszoom/eqtl-results-locuszoom.component';
+import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
 
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
 
@@ -43,10 +47,14 @@ import { PlotlyModule } from 'angular-plotly.js';
     HomeComponent,
     EqtlInputsComponent,
     EqtlResultsComponent,
-    FileValueAccessorDirective
+    FileValueAccessorDirective,
+    EqtlResultsGeneExpressionsComponent,
+    EqtlResultsLocuszoomComponent,
+    EqtlResultsTableComponent
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatButtonModule, //import need UI modules

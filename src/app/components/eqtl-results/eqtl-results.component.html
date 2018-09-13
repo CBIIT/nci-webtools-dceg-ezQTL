@@ -1,52 +1,30 @@
-
 <div *ngIf="resultsStatus">
-  <div class="mt-5 d-flex justify-content-center" *ngIf="message.length <= 0" id="results">
+  <div class="mt-5 d-flex justify-content-center" *ngIf="!message" id="results">
     <mat-spinner></mat-spinner>
   </div>
 
-  <div *ngIf="message.length > 0" id="results">
+  <div *ngIf="message" id="results">
     <mat-tab-group>
       <div class="row">
 
         <!-- Gene Expressions Result Tab -->
         <mat-tab label="Gene Expressions"> 
           <div class="col border border-light rounded" id="result-main">
-            eQTL Results: Gene Expressions <br>
-            <form class="example-form">
-              <mat-form-field class="example-full-width">
-                <input matInput placeholder="Number of Genes (for Plot)" value="All">
-              </mat-form-field>
-            </form>
-            
-            <div class="d-flex justify-content-center" id="eqtl-gene-expressions-plot">
-                <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
-            </div>
-
-            <pre>{{ message | json }}</pre>
-
+            <app-eqtl-results-gene-expressions></app-eqtl-results-gene-expressions>
           </div>
         </mat-tab>
 
         <!-- Locuszoom Result Tab -->
         <mat-tab label="Locuszoom Plot"> 
           <div class="col border border-light rounded" id="result-main">
-            eQTL Results: Locuszoom Plot <br>
-            <mat-form-field>
-              <mat-select placeholder="Reference Gene" [formControl]="geneControl" required>
-                <mat-option>--</mat-option>
-                <mat-option *ngFor="let gene of genes" [value]="gene.value">
-                  {{gene.viewValue}}
-                </mat-option>
-              </mat-select>
-              <mat-error *ngIf="geneControl.hasError('required')">Please choose a gene</mat-error>
-            </mat-form-field>
+            <app-eqtl-results-locuszoom></app-eqtl-results-locuszoom>
           </div>
         </mat-tab>
 
         <!-- Table Result Tab -->
         <mat-tab label="Table"> 
           <div class="col border border-light rounded" id="result-main">
-            eQTL Results: Table <br>
+            <app-eqtl-results-table></app-eqtl-results-table>
           </div>
         </mat-tab>
         

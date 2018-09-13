@@ -21,7 +21,7 @@ export class EqtlInputsComponent implements OnInit {
     associationFile: new FormControl('', Validators.required)
   });
 
-  message: string;
+  message: Object;
   resultsStatus: boolean;
 
   constructor(private data: EqtlResultsService) { }
@@ -49,15 +49,18 @@ export class EqtlInputsComponent implements OnInit {
     formData.append('expression-file', expressionFile[0]);
     formData.append('genotype-file', genotypeFile[0]);
     formData.append('association-file', associationFile[0]);
+
+    this.data.getResults(formData)
+      .subscribe(res => this.data.changeMessage(res))
     
-    const response = await fetch(environment.endpoint + '/upload-file', {
-      method: 'POST',
-      body: formData
-    });
+    // const response = await fetch(environment.endpoint + '/upload-file', {
+    //   method: 'POST',
+    //   body: formData
+    // });
 
-    // console.log(await response.text());
+    // // console.log(await response.text());
 
-    this.data.changeMessage(await response.json());
+    // this.data.changeMessage(await response.json());
   } 
 
   reset() {
