@@ -83,7 +83,8 @@ export class EqtlInputsComponent implements OnInit {
 
   handleError(error) {
     var errorTrimmed = error.error.trim().split('\n');
-    var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
+    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
+    var errorMessage = errorTrimmed[2];
     console.log(errorMessage);
     this.data.changeErrorMessage(errorMessage);
   }
