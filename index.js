@@ -10,7 +10,6 @@ const rscript = require('./r-calculations/r-wrapper.js');
 var app = express();
 
 // Upload files with file extension and original name
-// var upload = multer({dest: 'uploads/'})
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
       const dir = 'r-calculations/uploads/'
@@ -20,11 +19,11 @@ var storage = multer.diskStorage({
   filename: function (req, file, cb) {
       let ext = ''; // set default extension (if any)
       let fname = Date.now();
-      if (file.originalname.split(".").length > 1) {// checking if there is an extension or not.
+      if (file.originalname.split(".").length > 1) { // checking if there is an extension or not.
           ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
           fname = file.originalname.split(".").slice(0,-1).join('.');
       }
-      cb(null, fname + ext)
+      cb(null, fname + '.' + Date.now() + ext)
   }
 });
 var upload = multer({ storage: storage });
@@ -46,10 +45,10 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   // request.files.forEach(function(file) {
   //   console.log(file.originalname + ' has been uploaded');
   // });
-  // console.log('Files uploaded: ', request.files[0].originalname, request.files[1].originalname, request.files[2].originalname);
-  var expressionFile = request.files[0].originalname;
-  var genotypeFile = request.files[1].originalname;
-  var associationFile = request.files[2].originalname;
+  console.log('Files uploaded: ', request.files[0].filename, request.files[1].filename, request.files[2].filename);
+  var expressionFile = request.files[0].filename;
+  var genotypeFile = request.files[1].filename;
+  var associationFile = request.files[2].filename;
   const data = await rscript('./r-calculations/gene-expressions.r', expressionFile, genotypeFile, associationFile);
   response.json(data);
 });

@@ -1,6 +1,5 @@
-# setwd('C:\\Users\\jiangk3\\Desktop\\vQTL R_package')
-
-setwd('C:\\Users\\jiangk3\\Desktop\\nci-webtools-dceg-vQTL\\r-calculations')
+# setwd('C:/Users/jiangk3/Desktop/nci-webtools-dceg-vQTL/r-calculations')
+setwd(workingDirectory)
 
 library(tidyverse)
 library(hrbrthemes)
@@ -15,9 +14,9 @@ library(jsonlite)
 # edatafile <- paste0('uploads\\', '1q21_3.expression.txt')
 # qdatafile <- paste0('uploads\\', '1q21_3.eQTL.txt')
 
-gdatafile <- paste0('uploads\\', 'genotypeFile')
-edatafile <- paste0('uploads\\', 'expressionFile')
-qdatafile <- paste0('uploads\\', 'associationFile')
+gdatafile <- paste0('uploads/', genotypeFile)
+edatafile <- paste0('uploads/', expressionFile)
+qdatafile <- paste0('uploads/', associationFile)
 
 gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
 edata <- read_delim(edatafile,delim = "\t",col_names = T)

@@ -39,3 +39,8 @@ testem.log
 .DS_Store
 Thumbs.db
 package-lock.json
+
+# R Calculations
+/r-calculations/uploads/
+/r-calculations/.RData
+/r-calculations/.Rhistory

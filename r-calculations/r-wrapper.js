@@ -4,12 +4,14 @@ const { fileSync } = require('tmp');
 
 // function rscript(rfile, input) {
 function rscript(rfile, expressionFile, genotypeFile, associationFile) {
-    console.log('Files reached R-Wrapper: ', expressionFile, genotypeFile, associationFile);
+    console.log('Files reached R-Wrapper:', expressionFile, genotypeFile, associationFile);
+    var workingDirectory = JSON.stringify(__dirname);
+    console.log('R Working directory:', workingDirectory);
     return new Promise((resolve, reject) => {
 
-        // expressionFile = JSON.stringify(JSON.stringify(expressionFile));
-        // genotypeFile = JSON.stringify(JSON.stringify(genotypeFile));
-        // associationFile = JSON.stringify(JSON.stringify(associationFile));
+        expressionFile = JSON.stringify(expressionFile);
+        genotypeFile = JSON.stringify(genotypeFile);
+        associationFile = JSON.stringify(associationFile);
 
         // const code = readFileSync(rfile).toString();
         var code = readFileSync(rfile).toString();
@@ -23,7 +25,7 @@ function rscript(rfile, expressionFile, genotypeFile, associationFile) {
 
         // genotypeFile = jsonlite::fromJSON(${genotypeFile});
         // associationFile = jsonlite::fromJSON(${associationFile});
-
+        code = code.replace(/workingDirectory/g, workingDirectory);
         code = code.replace(/expressionFile/g, expressionFile);
         code = code.replace(/genotypeFile/g, genotypeFile);
         code = code.replace(/associationFile/g, associationFile);
