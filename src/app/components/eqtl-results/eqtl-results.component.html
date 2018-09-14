@@ -1,5 +1,5 @@
-<div *ngIf="resultsStatus">
-  <div class="mt-5 d-flex justify-content-center" *ngIf="!message" id="results">
+<div *ngIf="resultStatus">
+  <div class="mt-5 d-flex justify-content-center" *ngIf="!message && !errorMessage" id="results">
     <mat-spinner></mat-spinner>
   </div>
 

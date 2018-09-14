@@ -49,8 +49,13 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   var expressionFile = request.files[0].filename;
   var genotypeFile = request.files[1].filename;
   var associationFile = request.files[2].filename;
-  const data = await rscript('./r-calculations/gene-expressions.r', expressionFile, genotypeFile, associationFile);
-  response.json(data);
+  try {
+    const data = await rscript('./r-calculations/gene-expressions.r', expressionFile, genotypeFile, associationFile);
+    response.json(data);
+  } catch(err) {
+    response.status(500);
+    response.json(err.toString());
+  }
 });
 
 // app.route('/upload-file').get((req, res))

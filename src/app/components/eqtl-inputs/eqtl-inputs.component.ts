@@ -22,7 +22,9 @@ export class EqtlInputsComponent implements OnInit {
   });
 
   message: Object;
-  resultsStatus: boolean;
+  resultStatus: boolean;
+  errorMessage: string;
+  public resetColor = null;
 
   constructor(private data: EqtlResultsService) { }
 
@@ -32,15 +34,28 @@ export class EqtlInputsComponent implements OnInit {
     });
 
     this.data.currentMessage.subscribe(message => this.message = message);
-    this.data.currentresultsStatus.subscribe(resultsStatus => this.resultsStatus = resultsStatus);
+    this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
+    this.data.currentErrorMessage.subscribe(errorMessage => {
+      this.errorMessage = errorMessage;
+      if (this.errorMessage) {
+        this.resetColor = 'warn';
+      } else {
+        this.resetColor = null;
+      }
+    });
   }
+
+  // this.data.currentMessage.subscribe(message => {
+  //   this.message = message;
+  //   this.graph = this.exampleBoxPlot(this.message);
+  // });
 
   // newMessage() {
   //   this.data.changeMessage("Hello from Sibling");
   // }
 
   async submit() {
-    this.data.changeresultsStatus(true);
+    this.data.changeResultStatus(true);
 
     const { expressionFile, genotypeFile, associationFile } = this.eqtlForm.value;
     console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
@@ -51,7 +66,10 @@ export class EqtlInputsComponent implements OnInit {
     formData.append('association-file', associationFile[0]);
 
     this.data.getResults(formData)
-      .subscribe(res => this.data.changeMessage(res))
+      .subscribe(
+        res => this.data.changeMessage(res),
+        error => this.handleError(error)
+      )
     
     // const response = await fetch(environment.endpoint + '/upload-file', {
     //   method: 'POST',
@@ -63,9 +81,17 @@ export class EqtlInputsComponent implements OnInit {
     // this.data.changeMessage(await response.json());
   } 
 
+  handleError(error) {
+    var errorTrimmed = error.error.trim().split('\n');
+    var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
+    console.log(errorMessage);
+    this.data.changeErrorMessage(errorMessage);
+  }
+
   reset() {
-    this.data.changeresultsStatus(false);
+    this.data.changeResultStatus(false);
     this.data.changeMessage('');
+    this.data.changeErrorMessage('');
   }
 
   // onSubmit() {

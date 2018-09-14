@@ -46,7 +46,12 @@ function rscript(rfile, expressionFile, genotypeFile, associationFile) {
             (error, stdout, stderr) => {
                 if (error) reject(error);
                 if (stderr) reject(stderr);
-                resolve(JSON.parse(stdout.toString()));
+                try {
+                    resolve(JSON.parse(stdout.toString()));
+                } catch(error) {
+                    // const errorsLines = error.toString().trim().split('\n');
+                    reject(error.toString());
+                }
             }
         );
     });

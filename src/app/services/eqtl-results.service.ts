@@ -11,8 +11,11 @@ export class EqtlResultsService {
   private messageSource = new BehaviorSubject<Object>(null);
   currentMessage = this.messageSource.asObservable();
 
-  private showresultsStatus = new BehaviorSubject(false);
-  currentresultsStatus = this.showresultsStatus.asObservable();
+  private showResultStatus = new BehaviorSubject(false);
+  currentResultStatus = this.showResultStatus.asObservable();
+
+  private errorMessage = new BehaviorSubject('');
+  currentErrorMessage = this.errorMessage.asObservable();
 
   constructor(private http: HttpClient) { }
 
@@ -25,8 +28,12 @@ export class EqtlResultsService {
     this.messageSource.next(message);
   }
 
-  changeresultsStatus(resultsStatus: boolean) {
-    this.showresultsStatus.next(resultsStatus);
+  changeResultStatus(resultStatus: boolean) {
+    this.showResultStatus.next(resultStatus);
+  }
+
+  changeErrorMessage(errorMessage: string) {
+    this.errorMessage.next(errorMessage);
   }
 
 }

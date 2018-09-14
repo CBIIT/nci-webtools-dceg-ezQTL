@@ -10,7 +10,7 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   message: Object;
-  public graph = null;;
+  public graph = null;
 
   constructor(private data: EqtlResultsService) { }
 
