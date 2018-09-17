@@ -21,7 +21,7 @@ export class EqtlInputsComponent implements OnInit {
     associationFile: new FormControl('', Validators.required)
   });
 
-  message: Object;
+  eqtlGeneExpressionData: Object;
   resultStatus: boolean;
   errorMessage: string;
   public resetColor = null;
@@ -33,7 +33,7 @@ export class EqtlInputsComponent implements OnInit {
       console.log(formValue);
     });
 
-    this.data.currentMessage.subscribe(message => this.message = message);
+    this.data.currentEqtlGeneExpressionData.subscribe(eqtlGeneExpressionData => this.eqtlGeneExpressionData = eqtlGeneExpressionData);
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
     this.data.currentErrorMessage.subscribe(errorMessage => {
       this.errorMessage = errorMessage;
@@ -44,15 +44,6 @@ export class EqtlInputsComponent implements OnInit {
       }
     });
   }
-
-  // this.data.currentMessage.subscribe(message => {
-  //   this.message = message;
-  //   this.graph = this.exampleBoxPlot(this.message);
-  // });
-
-  // newMessage() {
-  //   this.data.changeMessage("Hello from Sibling");
-  // }
 
   async submit() {
     this.data.changeResultStatus(true);
@@ -67,18 +58,10 @@ export class EqtlInputsComponent implements OnInit {
 
     this.data.getResults(formData)
       .subscribe(
-        res => this.data.changeMessage(res),
+        res => this.data.changeEqtlGeneExpressionData(res),
         error => this.handleError(error)
       )
     
-    // const response = await fetch(environment.endpoint + '/upload-file', {
-    //   method: 'POST',
-    //   body: formData
-    // });
-
-    // // console.log(await response.text());
-
-    // this.data.changeMessage(await response.json());
   } 
 
   handleError(error) {
@@ -91,13 +74,8 @@ export class EqtlInputsComponent implements OnInit {
 
   reset() {
     this.data.changeResultStatus(false);
-    this.data.changeMessage('');
+    this.data.changeEqtlGeneExpressionData('');
     this.data.changeErrorMessage('');
   }
 
-  // onSubmit() {
-  //   // TODO: Use EventEmitter with form value
-  //   console.log("Form has been submitted.");
-  //   console.warn(this.eqtlForm.value);
-  // }
 }

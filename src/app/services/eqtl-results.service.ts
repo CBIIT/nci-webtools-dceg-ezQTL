@@ -8,8 +8,8 @@ import { environment } from '../../environments/environment'
 })
 export class EqtlResultsService {
 
-  private messageSource = new BehaviorSubject<Object>(null);
-  currentMessage = this.messageSource.asObservable();
+  private eqtlGeneExpressionDataSource = new BehaviorSubject<Object>(null);
+  currentEqtlGeneExpressionData = this.eqtlGeneExpressionDataSource.asObservable();
 
   private showResultStatus = new BehaviorSubject(false);
   currentResultStatus = this.showResultStatus.asObservable();
@@ -24,8 +24,8 @@ export class EqtlResultsService {
     return this.http.post(url, formData);
   }
 
-  changeMessage(message: Object) {
-    this.messageSource.next(message);
+  changeEqtlGeneExpressionData(eqtlGeneExpressionData: Object) {
+    this.eqtlGeneExpressionDataSource.next(eqtlGeneExpressionData);
   }
 
   changeResultStatus(resultStatus: boolean) {

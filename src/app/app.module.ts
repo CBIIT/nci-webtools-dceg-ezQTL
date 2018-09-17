@@ -16,7 +16,7 @@ import { HomeComponent } from './components/home/home.component';
 import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
 import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
 import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
-import {EqtlResultsLocuszoomComponent } from './components/eqtl-results-locuszoom/eqtl-results-locuszoom.component';
+import { EqtlResultsLocuszoomComponent } from './components/eqtl-results-locuszoom/eqtl-results-locuszoom.component';
 import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
 
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';

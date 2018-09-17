@@ -29,7 +29,7 @@ function rscript(rfile, expressionFile, genotypeFile, associationFile) {
         code = code.replace(/expressionFile/g, expressionFile);
         code = code.replace(/genotypeFile/g, genotypeFile);
         code = code.replace(/associationFile/g, associationFile);
-        console.log(code);
+        // console.log(code);
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(

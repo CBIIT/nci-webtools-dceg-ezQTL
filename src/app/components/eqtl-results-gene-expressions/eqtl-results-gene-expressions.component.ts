@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
+import {take} from 'rxjs/operators';
+
 
 
 @Component({
@@ -9,25 +11,19 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 })
 export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
-  message: Object;
+  eqtlGeneExpressionData: Object;
+  totalNumGenes: Number;
+  selectNumGenes: string;
   public graph = null;
 
   constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
-    this.data.currentMessage.subscribe(message => {
-      this.message = message;
-      this.graph = this.exampleBoxPlot(this.message);
+    this.data.currentEqtlGeneExpressionData.subscribe(eqtlGeneExpressionData => {
+      this.eqtlGeneExpressionData = eqtlGeneExpressionData;
+      this.graph = this.geneExpressionsBoxPlot(this.eqtlGeneExpressionData);
     });
-  }
-
-  getrandom(num , mul) {
-    var value = [ ];	
-    for(var i = 0; i < num; i++) {
-      var rand = Math.random() * mul;
-      value.push(rand);
-    }
-    return value;
+    this.selectNumGenes = "15";
   }
 
   getGeneSymbols(geneData) {
@@ -39,6 +35,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
       genes.push(geneData[i]['gene_symbol']);
     }
     var uniqueGenes = genes.filter(getUnique);
+    this.totalNumGenes = uniqueGenes.length;
     return uniqueGenes;
   }
 
@@ -56,7 +53,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     return yData;
   }
 
-  exampleBoxPlot(geneData) {
+  geneExpressionsBoxPlot(geneData) {
 
     var xData = this.getGeneSymbols(geneData);
     console.log(xData);
@@ -115,5 +112,67 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   }
 
+  replotExpressionsBoxPlot(geneData, xData) {
+
+    var yData = this.getGeneYData(geneData, xData);
+    console.log(yData);
+
+    var pdata = [];
+
+    for ( var i = 0; i < xData.length; i ++ ) {
+      var result = {
+        type: 'box',
+        y: yData[i],
+        name: xData[i],
+        boxpoints: 'all',
+        jitter: 0.5,
+        whiskerwidth: 0.2,
+        fillcolor: 'cls',
+        marker: {
+          size: 2
+        },
+        line: {
+          width: 1
+        }
+      };
+      pdata.push(result);
+    };
+
+    var playout = {
+        // title: 'Gene Expressions',
+        width: 1000,
+        height: 600,
+        yaxis: {
+          title: "Gene Expressions (log2)",
+          autorange: true,
+          showgrid: true,
+          zeroline: true,
+          dtick: 4,
+          // gridcolor: 'rgb(255, 255, 255)',
+          gridwidth: 1
+          // zerolinecolor: 'rgb(255, 255, 255)',
+          // zerolinewidth: 2
+        },
+        margin: {
+          l: 40,
+          r: 10,
+          b: 80,
+          t: 40
+        },
+        // paper_bgcolor: 'rgb(243, 243, 243)',
+        // plot_bgcolor: 'rgb(243, 243, 243)',
+        showlegend: false
+    };
+
+    this.graph = { data: pdata, layout: playout, config: {displaylogo: false} };
+  }
+
+  triggerReplot() {
+    console.log("replot graph");
+    console.log(parseInt(this.selectNumGenes));
+    var limitedGeneSymbols = this.getGeneSymbols(this.eqtlGeneExpressionData).slice(0,parseInt(this.selectNumGenes));
+    console.log(limitedGeneSymbols);
+    this.replotExpressionsBoxPlot(this.eqtlGeneExpressionData, limitedGeneSymbols);
+  }
 
 }

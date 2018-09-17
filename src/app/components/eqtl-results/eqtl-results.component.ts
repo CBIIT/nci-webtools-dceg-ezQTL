@@ -10,14 +10,14 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 export class EqtlResultsComponent implements OnInit {
 
-  message: Object;
+  eqtlGeneExpressionData: Object;
   resultStatus: boolean;
   errorMessage: string;
 
   constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
-    this.data.currentMessage.subscribe(message => this.message = message);
+    this.data.currentEqtlGeneExpressionData.subscribe(eqtlGeneExpressionData => this.eqtlGeneExpressionData = eqtlGeneExpressionData);
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
     this.data.currentErrorMessage.subscribe(errorMessage => this.errorMessage = errorMessage);
   }

@@ -1,9 +1,9 @@
 <div *ngIf="resultStatus">
-  <div class="mt-5 d-flex justify-content-center" *ngIf="!message && !errorMessage" id="results">
+  <div class="mt-5 d-flex justify-content-center" *ngIf="!eqtlGeneExpressionData && !errorMessage" id="results">
     <mat-spinner></mat-spinner>
   </div>
 
-  <div *ngIf="message" id="results">
+  <div *ngIf="eqtlGeneExpressionData" id="results">
     <mat-tab-group>
       <div class="row">
 
