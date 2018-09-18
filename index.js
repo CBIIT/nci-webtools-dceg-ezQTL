@@ -28,29 +28,21 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage });
 
-// var requestTime = function (req, res, next) {
-//   req.requestTime = Date.now()
-//   next()
-// }
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
   next();
 });
 
-app.post('/upload-file', upload.any(), async (request, response) => {
 
-  // request.files.forEach(function(file) {
-  //   console.log(file.originalname + ' has been uploaded');
-  // });
+app.post('/upload-file', upload.any(), async (request, response) => {
   console.log('Files uploaded: ', request.files[0].filename, request.files[1].filename, request.files[2].filename);
   var expressionFile = request.files[0].filename;
   var genotypeFile = request.files[1].filename;
   var associationFile = request.files[2].filename;
   try {
-    const data = await rscript('./r-calculations/gene-expressions.r', expressionFile, genotypeFile, associationFile);
+    const data = await rscript('./r-calculations/eQTL/gene-expressions.r', expressionFile, genotypeFile, associationFile);
     response.json(data);
   } catch(err) {
     response.status(500);
@@ -58,13 +50,6 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   }
 });
 
-// app.route('/upload-file').get((req, res))
-
-// async function test() {
-//   const result = await rscript('./r/gene-expressions.r');
-//   console.log(result);
-//   return result;
-// }
 
 app.get('/', function (req, res) {
   var responseText = 'Hello World!<br>';
