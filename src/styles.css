@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* Angular Material's Prebuilt Theme */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 
 body {
   height: 100vh;
@@ -17,11 +19,11 @@ body {
 }
 
 a {
-  color: #2f6fb3;
+  color: #00A2EC;
 }
 
 .bg-light {
-  background-color: #fafafa !important;
+  background-color: #f7f7f1 !important;
 }
 
 .bg-white {
@@ -202,5 +204,47 @@ textarea {
 
   to {
     transform: rotate(359deg);
+  }
+}
+
+
+/* Tachyons Override */
+.cf:before, .cf:after {
+  content: " ";
+  display: table;
+}
+
+.cf:after {
+  clear: both;
+}
+
+.cf {
+  *zoom: 1;
+}
+
+.fl {
+  float: left;
+  _display: inline;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.bg-light-gray {
+  background-color: #eee;
+}
+
+.bg-near-white {
+  background-color: #f4f4f4;
+}
+
+.tc {
+  text-align: center;
+}
+
+@media screen and (min-width: 30em) {
+  .w-50-ns {
+      width: 50%;
   }
 }

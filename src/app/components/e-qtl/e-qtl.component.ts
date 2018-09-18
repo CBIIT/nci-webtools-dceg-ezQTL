@@ -5,6 +5,7 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './e-qtl.component.html',
   styleUrls: ['./e-qtl.component.css']
 })
+
 export class EQTLComponent implements OnInit {
 
   constructor() { }
@@ -13,3 +14,5 @@ export class EQTLComponent implements OnInit {
   }
 
 }
+
+

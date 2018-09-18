@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { EQTLComponent } from './components/e-qtl/e-qtl.component';
@@ -12,6 +13,25 @@ import { AppRoutingModule } from './router/app-routing.module';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
+import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
+import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
+import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
+import { EqtlResultsLocuszoomComponent } from './components/eqtl-results-locuszoom/eqtl-results-locuszoom.component';
+import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
+
+import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule, MatCheckboxModule } from '@angular/material'; // import needed UI modules
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatSelectModule } from '@angular/material/select';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule, MatInput } from '@angular/material/input';
+import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { PlotlyModule } from 'angular-plotly.js';
+
 
 @NgModule({
   declarations: [
@@ -24,11 +44,30 @@ import { HomeComponent } from './components/home/home.component';
     HelpComponent,
     NavbarComponent,
     FooterComponent,
-    HomeComponent
+    HomeComponent,
+    EqtlInputsComponent,
+    EqtlResultsComponent,
+    FileValueAccessorDirective,
+    EqtlResultsGeneExpressionsComponent,
+    EqtlResultsLocuszoomComponent,
+    EqtlResultsTableComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    HttpClientModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    MatButtonModule, //import need UI modules
+    MatCheckboxModule,
+    MatGridListModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTabsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatProgressSpinnerModule,
+    PlotlyModule
   ],
   providers: [],
   bootstrap: [AppComponent]

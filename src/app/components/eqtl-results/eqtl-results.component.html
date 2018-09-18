@@ -1,0 +1,34 @@
+<div *ngIf="resultStatus">
+  <div class="mt-5 d-flex justify-content-center" *ngIf="!eqtlGeneExpressionData && !errorMessage" id="results">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="eqtlGeneExpressionData" id="results">
+    <mat-tab-group>
+      <div class="row">
+
+        <!-- Gene Expressions Result Tab -->
+        <mat-tab label="Gene Expressions"> 
+          <div class="col border border-light rounded" id="result-main">
+            <app-eqtl-results-gene-expressions></app-eqtl-results-gene-expressions>
+          </div>
+        </mat-tab>
+
+        <!-- Locuszoom Result Tab -->
+        <mat-tab label="Locuszoom Plot"> 
+          <div class="col border border-light rounded" id="result-main">
+            <app-eqtl-results-locuszoom></app-eqtl-results-locuszoom>
+          </div>
+        </mat-tab>
+
+        <!-- Table Result Tab -->
+        <mat-tab label="Table"> 
+          <div class="col border border-light rounded" id="result-main">
+            <app-eqtl-results-table></app-eqtl-results-table>
+          </div>
+        </mat-tab>
+        
+      </div>
+    </mat-tab-group>
+  </div>
+</div>
