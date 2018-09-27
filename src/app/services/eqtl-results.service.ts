@@ -8,12 +8,19 @@ import { environment } from '../../environments/environment'
 })
 export class EqtlResultsService {
 
+  // data output from R calculation to plot
   private eqtlDataSource = new BehaviorSubject<Object>(null);
   currentEqtlData = this.eqtlDataSource.asObservable();
 
-  private showResultStatus = new BehaviorSubject(false);
-  currentResultStatus = this.showResultStatus.asObservable();
+  // data output from R calculation to plot
+  private geneList = new BehaviorSubject([]);
+  currentGeneList = this.geneList.asObservable();
+  
+  // boolean: true=show results container
+  private resultStatus = new BehaviorSubject(false);
+  currentResultStatus = this.resultStatus.asObservable();
 
+  // error message output from R calculation
   private errorMessage = new BehaviorSubject('');
   currentErrorMessage = this.errorMessage.asObservable();
 
@@ -28,8 +35,12 @@ export class EqtlResultsService {
     this.eqtlDataSource.next(eqtlData);
   }
 
+  changeGeneList(geneList: string[]) {
+    this.geneList.next(geneList);
+  }
+
   changeResultStatus(resultStatus: boolean) {
-    this.showResultStatus.next(resultStatus);
+    this.resultStatus.next(resultStatus);
   }
 
   changeErrorMessage(errorMessage: string) {

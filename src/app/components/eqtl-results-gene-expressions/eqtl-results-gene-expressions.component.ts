@@ -14,6 +14,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   eqtlData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
+  geneList: string[];
   public graph = null;
 
   constructor(private data: EqtlResultsService) { }
@@ -22,6 +23,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     this.data.currentEqtlData.subscribe(eqtlData => {
       this.eqtlData = eqtlData[0];
       if (this.eqtlData) {
+        this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
         this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
       }
     });
@@ -38,6 +40,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     }
     var uniqueGenes = genes.filter(getUnique);
     this.totalNumGenes = uniqueGenes.length;
+    this.data.changeGeneList(uniqueGenes);
     return uniqueGenes;
   }
 
