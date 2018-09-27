@@ -21,7 +21,7 @@ export class EqtlInputsComponent implements OnInit {
     associationFile: new FormControl('', Validators.required)
   });
 
-  eqtlGeneExpressionData: Object;
+  eqtlData: Object;
   resultStatus: boolean;
   errorMessage: string;
   public resetColor = null;
@@ -33,7 +33,7 @@ export class EqtlInputsComponent implements OnInit {
       console.log(formValue);
     });
 
-    this.data.currentEqtlGeneExpressionData.subscribe(eqtlGeneExpressionData => this.eqtlGeneExpressionData = eqtlGeneExpressionData);
+    this.data.currentEqtlData.subscribe(eqtlData => this.eqtlData = eqtlData);
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
     this.data.currentErrorMessage.subscribe(errorMessage => {
       this.errorMessage = errorMessage;
@@ -58,13 +58,14 @@ export class EqtlInputsComponent implements OnInit {
 
     this.data.getResults(formData)
       .subscribe(
-        res => this.data.changeEqtlGeneExpressionData(res),
+        res => this.data.changeEqtlData(res),
         error => this.handleError(error)
       )
     
   } 
 
   handleError(error) {
+    console.log(error);
     var errorTrimmed = error.error.trim().split('\n');
     // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
     var errorMessage = errorTrimmed[2];
@@ -74,7 +75,7 @@ export class EqtlInputsComponent implements OnInit {
 
   reset() {
     this.data.changeResultStatus(false);
-    this.data.changeEqtlGeneExpressionData('');
+    this.data.changeEqtlData(null);
     this.data.changeErrorMessage('');
   }
 

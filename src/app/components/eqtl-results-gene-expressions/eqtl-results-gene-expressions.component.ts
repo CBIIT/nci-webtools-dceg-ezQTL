@@ -11,7 +11,7 @@ import {take} from 'rxjs/operators';
 })
 export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
-  eqtlGeneExpressionData: Object;
+  eqtlData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
   public graph = null;
@@ -19,9 +19,11 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
-    this.data.currentEqtlGeneExpressionData.subscribe(eqtlGeneExpressionData => {
-      this.eqtlGeneExpressionData = eqtlGeneExpressionData;
-      this.graph = this.geneExpressionsBoxPlot(this.eqtlGeneExpressionData);
+    this.data.currentEqtlData.subscribe(eqtlData => {
+      this.eqtlData = eqtlData[0];
+      if (this.eqtlData) {
+        this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
+      }
     });
     this.selectNumGenes = "15";
   }
@@ -41,7 +43,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   getGeneYData(geneData, xData) {
     var yData = [];
-    for (var i = 0; i <xData.length; i++) {
+    for (var i = 0; i < xData.length; i++) {
       var tmp = [];
       for (var j = 0; j < geneData.length; j++) {
         if (xData[i] == geneData[j]['gene_symbol']) {
@@ -170,9 +172,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   triggerReplot() {
     console.log("replot graph");
     console.log(parseInt(this.selectNumGenes));
-    var limitedGeneSymbols = this.getGeneSymbols(this.eqtlGeneExpressionData).slice(0,parseInt(this.selectNumGenes));
+    var limitedGeneSymbols = this.getGeneSymbols(this.eqtlData).slice(0,parseInt(this.selectNumGenes));
     console.log(limitedGeneSymbols);
-    this.replotExpressionsBoxPlot(this.eqtlGeneExpressionData, limitedGeneSymbols);
+    this.replotExpressionsBoxPlot(this.eqtlData, limitedGeneSymbols);
   }
 
 }

@@ -42,7 +42,7 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   var genotypeFile = request.files[1].filename;
   var associationFile = request.files[2].filename;
   try {
-    const data = await rscript('./r-calculations/eQTL/gene-expressions.r', expressionFile, genotypeFile, associationFile);
+    const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile);
     response.json(data);
   } catch(err) {
     response.status(500);

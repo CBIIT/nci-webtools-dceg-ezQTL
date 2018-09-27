@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { FormControl, Validators } from '@angular/forms';
 
 export interface Gene {
@@ -13,9 +14,14 @@ export interface Gene {
 })
 export class EqtlResultsLocuszoomComponent implements OnInit {
 
-  constructor() { }
+  eqtlData: Object;
+
+  constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
+    this.data.currentEqtlData.subscribe(eqtlData => {
+      this.eqtlData = eqtlData[1];
+    });
   }
 
   // Dummy Gene Expressions data for locus zoom drop down

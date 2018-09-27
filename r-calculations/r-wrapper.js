@@ -44,11 +44,14 @@ function rscript(rfile, expressionFile, genotypeFile, associationFile) {
             `Rscript --vanilla "${tmpFile.name}"`, 
             { maxBuffer: 100 * 1024 * 1024 },
             (error, stdout, stderr) => {
-                if (error) reject(error);
-                if (stderr) reject(stderr);
+                // if (error) reject(error);
+                // if (stderr) reject(stderr);
                 try {
+                    // console.log(stdout);
                     resolve(JSON.parse(stdout.toString()));
                 } catch(error) {
+                    if (error) reject(error);
+                    if (stderr) reject(stderr);
                     // const errorsLines = error.toString().trim().split('\n');
                     reject(error.toString());
                 }
