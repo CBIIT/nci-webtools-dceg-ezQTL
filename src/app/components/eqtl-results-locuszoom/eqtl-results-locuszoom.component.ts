@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
-import { FormControl, Validators } from '@angular/forms';
+// import { FormControl, Validators } from '@angular/forms';
 // import { forEach } from '@angular/router/src/utils/collection';
 
 export interface GeneSymbols {
@@ -17,9 +17,11 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   eqtlData: Object;
   geneList: string[];
-  geneDropdown: GeneSymbols[];
 
-  geneControl = new FormControl('', [Validators.required]);
+  geneDropdown: GeneSymbols[];
+  selectGene: string;
+
+  // geneControl = new FormControl('', [Validators.required]);
 
   constructor(private data: EqtlResultsService) { }
 
@@ -31,6 +33,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           this.geneList = geneList;
           if (this.geneList) {
             this.geneDropdown = this.populateReferenceGeneDropdown(this.geneList);
+            console.log(this.geneDropdown[0].value);
+            // set default gene in dropdown to first one
+            this.selectGene = this.geneDropdown[0].value;
           }
         });
       }
@@ -49,3 +54,4 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
 }
+
