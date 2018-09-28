@@ -1,15 +1,53 @@
-<mat-form-field>
-  <mat-label>Reference Gene</mat-label>
-  <mat-select #refGene [(value)]="selectGene">
-    <!-- <mat-option>--</mat-option> -->
-    <mat-option *ngFor="let gene of geneDropdown" [value]="gene.value">
-      {{ gene.viewValue }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+<div class="row">
+
+  <!-- Choose Population -->
+  <div class="col-md-auto p-4">
+    <mat-form-field>
+      <mat-label>Population</mat-label>
+      <mat-select #population [(value)]="selectedPop" (selectionChange)="changePop()" multiple>
+        <!-- + ... # others -->
+        <!-- <mat-select-trigger>
+          {{ toppings.value ? toppings.value[0] : '' }}
+          <span *ngIf="toppings.value?.length > 1" class="example-additional-selection">
+            (+{{toppings.value.length - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+          </span>
+        </mat-select-trigger> -->
+        <!-- <mat-option value="ALL">
+          (ALL) All Populations
+        </mat-option> -->
+        <br>
+        <mat-checkbox class="p-3" (change)="selectAll()" color="primary">
+          (ALL) All Populations
+        </mat-checkbox>
+        <mat-optgroup *ngFor="let group of populationGroups" [label]="group.name">
+          <mat-option class="p-4" *ngFor="let subPopulation of group.subPopulations" [value]="subPopulation.value">
+            ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
+          </mat-option>
+        </mat-optgroup>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Choose Reference Gene -->
+  <div class="col-md-auto p-4">
+    <!-- <form class="example-form"> -->
+      <mat-form-field>
+        <mat-label>Reference Gene</mat-label>
+        <mat-select #refGene [(value)]="selectGene">
+          <mat-option *ngFor="let gene of geneList" [value]="gene">
+            {{ gene }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    <!-- </form> -->
+  </div>
+
+</div>
 
 <br>
 
 <pre>{{ eqtlData | json }}</pre>
 
 <pre>{{ geneList }}</pre>
+
+<pre>{{ selectedPop }}</pre>
