@@ -9,6 +9,7 @@ const rscript = require('./r-calculations/r-wrapper.js');
 
 var app = express();
 
+
 // Upload files with file extension and original name
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -50,9 +51,10 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   }
 });
 
+app.use('/', express.static('static'));
 
-app.get('/', function (req, res) {
-  var responseText = 'Hello World!<br>';
+// app.get('/', function (req, res) {
+  // var responseText = 'Hello World!<br>';
   // `
   //   <form id="some-form">
   //     <input id="some-file" type="file" name="some-file">
@@ -85,7 +87,7 @@ app.get('/', function (req, res) {
   //     }
   //   </script>
   // `
-  res.send(responseText)
-});
+  // res.send(responseText)
+// });
 
 app.listen(3000);

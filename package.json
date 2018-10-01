@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
-    "start:dev": "ng serve --open",
+    "start:dev": "ng serve --host 0.0.0.0 --open",
+    "build:dev": "ng build --poll 500",
     "start": "node index.js",
     "build": "ng build --prod",
     "test": "ng test",
