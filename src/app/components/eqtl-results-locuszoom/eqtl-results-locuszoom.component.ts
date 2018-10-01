@@ -25,11 +25,15 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   populationGroups: PopulationGroup[];
   selectedPop: string[];
 
+  populationSelectedAll: boolean;
+
   constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
     this.data.currentEqtlData.subscribe(eqtlData => {
-      this.eqtlData = eqtlData[1];
+      if (eqtlData) {
+        this.eqtlData = eqtlData[1];
+      }
       if (this.eqtlData) {
         this.data.currentGeneList.subscribe(geneList => {
           this.geneList = geneList;
@@ -41,6 +45,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.populationGroups = this.populatePopulationDropdown();
     this.selectedPop = ["CEU"]; // default population
+    this.populationSelectedAll = false;
   }
 
   populatePopulationDropdown() {
@@ -107,19 +112,23 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   selectAll() {
     console.log("DO SOMETHING");
-    if (this.selectedPop.length == 27) {
+    if (this.selectedPop.length == 26 && this.populationSelectedAll == true) {
       this.selectedPop = [];
-    }
-    else if (this.selectedPop.length < 26) {
-      this.selectedPop = ["All","ACB","ASW","BEB","CDX","CEU","CHB","CHS","CLM","ESN","FIN","GBR","GIH","GWD","IBS","ITU","JPT","KHV","LWK","MSL","MXL","PEL","PJL","PUR","STU","TSI","YRI"];
-    }
-    else {
-      
+      this.populationSelectedAll = false;
+    } else if (this.selectedPop.length < 26 || this.populationSelectedAll == false) {
+      this.selectedPop = ["ACB","ASW","BEB","CDX","CEU","CHB","CHS","CLM","ESN","FIN","GBR","GIH","GWD","IBS","ITU","JPT","KHV","LWK","MSL","MXL","PEL","PJL","PUR","STU","TSI","YRI"];
+      this.populationSelectedAll = true;
+    } else {
+      // do nothing
     }
   }
 
   changePop() {
-    // do something here when the user changes the population
+    if (this.selectedPop.length < 26) {
+      this.populationSelectedAll = false;
+    } else {
+      this.populationSelectedAll = true;
+    }
   }
 
 }

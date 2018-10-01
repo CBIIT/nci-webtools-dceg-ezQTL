@@ -4,19 +4,26 @@
   <div class="col-md-auto p-4">
     <mat-form-field>
       <mat-label>Population</mat-label>
-      <mat-select #population [(value)]="selectedPop" (selectionChange)="changePop()" multiple>
-        <!-- + ... # others -->
-        <!-- <mat-select-trigger>
-          {{ toppings.value ? toppings.value[0] : '' }}
-          <span *ngIf="toppings.value?.length > 1" class="example-additional-selection">
-            (+{{toppings.value.length - 1}} {{toppings.value?.length === 2 ? 'other' : 'others'}})
+      <mat-select #population [(value)]="selectedPop" (selectionChange)="changePop()" multiple required>
+        <!-- Edit dropdown placeholder -->
+        <mat-select-trigger>
+          <span *ngIf="selectedPop.length < 26">
+            <span *ngIf="selectedPop.length <= 3">
+              {{ selectedPop.join('+') }}
+            </span>
+            <span *ngIf="selectedPop.length > 3">
+              {{ selectedPop[0] }} 
+              <span class="example-additional-selection">
+                (+{{selectedPop.length - 1}} {{ selectedPop?.length === 2 ? 'other' : 'others'}})
+              </span>
+            </span>
           </span>
-        </mat-select-trigger> -->
-        <!-- <mat-option value="ALL">
-          (ALL) All Populations
-        </mat-option> -->
+          <span *ngIf="selectedPop.length == 26">
+            (ALL) All Populations
+          </span>
+        </mat-select-trigger>
         <br>
-        <mat-checkbox class="p-3" (change)="selectAll()" color="primary">
+        <mat-checkbox class="p-3" (change)="selectAll()" color="primary" [checked]="populationSelectedAll">
           (ALL) All Populations
         </mat-checkbox>
         <mat-optgroup *ngFor="let group of populationGroups" [label]="group.name">
@@ -30,16 +37,14 @@
 
   <!-- Choose Reference Gene -->
   <div class="col-md-auto p-4">
-    <!-- <form class="example-form"> -->
-      <mat-form-field>
-        <mat-label>Reference Gene</mat-label>
-        <mat-select #refGene [(value)]="selectGene">
-          <mat-option *ngFor="let gene of geneList" [value]="gene">
-            {{ gene }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    <!-- </form> -->
+    <mat-form-field>
+      <mat-label>Reference Gene</mat-label>
+      <mat-select #refGene [(value)]="selectGene" required>
+        <mat-option *ngFor="let gene of geneList" [value]="gene">
+          {{ gene }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 
 </div>

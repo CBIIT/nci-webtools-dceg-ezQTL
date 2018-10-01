@@ -21,7 +21,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   ngOnInit() {
     this.data.currentEqtlData.subscribe(eqtlData => {
-      this.eqtlData = eqtlData[0];
+      if (eqtlData) {
+        this.eqtlData = eqtlData[0];
+      }
       if (this.eqtlData) {
         this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
         this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
