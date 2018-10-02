@@ -1,9 +1,11 @@
 var express = require('express');
 var multer = require('multer');
 
-const { readFileSync, writeFileSync } = require('fs');
-const { spawn } = require('child_process');
-const { fileSync } = require('tmp');
+var fs = require('fs');
+const { exec } = require('child_process');
+// const { fileSync } = require('tmp');
+const { promisify } = require('util')
+const unlinkAsync = promisify(fs.unlink)
 
 const rscript = require('./r-calculations/r-wrapper.js');
 
@@ -44,50 +46,19 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   var associationFile = request.files[2].filename;
   try {
     const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile);
+    // remove files from uploads folder when data is received from R
+    var dir = __dirname + '/r-calculations/uploads/'
+    await unlinkAsync(dir + expressionFile);
+    await unlinkAsync(dir + genotypeFile);
+    await unlinkAsync(dir + associationFile);
     response.json(data);
   } catch(err) {
+    console.log(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.use('/', express.static('static'));
-
-// app.get('/', function (req, res) {
-  // var responseText = 'Hello World!<br>';
-  // `
-  //   <form id="some-form">
-  //     <input id="some-file" type="file" name="some-file">
-  //     <button id="click-me">Upload</button>
-  //   </form>
-  //   <script>
-  //     var form = document.querySelector('#some-form');
-  //     var someFile = document.querySelector('#some-file');
-  //     var clickMe = document.querySelector('#click-me');
-  //     function getFormData(form) {
-  //       var inputs = Array.from(form.querySelectorAll('input,textarea'));
-  //       var formData = new FormData();
-  //       for (let input of inputs) {
-  //         if (input.type === 'file')
-  //           formData.append(input.name, input.files[0]);
-  //         else
-  //           formData.append(input.name, input.value);
-  //       }
-  //       return formData;
-  //     }
-  //     clickMe.onclick = async function() {
-  //       if(!someFile.files) return;
-  //       var formData = getFormData(form);
-
-  //       var response = await fetch('/upload-file', {
-  //         method: 'POST',
-  //         body: formData
-  //       });
-  //       console.log(await response.text());
-  //     }
-  //   </script>
-  // `
-  // res.send(responseText)
-// });
 
 app.listen(3000);

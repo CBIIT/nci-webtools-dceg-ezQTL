@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { EqtlResultsComponent } from '../eqtl-results/eqtl-results.component';
+// import { EqtlResultsComponent } from '../eqtl-results/eqtl-results.component';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 
-import { environment } from '../../../environments/environment';
+// import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-eqtl-inputs',
@@ -43,6 +43,11 @@ export class EqtlInputsComponent implements OnInit {
         this.resetColor = null;
       }
     });
+
+    // do something when browser window closes
+    // window.onbeforeunload = function() {
+    //   this.data.
+    // }
   }
 
   async submit() {

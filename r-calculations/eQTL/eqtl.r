@@ -1,4 +1,4 @@
-emeraLD2R <- function(path, bin = "/Users/kevinjiang/Desktop/dev/nci-webtools-dceg-vQTL/r-calculations/eQTL/emeraLD"){
+emeraLD2R <- function(path, bin){
 	require(data.table)
 	if(!file.exists(bin)) stop(paste0("bin = '", bin, "' file does not exist"))
 	function(region, matrix.out = TRUE, info.out = TRUE){
@@ -70,37 +70,36 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile) {
 
   # calculate locus zoom plot
 
-  # tmp <- qdata %>% arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% slice(1)
-  # default_gene <- tmp$gene_id
-  # default_vairnat <- tmp$variant_id
-  # default_rsnum <- tmp$rsnum
-  # defaul_info <-tmp %>% select(gene_id:alt)
+  tmp <- qdata %>% arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% slice(1)
+  default_gene <- tmp$gene_id
+  default_vairnat <- tmp$variant_id
+  default_rsnum <- tmp$rsnum
+  defaul_info <-tmp %>% select(gene_id:alt)
 
-  # qdata_region <- qdata %>% filter(gene_id==default_gene)
-  # rcdata_region <- rcdata %>% filter(pos<=max(qdata_region$pos),pos>=min(qdata_region$pos))
-  # qdata_top_annotation <- qdata_region %>% filter(variant_id==default_vairnat)
+  qdata_region <- qdata %>% filter(gene_id==default_gene)
+  rcdata_region <- rcdata %>% filter(pos<=max(qdata_region$pos),pos>=min(qdata_region$pos))
+  qdata_top_annotation <- qdata_region %>% filter(variant_id==default_vairnat)
 
-  # # source('emeraLD2R.r')
+  # source('emeraLD2R.r')
   # in_path <- '/Users/kevinjiang/Desktop/dev/nci-webtools-dceg-vQTL/r-calculations/eQTL/chr1_149039120_152938045.vcf.gz'
-  # regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
-  # getLD <- emeraLD2R(path = in_path) 
-  # ld_data <- getLD(region=regionLD)
+  in_path <- paste0(workDir, '/eQTL/chr1_149039120_152938045.vcf.gz')
+  in_bin <- '/usr/bin/emeraLD'
+  regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
+  getLD <- emeraLD2R(path = in_path, bin = in_bin) 
+  ld_data <- getLD(region=regionLD)
 
-  # index <- which(ld_data$info$id==default_rsnum|str_detect(ld_data$info$id,paste0(";",default_rsnum))|str_detect(ld_data$info$id,paste0(default_rsnum,";")))
-  # ld_info <- as.data.frame(ld_data$Sigma[,index])
-  # colnames(ld_info) <- "R2"
-  # rownames(ld_info) <- ld_data$info$id
+  index <- which(ld_data$info$id==default_rsnum|str_detect(ld_data$info$id,paste0(";",default_rsnum))|str_detect(ld_data$info$id,paste0(default_rsnum,";")))
+  ld_info <- as.data.frame(ld_data$Sigma[,index])
+  colnames(ld_info) <- "R2"
+  rownames(ld_info) <- ld_data$info$id
 
-  # qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
+  qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
 
-  # locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
+  locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
 
   # return outputs in list
-  # dataSource <- append(gene_expression_data, locus_zoom_data)
-  dataSource <- append(gene_expression_data, list(42))
+  dataSource <- append(gene_expression_data, locus_zoom_data)
+  # dataSource <- append(gene_expression_data, list(42))
 
   return(dataSource)
 }
-
-# function call parameters will be inputted by R Wrapper
-eqtl(workingDirectory, genotypeFile, expressionFile, associationFile)
