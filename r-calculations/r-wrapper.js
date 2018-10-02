@@ -1,5 +1,5 @@
 const { readFileSync, writeFileSync } = require('fs');
-const { spawn, exec } = require('child_process');
+const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
 // function rscript(rfile, input) {

@@ -1,27 +1,3 @@
-emeraLD2R <- function(path, bin){
-	require(data.table)
-	if(!file.exists(bin)) stop(paste0("bin = '", bin, "' file does not exist"))
-	function(region, matrix.out = TRUE, info.out = TRUE){
-		require(data.table)
-		opts <- paste(c("--matrix", "--stdout --extra")[c(matrix.out, TRUE)], collapse = " ")
-		pc <- "| tr ':' '\t'"
-		chr <- strsplit(region, ":")[[1]][1]
-		vcfile <- gsub("\\$chr", chr, path)
-		if(!file.exists(vcfile)) stop(paste0(vcfile, " does not exist"))
-		out <- suppressMessages(fread(
-			input  = paste(bin, "-i", vcfile, "--region", region, opts, pc), 
-			header = FALSE, showProgress = FALSE
-		))
-		info <- NULL
-		if(info.out){
-			info <- out[,1:5]
-			colnames(info) <- c("chr", "pos", "id", "ref", "alt")
-		}
-		if(matrix.out) out <- as.matrix(out[,-(1:5)]); colnames(out) <- NULL
-		list("Sigma" = out, "info" = info)
-	}
-}
-
 eqtl <- function(workDir, genoFile, exprFile, assocFile) {
   setwd(workDir)
 
@@ -80,8 +56,7 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile) {
   rcdata_region <- rcdata %>% filter(pos<=max(qdata_region$pos),pos>=min(qdata_region$pos))
   qdata_top_annotation <- qdata_region %>% filter(variant_id==default_vairnat)
 
-  # source('emeraLD2R.r')
-  # in_path <- '/Users/kevinjiang/Desktop/dev/nci-webtools-dceg-vQTL/r-calculations/eQTL/chr1_149039120_152938045.vcf.gz'
+  source('eQTL/emeraLD2R.r')
   in_path <- paste0(workDir, '/eQTL/chr1_149039120_152938045.vcf.gz')
   in_bin <- '/usr/bin/emeraLD'
   regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))

@@ -9,7 +9,6 @@ import { QTLInteractionComponent } from '../components/qtl-interaction/qtl-inter
 import { HelpComponent } from '../components/help/help.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' }, // Home
   { path: 'home', component: HomeComponent },
   { path: 'eqtl', component: EQTLComponent },
   { path: 'sqtl', component: SQTLComponent },
@@ -17,7 +16,9 @@ const routes: Routes = [
   { path: 'miqtl', component: MiQTLComponent },
   { path: 'eqtl', component: EQTLComponent },
   { path: 'qtl-interaction', component: QTLInteractionComponent },
-  { path: 'help', component: HelpComponent }
+  { path: 'help', component: HelpComponent },
+  { path: '**', redirectTo: '/home', pathMatch: 'full' } // Home
+  // { path: '**', redirectTo: '' }
 ];
 
 @NgModule({

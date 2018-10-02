@@ -2,10 +2,8 @@ var express = require('express');
 var multer = require('multer');
 
 var fs = require('fs');
-const { exec } = require('child_process');
-// const { fileSync } = require('tmp');
 const { promisify } = require('util')
-const unlinkAsync = promisify(fs.unlink)
+const removeFile = promisify(fs.unlink)
 
 const rscript = require('./r-calculations/r-wrapper.js');
 
@@ -48,9 +46,9 @@ app.post('/upload-file', upload.any(), async (request, response) => {
     const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile);
     // remove files from uploads folder when data is received from R
     var dir = __dirname + '/r-calculations/uploads/'
-    await unlinkAsync(dir + expressionFile);
-    await unlinkAsync(dir + genotypeFile);
-    await unlinkAsync(dir + associationFile);
+    await removeFile(dir + expressionFile);
+    await removeFile(dir + genotypeFile);
+    await removeFile(dir + associationFile);
     response.json(data);
   } catch(err) {
     console.log(err);
