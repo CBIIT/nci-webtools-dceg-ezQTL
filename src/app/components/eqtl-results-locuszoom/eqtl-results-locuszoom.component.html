@@ -4,7 +4,7 @@
   <div class="col-md-auto p-4">
     <mat-form-field>
       <mat-label>Population</mat-label>
-      <mat-select #population [(value)]="selectedPop" (selectionChange)="changePop()" multiple required>
+      <mat-select #population panelClass="populationPanel" [(value)]="selectedPop" (selectionChange)="changePop()" multiple required>
         <!-- Edit dropdown placeholder -->
         <mat-select-trigger>
           <span *ngIf="selectedPop.length < 26">
@@ -26,11 +26,21 @@
         <mat-checkbox class="p-3" (change)="selectAll()" color="primary" [checked]="populationSelectedAll">
           (ALL) All Populations
         </mat-checkbox>
-        <mat-optgroup *ngFor="let group of populationGroups" [label]="group.name">
-          <mat-option class="p-4" *ngFor="let subPopulation of group.subPopulations" [value]="subPopulation.value">
+        <!-- <a *ngFor="let group of populationGroups" (click)="selectAll()"> -->
+        <div *ngFor="let group of populationGroups">
+          <div class="pl-3">
+            <span (click)="selectPopulationGroup(group.namecode)">
+              (<u>{{ group.namecode }}</u>)<u> {{ group.name }}</u>
+            </span>
+          </div>
+          <!-- </div> -->
+        <!-- <mat-optgroup *ngFor="let group of populationGroups" [label]="'('+group.namecode+') '+group.name"> -->
+          <mat-option class="pl-5" *ngFor="let subPopulation of group.subPopulations" [value]="subPopulation.value">
             ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
           </mat-option>
-        </mat-optgroup>
+        <!-- </mat-optgroup> -->
+        <!-- </a> -->
+        </div>
       </mat-select>
     </mat-form-field>
   </div>
@@ -56,3 +66,5 @@
 <pre>{{ geneList }}</pre>
 
 <pre>{{ selectedPop }}</pre>
+
+<pre>{{ selectedPop2 | json }}</pre>

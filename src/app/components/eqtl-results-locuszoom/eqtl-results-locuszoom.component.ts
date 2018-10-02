@@ -4,12 +4,14 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 export interface PopulationGroup {
   namecode: string;
   name: string;
+  selected : boolean;
   subPopulations: SubPopulation[];
 }
 
 export interface SubPopulation {
   value: string;
   viewValue: string;
+  selected: boolean;
 }
 
 @Component({
@@ -24,6 +26,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   selectGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
+  selectedPop2: Object;
 
   populationSelectedAll: boolean;
 
@@ -45,6 +48,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.populationGroups = this.populatePopulationDropdown();
     this.selectedPop = ["CEU"]; // default population
+    this.selectedPop2 = this.populatePopulationDropdown();
+
     this.populationSelectedAll = false;
   }
 
@@ -53,57 +58,62 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       {
         namecode: "AFR",
         name: "African",
+        selected: false,
         subPopulations: [
-          { value: "YRI", viewValue: "Yoruba in Ibadan, Nigera" },
-          { value: "LWK", viewValue: "Luhya in Webuye, Kenya" },
-          { value: "GWD", viewValue: "Gambian in Western Gambia" },
-          { value: "MSL", viewValue: "Mende in Sierra Leone" },
-          { value: "ESN", viewValue: "Esan in Nigera" },
-          { value: "ASW", viewValue: "Americans of African Ancestry in SW USA" },
-          { value: "ACB", viewValue: "African Carribbeans in Barbados" },
+          { value: "YRI", viewValue: "Yoruba in Ibadan, Nigera", selected: false },
+          { value: "LWK", viewValue: "Luhya in Webuye, Kenya", selected: false },
+          { value: "GWD", viewValue: "Gambian in Western Gambia", selected: false },
+          { value: "MSL", viewValue: "Mende in Sierra Leone", selected: false },
+          { value: "ESN", viewValue: "Esan in Nigera", selected: false },
+          { value: "ASW", viewValue: "Americans of African Ancestry in SW USA", selected: false },
+          { value: "ACB", viewValue: "African Carribbeans in Barbados", selected: false },
         ]
       },
       {
         namecode: 'AMR',
         name: "Ad Mixed American",
+        selected: false,
         subPopulations: [
-          { value: "MXL", viewValue: "Mexican Ancestry from Los Angeles, USA" },
-          { value: "PUR", viewValue: "Puerto Ricans from Puerto Rico" },
-          { value: "CLM", viewValue: "Colombians from Medellin, Colombia" },
-          { value: "PEL", viewValue: "Peruvians from Lima, Peru" },
+          { value: "MXL", viewValue: "Mexican Ancestry from Los Angeles, USA", selected: false },
+          { value: "PUR", viewValue: "Puerto Ricans from Puerto Rico", selected: false },
+          { value: "CLM", viewValue: "Colombians from Medellin, Colombia", selected: false },
+          { value: "PEL", viewValue: "Peruvians from Lima, Peru", selected: false },
         ]
       },
       {
         namecode: "EAS",
         name: "East Asian",
+        selected: false,
         subPopulations: [
-          { value: "CHB", viewValue: "Han Chinese in Bejing, China" },
-          { value: "JPT", viewValue: "Japanese in Tokyo, Japan" },
-          { value: "CHS", viewValue: "Southern Han Chinese" },
-          { value: "CDX", viewValue: "Chinese Dai in Xishuangbanna, China" },
-          { value: "KHV", viewValue: "Kinh in Ho Chi Minh City, Vietnam" },
+          { value: "CHB", viewValue: "Han Chinese in Bejing, China", selected: false },
+          { value: "JPT", viewValue: "Japanese in Tokyo, Japan", selected: false },
+          { value: "CHS", viewValue: "Southern Han Chinese", selected: false },
+          { value: "CDX", viewValue: "Chinese Dai in Xishuangbanna, China", selected: false },
+          { value: "KHV", viewValue: "Kinh in Ho Chi Minh City, Vietnam", selected: false },
         ]
       },
       {
         namecode: "EUR",
         name: "European",
+        selected: false,
         subPopulations: [
-          { value: "CEU", viewValue: "Utah Residents from North and West Europe" },
-          { value: "TSI", viewValue: "Toscani in Italia" },
-          { value: "FIN", viewValue: "Finnish in Finland" },
-          { value: "GBR", viewValue: "British in England and Scotland" },
-          { value: "IBS", viewValue: "Iberian population in Spain" },
+          { value: "CEU", viewValue: "Utah Residents from North and West Europe", selected: false },
+          { value: "TSI", viewValue: "Toscani in Italia", selected: false },
+          { value: "FIN", viewValue: "Finnish in Finland", selected: false },
+          { value: "GBR", viewValue: "British in England and Scotland", selected: false },
+          { value: "IBS", viewValue: "Iberian population in Spain", selected: false },
         ]
       },
       {
         namecode: "SAS",
         name: "South Asian",
+        selected: false,
         subPopulations: [
-          { value: "GIH", viewValue: "Gujarati Indian from Houston, Texas" },
-          { value: "PJL", viewValue: "Punjabi from Lahore, Pakistan" },
-          { value: "BEB", viewValue: "Bengali from Bangladesh" },
-          { value: "STU", viewValue: "Sri Lankan Tamil from the UK" },
-          { value: "ITU", viewValue: "Indian Telugu from the UK" },
+          { value: "GIH", viewValue: "Gujarati Indian from Houston, Texas", selected: false },
+          { value: "PJL", viewValue: "Punjabi from Lahore, Pakistan", selected: false },
+          { value: "BEB", viewValue: "Bengali from Bangladesh", selected: false },
+          { value: "STU", viewValue: "Sri Lankan Tamil from the UK", selected: false },
+          { value: "ITU", viewValue: "Indian Telugu from the UK", selected: false },
         ]
       }
     ];
@@ -121,6 +131,18 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     } else {
       // do nothing
     }
+  }
+
+  selectPopulationGroup(groupName) {
+    console.log(groupName);
+    var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
+    var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
+    var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
+    var european = ["CEU", "TSI", "FIN", "GBR", "IBS"];
+    var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
+    // if (groupName == "AFR"  && this.selectedPop.difference(subset, superset).length === 0) {
+    //   this.selectedPop = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"]
+    // }
   }
 
   changePop() {
