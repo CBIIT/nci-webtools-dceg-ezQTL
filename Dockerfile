@@ -1,5 +1,6 @@
 FROM centos:latest
 
+
 RUN yum -y update \
  && yum -y groupinstall "Development Tools" \
  && curl -sL https://rpm.nodesource.com/setup_10.x | bash - \
@@ -55,3 +56,4 @@ RUN npm install \
  && dos2unix entrypoint.sh
 
 CMD ./entrypoint.sh
+# CMD pwd

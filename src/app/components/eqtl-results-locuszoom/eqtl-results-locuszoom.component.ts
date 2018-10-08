@@ -26,7 +26,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   selectGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
-  selectedPop2: Object;
+  // selectedPop2: Object;
 
   populationSelectedAll: boolean;
 
@@ -48,7 +48,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.populationGroups = this.populatePopulationDropdown();
     this.selectedPop = ["CEU"]; // default population
-    this.selectedPop2 = this.populatePopulationDropdown();
+    // this.selectedPop2 = this.populatePopulationDropdown();
 
     this.populationSelectedAll = false;
   }
@@ -133,6 +133,36 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
   }
 
+  unique(value, index, self) { 
+    return self.indexOf(value) === index;
+  }
+
+  containsAll(needles, haystack) { 
+    for(var i = 0 , len = needles.length; i < len; i++){
+      if (!haystack.includes(needles[i])) {
+        return false;
+      } 
+    }
+    return true;
+  }
+
+  // remove(element, newArray) {
+  //   // var newArray = this.selectedPop.slice(0);
+  //   // for( var i = 0; i < newarr.length; i++ ) { 
+  //   var x = newArray.indexOf(element);
+  //   console.log(newArray);
+  //   console.log(x);
+  //   if (x != -1) {
+  //     return newArray.splice(x, 1); 
+  //   }
+  //   console.log(newArray);
+  //   // }
+  //   // console.log(newarr);
+  //   return newArray;
+  //   // this.selectedPop = newarr;
+  // }
+
+
   selectPopulationGroup(groupName) {
     console.log(groupName);
     var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
@@ -140,9 +170,58 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
     var european = ["CEU", "TSI", "FIN", "GBR", "IBS"];
     var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
-    // if (groupName == "AFR"  && this.selectedPop.difference(subset, superset).length === 0) {
-    //   this.selectedPop = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"]
-    // }
+    if (groupName == "AFR") {
+      if (this.containsAll(african, this.selectedPop)) {
+        console.log("REMOVE ALL");
+        this.selectedPop = [];
+        // this.selectedPop = z;
+        // this.selectedPop = ["MSL", "GWD"];
+        this.changePop();
+      } else {
+        console.log("ADD ALL AFRICAN");
+        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.changePop();
+      }
+    }
+    if (groupName == "AFR") {
+      if (this.containsAll(african, this.selectedPop)) {
+        console.log("REMOVE ALL");
+        this.selectedPop = [];
+        // this.selectedPop = z;
+        // this.selectedPop = ["MSL", "GWD"];
+        this.changePop();
+      } else {
+        console.log("ADD ALL AFRICAN");
+        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.changePop();
+      }
+    }
+    if (groupName == "AFR") {
+      if (this.containsAll(african, this.selectedPop)) {
+        console.log("REMOVE ALL");
+        this.selectedPop = [];
+        // this.selectedPop = z;
+        // this.selectedPop = ["MSL", "GWD"];
+        this.changePop();
+      } else {
+        console.log("ADD ALL AFRICAN");
+        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.changePop();
+      }
+    }
+    if (groupName == "AFR") {
+      if (this.containsAll(african, this.selectedPop)) {
+        console.log("REMOVE ALL");
+        this.selectedPop = [];
+        // this.selectedPop = z;
+        // this.selectedPop = ["MSL", "GWD"];
+        this.changePop();
+      } else {
+        console.log("ADD ALL AFRICAN");
+        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.changePop();
+      }
+    }
   }
 
   changePop() {
