@@ -54,11 +54,13 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile) {
 
   qdata_region <- qdata %>% filter(gene_id==default_gene)
   rcdata_region <- rcdata %>% filter(pos<=max(qdata_region$pos),pos>=min(qdata_region$pos))
+  rcdata_region_data <- list(setNames(as.data.frame(rcdata_region),c("pos","rate","map","filtered")))
   qdata_top_annotation <- qdata_region %>% filter(variant_id==default_vairnat)
+  qdata_top_annotation_data <- list(setNames(as.data.frame(qdata_top_annotation),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se")))
 
   source('eQTL/emeraLD2R.r')
   in_path <- paste0(workDir, '/eQTL/chr1_149039120_152938045.vcf.gz')
-  in_bin <- '/usr/bin/emeraLD'
+  in_bin <- '/Users/kevinjiang/Desktop/dev/emeraLD/bin/emeraLD'
   regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
   getLD <- emeraLD2R(path = in_path, bin = in_bin) 
   ld_data <- getLD(region=regionLD)
@@ -73,7 +75,7 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile) {
   locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
 
   # return outputs in list
-  dataSource <- append(gene_expression_data, locus_zoom_data)
+  dataSource <- c(gene_expression_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data)
   # dataSource <- append(gene_expression_data, list(42))
 
   return(dataSource)

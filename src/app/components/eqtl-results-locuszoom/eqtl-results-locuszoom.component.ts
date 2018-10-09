@@ -22,11 +22,13 @@ export interface SubPopulation {
 export class EqtlResultsLocuszoomComponent implements OnInit {
 
   eqtlData: Object;
+  eqtlDataRC: Object;
+  eqtlQDataTopAnnot: Object;
   geneList: string[];
   selectGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
-  // selectedPop2: Object;
+  public graph = null;
 
   populationSelectedAll: boolean;
 
@@ -36,18 +38,21 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.data.currentEqtlData.subscribe(eqtlData => {
       if (eqtlData) {
         this.eqtlData = eqtlData[1];
+        this.eqtlDataRC = eqtlData[2]
+        this.eqtlQDataTopAnnot = eqtlData[3][0];
       }
       if (this.eqtlData) {
         this.data.currentGeneList.subscribe(geneList => {
           this.geneList = geneList;
           if (this.geneList) {
-            this.selectGene = this.geneList[0]; //default reference gen
+            this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gen
           }
         });
+        this.graph = this.locuszoomPlot(this.eqtlData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
       }
     });
     this.populationGroups = this.populatePopulationDropdown();
-    this.selectedPop = ["CEU"]; // default population
+    this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population
     // this.selectedPop2 = this.populatePopulationDropdown();
 
     this.populationSelectedAll = false;
@@ -121,7 +126,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   selectAll() {
-    console.log("DO SOMETHING");
     if (this.selectedPop.length == 26 && this.populationSelectedAll == true) {
       this.selectedPop = [];
       this.populationSelectedAll = false;
@@ -137,9 +141,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return self.indexOf(value) === index;
   }
 
-  containsAll(needles, haystack) { 
-    for(var i = 0 , len = needles.length; i < len; i++){
-      if (!haystack.includes(needles[i])) {
+  containsAll(subarr, arr) { 
+    for(var i = 0 , len = subarr.length; i < len; i++){
+      if (!arr.includes(subarr[i])) {
         return false;
       } 
     }
@@ -172,53 +176,56 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
     if (groupName == "AFR") {
       if (this.containsAll(african, this.selectedPop)) {
-        console.log("REMOVE ALL");
         this.selectedPop = [];
         // this.selectedPop = z;
         // this.selectedPop = ["MSL", "GWD"];
         this.changePop();
       } else {
-        console.log("ADD ALL AFRICAN");
         this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
         this.changePop();
       }
     }
-    if (groupName == "AFR") {
-      if (this.containsAll(african, this.selectedPop)) {
-        console.log("REMOVE ALL");
+    if (groupName == "AMR") {
+      if (this.containsAll(mixedAmerican, this.selectedPop)) {
         this.selectedPop = [];
         // this.selectedPop = z;
         // this.selectedPop = ["MSL", "GWD"];
         this.changePop();
       } else {
-        console.log("ADD ALL AFRICAN");
-        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.selectedPop = (this.selectedPop.concat(mixedAmerican)).filter(this.unique);
         this.changePop();
       }
     }
-    if (groupName == "AFR") {
-      if (this.containsAll(african, this.selectedPop)) {
-        console.log("REMOVE ALL");
+    if (groupName == "EAS") {
+      if (this.containsAll(eastAsian, this.selectedPop)) {
         this.selectedPop = [];
         // this.selectedPop = z;
         // this.selectedPop = ["MSL", "GWD"];
         this.changePop();
       } else {
-        console.log("ADD ALL AFRICAN");
-        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.selectedPop = (this.selectedPop.concat(eastAsian)).filter(this.unique);
         this.changePop();
       }
     }
-    if (groupName == "AFR") {
-      if (this.containsAll(african, this.selectedPop)) {
-        console.log("REMOVE ALL");
+    if (groupName == "EUR") {
+      if (this.containsAll(european, this.selectedPop)) {
         this.selectedPop = [];
         // this.selectedPop = z;
         // this.selectedPop = ["MSL", "GWD"];
         this.changePop();
       } else {
-        console.log("ADD ALL AFRICAN");
-        this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
+        this.selectedPop = (this.selectedPop.concat(european)).filter(this.unique);
+        this.changePop();
+      }
+    }
+    if (groupName == "SAS") {
+      if (this.containsAll(southAsian, this.selectedPop)) {
+        this.selectedPop = [];
+        // this.selectedPop = z;
+        // this.selectedPop = ["MSL", "GWD"];
+        this.changePop();
+      } else {
+        this.selectedPop = (this.selectedPop.concat(southAsian)).filter(this.unique);
         this.changePop();
       }
     }
@@ -230,6 +237,138 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     } else {
       this.populationSelectedAll = true;
     }
+  }
+
+  getXData(geneData) {
+    var xData = [];
+    for (var i = 0; i < geneData.length; i++) {
+      xData.push(geneData[i]['pos'] / 1000000.0);
+    }
+    return xData;
+  }
+
+  getYData(geneData) {
+    var yData = [];
+    for (var i = 0; i < geneData.length; i++) {
+      yData.push(Math.log10(geneData[i]['pval_nominal']) * -1.0);
+    }
+    return yData;
+  }
+
+  getColorData(geneData) {
+    var colorData = [];
+    for (var i = 0; i < geneData.length; i++) {
+      if (geneData[i]['R2']) {
+        colorData.push(geneData[i]['R2']);
+      } else {
+        colorData.push(0.0);
+      }
+    }
+    return colorData;
+  }
+
+  getXDataRC(geneDataRC) {
+    var xData = [];
+    for (var i = 0; i < geneDataRC.length; i++) {
+      xData.push(geneDataRC[i]['pos'] / 1000000.0);
+    }
+    return xData;
+  }
+
+  getYDataRC(geneDataRC) {
+    var yData = [];
+    for (var i = 0; i < geneDataRC.length; i++) {
+      yData.push(geneDataRC[i]['rate']);
+    }
+    return yData;
+  }
+
+  locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
+    var xData = this.getXData(geneData);
+    console.log(xData);
+
+    var yData = this.getYData(geneData);
+    console.log(yData);
+
+    var colorData = this.getColorData(geneData);
+    console.log(colorData);
+
+    var xDataRC = this.getXDataRC(geneDataRC);
+    console.log(xDataRC);
+
+    var yDataRC = this.getYDataRC(geneDataRC);
+    console.log(yDataRC);
+
+    var pdata = [];
+
+    var trace1 = {
+      x: xData,
+      y: yData,
+      mode: 'markers',
+      type: 'scatter',
+      marker: { 
+        size: 8, 
+        color: colorData
+      }
+    };
+    pdata.push(trace1);
+
+    var trace2 = {
+      x: xDataRC,
+      y: yDataRC,
+      yaxis: 'y2',
+      type: 'scatter',
+      line: {
+        color: 'blue',
+        width: 1
+      }
+    };
+    pdata.push(trace2);    
+
+    var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+    var chromosome = qDataTopAnnot['chr'];
+    var playout = {
+        width: 1000,
+        height: 600,
+        yaxis: {
+          title: "-log10(P-value)",
+          range: [0, maxY]
+          // autorange: true,
+          // showgrid: true,
+          // zeroline: true,
+          // dtick: 2,
+          // gridcolor: 'rgb(255, 255, 255)',
+          // gridwidth: 1,
+          // zerolinecolor: 'rgb(255, 255, 255)',
+          // zerolinewidth: 2
+        },
+        yaxis2: {
+          title: 'Recombination Rate (cM/Mb)',
+          titlefont: {
+            color: 'blue'
+          },
+          tickfont: {
+            color: 'blue'
+          },
+          overlaying: 'y',
+          side: 'right',
+          range: [0, maxY * 10],
+          showgrid: false,
+          dtick: 50
+        },
+        xaxis: {
+          title: "Chromosome " + chromosome + " (Mb)"
+        },
+        margin: {
+          l: 40,
+          r: 40,
+          b: 80,
+          t: 40
+        },
+        showlegend: false
+    };
+
+    return { data: pdata, layout: playout, config: {displaylogo: false} };
   }
 
 }

@@ -42,16 +42,20 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   var expressionFile = request.files[0].filename;
   var genotypeFile = request.files[1].filename;
   var associationFile = request.files[2].filename;
+  var dir = __dirname + '/r-calculations/uploads/'
   try {
     const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile);
     // remove files from uploads folder when data is received from R
-    var dir = __dirname + '/r-calculations/uploads/'
     await removeFile(dir + expressionFile);
     await removeFile(dir + genotypeFile);
     await removeFile(dir + associationFile);
     response.json(data);
   } catch(err) {
     console.log(err);
+    // remove files from uploads folder when data is received from R
+    await removeFile(dir + expressionFile);
+    await removeFile(dir + genotypeFile);
+    await removeFile(dir + associationFile);
     response.status(500);
     response.json(err.toString());
   }
