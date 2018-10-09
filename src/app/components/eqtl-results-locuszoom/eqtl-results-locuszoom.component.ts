@@ -308,7 +308,17 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       type: 'scatter',
       marker: { 
         size: 8, 
-        color: colorData
+        color: colorData,
+        colorscale: 'Viridis',
+        reversescale: true,
+        showscale: true,
+        colorbar: {
+          title: 'R2',
+          dtick: 0.25,
+          xpad: 45,
+          thicknessmode: 'pixels',
+          thickness: 15
+        }
       }
     };
     pdata.push(trace1);
