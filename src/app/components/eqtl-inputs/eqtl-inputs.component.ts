@@ -27,7 +27,7 @@ export class EqtlInputsComponent implements OnInit {
 
   ngOnInit() {
     this.eqtlForm.valueChanges.subscribe(formValue => {
-      console.log(formValue);
+      // console.log(formValue);
     });
 
     this.data.currentEqtlData.subscribe(eqtlData => this.eqtlData = eqtlData);
@@ -46,7 +46,7 @@ export class EqtlInputsComponent implements OnInit {
     this.data.changeResultStatus(true);
 
     const { expressionFile, genotypeFile, associationFile } = this.eqtlForm.value;
-    console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
+    // console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
 
     const formData = new FormData();
     formData.append('expression-file', expressionFile[0]);

@@ -1,10 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
+import { PlotComponent } from 'angular-plotly.js'
+import * as $ from 'jquery';
+// import * as Plotly from 'plotly.js';
+
 
 export interface PopulationGroup {
   namecode: string;
   name: string;
-  selected : boolean;
+  selected: boolean;
   subPopulations: SubPopulation[];
 }
 
@@ -45,15 +49,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.data.currentGeneList.subscribe(geneList => {
           this.geneList = geneList;
           if (this.geneList) {
-            this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gen
+            this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
           }
         });
         this.graph = this.locuszoomPlot(this.eqtlData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
       }
     });
     this.populationGroups = this.populatePopulationDropdown();
-    this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population
-    // this.selectedPop2 = this.populatePopulationDropdown();
+    this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
 
     this.populationSelectedAll = false;
   }
@@ -130,22 +133,22 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.selectedPop = [];
       this.populationSelectedAll = false;
     } else if (this.selectedPop.length < 26 || this.populationSelectedAll == false) {
-      this.selectedPop = ["ACB","ASW","BEB","CDX","CEU","CHB","CHS","CLM","ESN","FIN","GBR","GIH","GWD","IBS","ITU","JPT","KHV","LWK","MSL","MXL","PEL","PJL","PUR","STU","TSI","YRI"];
+      this.selectedPop = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
       this.populationSelectedAll = true;
     } else {
       // do nothing
     }
   }
 
-  unique(value, index, self) { 
+  unique(value, index, self) {
     return self.indexOf(value) === index;
   }
 
-  containsAll(subarr, arr) { 
-    for(var i = 0 , len = subarr.length; i < len; i++){
+  containsAll(subarr, arr) {
+    for (var i = 0, len = subarr.length; i < len; i++) {
       if (!arr.includes(subarr[i])) {
         return false;
-      } 
+      }
     }
     return true;
   }
@@ -168,7 +171,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
 
   selectPopulationGroup(groupName) {
-    console.log(groupName);
+    // console.log(groupName);
     var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
     var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
     var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
@@ -285,29 +288,24 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
     var xData = this.getXData(geneData);
-    console.log(xData);
-
+    // console.log(xData);
     var yData = this.getYData(geneData);
-    console.log(yData);
-
+    // console.log(yData);
     var colorData = this.getColorData(geneData);
-    console.log(colorData);
-
+    // console.log(colorData);
     var xDataRC = this.getXDataRC(geneDataRC);
-    console.log(xDataRC);
-
+    // console.log(xDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
-    console.log(yDataRC);
-
+    // console.log(yDataRC);
     var pdata = [];
-
+    // graph scatter
     var trace1 = {
       x: xData,
       y: yData,
       mode: 'markers',
       type: 'scatter',
-      marker: { 
-        size: 8, 
+      marker: {
+        size: 8,
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
@@ -322,7 +320,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       }
     };
     pdata.push(trace1);
-
+    // graph recombination rate line
     var trace2 = {
       x: xDataRC,
       y: yDataRC,
@@ -333,53 +331,109 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         width: 1
       }
     };
-    pdata.push(trace2);    
-
+    pdata.push(trace2);
+    // round most significant pval to next whole number
     var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
-        width: 1000,
-        height: 600,
-        yaxis: {
-          title: "-log10(P-value)",
-          range: [0, maxY]
-          // autorange: true,
-          // showgrid: true,
-          // zeroline: true,
-          // dtick: 2,
-          // gridcolor: 'rgb(255, 255, 255)',
-          // gridwidth: 1,
-          // zerolinecolor: 'rgb(255, 255, 255)',
-          // zerolinewidth: 2
+      width: 1000,
+      height: 600,
+      yaxis: {
+        title: "-log10(P-value)",
+        range: [0, maxY]
+      },
+      yaxis2: {
+        title: 'Recombination Rate (cM/Mb)',
+        titlefont: {
+          color: 'blue'
         },
-        yaxis2: {
-          title: 'Recombination Rate (cM/Mb)',
-          titlefont: {
-            color: 'blue'
-          },
-          tickfont: {
-            color: 'blue'
-          },
-          overlaying: 'y',
-          side: 'right',
-          range: [0, maxY * 10],
-          showgrid: false,
-          dtick: 50
+        tickfont: {
+          color: 'blue'
         },
-        xaxis: {
-          title: "Chromosome " + chromosome + " (Mb)"
-        },
-        margin: {
-          l: 40,
-          r: 40,
-          b: 80,
-          t: 40
-        },
-        showlegend: false
+        overlaying: 'y',
+        side: 'right',
+        range: [0, maxY * 10],
+        showgrid: false,
+        dtick: 50
+      },
+      xaxis: {
+        title: "Chromosome " + chromosome + " (Mb)"
+      },
+      margin: {
+        l: 40,
+        r: 40,
+        b: 80,
+        t: 40
+      },
+      showlegend: false,
+      clickmode: 'event+select',
+      hovermode: 'closest'
     };
-
-    return { data: pdata, layout: playout, config: {displaylogo: false} };
+    return {
+      data: pdata,
+      layout: playout,
+      config: {
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+      }
+    };
   }
+
+  clickPoint(event, plot: PlotComponent) {
+    // console.log(event, plot);
+    // console.log(event);
+    console.log(event.points);
+
+    if (event.points) {
+      // $('#locuszoom-plot').click(function (e) {
+
+      // var offset = $(this).offset();
+      var left = event.pageX;
+      var top = event.pageY;
+      var theHeight = $('.popover').height();
+      console.log("reached");
+      $('.popover').show();
+      $('.popover').css('left', (left+10) + 'px');
+      $('.popover').css('top', (top-(theHeight/2)-10) + 'px');
+      
+      // });
+      // var pts = '';
+      // for (let point of event.points) {
+        // pts = 'x = '+ point.x + '\ny = ' + 
+        //     point.y + '\n';
+        // let annotate_text = `x = ${point.x}, y = ${point.y}`;
+        // let annotation = {
+        //   text: annotate_text,
+        //   x: point.x,
+        //   y: point.y
+        // }
+
+        // let clone = Object.assign({}, this.graph.layout);
+        // clone.annotations = clone.annotations || [];
+        // clone.annotations.push(annotation);
+        // this.graph.layout = clone;
+        // var offset = $(this).offset();
+        // var left = event.pageX;
+        // var top = event.pageY;
+        // var theHeight = $('.popover').height();
+        // $('.popover').show();
+        // $('.popover').css('left', (left+10) + 'px');
+        // $('.popover').css('top', (top-(theHeight/2)-10) + 'px');
+      // }
+      // alert('Closest point clicked:\n\n'+pts);
+    }    
+  }
+
+  // $('.Img').click(function (e) {
+  //     var offset = $(this).offset();
+  //     var left = e.pageX;
+  //     var top = e.pageY;
+  //     var theHeight = $('.popover').height();
+  //     $('.popover').show();
+  //     $('.popover').css('left', (left+10) + 'px');
+  //     $('.popover').css('top', (top-(theHeight/2)-10) + 'px');
+  // });
+
 
 }
 

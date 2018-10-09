@@ -59,17 +59,31 @@
 
 </div>
 
+<!-- Popover -->
+<div class="popover">
+    <input type='text' class='span1' />
+    <input type='button' class='btn' value='Save' />
+</div>
+
 <!-- Show centered Plotly gene expressions boxplot if graph is generated -->
-<div class="d-flex justify-content-center" id="eqtl-locuszoom-plot" *ngIf="graph">
-  <plotly-plot [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+<div 
+  class="d-flex justify-content-center" 
+  id="eqtl-locuszoom-plot" 
+  *ngIf="graph">
+  <plotly-plot 
+    id="locuszoom-plot" 
+    [data]="graph.data" 
+    [layout]="graph.layout" 
+    [config]="graph.config"
+    (click)="clickPoint($event, plot)"
+    #plot>
+  </plotly-plot>
 </div>
 
 <br>
 
-<pre>{{ eqtlQDataTopAnnot | json }}</pre>
+<!-- <pre>{{ eqtlQDataTopAnnot | json }}</pre>
 
 <pre>{{ geneList }}</pre>
 
-<pre>{{ selectedPop }}</pre>
-
-<!-- <pre>{{ selectedPop2 | json }}</pre> -->
+<pre>{{ selectedPop }}</pre> -->

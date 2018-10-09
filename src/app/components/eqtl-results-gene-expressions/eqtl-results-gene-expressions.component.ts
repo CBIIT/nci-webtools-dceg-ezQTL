@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
-import {take} from 'rxjs/operators';
-
 
 
 @Component({
@@ -29,7 +27,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
         this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
       }
     });
-    this.selectNumGenes = "15";
+    this.selectNumGenes = "15"; // default number of genes displayed
   }
 
   getGeneSymbols(geneData) {
@@ -63,10 +61,8 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   geneExpressionsBoxPlot(geneData) {
 
     var xData = this.getGeneSymbols(geneData);
-    console.log(xData);
 
     var yData = this.getGeneYData(geneData, xData);
-    console.log(yData);
 
     var pdata = [];
 
@@ -90,7 +86,6 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     };
 
     var playout = {
-        // title: 'Gene Expressions',
         width: 1000,
         height: 600,
         yaxis: {
@@ -99,10 +94,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           showgrid: true,
           zeroline: true,
           dtick: 4,
-          // gridcolor: 'rgb(255, 255, 255)',
           gridwidth: 1
-          // zerolinecolor: 'rgb(255, 255, 255)',
-          // zerolinewidth: 2
         },
         margin: {
           l: 40,
@@ -110,19 +102,23 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           b: 80,
           t: 40
         },
-        // paper_bgcolor: 'rgb(243, 243, 243)',
-        // plot_bgcolor: 'rgb(243, 243, 243)',
         showlegend: false
     };
 
-    return { data: pdata, layout: playout, config: {displaylogo: false} };
+    return { 
+      data: pdata, 
+      layout: playout, 
+      config: {
+        displaylogo: false, 
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"]
+      } 
+    };
 
   }
 
   replotExpressionsBoxPlot(geneData, xData) {
 
     var yData = this.getGeneYData(geneData, xData);
-    console.log(yData);
 
     var pdata = [];
 
@@ -146,7 +142,6 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     };
 
     var playout = {
-        // title: 'Gene Expressions',
         width: 1000,
         height: 600,
         yaxis: {
@@ -155,10 +150,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           showgrid: true,
           zeroline: true,
           dtick: 4,
-          // gridcolor: 'rgb(255, 255, 255)',
           gridwidth: 1
-          // zerolinecolor: 'rgb(255, 255, 255)',
-          // zerolinewidth: 2
         },
         margin: {
           l: 40,
@@ -166,19 +158,21 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           b: 80,
           t: 40
         },
-        // paper_bgcolor: 'rgb(243, 243, 243)',
-        // plot_bgcolor: 'rgb(243, 243, 243)',
         showlegend: false
     };
 
-    this.graph = { data: pdata, layout: playout, config: {displaylogo: false} };
+    this.graph = { 
+      data: pdata, 
+      layout: playout, 
+      config: {
+        displaylogo: false, 
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"]
+      } 
+    };
   }
 
   triggerReplot() {
-    console.log("replot graph");
-    console.log(parseInt(this.selectNumGenes));
     var limitedGeneSymbols = this.getGeneSymbols(this.eqtlData).slice(0,parseInt(this.selectNumGenes));
-    console.log(limitedGeneSymbols);
     this.replotExpressionsBoxPlot(this.eqtlData, limitedGeneSymbols);
   }
 
