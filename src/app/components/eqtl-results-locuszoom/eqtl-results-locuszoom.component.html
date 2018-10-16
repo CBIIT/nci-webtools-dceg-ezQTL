@@ -61,8 +61,23 @@
 
 <!-- Popover -->
 <div class="popover">
-    <input type='text' class='span1' />
-    <input type='button' class='btn' value='Save' />
+  <button type="button" class="close" aria-label="Close" (click)="closePopover()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <div class="popover-content" *ngIf="popoverData">
+    <b>{{ popoverData.variant_id }}</b>
+    <br>
+    P Value: <b>{{ popoverData.pval_nominal }}</b>
+    <br>
+    Ref. Allele: <b>{{ popoverData.ref }}</b>
+    <hr>
+    <a (click)="makeLDRef()">Make LD Reference</a>
+    <br>
+    <a (click)="showBoxplot(popoverData)">Show Boxplot</a>
+  </div>
+  <div class="popover-content" *ngIf="!popoverData">
+    No data
+  </div>
 </div>
 
 <!-- Show centered Plotly gene expressions boxplot if graph is generated -->
@@ -82,8 +97,8 @@
 
 <br>
 
-<!-- <pre>{{ eqtlQDataTopAnnot | json }}</pre>
+<pre>{{ eqtlQDataTopAnnot | json }}</pre>
 
-<pre>{{ geneList }}</pre>
+<!-- <pre>{{ geneList }}</pre> -->
 
-<pre>{{ selectedPop }}</pre> -->
+<pre>{{ popoverPoint | json }}</pre>

@@ -30,7 +30,9 @@ import { MatInputModule, MatInput } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatDialogModule } from '@angular/material/dialog';
 import { PlotlyModule } from 'angular-plotly.js';
+import { EqtlResultsLocuszoomBoxplotsComponent } from './components/eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
 
 
 @NgModule({
@@ -50,7 +52,8 @@ import { PlotlyModule } from 'angular-plotly.js';
     FileValueAccessorDirective,
     EqtlResultsGeneExpressionsComponent,
     EqtlResultsLocuszoomComponent,
-    EqtlResultsTableComponent
+    EqtlResultsTableComponent,
+    EqtlResultsLocuszoomBoxplotsComponent
   ],
   imports: [
     BrowserModule,
@@ -67,9 +70,11 @@ import { PlotlyModule } from 'angular-plotly.js';
     FormsModule,
     ReactiveFormsModule,
     MatProgressSpinnerModule,
-    PlotlyModule
+    PlotlyModule,
+    MatDialogModule
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [EqtlResultsLocuszoomBoxplotsComponent]
 })
 export class AppModule { }

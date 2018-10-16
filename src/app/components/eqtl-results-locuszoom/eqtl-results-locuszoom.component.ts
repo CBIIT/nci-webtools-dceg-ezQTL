@@ -1,6 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
-import { PlotComponent } from 'angular-plotly.js'
+import { PlotComponent } from 'angular-plotly.js';
+import { MatDialog } from '@angular/material';
+import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
+
+
 import * as $ from 'jquery';
 // import * as Plotly from 'plotly.js';
 
@@ -16,6 +20,12 @@ export interface SubPopulation {
   value: string;
   viewValue: string;
   selected: boolean;
+}
+
+export interface PopoverData {
+  variant_id: string;
+  pval_nominal: Number;
+  ref: string;
 }
 
 @Component({
@@ -36,7 +46,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   populationSelectedAll: boolean;
 
-  constructor(private data: EqtlResultsService) { }
+  popoverData: PopoverData;
+  popoverPoint: Object;
+
+  // fileNameDialogRef: MatDialogRef<EqtlResultsLocuszoomBoxplotsComponent>;
+
+  constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
   ngOnInit() {
     this.data.currentEqtlData.subscribe(eqtlData => {
@@ -379,61 +394,47 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
   }
 
-  clickPoint(event, plot: PlotComponent) {
-    // console.log(event, plot);
-    // console.log(event);
-    console.log(event.points);
-
-    if (event.points) {
-      // $('#locuszoom-plot').click(function (e) {
-
-      // var offset = $(this).offset();
-      var left = event.pageX;
-      var top = event.pageY;
-      var theHeight = $('.popover').height();
-      console.log("reached");
-      $('.popover').show();
-      $('.popover').css('left', (left+10) + 'px');
-      $('.popover').css('top', (top-(theHeight/2)-10) + 'px');
-      
-      // });
-      // var pts = '';
-      // for (let point of event.points) {
-        // pts = 'x = '+ point.x + '\ny = ' + 
-        //     point.y + '\n';
-        // let annotate_text = `x = ${point.x}, y = ${point.y}`;
-        // let annotation = {
-        //   text: annotate_text,
-        //   x: point.x,
-        //   y: point.y
-        // }
-
-        // let clone = Object.assign({}, this.graph.layout);
-        // clone.annotations = clone.annotations || [];
-        // clone.annotations.push(annotation);
-        // this.graph.layout = clone;
-        // var offset = $(this).offset();
-        // var left = event.pageX;
-        // var top = event.pageY;
-        // var theHeight = $('.popover').height();
-        // $('.popover').show();
-        // $('.popover').css('left', (left+10) + 'px');
-        // $('.popover').css('top', (top-(theHeight/2)-10) + 'px');
-      // }
-      // alert('Closest point clicked:\n\n'+pts);
-    }    
+  populatePopover(pointData) {
+    this.popoverPoint = pointData;
+    var data = {
+      variant_id: pointData.variant_id, 
+      pval_nominal: pointData.pval_nominal, 
+      ref: pointData.ref, 
+    };
+    return data;
   }
 
-  // $('.Img').click(function (e) {
-  //     var offset = $(this).offset();
-  //     var left = e.pageX;
-  //     var top = e.pageY;
-  //     var theHeight = $('.popover').height();
-  //     $('.popover').show();
-  //     $('.popover').css('left', (left+10) + 'px');
-  //     $('.popover').css('top', (top-(theHeight/2)-10) + 'px');
-  // });
+  closePopover() {
+    $('.popover').hide();
+  }
+
+  makeLDRef() {
+    alert("make ld ref!");
+  } 
+
+  showBoxplot(boxplotData) {
+    console.log(boxplotData);
+    this.dialog.open(EqtlResultsLocuszoomBoxplotsComponent, {
+      data: {
+        variant_id: boxplotData.variant_id,
+        pval_nominal: boxplotData.pval_nominal,
+        ref: boxplotData.ref
+      }
+    });
+  }
+
+  clickPoint(event, plot: PlotComponent) {
+    if (event.points) {
+      var left = event.event.offsetX;
+      var top = event.event.offsetY;
+      console.log(event.points[0]);
+      this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex]);
+      $('.popover').show();
+      $('.popover').css('left', (left + 65));
+      $('.popover').css('top', (top + 50));
+
+    }
+  }
 
 
 }
-
