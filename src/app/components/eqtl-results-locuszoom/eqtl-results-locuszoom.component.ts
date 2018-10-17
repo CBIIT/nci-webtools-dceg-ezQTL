@@ -43,6 +43,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   populationGroups: PopulationGroup[];
   selectedPop: string[];
   public graph = null;
+  showPopover: boolean;
 
   populationSelectedAll: boolean;
 
@@ -168,25 +169,31 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return true;
   }
 
-  // remove(element, newArray) {
-  //   // var newArray = this.selectedPop.slice(0);
-  //   // for( var i = 0; i < newarr.length; i++ ) { 
-  //   var x = newArray.indexOf(element);
-  //   console.log(newArray);
-  //   console.log(x);
-  //   if (x != -1) {
-  //     return newArray.splice(x, 1); 
-  //   }
-  //   console.log(newArray);
-  //   // }
-  //   // console.log(newarr);
-  //   return newArray;
-  //   // this.selectedPop = newarr;
-  // }
+  remove(element, src) {
+    var newArray = JSON.parse(JSON.stringify(src));
+    // console.log(newArray);
+    for (var i = 0; i < newArray.length; i++) {
+      var idx = -1;
+      if (newArray[i] == element) {
+        idx = i;
+      }
+      if (idx != -1) {
+        newArray.splice(idx, 1);
+      }
+    }
+    return newArray;
+  }
+
+  removeAll(subpop, src) {
+    var newArray = JSON.parse(JSON.stringify(src));
+    for (var i = 0; i < subpop.length; i++) {
+      newArray = this.remove(subpop[i], newArray);
+    }
+    return newArray;
+  }
 
 
   selectPopulationGroup(groupName) {
-    // console.log(groupName);
     var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
     var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
     var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
@@ -194,9 +201,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
     if (groupName == "AFR") {
       if (this.containsAll(african, this.selectedPop)) {
-        this.selectedPop = [];
-        // this.selectedPop = z;
-        // this.selectedPop = ["MSL", "GWD"];
+        this.selectedPop = this.removeAll(african, this.selectedPop);
         this.changePop();
       } else {
         this.selectedPop = (this.selectedPop.concat(african)).filter(this.unique);
@@ -205,9 +210,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     if (groupName == "AMR") {
       if (this.containsAll(mixedAmerican, this.selectedPop)) {
-        this.selectedPop = [];
-        // this.selectedPop = z;
-        // this.selectedPop = ["MSL", "GWD"];
+        this.selectedPop = this.removeAll(mixedAmerican, this.selectedPop);
         this.changePop();
       } else {
         this.selectedPop = (this.selectedPop.concat(mixedAmerican)).filter(this.unique);
@@ -216,9 +219,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     if (groupName == "EAS") {
       if (this.containsAll(eastAsian, this.selectedPop)) {
-        this.selectedPop = [];
-        // this.selectedPop = z;
-        // this.selectedPop = ["MSL", "GWD"];
+        this.selectedPop = this.removeAll(eastAsian, this.selectedPop);
         this.changePop();
       } else {
         this.selectedPop = (this.selectedPop.concat(eastAsian)).filter(this.unique);
@@ -227,9 +228,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     if (groupName == "EUR") {
       if (this.containsAll(european, this.selectedPop)) {
-        this.selectedPop = [];
-        // this.selectedPop = z;
-        // this.selectedPop = ["MSL", "GWD"];
+        this.selectedPop = this.removeAll(european, this.selectedPop);
         this.changePop();
       } else {
         this.selectedPop = (this.selectedPop.concat(european)).filter(this.unique);
@@ -238,9 +237,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     if (groupName == "SAS") {
       if (this.containsAll(southAsian, this.selectedPop)) {
-        this.selectedPop = [];
-        // this.selectedPop = z;
-        // this.selectedPop = ["MSL", "GWD"];
+        this.selectedPop = this.removeAll(southAsian, this.selectedPop);
         this.changePop();
       } else {
         this.selectedPop = (this.selectedPop.concat(southAsian)).filter(this.unique);
@@ -406,6 +403,17 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   closePopover() {
     $('.popover').hide();
+    this.showPopover = false;
+  }
+  
+  // close popover if click anywhere else
+  closePopover2(event) {
+    if (event.points == null && this.showPopover == true) {
+      this.showPopover = false;
+    } else {
+      this.showPopover = false;
+      $('.popover').hide();
+    }
   }
 
   makeLDRef() {
@@ -413,7 +421,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   } 
 
   showBoxplot(boxplotData) {
-    console.log(boxplotData);
+    // console.log(boxplotData);
     this.dialog.open(EqtlResultsLocuszoomBoxplotsComponent, {
       data: {
         variant_id: boxplotData.variant_id,
@@ -424,16 +432,20 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   clickPoint(event, plot: PlotComponent) {
+    // console.log(event.points);
     if (event.points) {
       var left = event.event.offsetX;
       var top = event.event.offsetY;
-      console.log(event.points[0]);
+      // console.log(event.points[0]);
       this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex]);
       $('.popover').show();
       $('.popover').css('left', (left + 65));
       $('.popover').css('top', (top + 50));
-
+      this.showPopover = true;
+    } else {
+      this.closePopover2(event);
     }
+
   }
 
 

@@ -13,7 +13,7 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
   boxplotData: Object;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: PopoverData) {
-      console.log(data);
+      // console.log(data);
       this.boxplotData = data;
     }
 

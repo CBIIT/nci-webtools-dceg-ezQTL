@@ -4,7 +4,13 @@
   <div class="col-md-auto p-4">
     <mat-form-field>
       <mat-label>Population</mat-label>
-      <mat-select #population panelClass="populationPanel" [(value)]="selectedPop" (selectionChange)="changePop()" multiple required>
+      <mat-select 
+        panelClass="populationPanel" 
+        [(value)]="selectedPop" 
+        (selectionChange)="changePop()" 
+        multiple 
+        required 
+        #population>
         <!-- Edit dropdown placeholder -->
         <mat-select-trigger>
           <span *ngIf="selectedPop.length < 26">
@@ -18,28 +24,37 @@
               </span>
             </span>
           </span>
+          <!-- Display placeholder if all populations selected (26 total) -->
           <span *ngIf="selectedPop.length == 26">
             (ALL) All Populations
           </span>
         </mat-select-trigger>
         <br>
-        <mat-checkbox class="p-3" (change)="selectAll()" color="primary" [checked]="populationSelectedAll">
+        <mat-checkbox 
+          class="p-3" 
+          (change)="selectAll()" 
+          color="primary" 
+          [checked]="populationSelectedAll" 
+          style="width: 500px;">
           (ALL) All Populations
         </mat-checkbox>
-        <!-- <a *ngFor="let group of populationGroups" (click)="selectAll()"> -->
+        <!-- Populate dropdown with all populations -->
         <div *ngFor="let group of populationGroups">
+          <!-- Populate subpopulation groups -->
           <div class="pl-3">
-            <span (click)="selectPopulationGroup(group.namecode)">
+            <span 
+              (click)="selectPopulationGroup(group.namecode)" 
+              style="cursor: pointer;">
               (<u>{{ group.namecode }}</u>)<u> {{ group.name }}</u>
             </span>
           </div>
-          <!-- </div> -->
-        <!-- <mat-optgroup *ngFor="let group of populationGroups" [label]="'('+group.namecode+') '+group.name"> -->
-          <mat-option class="pl-5" *ngFor="let subPopulation of group.subPopulations" [value]="subPopulation.value">
+          <!-- Populate individual populations -->
+          <mat-option 
+            class="pl-5" 
+            *ngFor="let subPopulation of group.subPopulations" 
+            [value]="subPopulation.value">
             ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
           </mat-option>
-        <!-- </mat-optgroup> -->
-        <!-- </a> -->
         </div>
       </mat-select>
     </mat-form-field>
@@ -90,15 +105,17 @@
     [data]="graph.data" 
     [layout]="graph.layout" 
     [config]="graph.config"
-    (click)="clickPoint($event, plot)"
+    (click)="clickPoint($event, plot)" 
+    (relayout)="closePopover2($event)" 
+    (redraw)="closePopover2($event)"
     #plot>
   </plotly-plot>
 </div>
 
 <br>
 
-<pre>{{ eqtlQDataTopAnnot | json }}</pre>
+<!-- <pre>{{ eqtlQDataTopAnnot | json }}</pre> -->
 
-<!-- <pre>{{ geneList }}</pre> -->
+<!-- <pre>{{ selectedPop }}</pre> -->
 
-<pre>{{ popoverPoint | json }}</pre>
+<!-- <pre>{{ popoverPoint | json }}</pre> -->
