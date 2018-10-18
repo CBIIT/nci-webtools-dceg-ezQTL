@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from "@angular/material";
 import { PopoverData } from '../eqtl-results-locuszoom/eqtl-results-locuszoom.component';
+import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 
 @Component({
@@ -11,17 +12,21 @@ import { PopoverData } from '../eqtl-results-locuszoom/eqtl-results-locuszoom.co
 export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
 
   boxplotData: Object;
+  eqtlData: Object;
+  boxplotDataDetailed: Object;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: PopoverData) {
-      // console.log(data);
-      this.boxplotData = data;
+  constructor(private data: EqtlResultsService, @Inject(MAT_DIALOG_DATA) public popoverData: PopoverData) {
+      this.boxplotData = popoverData;
     }
 
   ngOnInit() {
+    this.data.currentEqtlData.subscribe(eqtlData => {
+      if (eqtlData) {
+        this.eqtlData = eqtlData[1];
+        this.boxplotDataDetailed = this.eqtlData[this.boxplotData['point_index']]
+      }
+    });
   }
 
-  // close() {
-  //   this.dialogRef.close();
-  // }
 
 }

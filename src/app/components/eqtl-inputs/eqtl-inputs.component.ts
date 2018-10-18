@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-eqtl-inputs',
@@ -21,9 +22,17 @@ export class EqtlInputsComponent implements OnInit {
   eqtlData: Object;
   resultStatus: boolean;
   errorMessage: string;
+  warningMessage: string;
   public resetColor = null;
 
-  constructor(private data: EqtlResultsService) { }
+  constructor(private cdr: ChangeDetectorRef, private data: EqtlResultsService) { }
+
+  ngAfterViewChecked(){
+      this.data.currentWarningMessage.subscribe(warningMessage => {
+        this.warningMessage = warningMessage;
+      });
+      this.cdr.detectChanges();
+  }
 
   ngOnInit() {
     this.eqtlForm.valueChanges.subscribe(formValue => {
@@ -74,6 +83,11 @@ export class EqtlInputsComponent implements OnInit {
     this.data.changeResultStatus(false);
     this.data.changeEqtlData(null);
     this.data.changeErrorMessage('');
+    this.data.changeWarningMessage('');
+  }
+
+  closeWarning() {
+    $('#warningAlert').hide();
   }
 
 }

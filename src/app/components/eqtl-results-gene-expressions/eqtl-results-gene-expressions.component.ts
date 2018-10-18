@@ -13,6 +13,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   totalNumGenes: Number;
   selectNumGenes: string;
   geneList: string[];
+  warningMessage: string;
   public graph = null;
 
   constructor(private data: EqtlResultsService) { }
@@ -28,6 +29,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
       }
     });
     this.selectNumGenes = "15"; // default number of genes displayed
+    this.data.currentWarningMessage.subscribe(warningMessage => {
+      this.warningMessage = warningMessage;
+    });
   }
 
   getGeneSymbols(geneData) {
@@ -40,6 +44,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     }
     var uniqueGenes = genes.filter(getUnique);
     this.totalNumGenes = uniqueGenes.length;
+    if (this.totalNumGenes > 15) {
+      this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+    }
     this.data.changeGeneList(uniqueGenes);
     return uniqueGenes;
   }

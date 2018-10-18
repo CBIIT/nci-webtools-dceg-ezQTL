@@ -3,8 +3,6 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
-
-
 import * as $ from 'jquery';
 // import * as Plotly from 'plotly.js';
 
@@ -23,6 +21,7 @@ export interface SubPopulation {
 }
 
 export interface PopoverData {
+  point_index: Number;
   variant_id: string;
   pval_nominal: Number;
   ref: string;
@@ -391,9 +390,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
   }
 
-  populatePopover(pointData) {
+  populatePopover(pointData, pointIndex) {
     this.popoverPoint = pointData;
     var data = {
+      point_index: pointIndex,
       variant_id: pointData.variant_id, 
       pval_nominal: pointData.pval_nominal, 
       ref: pointData.ref, 
@@ -424,6 +424,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     // console.log(boxplotData);
     this.dialog.open(EqtlResultsLocuszoomBoxplotsComponent, {
       data: {
+        point_index: boxplotData.point_index,
         variant_id: boxplotData.variant_id,
         pval_nominal: boxplotData.pval_nominal,
         ref: boxplotData.ref
@@ -437,7 +438,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       var left = event.event.offsetX;
       var top = event.event.offsetY;
       // console.log(event.points[0]);
-      this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex]);
+      this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex], event.points[0].pointIndex);
       $('.popover').show();
       $('.popover').css('left', (left + 65));
       $('.popover').css('top', (top + 50));

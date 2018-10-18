@@ -24,6 +24,10 @@ export class EqtlResultsService {
   private errorMessage = new BehaviorSubject('');
   currentErrorMessage = this.errorMessage.asObservable();
 
+  // warning message if uploaded data files has > 15 genes
+  private warningMessage = new BehaviorSubject('');
+  currentWarningMessage = this.warningMessage.asObservable();
+
   constructor(private http: HttpClient) { }
 
   getResults(formData: FormData) {
@@ -45,6 +49,10 @@ export class EqtlResultsService {
 
   changeErrorMessage(errorMessage: string) {
     this.errorMessage.next(errorMessage);
+  }
+
+  changeWarningMessage(warningMessage: string) {
+    this.warningMessage.next(warningMessage);
   }
 
 }
