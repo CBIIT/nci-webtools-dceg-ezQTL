@@ -401,7 +401,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   closePopover() {
-    $('.popover').popover('hide');
+    $('.popover').hide();
     this.showPopover = false;
   }
   
@@ -411,7 +411,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.showPopover = false;
     } else {
       this.showPopover = false;
-      $('.popover').popover('hide');
+      $('.popover').hide();
     }
   }
 
@@ -438,7 +438,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       var top = event.event.offsetY;
       // console.log(event.points[0]);
       this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex], event.points[0].pointIndex);
-      $('.popover').popover('show');
+      $('.popover').show();
       $('.popover').css('left', (left + 65));
       $('.popover').css('top', (top + 50));
       this.showPopover = true;
