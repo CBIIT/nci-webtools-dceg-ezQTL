@@ -87,8 +87,5 @@ export class EqtlInputsComponent implements OnInit {
     this.data.changeWarningMessage('');
   }
 
-  closeWarning() {
-    $('#warningAlert').alert('close');
-  }
 
 }
