@@ -3,9 +3,8 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
-import * as $ from 'jquery';
-// import * as Plotly from 'plotly.js';
 
+declare var $; // declare jquery $
 
 export interface PopulationGroup {
   namecode: string;
@@ -402,7 +401,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   closePopover() {
-    $('.popover').hide();
+    $('.popover').popover('hide');
     this.showPopover = false;
   }
   
@@ -412,7 +411,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.showPopover = false;
     } else {
       this.showPopover = false;
-      $('.popover').hide();
+      $('.popover').popover('hide');
     }
   }
 
@@ -439,7 +438,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       var top = event.event.offsetY;
       // console.log(event.points[0]);
       this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex], event.points[0].pointIndex);
-      $('.popover').show();
+      $('.popover').popover('show');
       $('.popover').css('left', (left + 65));
       $('.popover').css('top', (top + 50));
       this.showPopover = true;

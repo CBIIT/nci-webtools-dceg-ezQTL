@@ -3,7 +3,8 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
-import * as $ from 'jquery';
+
+declare var $; // declare jquery $
 
 @Component({
   selector: 'app-eqtl-inputs',
@@ -87,7 +88,7 @@ export class EqtlInputsComponent implements OnInit {
   }
 
   closeWarning() {
-    $('#warningAlert').hide();
+    $('#warningAlert').alert('close');
   }
 
 }

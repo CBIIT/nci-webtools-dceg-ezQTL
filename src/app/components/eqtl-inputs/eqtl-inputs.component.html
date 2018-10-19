@@ -50,10 +50,20 @@
             <!-- {{ eqtlForm.value.expressionFile[0]
                 ? eqtlForm.value.expressionFile[0].name.substring(0, 11)
                 : 'Choose File' }} -->
-            {{ !eqtlForm.value.expressionFile ? 'Choose File' : (eqtlForm.value?.expressionFile[0]?.name || 'Choose File') }}
+            {{ !eqtlForm.value.expressionFile ? 'Choose File' : ('File Selected' || 'Choose File') }}
           </button>
           <div class="d-block d-md-none w-100"></div>
           <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.expression.txt" download>Sample</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ml-5"></div>
+        <div class="ml-5"></div>
+        <div class="ml-1"></div>
+        <div 
+          class="ml-5" 
+          style="overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.expressionFile ? '' : (eqtlForm.value?.expressionFile[0]?.name || '') }}
         </div>
       </div>
     </div>
@@ -81,10 +91,20 @@
             [disabled]="resultStatus" 
             class="ml-3 mr-3" 
             mat-raised-button>
-            {{ !eqtlForm.value.genotypeFile ? 'Choose File' : (eqtlForm.value?.genotypeFile[0]?.name || 'Choose File') }}
+            {{ !eqtlForm.value.genotypeFile ? 'Choose File' : ('File Selected' || 'Choose File') }}
           </button>
           <div class="d-block d-md-none w-100"></div>
           <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.genotyping.txt" download>Sample</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ml-5"></div>
+        <div class="ml-5"></div>
+        <div class="ml-2"></div>
+        <div 
+          class="ml-5" 
+          style="overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.genotypeFile ? '' : (eqtlForm.value?.genotypeFile[0]?.name || '') }}
         </div>
       </div>
     </div>
@@ -113,10 +133,20 @@
             [disabled]="resultStatus" 
             class="ml-3 mr-3" 
             mat-raised-button>
-            {{ !eqtlForm.value.associationFile ? 'Choose File' : (eqtlForm.value?.associationFile[0]?.name || 'Choose File') }}
+            {{ !eqtlForm.value.associationFile ? 'Choose File' : ('File Selected' || 'Choose File') }}
           </button>
           <div class="d-block d-md-none w-100"></div>
           <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.eQTL.txt" download>Sample</a>
+        </div>
+      </div>
+      <div class="row">
+        <div class="ml-5"></div>
+        <div class="ml-5"></div>
+        <div class="ml-2"></div>
+        <div 
+          class="ml-5" 
+          style="overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.associationFile ? '' : (eqtlForm.value?.associationFile[0]?.name || '') }}
         </div>
       </div>
     </div>
