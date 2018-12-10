@@ -24,11 +24,33 @@
 <div class="container border border-light rounded p-3" id="inputs">
   <form class="row" [formGroup]="eqtlForm" id="input-files">
 
+   <!-- Checkboxes -->
+    <div class="col">
+      <div class="row" id="input-files">
+        <mat-checkbox
+          class="pl-3 pt-2" 
+          (change)="loadBoxplotData()" 
+          [checked]="(selectLoadBoxplotData || (eqtlForm.value.expressionFile && eqtlForm.value.genotypeFile))" 
+          color="primary">
+          Load Boxplot data
+        </mat-checkbox>
+        <mat-checkbox 
+          class="pl-4 pt-2" 
+          (change)="loadGWASData()" 
+          [checked]="(selectLoadGWASData || eqtlForm.value.gwasFile)" 
+          color="primary">
+          Load GWAS data
+        </mat-checkbox>
+      </div>
+    </div>
+
+    <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
+
     <!-- Expression Data File -->
     <div class="col">
       <div class="row" id="input-files">
         <div class="col-sm">
-          Expression Data File<span style="color:red">*</span>
+          Expression Data File<span *ngIf="(!selectLoadBoxplotData && (eqtlForm.value.expressionFile || eqtlForm.value.genotypeFile))">&nbsp;</span><span *ngIf="(selectLoadBoxplotData || (eqtlForm.value.expressionFile && eqtlForm.value.genotypeFile))" style="color:red">*</span>
           <div class="d-block d-md-none w-100"></div>
           <input required 
             type="file" 
@@ -57,9 +79,16 @@
       </div>
       <div class="row">
         <div 
+          *ngIf="(selectLoadBoxplotData || (eqtlForm.value.expressionFile && eqtlForm.value.genotypeFile))" 
           class="text-secondary" 
           style="margin-left:150px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
-          {{ !eqtlForm.value.expressionFile ? '' : (eqtlForm.value?.expressionFile[0]?.name || '') }}
+          {{ !eqtlForm.value.expressionFile ? '(required)' : (eqtlForm.value?.expressionFile[0]?.name || '(required)') }}
+        </div>
+        <div 
+          *ngIf="(!selectLoadBoxplotData && (!eqtlForm.value.expressionFile || !eqtlForm.value.genotypeFile))" 
+          class="text-secondary" 
+          style="margin-left:150px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.expressionFile ? '(optional)' : (eqtlForm.value?.expressionFile[0]?.name || '(optional)') }}
         </div>
       </div>
     </div>
@@ -70,7 +99,7 @@
     <div class="col">
       <div class="row" id="input-files">
         <div class="col-sm">
-          Genotype Data File<span style="color:red">*</span>
+          Genotype Data File<span *ngIf="(!selectLoadBoxplotData && (eqtlForm.value.expressionFile || eqtlForm.value.genotypeFile))">&nbsp;</span><span *ngIf="(selectLoadBoxplotData || (eqtlForm.value.expressionFile && eqtlForm.value.genotypeFile))" style="color:red">*</span>
           <div class="d-block d-md-none w-100"></div>
           <input required 
             type="file" 
@@ -95,17 +124,26 @@
       </div>
       <div class="row">
         <div 
+          *ngIf="(selectLoadBoxplotData || (eqtlForm.value.expressionFile && eqtlForm.value.genotypeFile))" 
           class="text-secondary" 
           style="margin-left:140px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
-          {{ !eqtlForm.value.genotypeFile ? '' : (eqtlForm.value?.genotypeFile[0]?.name || '') }}
+          {{ !eqtlForm.value.genotypeFile ? '(required)' : (eqtlForm.value?.genotypeFile[0]?.name || '(required)') }}
+        </div>
+        <div 
+          *ngIf="(!selectLoadBoxplotData && (!eqtlForm.value.expressionFile || !eqtlForm.value.genotypeFile))" 
+          class="text-secondary" 
+          style="margin-left:140px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.genotypeFile ? '(optional)' : (eqtlForm.value?.genotypeFile[0]?.name || '(optional)') }}
         </div>
       </div>
     </div>
 
+    <div class="w-100"></div>
+
     <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
 
     <!-- Association Data File -->
-    <div class="col">
+    <div class="col mt-3">
       <div class="row" id="input-files">
         <div class="col-sm">
           Association Data File<span style="color:red">*</span>
@@ -136,24 +174,61 @@
         <div 
           class="text-secondary" 
           style="margin-left:155px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
-          {{ !eqtlForm.value.associationFile ? '' : (eqtlForm.value?.associationFile[0]?.name || '') }}
+          {{ !eqtlForm.value.associationFile ? '(required)' : (eqtlForm.value?.associationFile[0]?.name || '(required)') }}
         </div>
       </div>
     </div>
 
-    <div class="w-100"></div>
+    <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
+
+    <!-- GWAS Data File -->
+    <div class="col mt-3">
+      <div class="row" id="input-files">
+        <div class="col-sm">
+          GWAS Data File<span *ngIf="(!selectLoadGWASData && !eqtlForm.value.gwasFile)">&nbsp;</span><span *ngIf="(selectLoadGWASData || eqtlForm.value.gwasFile)" style="color:red">*</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <div class="d-block d-md-none w-100"></div>
+          <input required 
+            type="file" 
+            formControlName="gwasFile"
+            class="ng-hide" 
+            id="gwas-file" 
+            name="input-files" 
+            accept=".txt" 
+            hidden 
+            required 
+            #gwasInput>
+          <button 
+            style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+            (click)="gwasInput.click()" 
+            [disabled]="resultStatus" 
+            class="ml-4 mr-3" 
+            mat-raised-button>
+            {{ !eqtlForm.value.gwasFile ? 'Choose File' : ('File Selected' || 'Choose File') }}
+          </button>
+          <div class="d-block d-md-none w-100"></div>
+          <i class="fas fa-download mr-1"></i><a href="/src/assets/files/1q21_3.eQTL.txt" download>Sample</a>
+        </div>
+      </div>
+      <div class="row">
+        <div 
+          *ngIf="(selectLoadGWASData || eqtlForm.value.gwasFile)" 
+          class="text-secondary" 
+          style="margin-left:155px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.gwasFile ? '(required)' : (eqtlForm.value?.gwasFile[0]?.name || '(required)') }}
+        </div>
+        <div 
+          *ngIf="(!selectLoadGWASData && !eqtlForm.value.gwasFile)" 
+          class="text-secondary" 
+          style="margin-left:155px; padding-top:5px; overflow:hidden; text-overflow:ellipsis;">
+          {{ !eqtlForm.value.gwasFile ? '(optional)' : (eqtlForm.value?.gwasFile[0]?.name || '(optional)') }}
+        </div>
+      </div>
+    </div>
 
     <div class="d-block d-md-none w-100 mt-2 mb-2 border border-light"></div>
 
-    <div class="col-sm">
-      <!-- <div class="mt-3">{{ resultStatus }}</div> -->
-    </div>
-    <div class="col-sm">
-      
-    </div>
-
     <!-- Submit and Reset Button   -->
-    <div class="col-sm text-center">
+    <div class="col text-center">
       <button 
         type="submit" 
         class="mt-3 mr-3" 
