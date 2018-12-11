@@ -42,13 +42,15 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   var expressionFile = request.files[0].filename;
   var genotypeFile = request.files[1].filename;
   var associationFile = request.files[2].filename;
+  var gwasFile = request.files[3].filename;
   var dir = __dirname + '/r-calculations/uploads/'
   try {
-    const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile);
+    const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile, gwasFile);
     // remove files from uploads folder when data is received from R
     await removeFile(dir + expressionFile);
     await removeFile(dir + genotypeFile);
     await removeFile(dir + associationFile);
+    await removeFile(dir + gwasFile);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -56,6 +58,7 @@ app.post('/upload-file', upload.any(), async (request, response) => {
     await removeFile(dir + expressionFile);
     await removeFile(dir + genotypeFile);
     await removeFile(dir + associationFile);
+    await removeFile(dir + gwasFile);
     response.status(500);
     response.json(err.toString());
   }

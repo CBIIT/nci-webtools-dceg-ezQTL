@@ -1,4 +1,4 @@
-eqtl <- function(workDir, genoFile, exprFile, assocFile) {
+eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
   setwd(workDir)
 
   library(tidyverse)
@@ -60,7 +60,7 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile) {
 
   source('eQTL/emeraLD2R.r')
   in_path <- paste0(workDir, '/eQTL/chr1_149039120_152938045.vcf.gz')
-  # in_bin <- '/Users/kevinjiang/Desktop/dev/emeraLD/bin/emeraLD'
+  # in_bin <- '/usr/local/bin/emeraLD'
   in_bin <- '/usr/bin/emeraLD'
   regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
   getLD <- emeraLD2R(path = in_path, bin = in_bin) 
