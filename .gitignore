@@ -47,5 +47,5 @@ package-lock.json
 
 /r-calculations/eQTL/chr1_149039120_152938045.vcf.gz
 /r-calculations/eQTL/chr1_149039120_152938045.vcf.gz.tbi
-/r-calculations/eQTL/emeraLD
+# /r-calculations/eQTL/emeraLD
 /r-calculations/eQTL/emeraLD2R.r
