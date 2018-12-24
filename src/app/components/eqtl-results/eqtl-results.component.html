@@ -4,26 +4,26 @@
   </div>
 
   <div *ngIf="eqtlData" id="results">
-    <mat-tab-group>
+    <mat-tab-group class="border border-light rounded">
       <div class="row">
 
         <!-- Locuszoom Result Tab -->
         <mat-tab label="Locuszoom Plot"> 
-            <div class="col border border-light rounded" id="result-main">
+            <div class="col" id="result-main">
               <app-eqtl-results-locuszoom></app-eqtl-results-locuszoom>
             </div>
           </mat-tab>
 
         <!-- Gene Expressions Result Tab -->
         <mat-tab label="Gene Expressions"> 
-          <div class="col border border-light rounded" id="result-main">
+          <div class="col" id="result-main">
             <app-eqtl-results-gene-expressions></app-eqtl-results-gene-expressions>
           </div>
         </mat-tab>
 
         <!-- Table Result Tab -->
         <mat-tab label="Table"> 
-          <div class="col border border-light rounded" id="result-main">
+          <div class="col" id="result-main">
             <app-eqtl-results-table></app-eqtl-results-table>
           </div>
         </mat-tab>

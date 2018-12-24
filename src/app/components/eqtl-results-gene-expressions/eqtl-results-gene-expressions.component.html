@@ -32,8 +32,15 @@
 </div>
 
 <!-- Show centered Plotly gene expressions boxplot if graph is generated -->
-<div class="d-flex justify-content-center" id="eqtl-gene-expressions-plot" *ngIf="graph">
-    <plotly-plot [data]="graph.data" [layout]="graph.layout" [config]="graph.config"></plotly-plot>
+<div 
+  class="d-flex justify-content-center" 
+  id="eqtl-gene-expressions-plot" 
+  *ngIf="graph">
+    <plotly-plot 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config">
+    </plotly-plot>
 </div>
 
 <br>

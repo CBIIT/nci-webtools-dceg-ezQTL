@@ -15,6 +15,8 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
   eqtlData: Object;
   boxplotDataDetailed: Object;
 
+  public graph = null;
+
   constructor(private data: EqtlResultsService, @Inject(MAT_DIALOG_DATA) public popoverData: PopoverData) {
       this.boxplotData = popoverData;
     }

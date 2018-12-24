@@ -33,6 +33,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PlotlyModule } from 'angular-plotly.js';
 import { EqtlResultsLocuszoomBoxplotsComponent } from './components/eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
+import { EqtlMessagesComponent } from './components/eqtl-messages/eqtl-messages.component';
 
 
 @NgModule({
@@ -53,7 +54,8 @@ import { EqtlResultsLocuszoomBoxplotsComponent } from './components/eqtl-results
     EqtlResultsGeneExpressionsComponent,
     EqtlResultsLocuszoomComponent,
     EqtlResultsTableComponent,
-    EqtlResultsLocuszoomBoxplotsComponent
+    EqtlResultsLocuszoomBoxplotsComponent,
+    EqtlMessagesComponent
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,21 @@
 <h2 mat-dialog-title>show boxplots!</h2>
 
+<div 
+  class="d-flex justify-content-center" 
+  id="eqtl-locuszoom-boxplots" 
+  *ngIf="graph">
+  <plotly-plot 
+    id="locuszoom-boxplots" 
+    [data]="graph.data" 
+    [layout]="graph.layout" 
+    [config]="graph.config"
+    (click)="clickPoint($event, plot)" 
+    (relayout)="closePopover2($event)" 
+    (redraw)="closePopover2($event)"
+    #plot>
+  </plotly-plot>
+</div>
+
 <pre>{{ boxplotData | json }}</pre>
 
 <br>

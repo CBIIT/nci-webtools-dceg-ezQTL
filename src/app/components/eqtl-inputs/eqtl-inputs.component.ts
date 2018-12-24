@@ -29,7 +29,6 @@ export class EqtlInputsComponent implements OnInit {
   selectLoadBoxplotData: boolean;
   selectLoadGWASData: boolean;
 
-
   constructor(private cdr: ChangeDetectorRef, private data: EqtlResultsService) { }
 
   ngAfterViewChecked(){
@@ -40,9 +39,9 @@ export class EqtlInputsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.eqtlForm.valueChanges.subscribe(formValue => {
-      // console.log(formValue);
-    });
+    // this.eqtlForm.valueChanges.subscribe(formValue => {
+    //   // console.log(formValue);
+    // });
 
     this.data.currentEqtlData.subscribe(eqtlData => this.eqtlData = eqtlData);
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
@@ -64,8 +63,12 @@ export class EqtlInputsComponent implements OnInit {
       this.selectLoadBoxplotData = false;
       this.eqtlForm.value.expressionFile = false;
       this.eqtlForm.value.genotypeFile = false;
+      $("#eqtl-input-expression-file").addClass("disabled-overlay");
+      $("#eqtl-input-genotype-file").addClass("disabled-overlay");
     } else if (this.selectLoadBoxplotData == false || (this.eqtlForm.value.expressionFile && this.eqtlForm.value.genotypeFile)) {
       this.selectLoadBoxplotData = true;
+      $("#eqtl-input-expression-file").removeClass("disabled-overlay");
+      $("#eqtl-input-genotype-file").removeClass("disabled-overlay");
     } else {
       // do nothing
     }
@@ -75,8 +78,10 @@ export class EqtlInputsComponent implements OnInit {
     if (this.selectLoadGWASData == true && !this.eqtlForm.value.gwasFile) {
       this.selectLoadGWASData = false;
       this.eqtlForm.value.gwasFile = false;
+      $("#eqtl-input-gwas-file").addClass("disabled-overlay");
     } else if (this.selectLoadGWASData == false || this.eqtlForm.value.gwasFile) {
       this.selectLoadGWASData = true;
+      $("#eqtl-input-gwas-file").removeClass("disabled-overlay");
     } else {
       // do nothing
     }
@@ -84,7 +89,7 @@ export class EqtlInputsComponent implements OnInit {
 
   async submit() {
     this.data.changeResultStatus(true);
-
+    
     const { expressionFile, genotypeFile, associationFile, gwasFile } = this.eqtlForm.value;
     // console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
 
@@ -92,7 +97,9 @@ export class EqtlInputsComponent implements OnInit {
     formData.append('expression-file', expressionFile[0]);
     formData.append('genotype-file', genotypeFile[0]);
     formData.append('association-file', associationFile[0]);
-    formData.append('gwas-file', gwasFile[0]);
+    if (this.selectLoadGWASData) {
+      formData.append('gwas-file', gwasFile[0]);
+    }
 
     this.data.getResults(formData)
       .subscribe(
@@ -118,6 +125,9 @@ export class EqtlInputsComponent implements OnInit {
     this.data.changeEqtlData(null);
     this.data.changeErrorMessage('');
     this.data.changeWarningMessage('');
+    $("#eqtl-input-expression-file").addClass("disabled-overlay");
+    $("#eqtl-input-genotype-file").addClass("disabled-overlay");
+    $("#eqtl-input-gwas-file").addClass("disabled-overlay");
   }
 
 

@@ -10,6 +10,10 @@ body {
 
 /* Bootstrap overrides */
 
+.container {
+  min-width: 1400px;
+}
+
 .bg-primary, .btn-primary {
   background-color: #2a71a5;
 }
@@ -18,16 +22,16 @@ body {
   background-color: #2a7bb2;
 }
 
-a {
-  color: #00A2EC;
-}
-
 .bg-light {
-  background-color: #f7f7f1 !important;
+  background-color: #EEEEEE !important;
 }
 
 .bg-white {
   background-color: white !important;
+}
+
+.border-light {
+  border-color: #E8E8E8 !important;
 }
 
 .bg-dark-gradient {

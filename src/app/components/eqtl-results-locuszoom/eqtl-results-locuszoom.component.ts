@@ -36,11 +36,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   eqtlData: Object;
   eqtlDataRC: Object;
   eqtlQDataTopAnnot: Object;
+  eqtlGWASData: Object;
+
   geneList: string[];
   selectGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
   public graph = null;
+  // public graphGWAS = null;
   showPopover: boolean;
 
   populationSelectedAll: boolean;
@@ -56,8 +59,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.data.currentEqtlData.subscribe(eqtlData => {
       if (eqtlData) {
         this.eqtlData = eqtlData[1];
-        this.eqtlDataRC = eqtlData[2]
+        this.eqtlDataRC = eqtlData[2];
         this.eqtlQDataTopAnnot = eqtlData[3][0];
+        this.eqtlGWASData = eqtlData[4]
       }
       if (this.eqtlData) {
         this.data.currentGeneList.subscribe(geneList => {
@@ -66,7 +70,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
             this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
           }
         });
-        this.graph = this.locuszoomPlot(this.eqtlData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
+        this.graph = this.locuszoomPlots(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
+        // this.graphGWAS = this.locuszoomGWASPlot(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot)
       }
     });
     this.populationGroups = this.populatePopulationDropdown();
@@ -268,6 +273,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return yData;
   }
 
+  getYGWASData(geneData) {
+    var yData = [];
+    for (var i = 0; i < geneData.length; i++) {
+      yData.push(Math.log10(geneData[i]['pvalue']) * -1.0);
+    }
+    return yData;
+  }
+
   getColorData(geneData) {
     var colorData = [];
     for (var i = 0; i < geneData.length; i++) {
@@ -296,22 +309,22 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return yData;
   }
 
-  locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
+  locuszoomPlots(geneData, geneGWASData, geneDataRC, qDataTopAnnot) {
     var xData = this.getXData(geneData);
-    // console.log(xData);
     var yData = this.getYData(geneData);
-    // console.log(yData);
+    var yGWASData = this.getYGWASData(geneGWASData);
+
     var colorData = this.getColorData(geneData);
-    // console.log(colorData);
+
     var xDataRC = this.getXDataRC(geneDataRC);
-    // console.log(xDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
-    // console.log(yDataRC);
+
     var pdata = [];
+
     // graph scatter
     var trace1 = {
       x: xData,
-      y: yData,
+      y: yGWASData,
       mode: 'markers',
       type: 'scatter',
       marker: {
@@ -327,14 +340,17 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           thicknessmode: 'pixels',
           thickness: 15
         }
-      }
+      },
+      // xaxis: 'x',
+      yaxis: 'y'
     };
     pdata.push(trace1);
+
     // graph recombination rate line
     var trace2 = {
       x: xDataRC,
       y: yDataRC,
-      yaxis: 'y2',
+      yaxis: 'y3',
       type: 'scatter',
       line: {
         color: 'blue',
@@ -342,17 +358,68 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       }
     };
     pdata.push(trace2);
+
+    // graph GWAS scatter
+    var trace3 = {
+      x: xData,
+      y: yData,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 8,
+        color: colorData,
+        colorscale: 'Viridis',
+        reversescale: true,
+        // showscale: true,
+        // colorbar: {
+        //   title: 'R2',
+        //   dtick: 0.25,
+        //   xpad: 100,
+        //   thicknessmode: 'pixels',
+        //   thickness: 15
+        // }
+      },
+      // xaxis: 'x',
+      yaxis: 'y2'
+    };
+    pdata.push(trace3);
+
+    // graph GWAS recombination rate line
+    var trace4 = {
+      x: xDataRC,
+      y: yDataRC,
+      yaxis: 'y4',
+      type: 'scatter',
+      line: {
+        color: 'blue',
+        width: 1
+      }
+    };
+    pdata.push(trace4);
+
     // round most significant pval to next whole number
     var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
+
     var playout = {
+      // grid: {
+      //   rows: 2, 
+      //   columns: 1, 
+      //   subplots:['xy', 'xy2']
+      // },
       width: 1000,
-      height: 600,
+      height: 1000,
       yaxis: {
-        title: "-log10(P-value)",
-        range: [0, maxY]
+        title: "(GWAS) -log10(P-value)",
+        range: [0, maxY],
+        domain: [0, 0.5]
       },
       yaxis2: {
+        title: "-log10(P-value)",
+        range: [0, maxY],
+        domain: [0.5, 1]
+      },
+      yaxis3: {
         title: 'Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
@@ -361,6 +428,20 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           color: 'blue'
         },
         overlaying: 'y',
+        side: 'right',
+        range: [0, maxY * 10],
+        showgrid: false,
+        dtick: 50
+      },
+      yaxis4: {
+        title: 'Recombination Rate (cM/Mb)',
+        titlefont: {
+          color: 'blue'
+        },
+        tickfont: {
+          color: 'blue'
+        },
+        overlaying: 'y2',
         side: 'right',
         range: [0, maxY * 10],
         showgrid: false,
@@ -379,6 +460,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       clickmode: 'event+select',
       hovermode: 'closest'
     };
+    
     return {
       data: pdata,
       layout: playout,
@@ -388,6 +470,95 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       }
     };
   }
+
+  // locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
+  //   var xData = this.getXData(geneData);
+  //   var yData = this.getYData(geneData);
+  //   var colorData = this.getColorData(geneData);
+  //   var xDataRC = this.getXDataRC(geneDataRC);
+  //   var yDataRC = this.getYDataRC(geneDataRC);
+
+  //   var pdata = [];
+  //   // graph scatter
+  //   var trace1 = {
+  //     x: xData,
+  //     y: yData,
+  //     mode: 'markers',
+  //     type: 'scatter',
+  //     marker: {
+  //       size: 8,
+  //       color: colorData,
+  //       colorscale: 'Viridis',
+  //       reversescale: true,
+  //       showscale: true,
+  //       colorbar: {
+  //         title: 'R2',
+  //         dtick: 0.25,
+  //         xpad: 45,
+  //         thicknessmode: 'pixels',
+  //         thickness: 15
+  //       }
+  //     }
+  //   };
+  //   pdata.push(trace1);
+  //   // graph recombination rate line
+  //   var trace2 = {
+  //     x: xDataRC,
+  //     y: yDataRC,
+  //     yaxis: 'y2',
+  //     type: 'scatter',
+  //     line: {
+  //       color: 'blue',
+  //       width: 1
+  //     }
+  //   };
+  //   pdata.push(trace2);
+  //   // round most significant pval to next whole number
+  //   var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+  //   var chromosome = qDataTopAnnot['chr'];
+  //   var playout = {
+  //     width: 1000,
+  //     height: 600,
+  //     yaxis: {
+  //       title: "-log10(P-value)",
+  //       range: [0, maxY]
+  //     },
+  //     yaxis2: {
+  //       title: 'Recombination Rate (cM/Mb)',
+  //       titlefont: {
+  //         color: 'blue'
+  //       },
+  //       tickfont: {
+  //         color: 'blue'
+  //       },
+  //       overlaying: 'y',
+  //       side: 'right',
+  //       range: [0, maxY * 10],
+  //       showgrid: false,
+  //       dtick: 50
+  //     },
+  //     xaxis: {
+  //       title: "Chromosome " + chromosome + " (Mb)"
+  //     },
+  //     margin: {
+  //       l: 40,
+  //       r: 40,
+  //       b: 80,
+  //       t: 40
+  //     },
+  //     showlegend: false,
+  //     clickmode: 'event+select',
+  //     hovermode: 'closest'
+  //   };
+  //   return {
+  //     data: pdata,
+  //     layout: playout,
+  //     config: {
+  //       displaylogo: false,
+  //       modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+  //     }
+  //   };
+  // }
 
   populatePopover(pointData, pointIndex) {
     this.popoverPoint = pointData;

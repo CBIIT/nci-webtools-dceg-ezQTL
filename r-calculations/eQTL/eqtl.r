@@ -11,11 +11,14 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
   gdatafile <- paste0('uploads/', genoFile)
   edatafile <- paste0('uploads/', exprFile)
   qdatafile <- paste0('uploads/', assocFile)
+  gwasdatafile <- paste0('uploads/', gwasFile)
 
   gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
   edata <- read_delim(edatafile,delim = "\t",col_names = T)
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
   qdata <- qdata %>% arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% group_by(gene_id,variant_id,rsnum,ref,alt) %>% slice(1) %>% ungroup()
+  gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
+
 
   chromosome <- qdata$chr[1]
 
@@ -60,8 +63,8 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
 
   source('eQTL/emeraLD2R.r')
   in_path <- paste0(workDir, '/eQTL/chr1_149039120_152938045.vcf.gz')
-  # in_bin <- '/usr/local/bin/emeraLD'
-  in_bin <- '/usr/bin/emeraLD'
+  in_bin <- '/usr/local/bin/emeraLD'
+  # in_bin <- '/usr/bin/emeraLD'
   regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
   getLD <- emeraLD2R(path = in_path, bin = in_bin) 
   ld_data <- getLD(region=regionLD)
@@ -75,8 +78,10 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
 
   locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
 
+  gwas_example_data <- list(setNames(as.data.frame(gwasdata),c("chr","pos","ref","alt","rs","pvalue")))
+  
   # return outputs in list
-  dataSource <- c(gene_expression_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data)
+  dataSource <- c(gene_expression_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
 
   return(dataSource)
 }

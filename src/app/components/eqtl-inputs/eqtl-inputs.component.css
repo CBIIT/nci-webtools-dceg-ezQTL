@@ -1,6 +1,33 @@
-#inputs {
+.eqtl-inputs {
     font-size: 9pt;
     font-weight: bold;
+}
+
+.eqtl-inputs a {
+    color: #00A2EC;
+    text-decoration: none;
+}
+
+.datafile-title {
+    color: #595959 !important;
+    font-size: 1.2em;
+}
+
+.disabled-overlay {
+    color: #A6A6A6 !important;
+    pointer-events: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;   
+}
+
+.disabled-overlay a {
+    color: #A6A6A6 !important;
+}
+
+.disabled-overlay .datafile-title {
+    color: #A6A6A6 !important;
 }
 
 .cf:before, .cf:after {

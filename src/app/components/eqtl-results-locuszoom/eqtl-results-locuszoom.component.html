@@ -95,7 +95,7 @@
   </div>
 </div>
 
-<!-- Show centered Plotly gene expressions boxplot if graph is generated -->
+<!-- Show centered Plotly locuszoom manhattan plots if graph is generated -->
 <div 
   class="d-flex justify-content-center" 
   id="eqtl-locuszoom-plot" 
@@ -111,8 +111,26 @@
     #plot>
   </plotly-plot>
 </div>
+<!-- Show Plotly GWAS Example manhattan plot -->
+<!-- <div 
+  class="d-flex justify-content-center" 
+  id="eqtl-locuszoom-GWAS-plot" 
+  *ngIf="graphGWAS">
+  <plotly-plot 
+    id="locuszoom-GWAS-plot" 
+    [data]="graphGWAS.data" 
+    [layout]="graphGWAS.layout" 
+    [config]="graphGWAS.config"
+    (click)="clickPoint($event, plot)" 
+    (relayout)="closePopover2($event)" 
+    (redraw)="closePopover2($event)"
+    #plot>
+  </plotly-plot>
+</div> -->
 
 <br>
+
+<!-- <pre>{{ eqtlGWASData | json }}</pre> -->
 
 <!-- <pre>{{ eqtlQDataTopAnnot | json }}</pre> -->
 
