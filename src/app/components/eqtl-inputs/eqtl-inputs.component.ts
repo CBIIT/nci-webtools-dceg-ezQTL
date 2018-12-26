@@ -15,10 +15,10 @@ declare var $; // declare jquery $
 export class EqtlInputsComponent implements OnInit {
 
   eqtlForm = new FormGroup({
-    expressionFile: new FormControl('', Validators.required), 
-    genotypeFile: new FormControl('', Validators.required), 
     associationFile: new FormControl('', Validators.required),
-    gwasFile: new FormControl('', Validators.required)
+    expressionFile: new FormControl(''), 
+    genotypeFile: new FormControl(''), 
+    gwasFile: new FormControl('')
   });
 
   eqtlData: Object;
@@ -59,31 +59,36 @@ export class EqtlInputsComponent implements OnInit {
   }
 
   loadBoxplotData() {
-    if (this.selectLoadBoxplotData == true && (!this.eqtlForm.value.expressionFile && !this.eqtlForm.value.genotypeFile)) {
+    if (this.selectLoadBoxplotData == true) {
+      this.eqtlForm.setControl('expressionFile', new FormControl(''));
+      this.eqtlForm.setControl('genotypeFile', new FormControl(''));
       this.selectLoadBoxplotData = false;
       this.eqtlForm.value.expressionFile = false;
       this.eqtlForm.value.genotypeFile = false;
+      $("#expression-file").val("");
+      $("#genotype-file").val("");
       $("#eqtl-input-expression-file").addClass("disabled-overlay");
       $("#eqtl-input-genotype-file").addClass("disabled-overlay");
-    } else if (this.selectLoadBoxplotData == false || (this.eqtlForm.value.expressionFile && this.eqtlForm.value.genotypeFile)) {
+    } else {
+      this.eqtlForm.setControl('expressionFile', new FormControl('', Validators.required));
+      this.eqtlForm.setControl('genotypeFile', new FormControl('', Validators.required));
       this.selectLoadBoxplotData = true;
       $("#eqtl-input-expression-file").removeClass("disabled-overlay");
       $("#eqtl-input-genotype-file").removeClass("disabled-overlay");
-    } else {
-      // do nothing
     }
   }
 
   loadGWASData() {
-    if (this.selectLoadGWASData == true && !this.eqtlForm.value.gwasFile) {
+    if (this.selectLoadGWASData == true) {
+      this.eqtlForm.setControl('gwasFile', new FormControl(''));
       this.selectLoadGWASData = false;
       this.eqtlForm.value.gwasFile = false;
+      $("#gwas-file").val("");
       $("#eqtl-input-gwas-file").addClass("disabled-overlay");
-    } else if (this.selectLoadGWASData == false || this.eqtlForm.value.gwasFile) {
+    } else {
+      this.eqtlForm.setControl('gwasFile', new FormControl('', Validators.required));
       this.selectLoadGWASData = true;
       $("#eqtl-input-gwas-file").removeClass("disabled-overlay");
-    } else {
-      // do nothing
     }
   }
 
@@ -106,7 +111,6 @@ export class EqtlInputsComponent implements OnInit {
         res => this.data.changeEqtlData(res),
         error => this.handleError(error)
       )
-    
   } 
 
   handleError(error) {
