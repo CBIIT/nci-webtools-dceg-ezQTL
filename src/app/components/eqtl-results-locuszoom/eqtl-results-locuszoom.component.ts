@@ -33,6 +33,7 @@ export interface PopoverData {
 })
 export class EqtlResultsLocuszoomComponent implements OnInit {
 
+  eqtlDataGenes: Object;
   eqtlData: Object;
   eqtlDataRC: Object;
   eqtlQDataTopAnnot: Object;
@@ -58,18 +59,20 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   ngOnInit() {
     this.data.currentEqtlData.subscribe(eqtlData => {
       if (eqtlData) {
+        this.eqtlDataGenes = eqtlData[0];
         this.eqtlData = eqtlData[1];
         this.eqtlDataRC = eqtlData[2];
         this.eqtlQDataTopAnnot = eqtlData[3][0];
         this.eqtlGWASData = eqtlData[4]
       }
       if (this.eqtlData) {
-        this.data.currentGeneList.subscribe(geneList => {
-          this.geneList = geneList;
-          if (this.geneList) {
-            this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
-          }
-        });
+        this.geneList = this.getGeneSymbols(this.eqtlDataGenes);
+        // this.data.currentGeneList.subscribe(geneList => {
+        //   this.geneList = geneList;
+        if (this.geneList) {
+          this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
+        }
+        // });
         this.graph = this.locuszoomPlots(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
         // this.graphGWAS = this.locuszoomGWASPlot(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot)
       }
@@ -78,6 +81,19 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
 
     this.populationSelectedAll = false;
+  }
+
+  getGeneSymbols(geneData) {
+    function getUnique(value, index, self) { 
+        return self.indexOf(value) === index;
+    }
+    var genes = [];
+    for (var i = 0; i < geneData.length; i++) {
+      genes.push(geneData[i]['gene_symbol']);
+    }
+    var uniqueGenes = genes.filter(getUnique);
+    // this.data.changeGeneList(uniqueGenes);
+    return uniqueGenes;
   }
 
   populatePopulationDropdown() {

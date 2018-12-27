@@ -13,8 +13,8 @@ export class EqtlResultsService {
   currentEqtlData = this.eqtlDataSource.asObservable();
 
   // data output from R calculation to plot
-  private geneList = new BehaviorSubject([]);
-  currentGeneList = this.geneList.asObservable();
+  // private geneList = new BehaviorSubject([]);
+  // currentGeneList = this.geneList.asObservable();
   
   // boolean: true=show results container
   private resultStatus = new BehaviorSubject(false);
@@ -28,6 +28,14 @@ export class EqtlResultsService {
   private warningMessage = new BehaviorSubject('');
   currentWarningMessage = this.warningMessage.asObservable();
 
+  // disable/enable gene expressions result tab
+  private disableGeneExpressions = new BehaviorSubject(true);
+  currentGeneExpressions = this.disableGeneExpressions.asObservable();
+
+  // programmatically select result tab
+  private selectedTab = new BehaviorSubject(0);
+  currentSelectedTab = this.selectedTab.asObservable();
+
   constructor(private http: HttpClient) { }
 
   getResults(formData: FormData) {
@@ -39,9 +47,9 @@ export class EqtlResultsService {
     this.eqtlDataSource.next(eqtlData);
   }
 
-  changeGeneList(geneList: string[]) {
-    this.geneList.next(geneList);
-  }
+  // changeGeneList(geneList: string[]) {
+  //   this.geneList.next(geneList);
+  // }
 
   changeResultStatus(resultStatus: boolean) {
     this.resultStatus.next(resultStatus);
@@ -55,4 +63,11 @@ export class EqtlResultsService {
     this.warningMessage.next(warningMessage);
   }
 
+  changeDisableGeneExpressions(disableGeneExpressions: boolean) {
+    this.disableGeneExpressions.next(disableGeneExpressions);
+  }
+
+  changeSelectedTab(selectedTab: number) {
+    this.selectedTab.next(selectedTab);
+  }
 }

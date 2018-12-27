@@ -12,7 +12,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   eqtlData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
-  geneList: string[];
+  // geneList: string[];
   warningMessage: string;
   public graph = null;
 
@@ -24,7 +24,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
         this.eqtlData = eqtlData[0];
       }
       if (this.eqtlData) {
-        this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
+        // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
         this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
       }
     });
@@ -47,7 +47,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     if (this.totalNumGenes > 15) {
       this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
     }
-    this.data.changeGeneList(uniqueGenes);
+    // this.data.changeGeneList(uniqueGenes);
     return uniqueGenes;
   }
 

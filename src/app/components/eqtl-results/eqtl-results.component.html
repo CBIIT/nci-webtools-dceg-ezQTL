@@ -1,34 +1,58 @@
-<div *ngIf="resultStatus">
+<!-- <div *ngIf="resultStatus">
   <div class="mt-5 d-flex justify-content-center" *ngIf="!eqtlData && !errorMessage" id="results">
     <mat-spinner></mat-spinner>
-  </div>
+  </div> -->
 
-  <div *ngIf="eqtlData" id="results">
-    <mat-tab-group class="border border-light rounded">
-      <div class="row">
+<div id="results">
+  <mat-tab-group [(selectedIndex)]="selectedTab" class="border border-light rounded">
+    <div class="row">
 
-        <!-- Locuszoom Result Tab -->
-        <mat-tab label="Locuszoom Plot"> 
-            <div class="col" id="result-main">
+      <!-- Locuszoom Result Tab -->
+      <mat-tab [disabled]="!eqtlData" id="locuszoom-results" label="Locuszoom Plot"> 
+          <div class="col" class="result-main">
+            <div class="p-2" *ngIf="!resultStatus && !eqtlData && !errorMessage">
+              Upload data files on the left panel and click Calculate to see results here.
+            </div>
+            <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !eqtlData && !errorMessage" id="results">
+              <mat-spinner></mat-spinner>
+            </div>
+            <div *ngIf="eqtlData">             
               <app-eqtl-results-locuszoom></app-eqtl-results-locuszoom>
             </div>
-          </mat-tab>
+          </div>
+        </mat-tab>
 
-        <!-- Gene Expressions Result Tab -->
-        <mat-tab label="Gene Expressions"> 
-          <div class="col" id="result-main">
+      <!-- Gene Expressions Result Tab -->
+      <mat-tab [disabled]="!eqtlData || disableGeneExpressions" id="gene-expressions-results" label="Gene Expressions"> 
+        <div class="col" class="result-main">
+          <div class="p-2" *ngIf="!resultStatus && !eqtlData && !errorMessage">
+            Upload data files on the left panel and click Calculate to see results here.
+          </div>
+          <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !eqtlData && !errorMessage" id="results">
+            <mat-spinner></mat-spinner>
+          </div>
+          <div *ngIf="eqtlData">  
             <app-eqtl-results-gene-expressions></app-eqtl-results-gene-expressions>
           </div>
-        </mat-tab>
+        </div>
+      </mat-tab>
 
-        <!-- Table Result Tab -->
-        <mat-tab label="Table"> 
-          <div class="col" id="result-main">
+      <!-- Table Result Tab -->
+      <mat-tab [disabled]="!eqtlData" id="table-results" label="Table"> 
+        <div class="col" class="result-main">
+          <div class="p-2" *ngIf="!resultStatus && !eqtlData && !errorMessage">
+            Upload data files on the left panel and click Calculate to see results here.
+          </div>
+          <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !eqtlData && !errorMessage" id="results">
+            <mat-spinner></mat-spinner>
+          </div>
+          <div *ngIf="eqtlData">
             <app-eqtl-results-table></app-eqtl-results-table>
           </div>
-        </mat-tab>
-        
-      </div>
-    </mat-tab-group>
-  </div>
+        </div>
+      </mat-tab>
+      
+    </div>
+  </mat-tab-group>
 </div>
+<!-- </div> -->

@@ -15,10 +15,10 @@ export class EqtlMessagesComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private data: EqtlResultsService) { }
 
   ngAfterViewChecked(){
-      this.data.currentWarningMessage.subscribe(warningMessage => {
-        this.warningMessage = warningMessage;
-      });
-      this.cdr.detectChanges();
+    this.data.currentWarningMessage.subscribe(warningMessage => {
+      this.warningMessage = warningMessage;
+    });
+    this.cdr.detectChanges();
   }
 
   ngOnInit() {
