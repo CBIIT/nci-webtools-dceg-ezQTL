@@ -1,3 +1,4 @@
 .result-main {
     min-height: 450px;
+    overflow: hidden !important;
 }

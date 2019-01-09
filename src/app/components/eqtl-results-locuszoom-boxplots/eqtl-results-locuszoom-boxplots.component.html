@@ -1,5 +1,6 @@
 <h2 mat-dialog-title>show boxplots!</h2>
 
+<!-- Show centered Plotly gene expressions boxplot if graph is generated -->
 <div 
   class="d-flex justify-content-center" 
   id="eqtl-locuszoom-boxplots" 
@@ -8,11 +9,7 @@
     id="locuszoom-boxplots" 
     [data]="graph.data" 
     [layout]="graph.layout" 
-    [config]="graph.config"
-    (click)="clickPoint($event, plot)" 
-    (relayout)="closePopover2($event)" 
-    (redraw)="closePopover2($event)"
-    #plot>
+    [config]="graph.config">
   </plotly-plot>
 </div>
 
