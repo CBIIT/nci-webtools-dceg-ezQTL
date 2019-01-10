@@ -1,0 +1,14 @@
+#input-panel {
+    padding-right: 0px !important;
+}
+#results-panel {
+    padding-left: 0px !important;
+}
+#toggle-view {
+    padding-right: 2px !important;
+    padding-left: 2px !important;
+    padding-top: 8px !important;
+}
+#toggle-view-button {
+    cursor: pointer;
+}

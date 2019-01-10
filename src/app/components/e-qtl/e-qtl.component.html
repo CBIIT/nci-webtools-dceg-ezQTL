@@ -2,11 +2,17 @@
 <app-eqtl-messages></app-eqtl-messages>
 
 <div class="row">
-    <div class="col-3">
+    <div id="input-panel" class="col-md-auto">
         <!-- eQTL Inputs (component) -->
         <app-eqtl-inputs></app-eqtl-inputs>
     </div>
-    <div class="col-9">
+    <div id="toggle-view" class="col-md-auto">
+      <i id="toggle-view-button" 
+        class="fas fa-caret-left fa-2x" 
+        (click)="toggleView()">
+      </i>
+    </div>
+    <div id="results-panel" class="col-9">
         <!-- eQTL Results (component) -->
         <app-eqtl-results></app-eqtl-results>
     </div>

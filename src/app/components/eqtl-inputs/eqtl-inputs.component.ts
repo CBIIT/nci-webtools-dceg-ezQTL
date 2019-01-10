@@ -144,6 +144,9 @@ export class EqtlInputsComponent implements OnInit {
     $("#eqtl-input-expression-file").addClass("disabled-overlay");
     $("#eqtl-input-genotype-file").addClass("disabled-overlay");
     $("#eqtl-input-gwas-file").addClass("disabled-overlay");
+    this.eqtlForm.setControl('expressionFile', new FormControl(''));
+    this.eqtlForm.setControl('genotypeFile', new FormControl(''));
+    this.eqtlForm.setControl('gwasFile', new FormControl(''));
   }
 
 
