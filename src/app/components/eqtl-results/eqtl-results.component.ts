@@ -1,11 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 
 @Component({
   selector: 'app-eqtl-results',
   templateUrl: './eqtl-results.component.html',
-  styleUrls: ['./eqtl-results.component.css']
+  styleUrls: ['./eqtl-results.component.css'], 
+  encapsulation: ViewEncapsulation.None
 })
 
 export class EqtlResultsComponent implements OnInit {
