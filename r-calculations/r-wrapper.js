@@ -4,20 +4,25 @@ const { fileSync } = require('tmp');
 
 // function rscript(rfile, input) {
 function rscript(rfile, expressionFile, genotypeFile, associationFile, gwasFile) {
-    console.log('Files reached R-Wrapper:', expressionFile, genotypeFile, associationFile, gwasFile);
+    console.log("Files reached R-Wrapper.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
-        console.log('R Working directory:', workingDirectory);
+        console.log("R Working directory:", workingDirectory);
 
+        associationFile = JSON.stringify(associationFile);
         expressionFile = JSON.stringify(expressionFile);
         genotypeFile = JSON.stringify(genotypeFile);
-        associationFile = JSON.stringify(associationFile);
         gwasFile = JSON.stringify(gwasFile);
+
+        console.log("Association File:", associationFile);
+        console.log("Expression File:", expressionFile);
+        console.log("Genotype File:", genotypeFile);
+        console.log("GWAS File:", gwasFile);
     
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        code += `eqtl(${workingDirectory}, ${genotypeFile}, ${expressionFile}, ${associationFile}, ${gwasFile})`;
+        code += `eqtl_main(${workingDirectory}, ${genotypeFile}, ${expressionFile}, ${associationFile}, ${gwasFile})`;
         // console.log(code);
 
         const rcode = `

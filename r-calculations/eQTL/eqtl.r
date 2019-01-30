@@ -1,6 +1,4 @@
-eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
-  setwd(workDir)
-
+eqtl_main <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
   library(tidyverse)
   library(hrbrthemes)
   library(scales)
@@ -8,10 +6,16 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
   library(forcats)
   library(jsonlite)
 
+  dataSource <- eqtl(workDir, genoFile, exprFile, assocFile, gwasFile)
+  return(dataSource)
+}
+
+eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
+  setwd(workDir)
+  
   gdatafile <- paste0('uploads/', genoFile)
   edatafile <- paste0('uploads/', exprFile)
   qdatafile <- paste0('uploads/', assocFile)
-  gwasdatafile <- paste0('uploads/', gwasFile)
 
   gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
   edata <- read_delim(edatafile,delim = "\t",col_names = T)
@@ -21,8 +25,6 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
     group_by(gene_id,variant_id,rsnum,ref,alt) %>% 
     slice(1) %>% 
     ungroup()
-  gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
-
 
   chromosome <- qdata$chr[1]
 
@@ -89,11 +91,19 @@ eqtl <- function(workDir, genoFile, exprFile, assocFile, gwasFile) {
   qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
 
   locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
-
-  gwas_example_data <- list(setNames(as.data.frame(gwasdata),c("chr","pos","ref","alt","rs","pvalue")))
   
+  # initialize GWAS data as empty until data file detected
+  gwas_example_data <- list(c())
   # return outputs in list
   dataSource <- c(gene_expression_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
+
+  # return outputs in list with GWAS data
+  if (!identical(gwasFile, 'false')) {
+    gwasdatafile <- paste0('uploads/', gwasFile)
+    gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
+    gwas_example_data <- list(setNames(as.data.frame(gwasdata),c("chr","pos","ref","alt","rs","pvalue")))
+    dataSource <- c(gene_expression_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
+  }
 
   return(dataSource)
 }

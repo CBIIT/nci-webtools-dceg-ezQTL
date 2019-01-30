@@ -72,9 +72,15 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         if (this.geneList) {
           this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
         }
-        // });
-        this.graph = this.locuszoomPlots(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
-        // this.graphGWAS = this.locuszoomGWASPlot(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot)
+        // });]
+        // check if there is data in GWAS object
+        if (this.eqtlGWASData[0]) {
+          // if there is, graph GWAS plot
+          this.graph = this.locuszoomPlotGWAS(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot);
+        } else {
+          // if not, do not graph GWAS plot
+          this.graph = this.locuszoomPlot(this.eqtlData, this.eqtlDataRC, this.eqtlQDataTopAnnot)
+        }
       }
     });
     this.populationGroups = this.populatePopulationDropdown();
@@ -325,7 +331,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return yData;
   }
 
-  locuszoomPlots(geneData, geneGWASData, geneDataRC, qDataTopAnnot) {
+  locuszoomPlotGWAS(geneData, geneGWASData, geneDataRC, qDataTopAnnot) {
     var xData = this.getXData(geneData);
     var yData = this.getYData(geneData);
     var yGWASData = this.getYGWASData(geneGWASData);
@@ -487,94 +493,94 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
   }
 
-  // locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
-  //   var xData = this.getXData(geneData);
-  //   var yData = this.getYData(geneData);
-  //   var colorData = this.getColorData(geneData);
-  //   var xDataRC = this.getXDataRC(geneDataRC);
-  //   var yDataRC = this.getYDataRC(geneDataRC);
+  locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
+    var xData = this.getXData(geneData);
+    var yData = this.getYData(geneData);
+    var colorData = this.getColorData(geneData);
+    var xDataRC = this.getXDataRC(geneDataRC);
+    var yDataRC = this.getYDataRC(geneDataRC);
 
-  //   var pdata = [];
-  //   // graph scatter
-  //   var trace1 = {
-  //     x: xData,
-  //     y: yData,
-  //     mode: 'markers',
-  //     type: 'scatter',
-  //     marker: {
-  //       size: 8,
-  //       color: colorData,
-  //       colorscale: 'Viridis',
-  //       reversescale: true,
-  //       showscale: true,
-  //       colorbar: {
-  //         title: 'R2',
-  //         dtick: 0.25,
-  //         xpad: 45,
-  //         thicknessmode: 'pixels',
-  //         thickness: 15
-  //       }
-  //     }
-  //   };
-  //   pdata.push(trace1);
-  //   // graph recombination rate line
-  //   var trace2 = {
-  //     x: xDataRC,
-  //     y: yDataRC,
-  //     yaxis: 'y2',
-  //     type: 'scatter',
-  //     line: {
-  //       color: 'blue',
-  //       width: 1
-  //     }
-  //   };
-  //   pdata.push(trace2);
-  //   // round most significant pval to next whole number
-  //   var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
-  //   var chromosome = qDataTopAnnot['chr'];
-  //   var playout = {
-  //     width: 1000,
-  //     height: 600,
-  //     yaxis: {
-  //       title: "-log10(P-value)",
-  //       range: [0, maxY]
-  //     },
-  //     yaxis2: {
-  //       title: 'Recombination Rate (cM/Mb)',
-  //       titlefont: {
-  //         color: 'blue'
-  //       },
-  //       tickfont: {
-  //         color: 'blue'
-  //       },
-  //       overlaying: 'y',
-  //       side: 'right',
-  //       range: [0, maxY * 10],
-  //       showgrid: false,
-  //       dtick: 50
-  //     },
-  //     xaxis: {
-  //       title: "Chromosome " + chromosome + " (Mb)"
-  //     },
-  //     margin: {
-  //       l: 40,
-  //       r: 40,
-  //       b: 80,
-  //       t: 40
-  //     },
-  //     showlegend: false,
-  //     clickmode: 'event+select',
-  //     hovermode: 'closest'
-  //   };
-  //   return {
-  //     data: pdata,
-  //     layout: playout,
-  //     config: {
-  //       displaylogo: false,
-  //       modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
-  //     }
-  //   };
-  // }
+    var pdata = [];
+    // graph scatter
+    var trace1 = {
+      x: xData,
+      y: yData,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 8,
+        color: colorData,
+        colorscale: 'Viridis',
+        reversescale: true,
+        showscale: true,
+        colorbar: {
+          title: 'R2',
+          dtick: 0.25,
+          xpad: 45,
+          thicknessmode: 'pixels',
+          thickness: 15
+        }
+      }
+    };
+    pdata.push(trace1);
+    // graph recombination rate line
+    var trace2 = {
+      x: xDataRC,
+      y: yDataRC,
+      yaxis: 'y2',
+      type: 'scatter',
+      line: {
+        color: 'blue',
+        width: 1
+      }
+    };
+    pdata.push(trace2);
+    // round most significant pval to next whole number
+    var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+    var chromosome = qDataTopAnnot['chr'];
+    var playout = {
+      width: 1000,
+      height: 600,
+      yaxis: {
+        title: "-log10(P-value)",
+        range: [0, maxY]
+      },
+      yaxis2: {
+        title: 'Recombination Rate (cM/Mb)',
+        titlefont: {
+          color: 'blue'
+        },
+        tickfont: {
+          color: 'blue'
+        },
+        overlaying: 'y',
+        side: 'right',
+        range: [0, maxY * 10],
+        showgrid: false,
+        dtick: 50
+      },
+      xaxis: {
+        title: "Chromosome " + chromosome + " (Mb)"
+      },
+      margin: {
+        l: 40,
+        r: 40,
+        b: 80,
+        t: 40
+      },
+      showlegend: false,
+      clickmode: 'event+select',
+      hovermode: 'closest'
+    };
+    return {
+      data: pdata,
+      layout: playout,
+      config: {
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+      }
+    };
+  }
 
   populatePopover(pointData, pointIndex) {
     this.popoverPoint = pointData;
