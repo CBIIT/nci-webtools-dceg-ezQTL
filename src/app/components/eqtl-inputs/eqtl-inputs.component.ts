@@ -147,6 +147,7 @@ export class EqtlInputsComponent implements OnInit {
     this.eqtlForm.setControl('expressionFile', new FormControl(''));
     this.eqtlForm.setControl('genotypeFile', new FormControl(''));
     this.eqtlForm.setControl('gwasFile', new FormControl(''));
+    this.data.changeDisableGeneExpressions(true);
   }
 
 

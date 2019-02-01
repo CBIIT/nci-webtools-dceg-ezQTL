@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
 // function rscript(rfile, input) {
-function rscript(rfile, expressionFile, genotypeFile, associationFile, gwasFile) {
+function rscript(rfile, associationFile, expressionFile, genotypeFile, gwasFile) {
     console.log("Files reached R-Wrapper.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -22,7 +22,7 @@ function rscript(rfile, expressionFile, genotypeFile, associationFile, gwasFile)
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        code += `eqtl_main(${workingDirectory}, ${genotypeFile}, ${expressionFile}, ${associationFile}, ${gwasFile})`;
+        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile})`;
         // console.log(code);
 
         const rcode = `

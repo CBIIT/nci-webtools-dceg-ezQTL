@@ -48,24 +48,49 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   var genotypeFile = 'false'; //optional data file
   var gwasFile = 'false'; //optional data file
 
-  if (request.files[1] !== undefined && request.files[2] !== undefined) {
+  if (request.files.length == 2) {
+    gwasFile = request.files[1].filename;
+  }
+  if (request.files.length == 3) {
     expressionFile = request.files[1].filename;
     genotypeFile = request.files[2].filename;
-  }
-  if (request.files[3] !== undefined) {
+  } 
+  if (request.files.length == 4) {
+    expressionFile = request.files[1].filename;
+    genotypeFile = request.files[2].filename;
     gwasFile = request.files[3].filename;
   }
 
+  // if (request.files[1] !== undefined && request.files[2] !== undefined) {
+  //   expressionFile = request.files[1].filename;
+  //   genotypeFile = request.files[2].filename;
+  // }
+  // if (request.files[3] !== undefined) {
+  //   gwasFile = request.files[3].filename;
+  // }
+
   var dir = __dirname + '/r-calculations/uploads/'
   try {
-    const data = await rscript('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, associationFile, gwasFile);
+    const data = await rscript('./r-calculations/eQTL/eqtl.1.r', associationFile, expressionFile, genotypeFile, gwasFile);
     // remove files from uploads folder when data is received from R
     await removeFile(dir + associationFile);
-    if (request.files[1] !== undefined && request.files[2] !== undefined) {
+    // if (request.files[1] !== undefined && request.files[2] !== undefined) {
+    //   await removeFile(dir + expressionFile);
+    //   await removeFile(dir + genotypeFile);
+    // }
+    // if (request.files[3] !== undefined) {
+    //   await removeFile(dir + gwasFile);
+    // }
+    if (request.files.length == 2) {
+      await removeFile(dir + gwasFile);
+    }
+    if (request.files.length == 3) {
       await removeFile(dir + expressionFile);
       await removeFile(dir + genotypeFile);
-    }
-    if (request.files[3] !== undefined) {
+    } 
+    if (request.files.length == 4) {
+      await removeFile(dir + expressionFile);
+      await removeFile(dir + genotypeFile);
       await removeFile(dir + gwasFile);
     }
     response.json(data);
@@ -73,11 +98,23 @@ app.post('/upload-file', upload.any(), async (request, response) => {
     console.log(err);
     // remove files from uploads folder when data is received from R
     await removeFile(dir + associationFile);
-    if (request.files[1] !== undefined && request.files[2] !== undefined) {
+    // if (request.files[1] !== undefined && request.files[2] !== undefined) {
+    //   await removeFile(dir + expressionFile);
+    //   await removeFile(dir + genotypeFile);
+    // }
+    // if (request.files[3] !== undefined) {
+    //   await removeFile(dir + gwasFile);
+    // }
+    if (request.files.length == 2) {
+      await removeFile(dir + gwasFile);
+    }
+    if (request.files.length == 3) {
       await removeFile(dir + expressionFile);
       await removeFile(dir + genotypeFile);
-    }
-    if (request.files[3] !== undefined) {
+    } 
+    if (request.files.length == 4) {
+      await removeFile(dir + expressionFile);
+      await removeFile(dir + genotypeFile);
       await removeFile(dir + gwasFile);
     }
     response.status(500);

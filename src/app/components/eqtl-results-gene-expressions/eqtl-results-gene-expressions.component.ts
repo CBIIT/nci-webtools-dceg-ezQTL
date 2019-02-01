@@ -9,28 +9,33 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 })
 export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
+  disableGeneExpressions: boolean;
   eqtlData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
-  // geneList: string[];
   warningMessage: string;
   public graph = null;
 
   constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
-    this.data.currentEqtlData.subscribe(eqtlData => {
-      if (eqtlData) {
-        this.eqtlData = eqtlData[0];
+    this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
+      this.disableGeneExpressions = disableGeneExpressions;
+      if (!this.disableGeneExpressions) {
+        this.data.currentEqtlData.subscribe(eqtlData => {
+          if (eqtlData) {
+            this.eqtlData = eqtlData[0];
+          }
+          if (this.eqtlData) {
+            // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
+            this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
+          }
+        });
+        this.selectNumGenes = "15"; // default number of genes displayed
+        this.data.currentWarningMessage.subscribe(warningMessage => {
+          this.warningMessage = warningMessage;
+        });
       }
-      if (this.eqtlData) {
-        // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
-        this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
-      }
-    });
-    this.selectNumGenes = "15"; // default number of genes displayed
-    this.data.currentWarningMessage.subscribe(warningMessage => {
-      this.warningMessage = warningMessage;
     });
   }
 
