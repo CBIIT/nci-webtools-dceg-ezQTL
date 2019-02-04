@@ -5,7 +5,8 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 
 // declare var $; // declare jquery $
-import * as $ from 'jquery';
+// import * as $ from 'jquery';
+declare let $: any;
 
 @Component({
   selector: 'app-eqtl-inputs',

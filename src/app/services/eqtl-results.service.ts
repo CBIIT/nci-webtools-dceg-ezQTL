@@ -36,6 +36,10 @@ export class EqtlResultsService {
   private selectedTab = new BehaviorSubject(0);
   currentSelectedTab = this.selectedTab.asObservable();
 
+  // boolean: whether or not the input panel is collapsed
+  private collapseInput = new BehaviorSubject(false);
+  currentCollapseInput = this.collapseInput.asObservable();
+
   constructor(private http: HttpClient) { }
 
   getResults(formData: FormData) {
@@ -69,5 +73,9 @@ export class EqtlResultsService {
 
   changeSelectedTab(selectedTab: number) {
     this.selectedTab.next(selectedTab);
+  }
+
+  changeCollapseInput(collapseInput: boolean) {
+    this.collapseInput.next(collapseInput);
   }
 }

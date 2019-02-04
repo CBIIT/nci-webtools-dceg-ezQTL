@@ -5,7 +5,8 @@ import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
 
 // declare var $; // declare jquery $
-import * as $ from 'jquery';
+// import * as $ from 'jquery';
+declare let $: any;
 
 export interface PopulationGroup {
   namecode: string;
@@ -47,6 +48,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   public graph = null;
   // public graphGWAS = null;
   showPopover: boolean;
+  collapseInput: boolean;
 
   populationSelectedAll: boolean;
 
@@ -82,6 +84,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         }
       }
     });
+    this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
     this.populationGroups = this.populatePopulationDropdown();
     this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
 
@@ -624,27 +627,28 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   clickPoint(event, plot: PlotComponent) {
-    // console.log(event.points);
+    console.log(event.event);
     if (event.points) {
-
-      
-
-      // proto jquery ui tooltip
-      // $("#tooltip-8").tooltip({
-      //     //use 'of' to link the tooltip to your specified input
-      //     position: { of: '#myInput', my: 'left center', at: 'left center' },
-      // });
-      // $('#tooltip-8').tooltip("open");
-
-
-
-      var left = event.event.offsetX;
       var top = event.event.offsetY;
+      var left = event.event.offsetX;
+      // var mouseX = event.event.pageX;
+      // var mouseY = event.event.pageY;
       // console.log(event.points[0]);
       this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex], event.points[0].pointIndex);
       $('.popover').show();
-      $('.popover').css('left', (left + 65) + 'px');
-      $('.popover').css('top', (top + 50) + 'px');
+      if (this.collapseInput) {
+        console.log("INPUT PANEL COLLAPSED");
+        $('.popover').css({
+          'top': top + 50, 
+          'left': left + 190
+        });
+      } else {
+        console.log("INPUT PANEL SHOWN");
+        $('.popover').css({
+          'top': top + 50, 
+          'left': left + 25
+        });
+      }
       this.showPopover = true;
     } else {
       this.closePopover2(event);

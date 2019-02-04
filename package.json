@@ -29,7 +29,6 @@
     "core-js": "^2.5.4",
     "express": "^4.16.3",
     "hammerjs": "^2.0.8",
-    "jquery": "^3.3.1",
     "multer": "^1.3.1",
     "plotly.js": "^1.41.0",
     "r-script": "0.0.3",

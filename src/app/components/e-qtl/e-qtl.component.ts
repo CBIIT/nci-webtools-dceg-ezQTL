@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 // declare var $; // declare jquery $
-import * as $ from 'jquery';
+// import * as $ from 'jquery';
+declare let $: any;
 
 @Component({
   selector: 'app-e-qtl',
@@ -36,11 +37,13 @@ export class EQTLComponent implements OnInit {
       console.log("show");
       $("#input-panel").show();
       $("#results-panel").toggleClass('col-9 col');
+      this.data.changeCollapseInput(false);
     } else {
       // hide input panel
       console.log("hide");
       $("#input-panel").hide();
       $("#results-panel").toggleClass('col-9 col');
+      this.data.changeCollapseInput(true);
     }
   }
 
