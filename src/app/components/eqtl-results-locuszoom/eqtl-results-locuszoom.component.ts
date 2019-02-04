@@ -4,7 +4,8 @@ import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
 
-declare var $; // declare jquery $
+// declare var $; // declare jquery $
+import * as $ from 'jquery';
 
 export interface PopulationGroup {
   namecode: string;
@@ -625,13 +626,25 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   clickPoint(event, plot: PlotComponent) {
     // console.log(event.points);
     if (event.points) {
+
+      
+
+      // proto jquery ui tooltip
+      // $("#tooltip-8").tooltip({
+      //     //use 'of' to link the tooltip to your specified input
+      //     position: { of: '#myInput', my: 'left center', at: 'left center' },
+      // });
+      // $('#tooltip-8').tooltip("open");
+
+
+
       var left = event.event.offsetX;
       var top = event.event.offsetY;
       // console.log(event.points[0]);
       this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex], event.points[0].pointIndex);
       $('.popover').show();
-      $('.popover').css('left', (left + 65));
-      $('.popover').css('top', (top + 50));
+      $('.popover').css('left', (left + 65) + 'px');
+      $('.popover').css('top', (top + 50) + 'px');
       this.showPopover = true;
     } else {
       this.closePopover2(event);

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
 
-declare var $; // declare jquery $
+// declare var $; // declare jquery $
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-e-qtl',

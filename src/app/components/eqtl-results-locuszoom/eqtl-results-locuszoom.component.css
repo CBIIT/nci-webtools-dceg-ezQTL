@@ -4,7 +4,7 @@
   }
 
 .popover {
-  position: absolute;
+  position: absolute !important;
   display: none;
   background: #fff;
   border: 1px solid #999;

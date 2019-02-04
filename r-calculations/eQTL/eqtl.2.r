@@ -1,4 +1,4 @@
-eQTL_main <- function(workDir, assocFile, genoFile, exprFile, gwasFile) {
+eqtl_main <- function(workDir, assocFile, genoFile, exprFile, gwasFile) {
   setwd(workDir)
 
   library(tidyverse)

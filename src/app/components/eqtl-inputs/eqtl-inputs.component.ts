@@ -4,7 +4,8 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Validators } from '@angular/forms';
 
-declare var $; // declare jquery $
+// declare var $; // declare jquery $
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-eqtl-inputs',

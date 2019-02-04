@@ -71,7 +71,7 @@ app.post('/upload-file', upload.any(), async (request, response) => {
 
   var dir = __dirname + '/r-calculations/uploads/'
   try {
-    const data = await rscript('./r-calculations/eQTL/eqtl.1.r', associationFile, expressionFile, genotypeFile, gwasFile);
+    const data = await rscript('./r-calculations/eQTL/eqtl.3.r', associationFile, expressionFile, genotypeFile, gwasFile);
     // remove files from uploads folder when data is received from R
     await removeFile(dir + associationFile);
     // if (request.files[1] !== undefined && request.files[2] !== undefined) {
