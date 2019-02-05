@@ -15,7 +15,7 @@ console.log("Starting server...");
 // Upload files with file extension and original name
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      const dir = 'r-calculations/uploads/'
+      const dir = 'r-calculations/tmp/'
       // fs.mkdir(dir, err => cb(err, dir))
       cb(null, dir)
   },
@@ -69,9 +69,9 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   //   gwasFile = request.files[3].filename;
   // }
 
-  var dir = __dirname + '/r-calculations/uploads/'
+  var dir = __dirname + '/r-calculations/tmp/'
   try {
-    const data = await rscript('./r-calculations/eQTL/eqtl.3.r', associationFile, expressionFile, genotypeFile, gwasFile);
+    const data = await rscript('./r-calculations/eQTL/eqtl.2.r', associationFile, expressionFile, genotypeFile, gwasFile);
     // remove files from uploads folder when data is received from R
     await removeFile(dir + associationFile);
     // if (request.files[1] !== undefined && request.files[2] !== undefined) {

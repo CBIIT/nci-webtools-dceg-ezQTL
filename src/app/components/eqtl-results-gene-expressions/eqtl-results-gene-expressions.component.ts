@@ -31,6 +31,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           if (this.geneList) {
             this.totalNumGenes = this.geneList.length;
             if (this.totalNumGenes > 15) {
+              console.log("reached");
               this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
             }
           }

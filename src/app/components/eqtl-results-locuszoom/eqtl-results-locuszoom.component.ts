@@ -75,7 +75,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
         }
         // check if there is data in GWAS object
-        console.log("GWAS DATA", this.eqtlGWASData[0]);
         if (this.eqtlGWASData[0]) {
           // if there is, graph GWAS plot
           this.graph = this.locuszoomPlotGWAS(this.eqtlData, this.eqtlGWASData, this.eqtlDataRC, this.eqtlQDataTopAnnot);

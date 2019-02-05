@@ -8,6 +8,6 @@ docker-compose*
 README.md
 LICENSE
 .vscode
-r-calculations/uploads/*
+r-calculations/tmp/*
 .Rhistory
 .RData

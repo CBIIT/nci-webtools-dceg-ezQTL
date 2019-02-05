@@ -21,7 +21,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile) {
 }
 
 eqtl_locuszoom <- function(workDir, assocFile) { 
-  qdatafile <- paste0('uploads/', assocFile)
+  qdatafile <- paste0('tmp/', assocFile)
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
   qdata <- qdata %>% 
     arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% 
@@ -89,9 +89,9 @@ eqtl_gene_expressions <- function(workDir, assocFile, exprFile, genoFile) {
   gene_expressions_data <- list(c())
   # check to see if boxplot data files are present
   if (!identical(genoFile, 'false') & !identical(exprFile, 'false')) {
-    qdatafile <- paste0('uploads/', assocFile)
-    gdatafile <- paste0('uploads/', genoFile)
-    edatafile <- paste0('uploads/', exprFile)
+    qdatafile <- paste0('tmp/', assocFile)
+    gdatafile <- paste0('tmp/', genoFile)
+    edatafile <- paste0('tmp/', exprFile)
     qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
     qdata <- qdata %>% 
       arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% 
@@ -126,7 +126,7 @@ eqtl_gwas_example <- function(workDir, gwasFile) {
   gwas_example_data <- list(c())
   # return outputs in list with GWAS data
   if (!identical(gwasFile, 'false')) {
-    gwasdatafile <- paste0('uploads/', gwasFile)
+    gwasdatafile <- paste0('tmp/', gwasFile)
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
     gwas_example_data <- list(setNames(as.data.frame(gwasdata),c("chr","pos","ref","alt","rs","pvalue")))
   }
