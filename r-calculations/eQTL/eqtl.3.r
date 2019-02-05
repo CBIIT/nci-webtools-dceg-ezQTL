@@ -28,22 +28,32 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile) {
     slice(1) %>% 
     ungroup()
 
+  qdata_tmp <- qdata %>% 
+    group_by(gene_id,gene_symbol) %>% 
+    arrange(pval_nominal) %>% 
+    slice(1) %>% 
+    ungroup() %>% 
+    arrange(pval_nominal)
+
+  # added code to isolate gene_symbols and put in variable
+  gene_symbols <- list(qdata_tmp$gene_symbol)
+
   ## call calculations for eqtl modules: locuszoom and gene expressions ##
   ## locuszoom calculations ##
-  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata)
+  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata, qdata_tmp, select_pop, gene, rsnum)
   locus_zoom_data <- eqtl_locuszoom_data[[1]]
   rcdata_region_data <- eqtl_locuszoom_data[[2]]
   qdata_top_annotation_data <- eqtl_locuszoom_data[[3]]
   ## gene expressions calculations ##
-  gene_expressions_data <- eqtl_gene_expressions(workDir, qdata, exprFile, genoFile)
-  ## locusxoom gwas data ##
+  gene_expressions_data <- eqtl_gene_expressions(workDir, qdata_tmp, exprFile, genoFile)
+  ## locuszoom gwas data ##
   gwas_example_data <- eqtl_gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
-  dataSource <- c(gene_expressions_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
+  dataSource <- c(gene_symbols, gene_expressions_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
   return(dataSource)
 }
 
-eqtl_locuszoom <- function(workDir, qdata) { 
+eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, select_pop, gene, rsnum) { 
   chromosome <- qdata$chr[1]
   rcdatafile <- paste0('Recombination_Rate_CEU/CEU-',chromosome,'-final.txt.gz')
   rcdata <- read_delim(rcdatafile,delim = "\t",col_names = T)
@@ -130,7 +140,7 @@ eqtl_locuszoom <- function(workDir, qdata) {
   return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))
 }
 
-eqtl_gene_expressions <- function(workDir, qdata, exprFile, genoFile) {
+eqtl_gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
   # initialize boxplot data as empty until data file detected
   gene_expressions_data <- list(c())
   # check to see if boxplot data files are present
@@ -140,12 +150,8 @@ eqtl_gene_expressions <- function(workDir, qdata, exprFile, genoFile) {
 
     gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
     edata <- read_delim(edatafile,delim = "\t",col_names = T)
-    tmp <- qdata %>% 
-      group_by(gene_id,gene_symbol) %>% 
-      arrange(pval_nominal) %>% 
-      slice(1) %>% 
-      ungroup() %>% 
-      arrange(pval_nominal) %>% 
+
+    tmp <- tmp %>% 
       slice(1:15)
     
     edata_boxplot <- edata %>% 

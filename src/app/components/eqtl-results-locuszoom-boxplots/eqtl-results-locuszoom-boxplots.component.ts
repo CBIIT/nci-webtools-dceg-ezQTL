@@ -24,7 +24,7 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
   ngOnInit() {
     this.data.currentEqtlData.subscribe(eqtlData => {
       if (eqtlData) {
-        this.eqtlData = eqtlData[1];
+        this.eqtlData = eqtlData[2];
         this.boxplotDataDetailed = this.eqtlData[this.boxplotData['point_index']]
       }
     });

@@ -62,14 +62,15 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   ngOnInit() {
     this.data.currentEqtlData.subscribe(eqtlData => {
       if (eqtlData) {
-        this.eqtlDataGenes = eqtlData[0]; // gene expression boxplot data
-        this.eqtlData = eqtlData[1];
-        this.eqtlDataRC = eqtlData[2];
-        this.eqtlQDataTopAnnot = eqtlData[3][0];
-        this.eqtlGWASData = eqtlData[4]
+        this.geneList = eqtlData[0]
+        this.eqtlDataGenes = eqtlData[1]; // gene expression boxplot data
+        this.eqtlData = eqtlData[2];
+        this.eqtlDataRC = eqtlData[3];
+        this.eqtlQDataTopAnnot = eqtlData[4][0];
+        this.eqtlGWASData = eqtlData[5]
       }
       if (this.eqtlData) {
-        this.geneList = this.getGeneSymbols(this.eqtlDataGenes);
+        // this.geneList = this.getGeneSymbols(this.eqtlDataGenes);
         if (this.geneList) {
           this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
         }
@@ -91,18 +92,18 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.populationSelectedAll = false;
   }
 
-  getGeneSymbols(geneData) {
-    function getUnique(value, index, self) { 
-        return self.indexOf(value) === index;
-    }
-    var genes = [];
-    for (var i = 0; i < geneData.length; i++) {
-      genes.push(geneData[i]['gene_symbol']);
-    }
-    var uniqueGenes = genes.filter(getUnique);
-    // this.data.changeGeneList(uniqueGenes);
-    return uniqueGenes;
-  }
+  // getGeneSymbols(geneData) {
+  //   function getUnique(value, index, self) { 
+  //       return self.indexOf(value) === index;
+  //   }
+  //   var genes = [];
+  //   for (var i = 0; i < geneData.length; i++) {
+  //     genes.push(geneData[i]['gene_symbol']);
+  //   }
+  //   var uniqueGenes = genes.filter(getUnique);
+  //   // this.data.changeGeneList(uniqueGenes);
+  //   return uniqueGenes;
+  // }
 
   populatePopulationDropdown() {
     var populations = [
@@ -352,10 +353,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       mode: 'markers',
       type: 'scatter',
       marker: {
-        size: 8,
+        size: 7,
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
         showscale: true,
         colorbar: {
           title: 'R2',
@@ -390,10 +395,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       mode: 'markers',
       type: 'scatter',
       marker: {
-        size: 8,
+        size: 7,
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
         // showscale: true,
         // colorbar: {
         //   title: 'R2',
@@ -510,10 +519,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       mode: 'markers',
       type: 'scatter',
       marker: {
-        size: 8,
+        size: 7,
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
         showscale: true,
         colorbar: {
           title: 'R2',

@@ -10,6 +10,7 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   disableGeneExpressions: boolean;
+  geneList: string[];
   eqtlData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
@@ -24,7 +25,14 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
       if (!this.disableGeneExpressions) {
         this.data.currentEqtlData.subscribe(eqtlData => {
           if (eqtlData) {
-            this.eqtlData = eqtlData[0];
+            this.geneList = eqtlData[0];
+            this.eqtlData = eqtlData[1];
+          }
+          if (this.geneList) {
+            this.totalNumGenes = this.geneList.length;
+            if (this.totalNumGenes > 15) {
+              this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+            }
           }
           if (this.eqtlData) {
             // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
@@ -39,22 +47,22 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     });
   }
 
-  getGeneSymbols(geneData) {
-    function getUnique(value, index, self) { 
-        return self.indexOf(value) === index;
-    }
-    var genes = [];
-    for (var i = 0; i < geneData.length; i++) {
-      genes.push(geneData[i]['gene_symbol']);
-    }
-    var uniqueGenes = genes.filter(getUnique);
-    this.totalNumGenes = uniqueGenes.length;
-    if (this.totalNumGenes > 15) {
-      this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
-    }
-    // this.data.changeGeneList(uniqueGenes);
-    return uniqueGenes;
-  }
+  // getGeneSymbols(geneData) {
+  //   function getUnique(value, index, self) { 
+  //       return self.indexOf(value) === index;
+  //   }
+  //   var genes = [];
+  //   for (var i = 0; i < geneData.length; i++) {
+  //     genes.push(geneData[i]['gene_symbol']);
+  //   }
+  //   var uniqueGenes = genes.filter(getUnique);
+  //   this.totalNumGenes = uniqueGenes.length;
+  //   if (this.totalNumGenes > 15) {
+  //     this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+  //   }
+  //   // this.data.changeGeneList(uniqueGenes);
+  //   return uniqueGenes;
+  // }
 
   getGeneYData(geneData, xData) {
     var yData = [];
@@ -72,7 +80,8 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   geneExpressionsBoxPlot(geneData) {
 
-    var xData = this.getGeneSymbols(geneData);
+    // var xData = this.getGeneSymbols(geneData);
+    var xData = this.geneList;
 
     var yData = this.getGeneYData(geneData, xData);
 
@@ -184,7 +193,8 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   }
 
   triggerReplot() {
-    var limitedGeneSymbols = this.getGeneSymbols(this.eqtlData).slice(0,parseInt(this.selectNumGenes));
+    // var limitedGeneSymbols = this.getGeneSymbols(this.eqtlData).slice(0,parseInt(this.selectNumGenes));
+    var limitedGeneSymbols = this.geneList.slice(0,parseInt(this.selectNumGenes));
     this.replotExpressionsBoxPlot(this.eqtlData, limitedGeneSymbols);
   }
 
