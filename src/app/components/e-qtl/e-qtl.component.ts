@@ -28,22 +28,34 @@ export class EQTLComponent implements OnInit {
   }
 
   toggleView() {
-    console.log("clicked");
+    // console.log("clicked");
     $("#toggle-view-button").toggleClass('fa-caret-left fa-caret-right');
-    console.log($("#toggle-view-button").attr("class"));
+    // console.log($("#toggle-view-button").attr("class"));
     var direction = $("#toggle-view-button").attr("class");
     if (direction.includes("left")) {
-      // show input pabel
+      // show input panel
       console.log("show");
       $("#input-panel").show();
       $("#results-panel").toggleClass('col-9 col');
       this.data.changeCollapseInput(false);
+      // shift popovers to the left if any are open
+      if ($(".popover").is(":visible")) {
+        $('.popover').css({
+          left: $(".popover").position().left - 165 + "px"
+        });
+      }
     } else {
       // hide input panel
       console.log("hide");
       $("#input-panel").hide();
       $("#results-panel").toggleClass('col-9 col');
       this.data.changeCollapseInput(true);
+      // shift popovers to the right if any are open
+      if ($(".popover").is(":visible")) {
+        $('.popover').css({
+          left: $(".popover").position().left + 165 + "px"
+        });
+      }
     }
   }
 

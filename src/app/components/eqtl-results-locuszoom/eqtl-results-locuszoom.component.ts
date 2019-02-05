@@ -627,7 +627,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   clickPoint(event, plot: PlotComponent) {
-    console.log(event.event);
+    // console.log(event.event);
     if (event.points) {
       var top = event.event.offsetY;
       var left = event.event.offsetX;
@@ -637,13 +637,13 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.popoverData = this.populatePopover(this.eqtlData[event.points[0].pointIndex], event.points[0].pointIndex);
       $('.popover').show();
       if (this.collapseInput) {
-        console.log("INPUT PANEL COLLAPSED");
+        // console.log("INPUT PANEL COLLAPSED");
         $('.popover').css({
           'top': top + 50, 
           'left': left + 190
         });
       } else {
-        console.log("INPUT PANEL SHOWN");
+        // console.log("INPUT PANEL SHOWN");
         $('.popover').css({
           'top': top + 50, 
           'left': left + 25
