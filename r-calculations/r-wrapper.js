@@ -13,16 +13,19 @@ function rscript(rfile, associationFile, expressionFile, genotypeFile, gwasFile)
         expressionFile = JSON.stringify(expressionFile);
         genotypeFile = JSON.stringify(genotypeFile);
         gwasFile = JSON.stringify(gwasFile);
+        var associationFileSplit = associationFile.split('.');
+        var request = associationFileSplit[associationFileSplit.length - 2];
 
         console.log("Association File:", associationFile);
         console.log("Expression File:", expressionFile);
         console.log("Genotype File:", genotypeFile);
         console.log("GWAS File:", gwasFile);
+        console.log("Request: ", request);
     
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile})`;
+        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request})`;
         // console.log(code);
 
         const rcode = `

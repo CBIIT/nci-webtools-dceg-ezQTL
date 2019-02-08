@@ -52,13 +52,5 @@ package-lock.json
 r-calculations/Recombination_Rate/
 r-calculations/eQTL/ALL.chr1.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
 r-calculations/eQTL/ALL.chr1.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi
-r-calculations/eQTL/archive/
-r-calculations/rc_temp.txt
 
-r-calculations/1q21_3.bed
-r-calculations/eQTL/chr1_149039120_152938045.vcf.gz
-r-calculations/eQTL/chr1_149039120_152938045.vcf.gz.tbi
-r-calculations/eQTL/chr1_149039120_152938045.vcf.gz.csi
-r-calculations/extracted.panel
-r-calculations/input.vcf.gz
-r-calculations/input.vcf.gz.tbi
+.Rhistory
