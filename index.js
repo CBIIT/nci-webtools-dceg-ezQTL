@@ -14,9 +14,12 @@ var file_id = Date.now();
 // Upload files with file extension and original name
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      const dir = 'r-calculations/tmp/'
+      const dir = 'r-calculations/tmp/';
+      if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir);
+      }
       // fs.mkdir(dir, err => cb(err, dir))
-      cb(null, dir)
+      cb(null, dir);
   },
   filename: function (req, file, cb) {
       let ext = ''; // set default extension (if any)
@@ -25,7 +28,7 @@ var storage = multer.diskStorage({
           ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
           fname = file.originalname.split(".").slice(0,-1).join('.');
       }
-      cb(null, fname + '.' + file_id + ext)
+      cb(null, fname + '.' + file_id + ext);
   }
 });
 var upload = multer({ storage: storage });
@@ -62,7 +65,7 @@ app.post('/eqtl-calculate', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.eqtlCalculate('./r-calculations/eQTL/eqtl.2.r', associationFile, expressionFile, genotypeFile, gwasFile);
+    const data = await rscript.eqtlCalculate('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile);
     response.json(data);
   } catch(err) {
     console.log(err);
