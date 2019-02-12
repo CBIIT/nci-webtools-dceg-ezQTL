@@ -2,8 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-// function rscript(rfile, input) {
-function rscript(rfile, associationFile, expressionFile, genotypeFile, gwasFile) {
+function eqtlCalculate(rfile, associationFile, expressionFile, genotypeFile, gwasFile) {
     console.log("Files reached R-Wrapper.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -56,4 +55,6 @@ function rscript(rfile, associationFile, expressionFile, genotypeFile, gwasFile)
     });
 }
 
-module.exports = rscript;
+module.exports = {
+    eqtlCalculate
+};

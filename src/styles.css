@@ -179,6 +179,24 @@ textarea {
   z-index: 1;
 }
 
+/* disabled web element */
+.disabled-overlay {
+  color: #A6A6A6 !important;
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;   
+}
+
+.disabled-overlay a {
+  color: #A6A6A6 !important;
+}
+
+.disabled-overlay .datafile-title {
+  color: #A6A6A6 !important;
+}
+
 /** Creates an overlay that covers the entire screen */
 .fullscreen-overlay {
   position: fixed;

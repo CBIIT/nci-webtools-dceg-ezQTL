@@ -119,7 +119,7 @@ export class EqtlInputsComponent implements OnInit {
       formData.append('gwas-file', gwasFile[0]);
     }
 
-    this.data.getResults(formData)
+    this.data.calculateEqtl(formData)
       .subscribe(
         res => this.data.changeEqtlData(res),
         error => this.handleError(error)

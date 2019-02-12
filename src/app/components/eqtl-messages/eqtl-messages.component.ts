@@ -11,6 +11,7 @@ export class EqtlMessagesComponent implements OnInit {
 
   errorMessage: string;
   warningMessage: string;
+  disableGeneExpressions: boolean;
 
   constructor(private cdr: ChangeDetectorRef, private data: EqtlResultsService) { }
 
@@ -24,6 +25,9 @@ export class EqtlMessagesComponent implements OnInit {
   ngOnInit() {
     this.data.currentErrorMessage.subscribe(errorMessage => {
       this.errorMessage = errorMessage;
+    });
+    this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
+      this.disableGeneExpressions = disableGeneExpressions;
     });
   }
 

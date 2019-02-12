@@ -55,11 +55,16 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   popoverData: PopoverData;
   popoverPoint: Object;
 
+  disableGeneExpressions: boolean;
+
   // fileNameDialogRef: MatDialogRef<EqtlResultsLocuszoomBoxplotsComponent>;
 
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
+      this.disableGeneExpressions = disableGeneExpressions;
+    });
     this.data.currentEqtlData.subscribe(eqtlData => {
       if (eqtlData) {
         this.geneList = eqtlData[0]
@@ -70,7 +75,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.eqtlGWASData = eqtlData[5]
       }
       if (this.eqtlData) {
-        // this.geneList = this.getGeneSymbols(this.eqtlDataGenes);
         if (this.geneList) {
           this.selectGene = this.eqtlQDataTopAnnot["gene_symbol"]; //default reference gene
         }

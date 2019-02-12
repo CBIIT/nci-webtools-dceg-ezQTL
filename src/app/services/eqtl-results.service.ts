@@ -42,8 +42,8 @@ export class EqtlResultsService {
 
   constructor(private http: HttpClient) { }
 
-  getResults(formData: FormData) {
-    const url = environment.endpoint + '/upload-file';
+  calculateEqtl(formData: FormData) {
+    const url = environment.endpoint + '/eqtl-calculate';
     return this.http.post(url, formData);
   }
 

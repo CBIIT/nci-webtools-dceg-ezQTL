@@ -38,7 +38,7 @@ app.use(function(req, res, next) {
 });
 
 
-app.post('/upload-file', upload.any(), async (request, response) => {
+app.post('/eqtl-calculate', upload.any(), async (request, response) => {
   console.log(request.files);
   console.log("Files uploaded.");
 
@@ -62,7 +62,7 @@ app.post('/upload-file', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript('./r-calculations/eQTL/eqtl.2.r', associationFile, expressionFile, genotypeFile, gwasFile);
+    const data = await rscript.eqtlCalculate('./r-calculations/eQTL/eqtl.2.r', associationFile, expressionFile, genotypeFile, gwasFile);
     response.json(data);
   } catch(err) {
     console.log(err);

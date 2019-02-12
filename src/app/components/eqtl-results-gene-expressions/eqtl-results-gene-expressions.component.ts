@@ -27,17 +27,16 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           if (eqtlData) {
             this.geneList = eqtlData[0];
             this.eqtlData = eqtlData[1];
-          }
-          if (this.geneList) {
-            this.totalNumGenes = this.geneList.length;
-            if (this.totalNumGenes > 15) {
-              console.log("reached");
-              this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+            if (this.geneList) {
+              this.totalNumGenes = this.geneList.length;
+              if (this.totalNumGenes > 15) {
+                this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+              }
             }
-          }
-          if (this.eqtlData) {
-            // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
-            this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
+            if (this.eqtlData) {
+              // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
+              this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
+            }
           }
         });
         this.selectNumGenes = "15"; // default number of genes displayed

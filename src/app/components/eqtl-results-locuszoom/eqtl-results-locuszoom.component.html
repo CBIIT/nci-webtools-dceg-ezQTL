@@ -88,7 +88,12 @@
     <hr>
     <a (click)="makeLDRef()">Make LD Reference</a>
     <br>
-    <a (click)="showBoxplot(popoverData)">Show Boxplot</a>
+    <div id="eqtl-enable-locuszoom-boxplots" *ngIf="!disableGeneExpressions">
+      <a (click)="showBoxplot(popoverData)">Show Boxplot</a>
+    </div>
+    <div id="eqtl-disable-locuszoom-boxplots" class="disabled-overlay" *ngIf="disableGeneExpressions">
+      <a>Show Boxplot</a>
+    </div>
   </div>
   <div class="popover-content" *ngIf="!popoverData">
     No data

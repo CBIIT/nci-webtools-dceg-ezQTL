@@ -11,6 +11,8 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 })
 export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
 
+  disableGeneExpressions: boolean;
+
   boxplotData: Object;
   eqtlData: Object;
   boxplotDataDetailed: Object;
@@ -22,10 +24,15 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
     }
 
   ngOnInit() {
-    this.data.currentEqtlData.subscribe(eqtlData => {
-      if (eqtlData) {
-        this.eqtlData = eqtlData[2];
-        this.boxplotDataDetailed = this.eqtlData[this.boxplotData['point_index']]
+    this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
+      this.disableGeneExpressions = disableGeneExpressions;
+      if (!this.disableGeneExpressions) {
+        this.data.currentEqtlData.subscribe(eqtlData => {
+          if (eqtlData) {
+            this.eqtlData = eqtlData[2];
+            this.boxplotDataDetailed = this.eqtlData[this.boxplotData['point_index']]
+          }
+        });
       }
     });
   }

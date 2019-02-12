@@ -34,7 +34,6 @@ export class EQTLComponent implements OnInit {
     var direction = $("#toggle-view-button").attr("class");
     if (direction.includes("left")) {
       // show input panel
-      console.log("show");
       $("#input-panel").show();
       $("#results-panel").toggleClass('col-9 col');
       this.data.changeCollapseInput(false);
@@ -46,7 +45,6 @@ export class EQTLComponent implements OnInit {
       }
     } else {
       // hide input panel
-      console.log("hide");
       $("#input-panel").hide();
       $("#results-panel").toggleClass('col-9 col');
       this.data.changeCollapseInput(true);
