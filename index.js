@@ -9,26 +9,25 @@ var app = express();
 
 console.log("Starting server...");
 
-var file_id = Date.now();
 
 // Upload files with file extension and original name
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      const dir = 'r-calculations/tmp/';
-      if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir);
-      }
-      // fs.mkdir(dir, err => cb(err, dir))
-      cb(null, dir);
+    const dir = 'r-calculations/tmp/';
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+    // fs.mkdir(dir, err => cb(err, dir))
+    cb(null, dir);
   },
   filename: function (req, file, cb) {
-      let ext = ''; // set default extension (if any)
-      let fname = Date.now();
-      if (file.originalname.split(".").length > 1) { // checking if there is an extension or not.
-          ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
-          fname = file.originalname.split(".").slice(0,-1).join('.');
-      }
-      cb(null, fname + '.' + file_id + ext);
+    let ext = ''; // set default extension (if any)
+    let fname = Date.now();
+    if (file.originalname.split(".").length > 1) { // checking if there is an extension or not.
+        ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
+        fname = file.originalname.split(".").slice(0,-1).join('.');
+    }
+    cb(null, fname + '.' + req.body.request_id + ext);
   }
 });
 var upload = multer({ storage: storage });

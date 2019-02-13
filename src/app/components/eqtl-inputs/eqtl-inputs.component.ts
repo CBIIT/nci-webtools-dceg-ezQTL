@@ -110,6 +110,7 @@ export class EqtlInputsComponent implements OnInit {
     // console.log(gwasFile);
 
     const formData = new FormData();
+    formData.append('request_id', Date.now().toString());
     formData.append('association-file', associationFile[0]);
     if (this.selectLoadBoxplotData) {
       formData.append('expression-file', expressionFile[0]);

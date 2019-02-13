@@ -1,11 +1,8 @@
 eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request) {
   setwd(workDir)
   library(tidyverse)
-  library(hrbrthemes)
-  library(scales)
-  library(ggrepel)
-  library(forcats)
-  library(jsonlite)
+  # library(forcats)
+  # library(jsonlite)
 
   ## parameters define ##
   select_pop <- "EUR"
@@ -51,7 +48,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request)
   ## combine results from eqtl modules calculations and return ##
   dataSource <- c(gene_symbols, gene_expressions_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
   ## remove all generated temporary files in the /tmp directory
-  unlink(paste0('tmp/*',request,'*'))
+  # unlink(paste0('tmp/*',request,'*'))
   return(dataSource)
 }
 
@@ -161,41 +158,12 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
     colnames(ld_info) <- "R2"
     rownames(ld_info) <- ld_data$info$id
     qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
-    
-    ## locus zoom plot ###
-    
-    qdata_region %>% 
-      ggplot(aes(x=pos/1000000))+
-      geom_point(aes(y=-log10(pval_nominal),fill=R2),pch=21,col="white",stroke=0.1,size=2.5)+
-      theme_ipsum_rc(axis_title_just = "m",axis_title_size = 14,axis = 'xy',grid = "xy",axis_col = "black",ticks = TRUE)+
-      scale_x_continuous(breaks = pretty_breaks(n = 10))+
-      scale_fill_viridis_c(direction = -1,na.value = "gray50",option = "D",alpha = 1)+
-      labs(x=paste0("Chromosome ",chromosome," (Mb)"),y="-log10(P-value)",fill="R2\n")+
-      geom_label_repel(aes(x=pos/1000000,y=-log10(pval_nominal),label=rsnum),force = 5,data = qdata_top_annotation)+
-      geom_line(aes(x=pos/1000000,y=rate/10),data=rcdata_region,col="blue",size=0.5)+
-      scale_y_continuous(breaks = pretty_breaks(n = 10),sec.axis = sec_axis(~.*10, name = "Recombination Rate (cM/Mb)"))+
-      theme(legend.position = "top",legend.key.width=unit(2,"cm"),legend.key.height=unit(0.2,"cm"),axis.text.y.right = element_text(color = "blue"),axis.title.y.right = element_text(color = "blue"))
-
-      locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
-      return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))
+    locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
   } else {
     qdata_region$R2 <- NA
-    
-    qdata_region %>% 
-      ggplot(aes(x=pos/1000000))+
-      geom_point(aes(y=-log10(pval_nominal)),fill="gray50",pch=21,col="white",stroke=0.1,size=2.5)+
-      theme_ipsum_rc(axis_title_just = "m",axis_title_size = 14,axis = 'xy',grid = "xy",axis_col = "black",ticks = TRUE)+
-      scale_x_continuous(breaks = pretty_breaks(n = 10))+
-      scale_fill_viridis_c(direction = -1,na.value = "gray50",option = "D",alpha = 1)+
-      labs(x=paste0("Chromosome ",chromosome," (Mb)"),y="-log10(P-value)",fill="R2\n")+
-      geom_label_repel(aes(x=pos/1000000,y=-log10(pval_nominal),label=rsnum),force = 5,data = qdata_top_annotation)+
-      geom_line(aes(x=pos/1000000,y=rate/10),data=rcdata_region,col="blue",size=0.5)+
-      scale_y_continuous(breaks = pretty_breaks(n = 10),sec.axis = sec_axis(~.*10, name = "Recombination Rate (cM/Mb)"))+
-      theme(legend.position = "top",legend.key.width=unit(2,"cm"),legend.key.height=unit(0.2,"cm"),axis.text.y.right = element_text(color = "blue"),axis.title.y.right = element_text(color = "blue"))
-
-      locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
-      return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))
+    locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
   }
+  return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))
 }
 
 eqtl_gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
@@ -237,4 +205,29 @@ eqtl_gwas_example <- function(workDir, gwasFile) {
   }
   return(gwas_example_data)
 }
+
+eqtl_locuszoom_boxplots <- function(workDir, exprFile, genoFile, info) {
+  # initialize locuszoom boxplots data as empty until data file detected
+  locuszoom_boxplots_data <- list(c())
+  # check to see if boxplot data files are present
+  gdatafile <- paste0('tmp/', genoFile)
+  edatafile <- paste0('tmp/', exprFile)
+
+  gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
+  edata <- read_delim(edatafile,delim = "\t",col_names = T)
+
+  cexpdata <- edata %>% 
+    filter(gene_id==gene) %>% 
+    gather(Sample,exp,-(chr:gene_id))
+
+  cexpdata <- gdata %>% 
+    gather(Sample,Genotype,-(chr:alt)) %>% 
+    right_join(info) %>% ## info is the data of the indivudual point where the box plots are calculated on
+    left_join(cexpdata)
+
+  locuszoom_boxplots_data <- list(setNames(as.data.frame(edata_boxplot),c("chr","pos","ref","alt","Sample","Genotype","gene_id","gene_symbol","variant_id","rsnum","start","end","exp")))
+  return(locuszoom_boxplots_data)
+}
+
+
 
