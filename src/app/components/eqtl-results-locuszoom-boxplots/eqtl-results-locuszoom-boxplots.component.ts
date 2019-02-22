@@ -14,8 +14,10 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
   disableGeneExpressions: boolean;
 
   boxplotData: Object;
-  eqtlData: Object;
+  mainData: Object;
   boxplotDataDetailed: Object;
+
+  locuszoomBoxplotsData: Object;
 
   public graph = null;
 
@@ -27,15 +29,31 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
       if (!this.disableGeneExpressions) {
-        this.data.currentEqtlData.subscribe(eqtlData => {
-          if (eqtlData) {
-            this.eqtlData = eqtlData[2];
-            this.boxplotDataDetailed = this.eqtlData[this.boxplotData['point_index']]
+        this.data.currentMainData.subscribe(mainData => {
+          if (mainData) {
+            this.mainData = mainData[2];
+            this.boxplotDataDetailed = this.mainData[this.boxplotData['point_index']]
+
+            this.data.calculateLocuszoomBoxplots(this.boxplotDataDetailed)
+              .subscribe(
+                res => { 
+                  this.locuszoomBoxplotsData = res[0] 
+                },
+                error => this.handleError(error)
+              )
           }
         });
       }
     });
   }
 
+  handleError(error) {
+    console.log(error);
+    var errorTrimmed = error.error.trim().split('\n');
+    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
+    var errorMessage = errorTrimmed[2];
+    console.log(errorMessage);
+    this.data.changeErrorMessage(errorMessage);
+  }
 
 }

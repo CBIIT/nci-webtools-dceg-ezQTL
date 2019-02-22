@@ -7,6 +7,8 @@ const rscript = require('./r-calculations/r-wrapper.js');
 
 var app = express();
 
+app.use(express.json());
+
 console.log("Starting server...");
 
 
@@ -40,9 +42,9 @@ app.use(function(req, res, next) {
 });
 
 
-app.post('/eqtl-calculate', upload.any(), async (request, response) => {
+app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   console.log(request.files);
-  console.log("Files uploaded.");
+  console.log("Main data files uploaded.");
 
   var associationFile = request.files[0].filename; // required file
   var expressionFile = 'false'; // optional data file
@@ -64,7 +66,7 @@ app.post('/eqtl-calculate', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.eqtlCalculate('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile);
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -73,6 +75,25 @@ app.post('/eqtl-calculate', upload.any(), async (request, response) => {
   }
 });
 
-app.use('/', express.static('static'));
+app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
+  console.log("Locuszoom boxplot info received.");
+  console.log("REQUEST BODY - info");
+  console.log(request.body);
+  var info = request.body;
+
+  var expressionFile = 'false'; // optional data file
+  var genotypeFile = 'false'; // optional data file
+
+  try {
+    const data = await rscript.eqtlCalculateLocuszoomBoxplots('./r-calculations/eQTL/locuszoomBoxplots.r', expressionFile, genotypeFile, info);
+    response.json(data);
+  } catch(err) {
+    console.log(err);
+    response.status(500);
+    response.json(err.toString());
+  }
+});
+
+// app.use('/', express.static('static'));
 
 app.listen(3000);

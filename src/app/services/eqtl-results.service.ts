@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment'
 
 @Injectable({
@@ -9,8 +9,11 @@ import { environment } from '../../environments/environment'
 export class EqtlResultsService {
 
   // data output from R calculation to plot
-  private eqtlDataSource = new BehaviorSubject<Object>(null);
-  currentEqtlData = this.eqtlDataSource.asObservable();
+  private mainDataSource = new BehaviorSubject<Object>(null);
+  currentMainData = this.mainDataSource.asObservable();
+
+  private locuszoomBoxplotsDataSource = new BehaviorSubject<Object>(null);
+  currentLocuszoomBoxplotsData = this.locuszoomBoxplotsDataSource.asObservable();
 
   // data output from R calculation to plot
   // private geneList = new BehaviorSubject([]);
@@ -42,13 +45,24 @@ export class EqtlResultsService {
 
   constructor(private http: HttpClient) { }
 
-  calculateEqtl(formData: FormData) {
-    const url = environment.endpoint + '/eqtl-calculate';
+  calculateMain(formData: FormData) {
+    const url = environment.endpoint + '/eqtl-calculate-main';
     return this.http.post(url, formData);
   }
 
-  changeEqtlData(eqtlData: Object) {
-    this.eqtlDataSource.next(eqtlData);
+  calculateLocuszoomBoxplots(boxplotDataDetailed: Object) {
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    const url = environment.endpoint + '/eqtl-locuszoom-boxplots';
+    return this.http.post(url, JSON.stringify(boxplotDataDetailed), {headers: headers});
+  }
+
+  changeMainData(mainData: Object) {
+    this.mainDataSource.next(mainData);
+  }
+
+  changeLocuszoomBoxplotsData(locuszoomBoxplotsData: Object) {
+    this.locuszoomBoxplotsDataSource.next(locuszoomBoxplotsData);
   }
 
   // changeGeneList(geneList: string[]) {

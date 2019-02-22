@@ -48,7 +48,9 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request)
   ## combine results from eqtl modules calculations and return ##
   dataSource <- c(gene_symbols, gene_expressions_data, locus_zoom_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_data)
   ## remove all generated temporary files in the /tmp directory
-  # unlink(paste0('tmp/*',request,'*'))
+
+  unlink(paste0('tmp/*',request,'*'))
+  
   return(dataSource)
 }
 
@@ -73,7 +75,6 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
   rcdata <- read_delim(paste0('tmp/rc_temp','.',request,'.txt'),delim = "\t",col_names = F)
   colnames(rcdata) <- c('chr','pos','rate','map','filtered')
   rcdata$pos <- as.integer(rcdata$pos)
-  # unlink(paste0('rc_temp','.',request,'.txt'))
 
   ### main funciton for the LD calculation 
 
@@ -228,6 +229,4 @@ eqtl_locuszoom_boxplots <- function(workDir, exprFile, genoFile, info) {
   locuszoom_boxplots_data <- list(setNames(as.data.frame(edata_boxplot),c("chr","pos","ref","alt","Sample","Genotype","gene_id","gene_symbol","variant_id","rsnum","start","end","exp")))
   return(locuszoom_boxplots_data)
 }
-
-
 

@@ -23,7 +23,7 @@ export class EqtlInputsComponent implements OnInit {
     gwasFile: new FormControl('')
   });
 
-  eqtlData: Object;
+  mainData: Object;
   resultStatus: boolean;
   errorMessage: string;
   warningMessage: string;
@@ -46,7 +46,7 @@ export class EqtlInputsComponent implements OnInit {
     //   // console.log(formValue);
     // });
 
-    this.data.currentEqtlData.subscribe(eqtlData => this.eqtlData = eqtlData);
+    this.data.currentMainData.subscribe(mainData => this.mainData = mainData);
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
     this.data.currentSelectedTab.subscribe(selectedTab => this.selectedTab = selectedTab);
     this.data.currentErrorMessage.subscribe(errorMessage => {
@@ -120,9 +120,9 @@ export class EqtlInputsComponent implements OnInit {
       formData.append('gwas-file', gwasFile[0]);
     }
 
-    this.data.calculateEqtl(formData)
+    this.data.calculateMain(formData)
       .subscribe(
-        res => this.data.changeEqtlData(res),
+        res => this.data.changeMainData(res),
         error => this.handleError(error)
       )
   } 
@@ -140,7 +140,8 @@ export class EqtlInputsComponent implements OnInit {
     this.selectLoadBoxplotData = false;
     this.selectLoadGWASData = false;
     this.data.changeResultStatus(false);
-    this.data.changeEqtlData(null);
+    this.data.changeMainData(null);
+    this.data.changeLocuszoomBoxplotsData(null);
     this.data.changeErrorMessage('');
     this.data.changeWarningMessage('');
     this.data.changeSelectedTab(0);

@@ -11,7 +11,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   disableGeneExpressions: boolean;
   geneList: string[];
-  eqtlData: Object;
+  mainData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
   warningMessage: string;
@@ -23,19 +23,19 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
       if (!this.disableGeneExpressions) {
-        this.data.currentEqtlData.subscribe(eqtlData => {
-          if (eqtlData) {
-            this.geneList = eqtlData[0];
-            this.eqtlData = eqtlData[1];
+        this.data.currentMainData.subscribe(mainData => {
+          if (mainData) {
+            this.geneList = mainData[0];
+            this.mainData = mainData[1];
             if (this.geneList) {
               this.totalNumGenes = this.geneList.length;
               if (this.totalNumGenes > 15) {
                 this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
               }
             }
-            if (this.eqtlData) {
+            if (this.mainData) {
               // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
-              this.graph = this.geneExpressionsBoxPlot(this.eqtlData);
+              this.graph = this.geneExpressionsBoxPlot(this.mainData);
             }
           }
         });
@@ -193,9 +193,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   }
 
   triggerReplot() {
-    // var limitedGeneSymbols = this.getGeneSymbols(this.eqtlData).slice(0,parseInt(this.selectNumGenes));
+    // var limitedGeneSymbols = this.getGeneSymbols(this.mainData).slice(0,parseInt(this.selectNumGenes));
     var limitedGeneSymbols = this.geneList.slice(0,parseInt(this.selectNumGenes));
-    this.replotExpressionsBoxPlot(this.eqtlData, limitedGeneSymbols);
+    this.replotExpressionsBoxPlot(this.mainData, limitedGeneSymbols);
   }
 
 }
