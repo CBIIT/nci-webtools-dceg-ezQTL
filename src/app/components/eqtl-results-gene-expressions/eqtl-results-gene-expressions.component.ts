@@ -82,12 +82,16 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
     // var xData = this.getGeneSymbols(geneData);
     var xData = this.geneList;
+    // console.log("gene expressions x data");
+    // console.log(xData);
 
     var yData = this.getGeneYData(geneData, xData);
+    // console.log("gene expressions y data");
+    // console.log(yData);
 
     var pdata = [];
 
-    for ( var i = 0; i < xData.length; i ++ ) {
+    for ( var i = 0; i < xData.length; i++ ) {
       var result = {
         type: 'box',
         y: yData[i],

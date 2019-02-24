@@ -1,4 +1,6 @@
-<h2 mat-dialog-title>show boxplots!</h2>
+<div class="d-flex justify-content-center" *ngIf="!locuszoomBoxplotsData" id="locuszoom-boxplots-results">
+  <mat-spinner></mat-spinner>
+</div>
 
 <!-- Show centered Plotly gene expressions boxplot if graph is generated -->
 <div 
@@ -13,16 +15,12 @@
   </plotly-plot>
 </div>
 
-<pre>{{ boxplotData | json }}</pre>
+<!-- <pre>{{ boxplotData | json }}</pre> -->
 
-<br>
+<!-- <br> -->
 
-<pre>{{ boxplotDataDetailed | json }}</pre>
+<!-- <pre>{{ boxplotDataDetailed | json }}</pre> -->
 
-<br>
+<!-- <br> -->
 
-<div class="d-flex justify-content-center" *ngIf="!locuszoomBoxplotsData" id="locuszoom-boxplots-results">
-  <mat-spinner></mat-spinner>
-</div>
-
-<pre>{{ locuszoomBoxplotsData | json }}</pre>
+<!-- <pre>{{ locuszoomBoxplotsData | json }}</pre> -->
