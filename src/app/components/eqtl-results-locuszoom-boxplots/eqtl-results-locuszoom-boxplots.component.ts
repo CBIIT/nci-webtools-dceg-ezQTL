@@ -14,10 +14,11 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
   disableGeneExpressions: boolean;
 
   boxplotData: Object;
-  mainData: Object;
+  locuszoomData: Object;
   boxplotDataDetailed: Object;
-
   locuszoomBoxplotsData: Object;
+  expressionFile: string;
+  genotypeFile: string;
 
   public graph = null;
 
@@ -31,17 +32,22 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
       if (!this.disableGeneExpressions) {
         this.data.currentMainData.subscribe(mainData => {
           if (mainData) {
-            this.mainData = mainData[2];
-            this.boxplotDataDetailed = this.mainData[this.boxplotData['point_index']]
-
-            this.data.calculateLocuszoomBoxplots(this.boxplotDataDetailed)
+            this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
+            this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
+            this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
+            this.boxplotDataDetailed = this.locuszoomData[this.boxplotData['point_index']];
+            if (this.expressionFile != 'false' && this.genotypeFile != 'false') {
+              this.data.calculateLocuszoomBoxplots(this.expressionFile, this.genotypeFile, this.boxplotDataDetailed)
               .subscribe(
                 res => { 
-                  this.locuszoomBoxplotsData = res[0];
-                  this.graph = this.locuszoomBoxplots(this.boxplotDataDetailed, this.locuszoomBoxplotsData);
+                  this.locuszoomBoxplotsData = res["locuszoom_boxplots"]["data"][0];
+                  if (this.locuszoomBoxplotsData) {
+                    this.graph = this.locuszoomBoxplots(this.boxplotDataDetailed, this.locuszoomBoxplotsData);
+                  }
                 },
                 error => this.handleError(error)
-              )
+              );
+            }
           }
         });
       }
@@ -51,23 +57,10 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
   handleError(error) {
     console.log(error);
     var errorTrimmed = error.error.trim().split('\n');
-    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
     var errorMessage = errorTrimmed[2];
     console.log(errorMessage);
     this.data.changeErrorMessage(errorMessage);
   }
-
-  // getXData(boxplotData) {
-  //   var xData = [];
-  //   // var yData = [];
-  //   for (var i = 0; i < boxplotData.length; i++) {
-  //     xData.push(boxplotData[i]['Genotype']);
-  //     // yData.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
-  //   }
-  //   // var xyData = [xData, yData];
-  //   // return xyData;
-  //   return xData;
-  // }
 
   getYData(boxplotData) {
     var a0a0 = [];
@@ -90,15 +83,8 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
 
   // x: genotype, y: -log2(exp) + 0.1
   locuszoomBoxplots(info, boxplotData) {
-    // var xData = this.getXData(boxplotData);
     var xData = ["0/0", "0/1", "1/1"];
-    // console.log("xData");
-    console.log(xData);
     var yData = this.getYData(boxplotData);
-    // console.log("yData");
-    // console.log(yData);
-
-    console.log(info);
 
     var pdata = [];
 

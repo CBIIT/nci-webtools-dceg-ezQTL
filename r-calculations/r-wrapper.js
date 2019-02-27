@@ -42,7 +42,10 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
             (error, stdout, stderr) => {
                 try {
                     if (stdout) {
-                        resolve(JSON.parse(stdout.toString()));
+                        // resolve(JSON.parse(stdout.toString()));
+                        var parsed = JSON.parse(JSON.parse(stdout));
+                        console.log(parsed);
+                        resolve(parsed);
                     } else {
                         if (error) reject(error);
                         if (stderr) reject(stderr);
@@ -61,18 +64,18 @@ function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, inf
         const workingDirectory = JSON.stringify(__dirname);
         console.log("R Working directory:", workingDirectory);
 
-        // expressionFile = JSON.stringify(expressionFile);
-        // genotypeFile = JSON.stringify(genotypeFile);
-        expressionFile = JSON.stringify("1q21_3.expression.txt");
-        genotypeFile = JSON.stringify("1q21_3.genotyping.txt");
+        expressionFile = JSON.stringify(expressionFile);
+        genotypeFile = JSON.stringify(genotypeFile);
+        // expressionFile = JSON.stringify("1q21_3.expression.txt");
+        // genotypeFile = JSON.stringify("1q21_3.genotyping.txt");
         info = JSON.stringify(JSON.stringify(info));
-        var expressionFileSplit = expressionFile.split('.');
-        var request = expressionFileSplit[expressionFileSplit.length - 2];
+        // var expressionFileSplit = expressionFile.split('.');
+        // var request = expressionFileSplit[expressionFileSplit.length - 2];
 
         console.log("Expression File:", expressionFile);
         console.log("Genotype File:", genotypeFile);
-        console.log("Info:", info);
-        console.log("Request:", request);
+        // console.log("Info:", info);
+        // console.log("Request:", request);
     
         var code = readFileSync(rfile).toString();
         
@@ -95,7 +98,9 @@ function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, inf
             (error, stdout, stderr) => {
                 try {
                     if (stdout) {
-                        resolve(JSON.parse(stdout.toString()));
+                        var parsed = JSON.parse(JSON.parse(stdout));
+                        console.log(parsed);
+                        resolve(parsed);
                     } else {
                         if (error) reject(error);
                         if (stderr) reject(stderr);

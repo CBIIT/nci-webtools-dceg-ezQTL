@@ -11,7 +11,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   disableGeneExpressions: boolean;
   geneList: string[];
-  mainData: Object;
+  geneExpressionsData: Object;
   totalNumGenes: Number;
   selectNumGenes: string;
   warningMessage: string;
@@ -25,17 +25,16 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
       if (!this.disableGeneExpressions) {
         this.data.currentMainData.subscribe(mainData => {
           if (mainData) {
-            this.geneList = mainData[0];
-            this.mainData = mainData[1];
+            this.geneList = mainData["info"]["gene_symbols"][0]; // gene list
+            this.geneExpressionsData = mainData["gene_expressions"]["data"][0]; // gene expression data
             if (this.geneList) {
               this.totalNumGenes = this.geneList.length;
               if (this.totalNumGenes > 15) {
                 this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
               }
             }
-            if (this.mainData) {
-              // this.data.currentGeneList.subscribe(geneList => this.geneList = geneList);
-              this.graph = this.geneExpressionsBoxPlot(this.mainData);
+            if (this.geneExpressionsData) {
+              this.graph = this.geneExpressionsBoxPlot(this.geneExpressionsData);
             }
           }
         });
@@ -46,23 +45,6 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
       }
     });
   }
-
-  // getGeneSymbols(geneData) {
-  //   function getUnique(value, index, self) { 
-  //       return self.indexOf(value) === index;
-  //   }
-  //   var genes = [];
-  //   for (var i = 0; i < geneData.length; i++) {
-  //     genes.push(geneData[i]['gene_symbol']);
-  //   }
-  //   var uniqueGenes = genes.filter(getUnique);
-  //   this.totalNumGenes = uniqueGenes.length;
-  //   if (this.totalNumGenes > 15) {
-  //     this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
-  //   }
-  //   // this.data.changeGeneList(uniqueGenes);
-  //   return uniqueGenes;
-  // }
 
   getGeneYData(geneData, xData) {
     var yData = [];
@@ -199,7 +181,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   triggerReplot() {
     // var limitedGeneSymbols = this.getGeneSymbols(this.mainData).slice(0,parseInt(this.selectNumGenes));
     var limitedGeneSymbols = this.geneList.slice(0,parseInt(this.selectNumGenes));
-    this.replotExpressionsBoxPlot(this.mainData, limitedGeneSymbols);
+    this.replotExpressionsBoxPlot(this.geneExpressionsData, limitedGeneSymbols);
   }
 
 }

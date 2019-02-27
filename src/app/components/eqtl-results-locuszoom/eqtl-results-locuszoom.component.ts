@@ -35,11 +35,10 @@ export interface PopoverData {
 })
 export class EqtlResultsLocuszoomComponent implements OnInit {
 
-  mainDataGenes: Object;
-  mainData: Object;
-  mainDataRC: Object;
-  mainQDataTopAnnot: Object;
-  mainGWASData: Object;
+  locuszoomData: String;
+  locuszoomDataRC: Object;
+  locuszoomDataQTopAnnot: Object;
+  GWASData: Object;
 
   geneList: string[];
   selectGene: string;
@@ -67,24 +66,23 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
-        this.geneList = mainData[0]
-        this.mainDataGenes = mainData[1]; // gene expression boxplot data
-        this.mainData = mainData[2];
-        this.mainDataRC = mainData[3];
-        this.mainQDataTopAnnot = mainData[4][0];
-        this.mainGWASData = mainData[5]
+        this.geneList = mainData["info"]["gene_symbols"][0]; // gene list
+        this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
+        this.locuszoomDataRC = mainData["locuszoom"]["rc"][0]; // locuszoom RC data
+        this.locuszoomDataQTopAnnot = mainData["locuszoom"]["top"][0][0]; // locuszoom Top Gene data
+        this.GWASData = mainData["gwas"]["data"][0]; // gwas data
       }
-      if (this.mainData) {
+      if (this.locuszoomData) {
         if (this.geneList) {
-          this.selectGene = this.mainQDataTopAnnot["gene_symbol"]; //default reference gene
+          this.selectGene = this.locuszoomDataQTopAnnot["gene_symbol"]; //default reference gene
         }
         // check if there is data in GWAS object
-        if (this.mainGWASData[0]) {
+        if (this.GWASData[0]) {
           // if there is, graph GWAS plot
-          this.graph = this.locuszoomPlotGWAS(this.mainData, this.mainGWASData, this.mainDataRC, this.mainQDataTopAnnot);
+          this.graph = this.locuszoomPlotGWAS(this.locuszoomData, this.GWASData, this.locuszoomDataRC, this.locuszoomDataQTopAnnot);
         } else {
           // if not, do not graph GWAS plot
-          this.graph = this.locuszoomPlot(this.mainData, this.mainDataRC, this.mainQDataTopAnnot)
+          this.graph = this.locuszoomPlot(this.locuszoomData, this.locuszoomDataRC, this.locuszoomDataQTopAnnot)
         }
       }
     });
@@ -94,19 +92,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
     this.populationSelectedAll = false;
   }
-
-  // getGeneSymbols(geneData) {
-  //   function getUnique(value, index, self) { 
-  //       return self.indexOf(value) === index;
-  //   }
-  //   var genes = [];
-  //   for (var i = 0; i < geneData.length; i++) {
-  //     genes.push(geneData[i]['gene_symbol']);
-  //   }
-  //   var uniqueGenes = genes.filter(getUnique);
-  //   // this.data.changeGeneList(uniqueGenes);
-  //   return uniqueGenes;
-  // }
 
   populatePopulationDropdown() {
     var populations = [
@@ -650,7 +635,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       // var mouseX = event.event.pageX;
       // var mouseY = event.event.pageY;
       // console.log(event.points[0]);
-      this.popoverData = this.populatePopover(this.mainData[event.points[0].pointIndex], event.points[0].pointIndex);
+      this.popoverData = this.populatePopover(this.locuszoomData[event.points[0].pointIndex], event.points[0].pointIndex);
       $('.popover').show();
       if (this.collapseInput) {
         // console.log("INPUT PANEL COLLAPSED");

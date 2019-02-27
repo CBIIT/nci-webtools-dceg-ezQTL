@@ -12,13 +12,6 @@ export class EqtlResultsService {
   private mainDataSource = new BehaviorSubject<Object>(null);
   currentMainData = this.mainDataSource.asObservable();
 
-  private locuszoomBoxplotsDataSource = new BehaviorSubject<Object>(null);
-  currentLocuszoomBoxplotsData = this.locuszoomBoxplotsDataSource.asObservable();
-
-  // data output from R calculation to plot
-  // private geneList = new BehaviorSubject([]);
-  // currentGeneList = this.geneList.asObservable();
-  
   // boolean: true=show results container
   private resultStatus = new BehaviorSubject(false);
   currentResultStatus = this.resultStatus.asObservable();
@@ -50,24 +43,21 @@ export class EqtlResultsService {
     return this.http.post(url, formData);
   }
 
-  calculateLocuszoomBoxplots(boxplotDataDetailed: Object) {
+  calculateLocuszoomBoxplots(expressionFile: string, genotypeFile: string, boxplotDataDetailed: Object) {
+    let locuszoomBoxplotsParameters= {
+      expressionFile: expressionFile,
+      genotypeFile: genotypeFile,
+      boxplotDataDetailed: boxplotDataDetailed
+    };
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     const url = environment.endpoint + '/eqtl-locuszoom-boxplots';
-    return this.http.post(url, JSON.stringify(boxplotDataDetailed), {headers: headers});
+    return this.http.post(url, JSON.stringify(locuszoomBoxplotsParameters), {headers: headers});
   }
 
   changeMainData(mainData: Object) {
     this.mainDataSource.next(mainData);
   }
-
-  changeLocuszoomBoxplotsData(locuszoomBoxplotsData: Object) {
-    this.locuszoomBoxplotsDataSource.next(locuszoomBoxplotsData);
-  }
-
-  // changeGeneList(geneList: string[]) {
-  //   this.geneList.next(geneList);
-  // }
 
   changeResultStatus(resultStatus: boolean) {
     this.resultStatus.next(resultStatus);
