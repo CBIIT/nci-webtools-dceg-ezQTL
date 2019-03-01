@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile) {
+function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop) {
     console.log("Execute main eqtl calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -12,19 +12,24 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         expressionFile = JSON.stringify(expressionFile);
         genotypeFile = JSON.stringify(genotypeFile);
         gwasFile = JSON.stringify(gwasFile);
-        var associationFileSplit = associationFile.split('.');
-        var request = associationFileSplit[associationFileSplit.length - 2];
+        request = JSON.stringify(request);
+        select_pop = JSON.stringify(select_pop);
 
         console.log("Association File:", associationFile);
         console.log("Expression File:", expressionFile);
         console.log("Genotype File:", genotypeFile);
         console.log("GWAS File:", gwasFile);
         console.log("Request: ", request);
+        // var debugRequest = JSON.stringify("0000000000000");
+        // console.log("Debug Request: ", debugRequest);
+        console.log("Selected Pop: ", select_pop);
+
     
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request})`;
+        // code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
+        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop})`;
         // console.log(code);
 
         const rcode = `

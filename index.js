@@ -29,7 +29,7 @@ var storage = multer.diskStorage({
         ext = file.originalname.substring(file.originalname.lastIndexOf('.'), file.originalname.length);
         fname = file.originalname.split(".").slice(0,-1).join('.');
     }
-    cb(null, fname + '.' + req.body.request_id + ext);
+    cb(null, req.body.request_id + '.' + fname +  ext);
   }
 });
 var upload = multer({ storage: storage });
@@ -41,6 +41,17 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.get('/', function(request, response) {
+  response.send("Hi");
+  console.log("Client connected.");
+  // request.on("close", function() {
+  //   console.log("request closed unexpectedly");
+  // });
+  
+  // request.on("end", function() {
+  //   console.log("request ended normally");
+  // });
+});
 
 app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   console.log(request.files);
@@ -50,6 +61,8 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   var expressionFile = 'false'; // optional data file
   var genotypeFile = 'false'; // optional data file
   var gwasFile = 'false'; // optional data file
+  var request_id = request.body.request_id;
+  var select_pop = request.body.select_pop;
 
   // assign filenames to variable depending on how many files are uploaded
   if (request.files.length == 2) {
@@ -66,7 +79,27 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile);
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.2.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop);
+    response.json(data);
+  } catch(err) {
+    console.log(err);
+    response.status(500);
+    response.json(err.toString());
+  }
+});
+
+app.post('/eqtl-recalculate-main', async (request, response) => {
+  console.log("Recalculation info received.");
+
+  var associationFile = request.body.associationFile;
+  var expressionFile = request.body.expressionFile;
+  var genotypeFile = request.body.genotypeFile;
+  var gwasFile = request.body.gwasFile;
+  var request_id = request.body.request_id;
+  var select_pop = request.body.select_pop;
+
+  try {
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.2.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -82,6 +115,8 @@ app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
   var info = request.body.boxplotDataDetailed;
   var expressionFile = request.body.expressionFile; // optional data file
   var genotypeFile = request.body.genotypeFile; // optional data file
+  // var expressionFile = "0000000000000.1q21_3.expression.txt"; // debug data file
+  // var genotypeFile = "0000000000000.1q21_3.genotyping.txt"; // debug data file
 
   try {
     const data = await rscript.eqtlCalculateLocuszoomBoxplots('./r-calculations/eQTL/locuszoomBoxplots.r', expressionFile, genotypeFile, info);

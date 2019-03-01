@@ -1,13 +1,16 @@
-eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, request2) {
+eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, request2, select_pop) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
 
   ## parameters define ##
-  select_pop <- "EUR"
+  # select_pop <- "EUR"
   gene <- NULL
   rsnum <- NULL
+  # if (!identical(gwasFile, 'false')) {
+
+  # }
 
   ## load 1kg pop panel file ##
   kgpanel <- read_delim('eQTL/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
@@ -62,7 +65,7 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
 
   kgvcfpath <- paste0(workDir, '/eQTL/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
 
-  in_path <- paste0(workDir, '/tmp/chr',chromosome,'_',minpos,'_',maxpos,'.',request,'.vcf.gz')
+  # in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
   # cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
   # system(cmd)
 
@@ -71,9 +74,9 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
 
   popshort <- "CEU"  ### need to find the superpop recomendation data 
 
-  # cmd = paste0("tabix Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/rc_temp",'.',request,".txt")
+  # cmd = paste0("tabix Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/",request,'.',"rc_temp",".txt")
   # system(cmd)
-  rcdata <- read_delim(paste0('tmp/rc_temp','.',request,'.txt'),delim = "\t",col_names = F)
+  rcdata <- read_delim(paste0('tmp/',request,'.','rc_temp','.txt'),delim = "\t",col_names = F)
   colnames(rcdata) <- c('chr','pos','rate','map','filtered')
   rcdata$pos <- as.integer(rcdata$pos)
 
@@ -128,27 +131,27 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
     select(chr,start,pos) %>% 
     arrange(chr,start,pos) %>% 
     unique() %>% 
-    write_delim(paste0('tmp/',locus,'.',request,'.bed'),delim = '\t',col_names = F)
+    write_delim(paste0('tmp/',request,'.',locus,'.bed'),delim = '\t',col_names = F)
 
   # if (select_pop %in% kgpanel$super_pop) {
   #   kgpanel %>% 
   #   filter(super_pop==select_pop) %>% 
   #   select(sample) %>% 
-  #   write_delim(paste0('tmp/','extracted','.',request,'.panel'),delim = '\t',col_names = F)
+  #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
   # } else if (select_pop %in% kgpanel$pop) {
   #   kgpanel %>% 
   #   filter(pop==select_pop) %>% 
   #   select(sample) %>% 
-  #   write_delim(paste0('tmp/','extracted','.',request,'.panel'),delim = '\t',col_names = F)
+  #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
   # }
 
-  # cmd <- paste0('bcftools view -S tmp/extracted','.',request,'.panel -R ',paste0('tmp/',locus,'.',request,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/input','.',request,'.vcf.gz')
+  # cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
   # system(cmd)
-  # cmd <- paste0('bcftools index -t tmp/input','.',request,'.vcf.gz')
+  # cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')
   # system(cmd)
   regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
   in_bin <- '/usr/local/bin/emeraLD'
-  getLD <- emeraLD2R(path = paste0('tmp/input','.',request,'.vcf.gz'), bin = in_bin) 
+  getLD <- emeraLD2R(path = paste0('tmp/',request,'.','input','.vcf.gz'), bin = in_bin) 
   ld_data <- getLD(region = regionLD)
 
   index <- which(ld_data$info$id==rsnum|str_detect(ld_data$info$id,paste0(";",rsnum))|str_detect(ld_data$info$id,paste0(rsnum,";")))

@@ -43,6 +43,22 @@ export class EqtlResultsService {
     return this.http.post(url, formData);
   }
 
+  recalculateMain(associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string) {
+    let recalculateParameters = {
+      associationFile: associationFile,
+      expressionFile: expressionFile,
+      genotypeFile: genotypeFile,
+      gwasFile: gwasFile,
+      request_id: request_id, 
+      select_pop: select_pop
+    };
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    const url = environment.endpoint + '/eqtl-recalculate-main';
+    return this.http.post(url, JSON.stringify(recalculateParameters), {headers: headers});
+    // return this.http.post(url, formData);
+  }
+
   calculateLocuszoomBoxplots(expressionFile: string, genotypeFile: string, boxplotDataDetailed: Object) {
     let locuszoomBoxplotsParameters= {
       expressionFile: expressionFile,

@@ -35,7 +35,7 @@ export interface PopoverData {
 })
 export class EqtlResultsLocuszoomComponent implements OnInit {
 
-  locuszoomData: String;
+  locuszoomData: string;
   locuszoomDataRC: Object;
   locuszoomDataQTopAnnot: Object;
   GWASData: Object;
@@ -55,6 +55,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   popoverPoint: Object;
 
   disableGeneExpressions: boolean;
+  inputChanged: boolean;
+  requestID: number;
+  associationFile: string;
+  expressionFile: string;
+  genotypeFile: string;
+  gwasFile: string;
 
   // fileNameDialogRef: MatDialogRef<EqtlResultsLocuszoomBoxplotsComponent>;
 
@@ -66,6 +72,11 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
+        this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
+        this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
+        this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
+        this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
+        this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
         this.geneList = mainData["info"]["gene_symbols"][0]; // gene list
         this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
         this.locuszoomDataRC = mainData["locuszoom"]["rc"][0]; // locuszoom RC data
@@ -91,6 +102,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
 
     this.populationSelectedAll = false;
+    this.inputChanged = false;
+
+    console.log("Default selected populations: ", this.selectedPop);
+    console.log("Default selected gene: ", this.selectGene);
   }
 
   populatePopulationDropdown() {
@@ -161,15 +176,24 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   selectAll() {
-    if (this.selectedPop.length == 26 && this.populationSelectedAll == true) {
+    if (this.selectedPop.length == 26) {
       this.selectedPop = [];
-      this.populationSelectedAll = false;
-    } else if (this.selectedPop.length < 26 || this.populationSelectedAll == false) {
+      if (this.populationSelectedAll == true) {
+        this.populationSelectedAll = false;
+      } else {
+        this.populationSelectedAll = true;
+      } 
+    } else if (this.selectedPop.length < 26) {
       this.selectedPop = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
-      this.populationSelectedAll = true;
+      if (this.populationSelectedAll == true) {
+        this.populationSelectedAll = false;
+      } else {
+        this.populationSelectedAll = true;
+      } 
     } else {
       // do nothing
     }
+    this.inputChanged = true;
   }
 
   unique(value, index, self) {
@@ -210,6 +234,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
 
   selectPopulationGroup(groupName) {
+    // this.inputChanged = true;
     var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
     var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
     var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
@@ -268,6 +293,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     } else {
       this.populationSelectedAll = true;
     }
+    this.inputChanged = true;
   }
 
   getXData(geneData) {
@@ -657,5 +683,35 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   }
 
+  refGeneChange() {
+    this.inputChanged = true;
+  }
+
+  handleError(error) {
+    console.log(error);
+    var errorTrimmed = error.error.trim().split('\n');
+    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
+    var errorMessage = errorTrimmed[2];
+    console.log(errorMessage);
+    this.data.changeErrorMessage(errorMessage);
+  }
+
+  async recalculate() {
+    console.log("Recalculate!");
+    console.log("Request ID: ", this.requestID);
+    console.log("Selected gene: ", this.selectGene);
+    console.log("Selected populations: ", this.selectedPop);
+    this.inputChanged = false;
+    // reset
+    // this.data.changeResultStatus(false);
+    this.data.changeMainData(null);
+    this.data.changeSelectedTab(0);
+    // calculate
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, "EUR")
+      .subscribe(
+        res => this.data.changeMainData(res),
+        error => this.handleError(error)
+      )
+  }
 
 }

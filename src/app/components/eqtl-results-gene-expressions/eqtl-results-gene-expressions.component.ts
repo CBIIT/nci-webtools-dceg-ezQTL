@@ -12,7 +12,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   disableGeneExpressions: boolean;
   geneList: string[];
   geneExpressionsData: Object;
-  totalNumGenes: Number;
+  totalNumGenes: number;
   selectNumGenes: string;
   warningMessage: string;
   public graph = null;

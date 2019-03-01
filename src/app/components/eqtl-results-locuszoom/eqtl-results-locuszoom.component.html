@@ -64,12 +64,28 @@
   <div class="col-md-auto p-4">
     <mat-form-field>
       <mat-label>Reference Gene</mat-label>
-      <mat-select #refGene [(value)]="selectGene" required>
+      <mat-select 
+        [(value)]="selectGene" 
+        (selectionChange)="refGeneChange()" 
+        required 
+        #refGene>
         <mat-option *ngFor="let gene of geneList" [value]="gene">
           {{ gene }}
         </mat-option>
       </mat-select>
     </mat-form-field>
+  </div>
+
+  <!-- Re-calculate Button -->
+  <div class="col-md-auto p-4">
+    <button 
+      type="submit" 
+      class="mt-2" 
+      [disabled]="!inputChanged || selectedPop.length == 0" 
+      mat-raised-button color="primary" 
+      (click)="recalculate()">
+      Recalculate
+    </button>
   </div>
 
 </div>

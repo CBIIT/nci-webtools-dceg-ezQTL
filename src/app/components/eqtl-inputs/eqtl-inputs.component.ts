@@ -98,6 +98,15 @@ export class EqtlInputsComponent implements OnInit {
     }
   }
 
+  handleError(error) {
+    console.log(error);
+    var errorTrimmed = error.error.trim().split('\n');
+    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
+    var errorMessage = errorTrimmed[2];
+    console.log(errorMessage);
+    this.data.changeErrorMessage(errorMessage);
+  }
+
   async submit() {
     this.data.changeResultStatus(true);
     
@@ -110,7 +119,8 @@ export class EqtlInputsComponent implements OnInit {
     // console.log(gwasFile);
 
     const formData = new FormData();
-    formData.append('request_id', Date.now().toString());
+    formData.append('request_id', Date.now().toString()); // generate calculation request ID
+    formData.append('select_pop', "EUR"); // set default population to 'EUR'
     formData.append('association-file', associationFile[0]);
     if (this.selectLoadBoxplotData) {
       formData.append('expression-file', expressionFile[0]);
@@ -126,15 +136,6 @@ export class EqtlInputsComponent implements OnInit {
         error => this.handleError(error)
       )
   } 
-
-  handleError(error) {
-    console.log(error);
-    var errorTrimmed = error.error.trim().split('\n');
-    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
-    var errorMessage = errorTrimmed[2];
-    console.log(errorMessage);
-    this.data.changeErrorMessage(errorMessage);
-  }
 
   reset() {
     this.selectLoadBoxplotData = false;
