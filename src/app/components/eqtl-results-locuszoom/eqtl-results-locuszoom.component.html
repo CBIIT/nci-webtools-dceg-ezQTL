@@ -65,12 +65,14 @@
     <mat-form-field>
       <mat-label>Reference Gene</mat-label>
       <mat-select 
-        [(value)]="selectGene" 
+        [(value)]="selectedGene" 
         (selectionChange)="refGeneChange()" 
         required 
         #refGene>
-        <mat-option *ngFor="let gene of geneList" [value]="gene">
-          {{ gene }}
+        <mat-option 
+          *ngFor="let gene of geneList" 
+          [value]="gene.gene_id">
+          {{ gene.gene_symbol }}
         </mat-option>
       </mat-select>
     </mat-form-field>

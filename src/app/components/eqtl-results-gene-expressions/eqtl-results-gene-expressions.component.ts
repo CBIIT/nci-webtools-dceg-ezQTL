@@ -10,7 +10,7 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   disableGeneExpressions: boolean;
-  geneList: string[];
+  geneSymbols: string[];
   geneExpressionsData: Object;
   totalNumGenes: number;
   selectNumGenes: string;
@@ -25,10 +25,11 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
       if (!this.disableGeneExpressions) {
         this.data.currentMainData.subscribe(mainData => {
           if (mainData) {
-            this.geneList = mainData["info"]["gene_symbols"][0]; // gene list
+            // this.geneSymbols = mainData["info"]["gene_symbols"][0]; // gene list
+            this.geneSymbols = this.getGeneSymbols(mainData["info"]["gene_list"]["data"][0]); // get gene list symbols only
             this.geneExpressionsData = mainData["gene_expressions"]["data"][0]; // gene expression data
-            if (this.geneList) {
-              this.totalNumGenes = this.geneList.length;
+            if (this.geneSymbols) {
+              this.totalNumGenes = this.geneSymbols.length;
               if (this.totalNumGenes > 15) {
                 this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
               }
@@ -44,6 +45,14 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
         });
       }
     });
+  }
+
+  getGeneSymbols(geneList) {
+    var geneSymbols = [];
+    for (var i = 0; i < geneList.length; i++) {
+      geneSymbols.push(geneList[i]['gene_symbol']);
+    }
+    return geneSymbols;
   }
 
   getGeneYData(geneData, xData) {
@@ -63,7 +72,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   geneExpressionsBoxPlot(geneData) {
 
     // var xData = this.getGeneSymbols(geneData);
-    var xData = this.geneList;
+    var xData = this.geneSymbols;
     // console.log("gene expressions x data");
     // console.log(xData);
 
@@ -180,7 +189,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
   triggerReplot() {
     // var limitedGeneSymbols = this.getGeneSymbols(this.mainData).slice(0,parseInt(this.selectNumGenes));
-    var limitedGeneSymbols = this.geneList.slice(0,parseInt(this.selectNumGenes));
+    var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
     this.replotExpressionsBoxPlot(this.geneExpressionsData, limitedGeneSymbols);
   }
 

@@ -11,14 +11,17 @@ declare let $: any;
 export interface PopulationGroup {
   namecode: string;
   name: string;
-  selected: boolean;
   subPopulations: SubPopulation[];
 }
 
 export interface SubPopulation {
   value: string;
   viewValue: string;
-  selected: boolean;
+}
+
+export interface ReferenceGene {
+  gene_id: string;
+  gene_symbol: string;
 }
 
 export interface PopoverData {
@@ -40,8 +43,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   locuszoomDataQTopAnnot: Object;
   GWASData: Object;
 
-  geneList: string[];
-  selectGene: string;
+  geneList: ReferenceGene[];
+  selectedGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
   public graph = null;
@@ -61,6 +64,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   expressionFile: string;
   genotypeFile: string;
   gwasFile: string;
+  recalculateAttempt: string;
+  newSelectedPop: string;
+  newSelectedGene: string;
 
   // fileNameDialogRef: MatDialogRef<EqtlResultsLocuszoomBoxplotsComponent>;
 
@@ -72,12 +78,15 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
+        this.recalculateAttempt = mainData["info"]["recalculate"][0]; // recalculation attempt ?
         this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
+        this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
+        this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
-        this.geneList = mainData["info"]["gene_symbols"][0]; // gene list
+        this.geneList = mainData["info"]["gene_list"]["data"][0]; // get gene list & populate ref gene dropdown
         this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
         this.locuszoomDataRC = mainData["locuszoom"]["rc"][0]; // locuszoom RC data
         this.locuszoomDataQTopAnnot = mainData["locuszoom"]["top"][0][0]; // locuszoom Top Gene data
@@ -85,7 +94,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       }
       if (this.locuszoomData) {
         if (this.geneList) {
-          this.selectGene = this.locuszoomDataQTopAnnot["gene_symbol"]; //default reference gene
+          if(this.recalculateAttempt == "false") {
+            this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; //default reference gene
+          } 
+          // else {
+          //   this.selectedGene = this.newSelectedGene;
+          // }
         }
         // check if there is data in GWAS object
         if (this.GWASData[0]) {
@@ -99,13 +113,16 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
     this.populationGroups = this.populatePopulationDropdown();
-    this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+    if(this.recalculateAttempt == "false") {
+      this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+    } else {
+      var newSelectedPopList = this.newSelectedPop.split('+');
+      this.selectedPop = newSelectedPopList; // recalculated new population selection
+      this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+    }
 
     this.populationSelectedAll = false;
     this.inputChanged = false;
-
-    console.log("Default selected populations: ", this.selectedPop);
-    console.log("Default selected gene: ", this.selectGene);
   }
 
   populatePopulationDropdown() {
@@ -113,62 +130,57 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       {
         namecode: "AFR",
         name: "African",
-        selected: false,
         subPopulations: [
-          { value: "YRI", viewValue: "Yoruba in Ibadan, Nigera", selected: false },
-          { value: "LWK", viewValue: "Luhya in Webuye, Kenya", selected: false },
-          { value: "GWD", viewValue: "Gambian in Western Gambia", selected: false },
-          { value: "MSL", viewValue: "Mende in Sierra Leone", selected: false },
-          { value: "ESN", viewValue: "Esan in Nigera", selected: false },
-          { value: "ASW", viewValue: "Americans of African Ancestry in SW USA", selected: false },
-          { value: "ACB", viewValue: "African Carribbeans in Barbados", selected: false },
+          { value: "YRI", viewValue: "Yoruba in Ibadan, Nigera" },
+          { value: "LWK", viewValue: "Luhya in Webuye, Kenya" },
+          { value: "GWD", viewValue: "Gambian in Western Gambia" },
+          { value: "MSL", viewValue: "Mende in Sierra Leone" },
+          { value: "ESN", viewValue: "Esan in Nigera" },
+          { value: "ASW", viewValue: "Americans of African Ancestry in SW USA" },
+          { value: "ACB", viewValue: "African Carribbeans in Barbados" },
         ]
       },
       {
         namecode: 'AMR',
         name: "Ad Mixed American",
-        selected: false,
         subPopulations: [
-          { value: "MXL", viewValue: "Mexican Ancestry from Los Angeles, USA", selected: false },
-          { value: "PUR", viewValue: "Puerto Ricans from Puerto Rico", selected: false },
-          { value: "CLM", viewValue: "Colombians from Medellin, Colombia", selected: false },
-          { value: "PEL", viewValue: "Peruvians from Lima, Peru", selected: false },
+          { value: "MXL", viewValue: "Mexican Ancestry from Los Angeles, USA" },
+          { value: "PUR", viewValue: "Puerto Ricans from Puerto Rico" },
+          { value: "CLM", viewValue: "Colombians from Medellin, Colombia" },
+          { value: "PEL", viewValue: "Peruvians from Lima, Peru" },
         ]
       },
       {
         namecode: "EAS",
         name: "East Asian",
-        selected: false,
         subPopulations: [
-          { value: "CHB", viewValue: "Han Chinese in Bejing, China", selected: false },
-          { value: "JPT", viewValue: "Japanese in Tokyo, Japan", selected: false },
-          { value: "CHS", viewValue: "Southern Han Chinese", selected: false },
-          { value: "CDX", viewValue: "Chinese Dai in Xishuangbanna, China", selected: false },
-          { value: "KHV", viewValue: "Kinh in Ho Chi Minh City, Vietnam", selected: false },
+          { value: "CHB", viewValue: "Han Chinese in Bejing, China" },
+          { value: "JPT", viewValue: "Japanese in Tokyo, Japan" },
+          { value: "CHS", viewValue: "Southern Han Chinese" },
+          { value: "CDX", viewValue: "Chinese Dai in Xishuangbanna, China" },
+          { value: "KHV", viewValue: "Kinh in Ho Chi Minh City, Vietnam" },
         ]
       },
       {
         namecode: "EUR",
         name: "European",
-        selected: false,
         subPopulations: [
-          { value: "CEU", viewValue: "Utah Residents from North and West Europe", selected: false },
-          { value: "TSI", viewValue: "Toscani in Italia", selected: false },
-          { value: "FIN", viewValue: "Finnish in Finland", selected: false },
-          { value: "GBR", viewValue: "British in England and Scotland", selected: false },
-          { value: "IBS", viewValue: "Iberian population in Spain", selected: false },
+          { value: "CEU", viewValue: "Utah Residents from North and West Europe" },
+          { value: "TSI", viewValue: "Toscani in Italia" },
+          { value: "FIN", viewValue: "Finnish in Finland" },
+          { value: "GBR", viewValue: "British in England and Scotland" },
+          { value: "IBS", viewValue: "Iberian population in Spain" },
         ]
       },
       {
         namecode: "SAS",
         name: "South Asian",
-        selected: false,
         subPopulations: [
-          { value: "GIH", viewValue: "Gujarati Indian from Houston, Texas", selected: false },
-          { value: "PJL", viewValue: "Punjabi from Lahore, Pakistan", selected: false },
-          { value: "BEB", viewValue: "Bengali from Bangladesh", selected: false },
-          { value: "STU", viewValue: "Sri Lankan Tamil from the UK", selected: false },
-          { value: "ITU", viewValue: "Indian Telugu from the UK", selected: false },
+          { value: "GIH", viewValue: "Gujarati Indian from Houston, Texas" },
+          { value: "PJL", viewValue: "Punjabi from Lahore, Pakistan" },
+          { value: "BEB", viewValue: "Bengali from Bangladesh" },
+          { value: "STU", viewValue: "Sri Lankan Tamil from the UK" },
+          { value: "ITU", viewValue: "Indian Telugu from the UK" },
         ]
       }
     ];
@@ -685,6 +697,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   refGeneChange() {
     this.inputChanged = true;
+    console.log(this.selectedGene);
   }
 
   handleError(error) {
@@ -698,16 +711,19 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   async recalculate() {
     console.log("Recalculate!");
-    console.log("Request ID: ", this.requestID);
-    console.log("Selected gene: ", this.selectGene);
-    console.log("Selected populations: ", this.selectedPop);
+    // console.log("Request ID: ", this.requestID);
+    // console.log("Selected gene: ", this.selectedGene);
+    var selectedGeneString = this.selectedGene;
+    // console.log("Selected populations: ", this.selectedPop);
+    var selectedPopString = this.selectedPop.join('+');
+    var recalculate = "true";
     this.inputChanged = false;
     // reset
     // this.data.changeResultStatus(false);
     this.data.changeMainData(null);
     this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, "EUR")
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, recalculate)
       .subscribe(
         res => this.data.changeMainData(res),
         error => this.handleError(error)

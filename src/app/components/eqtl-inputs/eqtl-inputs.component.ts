@@ -120,7 +120,9 @@ export class EqtlInputsComponent implements OnInit {
 
     const formData = new FormData();
     formData.append('request_id', Date.now().toString()); // generate calculation request ID
-    formData.append('select_pop', "EUR"); // set default population to 'EUR'
+    formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
+    formData.append('select_gene', "false"); // set default population to 'false' -> QData top gene in R
+    formData.append('recalculate', "false");
     formData.append('association-file', associationFile[0]);
     if (this.selectLoadBoxplotData) {
       formData.append('expression-file', expressionFile[0]);

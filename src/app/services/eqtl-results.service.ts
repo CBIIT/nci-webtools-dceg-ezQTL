@@ -43,15 +43,18 @@ export class EqtlResultsService {
     return this.http.post(url, formData);
   }
 
-  recalculateMain(associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string) {
+  recalculateMain(associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, recalculate: string) {
     let recalculateParameters = {
       associationFile: associationFile,
       expressionFile: expressionFile,
       genotypeFile: genotypeFile,
       gwasFile: gwasFile,
       request_id: request_id, 
-      select_pop: select_pop
+      select_pop: select_pop,
+      select_gene: select_gene,
+      recalculate: recalculate
     };
+    console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     const url = environment.endpoint + '/eqtl-recalculate-main';

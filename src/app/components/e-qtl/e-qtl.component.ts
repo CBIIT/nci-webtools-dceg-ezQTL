@@ -14,14 +14,21 @@ declare let $: any;
 export class EQTLComponent implements OnInit {
 
   resultStatus: boolean;
+  errorMessage: string;
 
   constructor(private data: EqtlResultsService) { }
 
   ngOnInit() {
     // hide input panel once calculate button is hit
     this.data.currentResultStatus.subscribe(resultStatus => {
-      this.resultStatus = resultStatus
+      this.resultStatus = resultStatus;
       if (this.resultStatus) {
+        this.toggleView();
+      }
+    });
+    this.data.currentErrorMessage.subscribe(errorMessage => {
+      this.errorMessage = errorMessage;
+      if (this.errorMessage) {
         this.toggleView();
       }
     });

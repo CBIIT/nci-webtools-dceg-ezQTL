@@ -13,6 +13,9 @@
             <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
               Upload data files on the left panel and click Calculate to see results here.
             </div>
+            <div class="p-2" *ngIf="errorMessage && !mainData">
+              Please check input files — reset form to try again.
+            </div>
             <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !mainData && !errorMessage" id="results">
               <mat-spinner></mat-spinner>
             </div>
@@ -28,6 +31,9 @@
           <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>
+          <div class="p-2" *ngIf="errorMessage && !mainData">
+            Please check input files — reset form to try again.
+          </div>
           <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !mainData && !errorMessage" id="results">
             <mat-spinner></mat-spinner>
           </div>
@@ -42,6 +48,9 @@
         <div class="col" class="result-main">
           <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
+          </div>
+          <div class="p-2" *ngIf="errorMessage && !mainData">
+            Please check input files — reset form to try again.
           </div>
           <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !mainData && !errorMessage" id="results">
             <mat-spinner></mat-spinner>

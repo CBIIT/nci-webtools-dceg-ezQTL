@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop) {
+function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, recalculate) {
     console.log("Execute main eqtl calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -14,6 +14,8 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         gwasFile = JSON.stringify(gwasFile);
         request = JSON.stringify(request);
         select_pop = JSON.stringify(select_pop);
+        select_gene = JSON.stringify(select_gene);
+        recalculate = JSON.stringify(recalculate)
 
         console.log("Association File:", associationFile);
         console.log("Expression File:", expressionFile);
@@ -23,13 +25,14 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         // var debugRequest = JSON.stringify("0000000000000");
         // console.log("Debug Request: ", debugRequest);
         console.log("Selected Pop: ", select_pop);
+        console.log("Selected Gene: ", select_gene);
+        console.log("Recalculate?", recalculate);
 
-    
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
         // code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
-        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop})`;
+        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${recalculate})`;
         // console.log(code);
 
         const rcode = `

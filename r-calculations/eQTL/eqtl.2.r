@@ -1,16 +1,19 @@
-eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop) {
+eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, recalculate) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
 
   ## parameters define ##
-  # select_pop <- "EUR"
+  ## set default population to EUR
+  if (identical(select_pop, 'false')) {
+    select_pop <- "EUR"
+  }
+  if (identical(select_gene, 'false')) {
+    gene <- NULL
+  }
   gene <- NULL
   rsnum <- NULL
-  # if (!identical(gwasFile, 'false')) {
-
-  # }
 
   ## load 1kg pop panel file ##
   kgpanel <- read_delim('eQTL/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
@@ -49,7 +52,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
   ## locuszoom gwas data ##
   gwas_example_data <- eqtl_gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(gene_symbols=gene_symbols, inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile,request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculate=recalculate, gene_symbols=gene_symbols, inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
@@ -153,6 +156,9 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
   in_bin <- '/usr/local/bin/emeraLD'
   getLD <- emeraLD2R(path = paste0('tmp/',request,'.','input','.vcf.gz'), bin = in_bin) 
   ld_data <- getLD(region = regionLD)
+
+  # saveRDS(ld_data, file=paste0("tmp/",request,".ld_data.rds"))
+  # ld_data <- readRDS(paste0("tmp/",request,".ld_data.rds"))
 
   index <- which(ld_data$info$id==rsnum|str_detect(ld_data$info$id,paste0(";",rsnum))|str_detect(ld_data$info$id,paste0(rsnum,";")))
 
