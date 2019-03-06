@@ -1,20 +1,26 @@
-eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, recalculate) {
+eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculate) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
 
   ## parameters define ##
-  ## set default population to EUR
   if (identical(select_pop, 'false')) {
+    ## set default population to EUR if none chosen
     select_pop <- "EUR"
   }
   if (identical(select_gene, 'false')) {
+    ## set default gene to top gene if none chosen
     gene <- NULL
   } else {
     gene <- select_gene
   }
-  rsnum <- NULL
+  if (identical(select_ref, 'false')) {
+    ## set default rsnum to top gene's rsnum if none chosen
+    rsnum <- NULL
+  } else {
+    rsnum <- select_ref
+  }
 
   ## load 1kg pop panel file ##
   kgpanel <- read_delim('eQTL/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
@@ -56,7 +62,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
   ## locuszoom gwas data ##
   gwas_example_data <- eqtl_gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculate=recalculate, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculate=recalculate, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
@@ -140,17 +146,35 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
     unique() %>% 
     write_delim(paste0('tmp/',request,'.',locus,'.bed'),delim = '\t',col_names = F)
 
-  if (select_pop %in% kgpanel$super_pop) {
-    kgpanel %>% 
-    filter(super_pop==select_pop) %>% 
-    select(sample) %>% 
-    write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
-  } else if (select_pop %in% kgpanel$pop) {
-    kgpanel %>% 
-    filter(pop==select_pop) %>% 
-    select(sample) %>% 
-    write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
+  ## remove any previous extracted panel if exists
+  unlink(paste0('tmp/',request,'.','extracted','.panel'))
+  ## read multiple population selections
+  select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
+  for(pop_i in select_pop_list){
+    if (pop_i %in% kgpanel$super_pop) {
+      kgpanel %>% 
+        filter(super_pop==pop_i) %>% 
+        select(sample) %>% 
+        write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F, append = TRUE)
+    } else if (pop_i %in% kgpanel$pop) {
+      kgpanel %>% 
+        filter(pop==pop_i) %>% 
+        select(sample) %>% 
+        write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F, append = TRUE)
+    }
   }
+
+  # if (select_pop %in% kgpanel$super_pop) {
+  #   kgpanel %>% 
+  #   filter(super_pop==select_pop) %>% 
+  #   select(sample) %>% 
+  #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
+  # } else if (select_pop %in% kgpanel$pop) {
+  #   kgpanel %>% 
+  #   filter(pop==select_pop) %>% 
+  #   select(sample) %>% 
+  #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
+  # }
 
   cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
   system(cmd)

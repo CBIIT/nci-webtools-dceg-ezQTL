@@ -4,8 +4,6 @@ import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
 
-// declare var $; // declare jquery $
-// import * as $ from 'jquery';
 declare let $: any;
 
 export interface PopulationGroup {
@@ -22,13 +20,6 @@ export interface SubPopulation {
 export interface ReferenceGene {
   gene_id: string;
   gene_symbol: string;
-}
-
-export interface PopoverData {
-  point_index: Number;
-  variant_id: string;
-  pval_nominal: Number;
-  ref: string;
 }
 
 @Component({
@@ -48,14 +39,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   populationGroups: PopulationGroup[];
   selectedPop: string[];
   public graph = null;
-  // public graphGWAS = null;
   showPopover: boolean;
   collapseInput: boolean;
 
   populationSelectedAll: boolean;
 
-  popoverData: PopoverData;
-  popoverPoint: Object;
+  popoverData: Object;
 
   disableGeneExpressions: boolean;
   inputChanged: boolean;
@@ -67,8 +56,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   recalculateAttempt: string;
   newSelectedPop: string;
   newSelectedGene: string;
-
-  // fileNameDialogRef: MatDialogRef<EqtlResultsLocuszoomBoxplotsComponent>;
 
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
@@ -97,9 +84,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           if(this.recalculateAttempt == "false") {
             this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; //default reference gene
           } 
-          // else {
-          //   this.selectedGene = this.newSelectedGene;
-          // }
         }
         // check if there is data in GWAS object
         if (this.GWASData[0]) {
@@ -113,6 +97,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
     this.populationGroups = this.populatePopulationDropdown();
+
+    // this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+
     if(this.recalculateAttempt == "false") {
       this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
     } else {
@@ -623,17 +610,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
   }
 
-  populatePopover(pointData, pointIndex) {
-    this.popoverPoint = pointData;
-    var data = {
-      point_index: pointIndex,
-      variant_id: pointData.variant_id, 
-      pval_nominal: pointData.pval_nominal, 
-      ref: pointData.ref, 
-    };
-    return data;
-  }
-
   closePopover() {
     $('.popover').hide();
     this.showPopover = false;
@@ -649,20 +625,37 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
   }
 
+  // makeLDRef(boxplotData) {
   makeLDRef() {
-    alert("make ld ref!");
+    // console.log("Recalculate!");
+    // console.log(boxplotData.point_index);
+    // var selectedRefString = this.locuszoomData[boxplotData["point_index"]]["rsnum"];
+    var selectedRefString = this.popoverData["rsnum"];
+    // console.log(selectedRefString);
+    var selectedGeneString = this.selectedGene;
+    var selectedPopString = this.selectedPop.join('+');
+    var recalculate = "true";
+    this.inputChanged = false;
+    // reset
+    this.data.changeMainData(null);
+    this.data.changeSelectedTab(0);
+    // calculate
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculate)
+      .subscribe(
+        res => this.data.changeMainData(res),
+        error => this.handleError(error)
+      )
   } 
 
-  showBoxplot(boxplotData) {
-    // console.log(boxplotData);
-    this.dialog.open(EqtlResultsLocuszoomBoxplotsComponent, {
-      data: {
-        point_index: boxplotData.point_index,
-        variant_id: boxplotData.variant_id,
-        pval_nominal: boxplotData.pval_nominal,
-        ref: boxplotData.ref
-      }
-    });
+  showBoxplot() {
+    if (this.popoverData) {
+      // console.log("LOCUSZOOM BOXPLOT DIALOG MODULE OPENED");
+      this.dialog.open(EqtlResultsLocuszoomBoxplotsComponent, {
+        data: this.popoverData
+      });
+      this.closePopover();
+      this.popoverData = null;
+    }
   }
 
   clickPoint(event, plot: PlotComponent) {
@@ -673,7 +666,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       // var mouseX = event.event.pageX;
       // var mouseY = event.event.pageY;
       // console.log(event.points[0]);
-      this.popoverData = this.populatePopover(this.locuszoomData[event.points[0].pointIndex], event.points[0].pointIndex);
+      this.popoverData = this.locuszoomData[event.points[0].pointIndex];
       $('.popover').show();
       if (this.collapseInput) {
         // console.log("INPUT PANEL COLLAPSED");
@@ -697,7 +690,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   refGeneChange() {
     this.inputChanged = true;
-    console.log(this.selectedGene);
+    // console.log(this.selectedGene);
   }
 
   handleError(error) {
@@ -709,21 +702,52 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.data.changeErrorMessage(errorMessage);
   }
 
+  // returnPopulationGroupFinal() {
+  //   var selectedPopFinal = this.selectedPop;
+  //   var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
+  //   var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
+  //   var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
+  //   var european = ["CEU", "TSI", "FIN", "GBR", "IBS"];
+  //   var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
+  //   if (this.containsAll(african, this.selectedPop)) {
+  //     selectedPopFinal = this.removeAll(african, selectedPopFinal);
+  //     selectedPopFinal.push("AFR");
+  //   }
+  //   if (this.containsAll(mixedAmerican, this.selectedPop)) {
+  //     selectedPopFinal = this.removeAll(mixedAmerican, selectedPopFinal);
+  //     selectedPopFinal.push("AMR");
+  //   }
+  //   if (this.containsAll(eastAsian, this.selectedPop)) {
+  //     selectedPopFinal = this.removeAll(eastAsian, selectedPopFinal);
+  //     selectedPopFinal.push("EAS");
+  //   }
+  //   if (this.containsAll(european, this.selectedPop)) {
+  //     selectedPopFinal = this.removeAll(european, selectedPopFinal);
+  //     selectedPopFinal.push("EUR");
+  //   }
+  //   if (this.containsAll(southAsian, this.selectedPop)) {
+  //     selectedPopFinal = this.removeAll(southAsian, selectedPopFinal);
+  //     selectedPopFinal.push("SAS");
+  //   }
+  //   return selectedPopFinal;
+  // }
+
   async recalculate() {
-    console.log("Recalculate!");
+    // console.log("Recalculate!");
     // console.log("Request ID: ", this.requestID);
     // console.log("Selected gene: ", this.selectedGene);
     var selectedGeneString = this.selectedGene;
     // console.log("Selected populations: ", this.selectedPop);
     var selectedPopString = this.selectedPop.join('+');
+    // console.log("Selected populations RETURNED: ", selectedPopString);
+    var selectedRefString = "false";
     var recalculate = "true";
     this.inputChanged = false;
     // reset
-    // this.data.changeResultStatus(false);
     this.data.changeMainData(null);
     this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, recalculate)
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculate)
       .subscribe(
         res => this.data.changeMainData(res),
         error => this.handleError(error)

@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from "@angular/material";
-import { PopoverData } from '../eqtl-results-locuszoom/eqtl-results-locuszoom.component';
+// import { PopoverData } from '../eqtl-results-locuszoom/eqtl-results-locuszoom.component';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
 
 
@@ -15,43 +15,42 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
 
   boxplotData: Object;
   locuszoomData: Object;
-  boxplotDataDetailed: Object;
   locuszoomBoxplotsData: Object;
   expressionFile: string;
   genotypeFile: string;
+  mainData: Object;
 
   public graph = null;
 
-  constructor(private data: EqtlResultsService, @Inject(MAT_DIALOG_DATA) public popoverData: PopoverData) {
-      this.boxplotData = popoverData;
-    }
+  constructor(private data: EqtlResultsService, @Inject(MAT_DIALOG_DATA) public popoverData: Object) {
+    this.boxplotData = popoverData;
+  }
 
   ngOnInit() {
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
-      if (!this.disableGeneExpressions) {
-        this.data.currentMainData.subscribe(mainData => {
-          if (mainData) {
-            this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
-            this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
-            this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
-            this.boxplotDataDetailed = this.locuszoomData[this.boxplotData['point_index']];
-            if (this.expressionFile != 'false' && this.genotypeFile != 'false') {
-              this.data.calculateLocuszoomBoxplots(this.expressionFile, this.genotypeFile, this.boxplotDataDetailed)
-              .subscribe(
-                res => { 
-                  this.locuszoomBoxplotsData = res["locuszoom_boxplots"]["data"][0];
-                  if (this.locuszoomBoxplotsData) {
-                    this.graph = this.locuszoomBoxplots(this.boxplotDataDetailed, this.locuszoomBoxplotsData);
-                  }
-                },
-                error => this.handleError(error)
-              );
-            }
-          }
-        });
-      }
     });
+    this.data.currentMainData.subscribe(mainData => {
+      this.mainData = mainData;
+    });
+    if (this.mainData && this.boxplotData && !this.disableGeneExpressions) {
+      this.expressionFile = this.mainData["info"]["inputs"]["expression_file"][0]; // expression filename
+      this.genotypeFile = this.mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
+      this.locuszoomData = this.mainData["locuszoom"]["data"][0]; // locuszoom data
+      if (this.expressionFile != 'false' && this.genotypeFile != 'false') {
+        // console.log("HERE I GO CALCULATING !!!!!!");
+        this.data.calculateLocuszoomBoxplots(this.expressionFile, this.genotypeFile, this.boxplotData)
+        .subscribe(
+          res => { 
+            this.locuszoomBoxplotsData = res["locuszoom_boxplots"]["data"][0];
+            if (this.locuszoomBoxplotsData) {
+              this.graph = this.locuszoomBoxplots(this.boxplotData, this.locuszoomBoxplotsData);
+            }
+          },
+          error => this.handleError(error)
+        );
+      }
+    }
   }
 
   handleError(error) {

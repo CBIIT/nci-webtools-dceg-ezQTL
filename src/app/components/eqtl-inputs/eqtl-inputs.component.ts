@@ -31,6 +31,7 @@ export class EqtlInputsComponent implements OnInit {
   selectLoadBoxplotData: boolean;
   selectLoadGWASData: boolean;
   selectedTab: number;
+  popoverData: Object;
 
   constructor(private cdr: ChangeDetectorRef, private data: EqtlResultsService) { }
 
@@ -121,7 +122,8 @@ export class EqtlInputsComponent implements OnInit {
     const formData = new FormData();
     formData.append('request_id', Date.now().toString()); // generate calculation request ID
     formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
-    formData.append('select_gene', "false"); // set default population to 'false' -> QData top gene in R
+    formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
+    formData.append('select_ref', "false"); // set default rsnum to 'false' -> QData top gene's rsnum in R
     formData.append('recalculate', "false");
     formData.append('association-file', associationFile[0]);
     if (this.selectLoadBoxplotData) {

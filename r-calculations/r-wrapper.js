@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, recalculate) {
+function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculate) {
     console.log("Execute main eqtl calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -15,6 +15,7 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         request = JSON.stringify(request);
         select_pop = JSON.stringify(select_pop);
         select_gene = JSON.stringify(select_gene);
+        select_ref = JSON.stringify(select_ref);
         recalculate = JSON.stringify(recalculate)
 
         console.log("Association File:", associationFile);
@@ -26,13 +27,14 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         // console.log("Debug Request: ", debugRequest);
         console.log("Selected Pop: ", select_pop);
         console.log("Selected Gene: ", select_gene);
+        console.log("Select Ref: ", select_ref);
         console.log("Recalculate?", recalculate);
 
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
         // code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
-        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${recalculate})`;
+        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculate})`;
         // console.log(code);
 
         const rcode = `
@@ -77,9 +79,6 @@ function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, inf
         // expressionFile = JSON.stringify("1q21_3.expression.txt");
         // genotypeFile = JSON.stringify("1q21_3.genotyping.txt");
         info = JSON.stringify(JSON.stringify(info));
-        // var expressionFileSplit = expressionFile.split('.');
-        // var request = expressionFileSplit[expressionFileSplit.length - 2];
-
         console.log("Expression File:", expressionFile);
         console.log("Genotype File:", genotypeFile);
         // console.log("Info:", info);
