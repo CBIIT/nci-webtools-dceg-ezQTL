@@ -41,6 +41,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   public graph = null;
   showPopover: boolean;
   collapseInput: boolean;
+  selectedRef: string;
 
   populationSelectedAll: boolean;
 
@@ -56,6 +57,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   recalculateAttempt: string;
   newSelectedPop: string;
   newSelectedGene: string;
+  newSelectedRef: string;
 
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
@@ -72,6 +74,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
+        this.newSelectedRef = mainData["info"]["inputs"]["select_ref"][0]; // inputted ref
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
         this.geneList = mainData["info"]["gene_list"]["data"][0]; // get gene list & populate ref gene dropdown
         this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
@@ -82,7 +85,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       if (this.locuszoomData) {
         if (this.geneList) {
           if(this.recalculateAttempt == "false") {
-            this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; //default reference gene
+            this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; // default reference gene
           } 
         }
         // check if there is data in GWAS object
@@ -102,10 +105,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
     if(this.recalculateAttempt == "false") {
       this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+      this.selectedRef = "false"; // default ref rsnum
     } else {
       var newSelectedPopList = this.newSelectedPop.split('+');
       this.selectedPop = newSelectedPopList; // recalculated new population selection
       this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+      this.selectedRef = this.newSelectedRef; // recalculated new gene selection
     }
 
     this.populationSelectedAll = false;
@@ -740,7 +745,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     // console.log("Selected populations: ", this.selectedPop);
     var selectedPopString = this.selectedPop.join('+');
     // console.log("Selected populations RETURNED: ", selectedPopString);
-    var selectedRefString = "false";
+    var selectedRefString = this.selectedRef;
     var recalculate = "true";
     this.inputChanged = false;
     // reset

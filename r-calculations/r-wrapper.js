@@ -27,7 +27,7 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         // console.log("Debug Request: ", debugRequest);
         console.log("Selected Pop: ", select_pop);
         console.log("Selected Gene: ", select_gene);
-        console.log("Select Ref: ", select_ref);
+        console.log("Selected Ref: ", select_ref);
         console.log("Recalculate?", recalculate);
 
         var code = readFileSync(rfile).toString();
