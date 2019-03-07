@@ -125,7 +125,7 @@ app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
   // var genotypeFile = "0000000000000.1q21_3.genotyping.txt"; // debug data file
 
   try {
-    const data = await rscript.eqtlCalculateLocuszoomBoxplots('./r-calculations/eQTL/locuszoomBoxplots.r', expressionFile, genotypeFile, info);
+    const data = await rscript.eqtlCalculateLocuszoomBoxplots('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, info);
     response.json(data);
   } catch(err) {
     console.log(err);

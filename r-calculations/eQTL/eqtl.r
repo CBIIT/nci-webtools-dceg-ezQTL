@@ -53,7 +53,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
 
   ## call calculations for eqtl modules: locuszoom and gene expressions ##
   ## locuszoom calculations ##
-  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request)
+  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculate)
   locus_zoom_data <- eqtl_locuszoom_data[[1]]
   rcdata_region_data <- eqtl_locuszoom_data[[2]]
   qdata_top_annotation_data <- eqtl_locuszoom_data[[3]]
@@ -71,19 +71,20 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
   return(dataSourceJSON)
 }
 
-eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request) { 
+eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculate) { 
   chromosome <- unique(qdata$chr)
   minpos <- min(qdata$pos)
   maxpos <- max(qdata$pos)
 
   kgvcfpath <- paste0(workDir, '/eQTL/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
-
+  
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
-  cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
-  system(cmd)
-
-  cmd <- paste0('bcftools index ', in_path)
-  system(cmd)
+  if (identical(recalculate, 'false')) {
+    cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
+    system(cmd)
+    cmd <- paste0('bcftools index ', in_path)
+    system(cmd)
+  }
 
   popshort <- "CEU"  ### need to find the superpop recomendation data 
 
@@ -244,3 +245,38 @@ eqtl_gwas_example <- function(workDir, gwasFile) {
   }
   return(gwas_example_data)
 }
+
+eqtl_locuszoom_boxplots <- function(workDir, exprFile, genoFile, info) {
+  setwd(workDir)
+  library(tidyverse)
+  # library(forcats)
+  library(jsonlite)
+  # initialize locuszoom boxplots data as empty until data file detected
+  locuszoom_boxplots_data <- list(c())
+  if (!identical(genoFile, 'false') & !identical(exprFile, 'false')) {
+    gdatafile <- paste0('tmp/', genoFile)
+    edatafile <- paste0('tmp/', exprFile)
+
+    gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
+    edata <- read_delim(edatafile,delim = "\t",col_names = T)
+
+    # parse info json to data frame
+    info <- paste0('[', info, ']')  %>%
+      fromJSON(info, simplifyDataFrame = TRUE)
+    info <- select(info, gene_id, gene_symbol, variant_id, rsnum, chr, pos, ref, alt)
+
+    cexpdata <- edata %>% 
+      filter(gene_id==info$gene_id) %>% 
+      gather(Sample,exp,-(chr:gene_id))
+
+    cexpdata <- gdata %>% 
+      gather(Sample,Genotype,-(chr:alt)) %>% 
+      right_join(info) %>%
+      left_join(cexpdata)
+
+    locuszoom_boxplots_data <- list(setNames(as.data.frame(cexpdata),c("chr","pos","ref","alt","Sample","Genotype","gene_id","gene_symbol","variant_id","rsnum","start","end","exp")))
+  }
+  dataSourceJSON <- c(toJSON(list(locuszoom_boxplots=list(data=locuszoom_boxplots_data))))
+  return(dataSourceJSON)
+}
+
