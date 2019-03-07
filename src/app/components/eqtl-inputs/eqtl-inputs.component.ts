@@ -124,7 +124,8 @@ export class EqtlInputsComponent implements OnInit {
     formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
     formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
     formData.append('select_ref', "false"); // set default rsnum to 'false' -> QData top gene's rsnum in R
-    formData.append('recalculate', "false");
+    formData.append('recalculatePopGene', "false");
+    formData.append('recalculateLD', "true");
     formData.append('association-file', associationFile[0]);
     if (this.selectLoadBoxplotData) {
       formData.append('expression-file', expressionFile[0]);

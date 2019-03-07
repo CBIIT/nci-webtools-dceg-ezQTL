@@ -65,7 +65,8 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   var select_pop = request.body.select_pop;
   var select_gene = request.body.select_gene;
   var select_ref = request.body.select_ref;
-  var recalculate = request.body.recalculate;
+  var recalculatePopGene = request.body.recalculatePopGene;
+  var recalculateLD = request.body.recalculateLD
 
   // assign filenames to variable depending on how many files are uploaded
   if (request.files.length == 2) {
@@ -82,7 +83,7 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculate);
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculatePopGene, recalculateLD);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -102,10 +103,11 @@ app.post('/eqtl-recalculate-main', async (request, response) => {
   var select_pop = request.body.select_pop;
   var select_gene = request.body.select_gene;
   var select_ref = request.body.select_ref;
-  var recalculate = request.body.recalculate;
+  var recalculatePopGene = request.body.recalculatePopGene;
+  var recalculateLD = request.body.recalculateLD
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculate);
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculatePopGene, recalculateLD);
     response.json(data);
   } catch(err) {
     console.log(err);

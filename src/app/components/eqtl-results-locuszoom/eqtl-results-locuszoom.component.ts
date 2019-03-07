@@ -54,7 +54,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   expressionFile: string;
   genotypeFile: string;
   gwasFile: string;
-  recalculateAttempt: string;
+  recalculatePopGeneAttempt: string;
+  recalculateLDAttempt: string;
   newSelectedPop: string;
   newSelectedGene: string;
   newSelectedRef: string;
@@ -67,7 +68,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
-        this.recalculateAttempt = mainData["info"]["recalculate"][0]; // recalculation attempt ?
+        this.recalculatePopGeneAttempt = mainData["info"]["recalculatePopGene"][0]; // recalculation attempt when pop or gene changed ?
+        this.recalculateLDAttempt = mainData["info"]["recalculateLD"][0]; // recalculation attempt when ref rsnum changed ?
         this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
@@ -84,7 +86,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       }
       if (this.locuszoomData) {
         if (this.geneList) {
-          if(this.recalculateAttempt == "false") {
+          if(this.recalculatePopGeneAttempt == "false") {
             this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; // default reference gene
           } 
         }
@@ -103,13 +105,16 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
     // this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
 
-    if(this.recalculateAttempt == "false") {
+    if (this.recalculatePopGeneAttempt == "false") {
       this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
-      this.selectedRef = "false"; // default ref rsnum
     } else {
       var newSelectedPopList = this.newSelectedPop.split('+');
       this.selectedPop = newSelectedPopList; // recalculated new population selection
       this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+    }
+    if (this.recalculateLDAttempt == "false") {
+      this.selectedRef = "false"; // default ref rsnum
+    } else {
       this.selectedRef = this.newSelectedRef; // recalculated new gene selection
     }
 
@@ -238,7 +243,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
 
   selectPopulationGroup(groupName) {
-    // this.inputChanged = true;
     var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
     var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
     var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
@@ -631,7 +635,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   // makeLDRef(boxplotData) {
-  makeLDRef() {
+  async makeLDRef() {
     // console.log("Recalculate!");
     // console.log(boxplotData.point_index);
     // var selectedRefString = this.locuszoomData[boxplotData["point_index"]]["rsnum"];
@@ -639,20 +643,22 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     // console.log(selectedRefString);
     var selectedGeneString = this.selectedGene;
     var selectedPopString = this.selectedPop.join('+');
-    var recalculate = "true";
+    // var recalculatePopGene = this.recalculatePopGeneAttempt;
+    var recalculatePopGene = this.recalculatePopGeneAttempt;
+    var recalculateLD = "false";
     this.inputChanged = false;
     // reset
     this.data.changeMainData(null);
     this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculate)
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculatePopGene, recalculateLD)
       .subscribe(
         res => this.data.changeMainData(res),
         error => this.handleError(error)
       )
   } 
 
-  showBoxplot() {
+  async showBoxplot() {
     if (this.popoverData) {
       // console.log("LOCUSZOOM BOXPLOT DIALOG MODULE OPENED");
       this.dialog.open(EqtlResultsLocuszoomBoxplotsComponent, {
@@ -743,7 +749,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   //   return selectedPopFinal;
   // }
 
-  async recalculate() {
+  async recalculatePopGene() {
     // console.log("Recalculate!");
     // console.log("Request ID: ", this.requestID);
     // console.log("Selected gene: ", this.selectedGene);
@@ -752,13 +758,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var selectedPopString = this.selectedPop.join('+');
     // console.log("Selected populations RETURNED: ", selectedPopString);
     var selectedRefString = this.selectedRef;
-    var recalculate = "true";
+    var recalculatePopGene = "true";
+    var recalculateLD = "true";
     this.inputChanged = false;
     // reset
     this.data.changeMainData(null);
     this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculate)
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculatePopGene, recalculateLD)
       .subscribe(
         res => this.data.changeMainData(res),
         error => this.handleError(error)
