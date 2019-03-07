@@ -666,24 +666,30 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   clickPoint(event, plot: PlotComponent) {
     // console.log(event.event);
     if (event.points) {
-      var top = event.event.offsetY;
-      var left = event.event.offsetX;
-      // var mouseX = event.event.pageX;
-      // var mouseY = event.event.pageY;
+      var top = event.event.pointerY;
+      var left = event.event.pointerX;
+      // console.log("event", event);
+      // console.log("event.event", event.event);
+      // console.log("pointerY", top);
+      // console.log("pointerX", left);
+      // console.log("pageY", event.event.pageY);
+      // console.log("pageX", event.event.pageX);
       // console.log(event.points[0]);
       this.popoverData = this.locuszoomData[event.points[0].pointIndex];
       $('.popover').show();
       if (this.collapseInput) {
         // console.log("INPUT PANEL COLLAPSED");
-        $('.popover').css({
-          'top': top + 50, 
-          'left': left + 190
+        $('.popover').show().css({
+          position: "absolute",
+          top: top + 50, 
+          left: left + 190
         });
       } else {
         // console.log("INPUT PANEL SHOWN");
-        $('.popover').css({
-          'top': top + 50, 
-          'left': left + 25
+        $('.popover').show().css({
+          position: "absolute",
+          top: top + 50, 
+          left: left + 25
         });
       }
       this.showPopover = true;
