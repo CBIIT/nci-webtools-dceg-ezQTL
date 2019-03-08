@@ -74,6 +74,8 @@ export class EqtlInputsComponent implements OnInit {
       $("#genotype-file").val("");
       $("#eqtl-input-expression-file").addClass("disabled-overlay");
       $("#eqtl-input-genotype-file").addClass("disabled-overlay");
+      $("#expression-file").prop("disabled", true);
+      $("#genotype-file").prop("disabled", true);
       this.data.changeDisableGeneExpressions(true);
     } else {
       this.eqtlForm.setControl('expressionFile', new FormControl('', Validators.required));
@@ -81,6 +83,8 @@ export class EqtlInputsComponent implements OnInit {
       this.selectLoadBoxplotData = true;
       $("#eqtl-input-expression-file").removeClass("disabled-overlay");
       $("#eqtl-input-genotype-file").removeClass("disabled-overlay");
+      $("#expression-file").prop("disabled", false);
+      $("#genotype-file").prop("disabled", false);
       this.data.changeDisableGeneExpressions(false);
     }
   }
@@ -92,10 +96,12 @@ export class EqtlInputsComponent implements OnInit {
       this.eqtlForm.value.gwasFile = false;
       $("#gwas-file").val("");
       $("#eqtl-input-gwas-file").addClass("disabled-overlay");
+      $("#gwas-file").prop("disabled", true);
     } else {
       this.eqtlForm.setControl('gwasFile', new FormControl('', Validators.required));
       this.selectLoadGWASData = true;
       $("#eqtl-input-gwas-file").removeClass("disabled-overlay");
+      $("#gwas-file").prop("disabled", false);
     }
   }
 
@@ -153,6 +159,9 @@ export class EqtlInputsComponent implements OnInit {
     $("#eqtl-input-expression-file").addClass("disabled-overlay");
     $("#eqtl-input-genotype-file").addClass("disabled-overlay");
     $("#eqtl-input-gwas-file").addClass("disabled-overlay");
+    $("#expression-file").prop("disabled", true);
+    $("#genotype-file").prop("disabled", true);
+    $("#gwas-file").prop("disabled", true);
     this.eqtlForm.setControl('expressionFile', new FormControl(''));
     this.eqtlForm.setControl('genotypeFile', new FormControl(''));
     this.eqtlForm.setControl('gwasFile', new FormControl(''));
