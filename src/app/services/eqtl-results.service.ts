@@ -43,18 +43,20 @@ export class EqtlResultsService {
     return this.http.post(url, formData);
   }
 
-  recalculateMain(associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, select_ref: string, recalculatePopGene: string, recalculateLD: string) {
+  recalculateMain(associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateRef: string) {
     let recalculateParameters = {
-      associationFile: associationFile,
-      expressionFile: expressionFile,
-      genotypeFile: genotypeFile,
-      gwasFile: gwasFile,
+      associationFile: associationFile, 
+      expressionFile: expressionFile, 
+      genotypeFile: genotypeFile, 
+      gwasFile: gwasFile, 
       request_id: request_id, 
-      select_pop: select_pop,
-      select_gene: select_gene,
-      select_ref: select_ref,
-      recalculatePopGene: recalculatePopGene,
-      recalculateLD: recalculateLD
+      select_pop: select_pop, 
+      select_gene: select_gene, 
+      select_ref: select_ref, 
+      recalculateAttempt: recalculateAttempt,
+      recalculatePop: recalculatePop, 
+      recalculateGene: recalculateGene, 
+      recalculateRef: recalculateRef
     };
     // console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();

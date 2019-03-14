@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculatePopGene, recalculateLD) {
+function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
     console.log("Execute main eqtl calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -16,8 +16,10 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         select_pop = JSON.stringify(select_pop);
         select_gene = JSON.stringify(select_gene);
         select_ref = JSON.stringify(select_ref);
-        recalculatePopGene = JSON.stringify(recalculatePopGene);
-        recalculateLD = JSON.stringify(recalculateLD);
+        recalculateAttempt = JSON.stringify(recalculateAttempt);
+        recalculatePop = JSON.stringify(recalculatePop);
+        recalculateGene = JSON.stringify(recalculateGene);
+        recalculateRef = JSON.stringify(recalculateRef);
 
 
         console.log("Association File:", associationFile);
@@ -30,14 +32,16 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         console.log("Selected Pop: ", select_pop);
         console.log("Selected Gene: ", select_gene);
         console.log("Selected Ref: ", select_ref);
-        console.log("Recalculate Pop/Gene?", recalculatePopGene);
-        console.log("Recalculate LD?", recalculateLD);
+        console.log("Recalculate Attempt?", recalculateAttempt);
+        console.log("Recalculate Pop?", recalculatePop);
+        console.log("Recalculate Gene?", recalculateGene);
+        console.log("Recalculate Ref?", recalculateRef);
 
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
         // code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
-        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculatePopGene}, ${recalculateLD})`;
+        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
         // console.log(code);
 
         const rcode = `

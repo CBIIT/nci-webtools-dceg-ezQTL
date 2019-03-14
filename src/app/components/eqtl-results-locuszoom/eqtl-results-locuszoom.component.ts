@@ -54,8 +54,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   expressionFile: string;
   genotypeFile: string;
   gwasFile: string;
-  recalculatePopGeneAttempt: string;
-  recalculateLDAttempt: string;
+  recalculateAttempt: string;
+  recalculatePopAttempt: string;
+  recalculateGeneAttempt: string;
+  recalculateRefAttempt: string;
   newSelectedPop: string;
   newSelectedGene: string;
   newSelectedRef: string;
@@ -68,8 +70,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     });
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
-        this.recalculatePopGeneAttempt = mainData["info"]["recalculatePopGene"][0]; // recalculation attempt when pop or gene changed ?
-        this.recalculateLDAttempt = mainData["info"]["recalculateLD"][0]; // recalculation attempt when ref rsnum changed ?
+        this.recalculateAttempt = mainData["info"]["recalculateAttempt"][0]; // recalculation attempt ?
+        this.recalculatePopAttempt = mainData["info"]["recalculatePop"][0]; // recalculation attempt when pop changed ?
+        this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
+        this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
         this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
@@ -85,11 +89,11 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.GWASData = mainData["gwas"]["data"][0]; // gwas data
       }
       if (this.locuszoomData) {
-        if (this.geneList) {
-          if(this.recalculatePopGeneAttempt == "false") {
-            this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; // default reference gene
-          } 
-        }
+        // if (this.geneList) {
+        //   if(this.recalculateGeneAttempt == "false") {
+        //     this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; // default reference gene
+        //   } 
+        // }
         // check if there is data in GWAS object
         if (this.GWASData[0]) {
           // if there is, graph GWAS plot
@@ -103,19 +107,28 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
     this.populationGroups = this.populatePopulationDropdown();
 
-    // this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
-
-    if (this.recalculatePopGeneAttempt == "false") {
+    
+    if (this.recalculatePopAttempt == "false") {
       this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
     } else {
       var newSelectedPopList = this.newSelectedPop.split('+');
       this.selectedPop = newSelectedPopList; // recalculated new population selection
-      this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+      // this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+      this.recalculatePopAttempt = "false";
     }
-    if (this.recalculateLDAttempt == "false") {
+    if (this.geneList) {
+      if(this.recalculateGeneAttempt == "false") {
+        this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; // default reference gene
+      } else {
+        this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+        this.recalculateGeneAttempt = "false";
+      }
+    }
+    if (this.recalculateRefAttempt == "false") {
       this.selectedRef = "false"; // default ref rsnum
     } else {
       this.selectedRef = this.newSelectedRef; // recalculated new gene selection
+      this.recalculateRefAttempt = "false";
     }
 
     this.populationSelectedAll = false;
@@ -203,6 +216,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       // do nothing
     }
     this.inputChanged = true;
+    this.recalculatePopAttempt = "true";
   }
 
   unique(value, index, self) {
@@ -302,6 +316,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.populationSelectedAll = true;
     }
     this.inputChanged = true;
+    this.recalculatePopAttempt = "true";
   }
 
   getXData(geneData) {
@@ -643,15 +658,16 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     // console.log(selectedRefString);
     var selectedGeneString = this.selectedGene;
     var selectedPopString = this.selectedPop.join('+');
-    // var recalculatePopGene = this.recalculatePopGeneAttempt;
-    var recalculatePopGene = this.recalculatePopGeneAttempt;
-    var recalculateLD = "false";
+    var recalculateAttempt = "true";
+    var recalculatePop = this.recalculatePopAttempt;
+    var recalculateGene = this.recalculateGeneAttempt;
+    var recalculateRef = "true";
     this.inputChanged = false;
     // reset
     this.data.changeMainData(null);
     this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculatePopGene, recalculateLD)
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
       .subscribe(
         res => this.data.changeMainData(res),
         error => this.handleError(error)
@@ -707,6 +723,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   refGeneChange() {
     this.inputChanged = true;
+    this.recalculateGeneAttempt = "true";
     // console.log(this.selectedGene);
   }
 
@@ -758,14 +775,20 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var selectedPopString = this.selectedPop.join('+');
     // console.log("Selected populations RETURNED: ", selectedPopString);
     var selectedRefString = this.selectedRef;
-    var recalculatePopGene = "true";
-    var recalculateLD = "true";
+    var recalculateAttempt = "true";
+    var recalculatePop = this.recalculatePopAttempt;
+    var recalculateGene = this.recalculateGeneAttempt;
+    console.log("recalculatePop", recalculatePop);
+    console.log("recalculateGene", recalculateGene);
+    var recalculateRef = "false";
     this.inputChanged = false;
+    this.recalculatePopAttempt = "false";
+    this.recalculateGeneAttempt = "false";
     // reset
     this.data.changeMainData(null);
     this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculatePopGene, recalculateLD)
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
       .subscribe(
         res => this.data.changeMainData(res),
         error => this.handleError(error)

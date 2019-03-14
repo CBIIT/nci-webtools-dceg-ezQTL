@@ -1,4 +1,4 @@
-eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculatePopGene, recalculateLD) {
+eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -53,7 +53,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
 
   ## call calculations for eqtl modules: locuszoom and gene expressions ##
   ## locuszoom calculations ##
-  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculatePopGene, recalculateLD)
+  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
   locus_zoom_data <- eqtl_locuszoom_data[[1]]
   rcdata_region_data <- eqtl_locuszoom_data[[2]]
   qdata_top_annotation_data <- eqtl_locuszoom_data[[3]]
@@ -62,7 +62,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
   ## locuszoom gwas data ##
   gwas_example_data <- eqtl_gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculatePopGene=recalculatePopGene, recalculateLD=recalculateLD, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
@@ -71,7 +71,7 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
   return(dataSourceJSON)
 }
 
-eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculatePopGene, recalculateLD) { 
+eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) { 
   chromosome <- unique(qdata$chr)
   minpos <- min(qdata$pos)
   maxpos <- max(qdata$pos)
@@ -79,7 +79,7 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
   kgvcfpath <- paste0(workDir, '/eQTL/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
-  if (identical(recalculatePopGene, 'false') && identical(recalculateLD, 'true')) {
+  if (identical(recalculateAttempt, 'false')) {
     cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
     system(cmd)
     cmd <- paste0('bcftools index ', in_path)
@@ -177,7 +177,7 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
   #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
   # }
 
-  if (identical(recalculateLD, 'true')) {
+  if (identical(recalculateAttempt, 'false') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
     cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
     system(cmd)
     cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')

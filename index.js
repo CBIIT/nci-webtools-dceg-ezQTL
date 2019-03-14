@@ -65,8 +65,10 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   var select_pop = request.body.select_pop;
   var select_gene = request.body.select_gene;
   var select_ref = request.body.select_ref;
-  var recalculatePopGene = request.body.recalculatePopGene;
-  var recalculateLD = request.body.recalculateLD
+  var recalculateAttempt = request.body.recalculateAttempt;
+  var recalculatePop = request.body.recalculatePop;
+  var recalculateGene = request.body.recalculateGene;
+  var recalculateRef = request.body.recalculateRef;
 
   // assign filenames to variable depending on how many files are uploaded
   if (request.files.length == 2) {
@@ -83,7 +85,7 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculatePopGene, recalculateLD);
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -103,11 +105,13 @@ app.post('/eqtl-recalculate-main', async (request, response) => {
   var select_pop = request.body.select_pop;
   var select_gene = request.body.select_gene;
   var select_ref = request.body.select_ref;
-  var recalculatePopGene = request.body.recalculatePopGene;
-  var recalculateLD = request.body.recalculateLD
+  var recalculateAttempt = request.body.recalculateAttempt;
+  var recalculatePop = request.body.recalculatePop;
+  var recalculateGene = request.body.recalculateGene;
+  var recalculateRef = request.body.recalculateRef;
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculatePopGene, recalculateLD);
+    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
