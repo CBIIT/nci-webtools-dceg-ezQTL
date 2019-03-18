@@ -78,14 +78,13 @@
           class="ng-hide" 
           id="expression-file" 
           name="input-files" 
-          accept=".txt" 
-          disabled 
+          accept=".txt"  
           hidden 
           #expressionInput>
         <button 
           style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
           (click)="expressionInput.click()" 
-          [disabled]="resultStatus" 
+          [disabled]="resultStatus || !selectLoadBoxplotData" 
           class="ml-3 mr-3" 
           mat-stroked-button>
           Choose File
@@ -127,13 +126,12 @@
           id="genotype-file" 
           name="input-files" 
           accept=".txt" 
-          disabled 
           hidden 
           #genotypeInput>
           <button 
             style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
             (click)="genotypeInput.click()" 
-            [disabled]="resultStatus" 
+            [disabled]="resultStatus || !selectLoadBoxplotData" 
             class="ml-3 mr-3" 
             mat-stroked-button>
             Choose File
@@ -176,13 +174,12 @@
           name="input-files" 
           accept=".txt" 
           hidden 
-          disabled 
           #gwasInput>
           <!-- formControlName="gwasFile" -->
         <button 
           style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
           (click)="gwasInput.click()" 
-          [disabled]="resultStatus" 
+          [disabled]="resultStatus || !selectLoadGWASData" 
           class="ml-3 mr-3" 
           mat-stroked-button>
           Choose File

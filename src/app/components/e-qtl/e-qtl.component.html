@@ -13,7 +13,10 @@
     <div id="toggle-view" class="col-md-auto">
       <i id="toggle-view-button" 
         class="fas fa-caret-left fa-2x" 
-        (click)="toggleView()">
+        tabindex="10"
+        (click)="toggleView()" 
+        (keyup.enter)="toggleView()" 
+        (keyup.space)="toggleView()">
       </i>
     </div>
     <div id="results-panel" class="col-9">

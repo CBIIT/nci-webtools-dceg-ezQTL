@@ -1,4 +1,4 @@
-eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
+main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -53,14 +53,14 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
 
   ## call calculations for eqtl modules: locuszoom and gene expressions ##
   ## locuszoom calculations ##
-  eqtl_locuszoom_data <- eqtl_locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-  locus_zoom_data <- eqtl_locuszoom_data[[1]]
-  rcdata_region_data <- eqtl_locuszoom_data[[2]]
-  qdata_top_annotation_data <- eqtl_locuszoom_data[[3]]
+  locuszoom_data <- locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+  locus_zoom_data <- locuszoom_data[[1]]
+  rcdata_region_data <- locuszoom_data[[2]]
+  qdata_top_annotation_data <- locuszoom_data[[3]]
   ## gene expressions calculations ##
-  gene_expressions_data <- eqtl_gene_expressions(workDir, qdata_tmp, exprFile, genoFile)
+  gene_expressions_data <- gene_expressions(workDir, qdata_tmp, exprFile, genoFile)
   ## locuszoom gwas data ##
-  gwas_example_data <- eqtl_gwas_example(workDir, gwasFile)
+  gwas_example_data <- gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
   dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
@@ -71,7 +71,30 @@ eqtl_main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request,
   return(dataSourceJSON)
 }
 
-eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) { 
+locuszoom_define_window <- function(recalculateAttempt, in_path, kgvcfpath, chromosome, minpos, maxpos) {
+  if (identical(recalculateAttempt, 'false')) {
+    cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
+    system(cmd)
+    cmd <- paste0('bcftools index ', in_path)
+    system(cmd)
+  }
+}
+
+locuszoom_get_ld <- function(recalculateAttempt, recalculatePop, in_path, request, locus, chromosome, qdata_region_pos) {
+  if (identical(recalculateAttempt, 'false') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
+    cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
+    system(cmd)
+    cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')
+    system(cmd)
+    regionLD <- paste0(chromosome,":",min(qdata_region_pos),"-",max(qdata_region_pos))
+    in_bin <- '/usr/local/bin/emeraLD'
+    getLD <- emeraLD2R(path = paste0('tmp/',request,'.','input','.vcf.gz'), bin = in_bin) 
+    ld_data <- getLD(region = regionLD)
+    saveRDS(ld_data, file=paste0("tmp/",request,".ld_data.rds"))
+  }
+}
+
+locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) { 
   chromosome <- unique(qdata$chr)
   minpos <- min(qdata$pos)
   maxpos <- max(qdata$pos)
@@ -79,12 +102,8 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
   kgvcfpath <- paste0(workDir, '/eQTL/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
-  if (identical(recalculateAttempt, 'false')) {
-    cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
-    system(cmd)
-    cmd <- paste0('bcftools index ', in_path)
-    system(cmd)
-  }
+  
+  locuszoom_define_window(recalculateAttempt, in_path, kgvcfpath, chromosome, minpos, maxpos)
 
   popshort <- "CEU"  ### need to find the superpop recomendation data 
 
@@ -165,29 +184,7 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
     }
   }
 
-  # if (select_pop %in% kgpanel$super_pop) {
-  #   kgpanel %>% 
-  #   filter(super_pop==select_pop) %>% 
-  #   select(sample) %>% 
-  #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
-  # } else if (select_pop %in% kgpanel$pop) {
-  #   kgpanel %>% 
-  #   filter(pop==select_pop) %>% 
-  #   select(sample) %>% 
-  #   write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F)
-  # }
-
-  if (identical(recalculateAttempt, 'false') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
-    cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
-    system(cmd)
-    cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')
-    system(cmd)
-    regionLD <- paste0(chromosome,":",min(qdata_region$pos),"-",max(qdata_region$pos))
-    in_bin <- '/usr/local/bin/emeraLD'
-    getLD <- emeraLD2R(path = paste0('tmp/',request,'.','input','.vcf.gz'), bin = in_bin) 
-    ld_data <- getLD(region = regionLD)
-    saveRDS(ld_data, file=paste0("tmp/",request,".ld_data.rds"))
-  }
+  locuszoom_get_ld(recalculateAttempt, recalculatePop, in_path, request, locus, chromosome, qdata_region$pos)
 
   ld_data <- readRDS(paste0("tmp/",request,".ld_data.rds"))
 
@@ -208,7 +205,7 @@ eqtl_locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene,
   return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))
 }
 
-eqtl_gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
+gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
   # initialize boxplot data as empty until data file detected
   gene_expressions_data <- list(c())
   # check to see if boxplot data files are present
@@ -236,7 +233,7 @@ eqtl_gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
   return(gene_expressions_data)
 }
 
-eqtl_gwas_example <- function(workDir, gwasFile) {
+gwas_example <- function(workDir, gwasFile) {
   # initialize GWAS data as empty until data file detected
   gwas_example_data <- list(c())
   # return outputs in list with GWAS data
@@ -248,7 +245,7 @@ eqtl_gwas_example <- function(workDir, gwasFile) {
   return(gwas_example_data)
 }
 
-eqtl_locuszoom_boxplots <- function(workDir, exprFile, genoFile, info) {
+locuszoom_boxplots <- function(workDir, exprFile, genoFile, info) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)

@@ -44,13 +44,13 @@ app.use(function(req, res, next) {
 app.get('/', function(request, response) {
   response.send("Hi");
   console.log("Client connected.");
-  // request.on("close", function() {
-  //   console.log("request closed unexpectedly");
-  // });
+  request.on("close", function() {
+    console.log("request closed unexpectedly");
+  });
   
-  // request.on("end", function() {
-  //   console.log("request ended normally");
-  // });
+  request.on("end", function() {
+    console.log("request ended normally");
+  });
 });
 
 app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {

@@ -41,7 +41,7 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         
         // make sure the R statement below is not appended to a comment in R code file
         // code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
-        code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
+        code += `main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
         // console.log(code);
 
         const rcode = `
@@ -94,7 +94,7 @@ function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, inf
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        code += `eqtl_locuszoom_boxplots(${workingDirectory}, ${expressionFile}, ${genotypeFile}, ${info})`;
+        code += `locuszoom_boxplots(${workingDirectory}, ${expressionFile}, ${genotypeFile}, ${info})`;
         // console.log(code);
 
         const rcode = `

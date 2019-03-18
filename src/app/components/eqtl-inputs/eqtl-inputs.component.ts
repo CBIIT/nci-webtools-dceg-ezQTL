@@ -17,10 +17,10 @@ declare let $: any;
 export class EqtlInputsComponent implements OnInit {
 
   eqtlForm = new FormGroup({
-    associationFile: new FormControl('', Validators.required),
-    expressionFile: new FormControl(''), 
-    genotypeFile: new FormControl(''), 
-    gwasFile: new FormControl('')
+    associationFile: new FormControl({value: '', disabled: false}, Validators.required),
+    expressionFile: new FormControl({value: '', disabled: true}), 
+    genotypeFile: new FormControl({value: '', disabled: true}), 
+    gwasFile: new FormControl({value: '', disabled: true})
   });
 
   mainData: Object;
@@ -65,8 +65,8 @@ export class EqtlInputsComponent implements OnInit {
 
   loadBoxplotData() {
     if (this.selectLoadBoxplotData == true) {
-      this.eqtlForm.setControl('expressionFile', new FormControl(''));
-      this.eqtlForm.setControl('genotypeFile', new FormControl(''));
+      this.eqtlForm.setControl('expressionFile', new FormControl({value: '', disabled: true}));
+      this.eqtlForm.setControl('genotypeFile', new FormControl({value: '', disabled: true}));
       this.selectLoadBoxplotData = false;
       this.eqtlForm.value.expressionFile = false;
       this.eqtlForm.value.genotypeFile = false;
@@ -74,34 +74,34 @@ export class EqtlInputsComponent implements OnInit {
       $("#genotype-file").val("");
       $("#eqtl-input-expression-file").addClass("disabled-overlay");
       $("#eqtl-input-genotype-file").addClass("disabled-overlay");
-      $("#expression-file").prop("disabled", true);
-      $("#genotype-file").prop("disabled", true);
+      // $("#expression-file").prop("disabled", true);
+      // $("#genotype-file").prop("disabled", true);
       this.data.changeDisableGeneExpressions(true);
     } else {
-      this.eqtlForm.setControl('expressionFile', new FormControl('', Validators.required));
-      this.eqtlForm.setControl('genotypeFile', new FormControl('', Validators.required));
+      this.eqtlForm.setControl('expressionFile', new FormControl({value: '', disabled: false}, Validators.required));
+      this.eqtlForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}, Validators.required));
       this.selectLoadBoxplotData = true;
       $("#eqtl-input-expression-file").removeClass("disabled-overlay");
       $("#eqtl-input-genotype-file").removeClass("disabled-overlay");
-      $("#expression-file").prop("disabled", false);
-      $("#genotype-file").prop("disabled", false);
+      // $("#expression-file").prop("disabled", false);
+      // $("#genotype-file").prop("disabled", false);
       this.data.changeDisableGeneExpressions(false);
     }
   }
 
   loadGWASData() {
     if (this.selectLoadGWASData == true) {
-      this.eqtlForm.setControl('gwasFile', new FormControl(''));
+      this.eqtlForm.setControl('gwasFile', new FormControl({value: '', disabled: true}));
       this.selectLoadGWASData = false;
       this.eqtlForm.value.gwasFile = false;
       $("#gwas-file").val("");
       $("#eqtl-input-gwas-file").addClass("disabled-overlay");
-      $("#gwas-file").prop("disabled", true);
+      // $("#gwas-file").prop("disabled", true);
     } else {
-      this.eqtlForm.setControl('gwasFile', new FormControl('', Validators.required));
+      this.eqtlForm.setControl('gwasFile', new FormControl({value: '', disabled: false}, Validators.required));
       this.selectLoadGWASData = true;
       $("#eqtl-input-gwas-file").removeClass("disabled-overlay");
-      $("#gwas-file").prop("disabled", false);
+      // $("#gwas-file").prop("disabled", false);
     }
   }
 
@@ -161,12 +161,12 @@ export class EqtlInputsComponent implements OnInit {
     $("#eqtl-input-expression-file").addClass("disabled-overlay");
     $("#eqtl-input-genotype-file").addClass("disabled-overlay");
     $("#eqtl-input-gwas-file").addClass("disabled-overlay");
-    $("#expression-file").prop("disabled", true);
-    $("#genotype-file").prop("disabled", true);
-    $("#gwas-file").prop("disabled", true);
-    this.eqtlForm.setControl('expressionFile', new FormControl(''));
-    this.eqtlForm.setControl('genotypeFile', new FormControl(''));
-    this.eqtlForm.setControl('gwasFile', new FormControl(''));
+    // $("#expression-file").prop("disabled", true);
+    // $("#genotype-file").prop("disabled", true);
+    // $("#gwas-file").prop("disabled", true);
+    this.eqtlForm.setControl('expressionFile', new FormControl({value: '', disabled: true}));
+    this.eqtlForm.setControl('genotypeFile', new FormControl({value: '', disabled: true}));
+    this.eqtlForm.setControl('gwasFile', new FormControl({value: '', disabled: true}));
     this.data.changeDisableGeneExpressions(true);
   }
 
