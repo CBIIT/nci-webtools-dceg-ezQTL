@@ -94,10 +94,11 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
         name: xData[i],
         boxpoints: 'all',
         jitter: 0.5,
+        pointpos: 0,
         whiskerwidth: 0.2,
         fillcolor: 'cls',
         marker: {
-          size: 2
+          size: 4
         },
         line: {
           width: 1

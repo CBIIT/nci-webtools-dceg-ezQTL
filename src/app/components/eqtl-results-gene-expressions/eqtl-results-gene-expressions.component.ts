@@ -70,16 +70,8 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   }
 
   geneExpressionsBoxPlot(geneData) {
-
-    // var xData = this.getGeneSymbols(geneData);
     var xData = this.geneSymbols;
-    // console.log("gene expressions x data");
-    // console.log(xData);
-
     var yData = this.getGeneYData(geneData, xData);
-    // console.log("gene expressions y data");
-    // console.log(yData);
-
     var pdata = [];
 
     for ( var i = 0; i < xData.length; i++ ) {
@@ -89,10 +81,11 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
         name: xData[i],
         boxpoints: 'all',
         jitter: 0.5,
+        pointpos: 0,
         whiskerwidth: 0.2,
         fillcolor: 'cls',
         marker: {
-          size: 2
+          size: 4
         },
         line: {
           width: 1
@@ -145,10 +138,11 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
         name: xData[i],
         boxpoints: 'all',
         jitter: 0.5,
+        pointpos: 0,
         whiskerwidth: 0.2,
         fillcolor: 'cls',
         marker: {
-          size: 2
+          size: 4
         },
         line: {
           width: 1
