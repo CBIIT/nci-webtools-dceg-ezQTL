@@ -76,16 +76,18 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
     for ( var i = 0; i < xData.length; i++ ) {
       var result = {
-        type: 'box',
+        type: 'violin',
         y: yData[i],
         name: xData[i],
-        boxpoints: 'all',
+        box: {
+          visible: true
+        }, 
+        points: 'all',
         jitter: 0.5,
         pointpos: 0,
-        whiskerwidth: 0.2,
         fillcolor: 'cls',
         marker: {
-          size: 4
+          size: 2
         },
         line: {
           width: 1
@@ -133,16 +135,18 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
 
     for ( var i = 0; i < xData.length; i ++ ) {
       var result = {
-        type: 'box',
+        type: 'violin',
         y: yData[i],
         name: xData[i],
-        boxpoints: 'all',
+        box: {
+          visible: true
+        }, 
+        points: 'all',
         jitter: 0.5,
         pointpos: 0,
-        whiskerwidth: 0.2,
         fillcolor: 'cls',
         marker: {
-          size: 4
+          size: 2
         },
         line: {
           width: 1
