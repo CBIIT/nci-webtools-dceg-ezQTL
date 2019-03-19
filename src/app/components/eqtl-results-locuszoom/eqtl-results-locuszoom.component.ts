@@ -685,6 +685,33 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
   }
 
+  plotlyClick(event, plot: PlotComponent) {
+    if (event.points) {
+      var point = event.points[0];
+      console.log(point);
+
+      var newAnnotation = {
+        x: point.xaxis.d2l(point.x),
+        y: point.yaxis.d2l(point.y),
+        text: '<b>1:152210492</b>' + 
+              '<br>P Value: <b>3.3282e-15</b>' + 
+              '<br>Ref. Allele: <b> ATT</b>' + 
+              '<br>────────────────<br>' + 
+              '<a href="https://www.google.com"><b>Make LD Reference</b></a>' + 
+              '<br><a href="https://www.google.com"><b>Show Boxplots</b></a>',
+        align: "left",
+        showarrow: true,
+        clicktoshow: 'onout',
+        visible: false,
+        bordercolor: "black",
+        bgcolor: "white",
+        borderpad: 10, 
+        ax: 90,
+        ay: 0,
+      };
+    }
+  }
+
   clickPoint(event, plot: PlotComponent) {
     // console.log(event.event);
     if (event.points) {
