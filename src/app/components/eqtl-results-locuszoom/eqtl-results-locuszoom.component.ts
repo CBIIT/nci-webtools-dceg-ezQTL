@@ -3,6 +3,8 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
+// import * as Plotly from '../../../../node_modules/plotly.js/dist/plotly.js';
+
 
 declare let $: any;
 
@@ -563,7 +565,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     
     return {
       data: pdata,
-      layout: playout,
+      layout: playout, 
+      // divId: "eqtl-locuszoom-plot",
       config: {
         displaylogo: false,
         modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
@@ -572,6 +575,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
+    console.log("GENE DATA");
+    console.log(geneData);
+    console.log("Q DATA TOP ANNOT");
+    console.log(qDataTopAnnot);
     var xData = this.getXData(geneData);
     var yData = this.getYData(geneData);
     var colorData = this.getColorData(geneData);
@@ -686,6 +693,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return {
       data: pdata,
       layout: playout,
+      // divId: "eqtl-locuszoom-plot",
       config: {
         displaylogo: false,
         modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
@@ -780,8 +788,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   // }
 
   clickPoint(event, plot: PlotComponent) {
-    // console.log(event.points);
     if (event.points) {
+      console.log(event);
       if (event.points[0].hasOwnProperty("marker.color")) {
         // console.log("SHOW MARKER");
         // only show popovers for scatter points not recomb line (points w/ markers)
@@ -816,8 +824,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     } else {
       this.closePopover2(event);
     }
-
   }
+
+  // hoverPoint(event, plot: PlotComponent) {
+  //   console.log(event.points[0]);
+  //   // Plotly.Fx.hover([{curveNumber:event.points[0].curveNumber - 2, pointNumber: event.points[0].pointIndex}]);
+  // }
 
   refGeneChange() {
     this.inputChanged = true;

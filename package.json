@@ -6,7 +6,7 @@
     "start:dev": "ng serve --host 0.0.0.0 --open",
     "build:dev": "ng build --poll 500",
     "start": "node index.js",
-    "build": "ng build --prod",
+    "build": "ng build --prod --optimization=false",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

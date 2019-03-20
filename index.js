@@ -9,7 +9,7 @@ var app = express();
 
 app.use(express.json());
 
-console.log("Starting server...");
+console.log("Server started.");
 
 
 // Upload files with file extension and original name
@@ -41,17 +41,18 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/', function(request, response) {
-  response.send("Hi");
-  console.log("Client connected.");
-  request.on("close", function() {
-    console.log("request closed unexpectedly");
-  });
+// app.get('/', function(request, response) {
+//   // response.send("Hi");
+//   console.log("Client connected.");
+
+//   request.on("close", function() {
+//     console.log("request closed unexpectedly");
+//   });
   
-  request.on("end", function() {
-    console.log("request ended normally");
-  });
-});
+//   request.on("end", function() {
+//     console.log("request ended normally");
+//   });
+// });
 
 app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   console.log(request.files);
@@ -140,6 +141,6 @@ app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
   }
 });
 
-// app.use('/', express.static('static'));
+app.use('/', express.static('static'));
 
 app.listen(3000);
