@@ -335,6 +335,22 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return yData;
   }
 
+  getHoverData(geneData) {
+    var hoverData = [];
+    for (var i = 0; i < geneData.length; i++) {
+      hoverData.push(geneData[i]['variant_id'] + '<br>' + 'P Value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Ref. Allele: ' + geneData[i]['ref']);
+    }
+    return hoverData;
+  }
+
+  getHoverDataRC(geneDataRC) {
+    var hoverDataRC = [];
+    for (var i = 0; i < geneDataRC.length; i++) {
+      hoverDataRC.push(geneDataRC[i]['chr'] + ':' + geneDataRC[i]['pos'] + '<br>' + 'Rate: ' + geneDataRC[i]['rate']);
+    }
+    return hoverDataRC;
+  }
+
   getYGWASData(geneData) {
     var yData = [];
     for (var i = 0; i < geneData.length; i++) {
@@ -375,11 +391,11 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var xData = this.getXData(geneData);
     var yData = this.getYData(geneData);
     var yGWASData = this.getYGWASData(geneGWASData);
-
     var colorData = this.getColorData(geneData);
-
     var xDataRC = this.getXDataRC(geneDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
+    var hoverData = this.getHoverData(geneData);
+    var hoverDataRC = this.getHoverDataRC(geneDataRC);
 
     var pdata = [];
 
@@ -387,6 +403,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var trace1 = {
       x: xData,
       y: yGWASData,
+      text: hoverData,
+      hoverinfo: 'text',
       mode: 'markers',
       type: 'scatter',
       marker: {
@@ -416,6 +434,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var trace2 = {
       x: xDataRC,
       y: yDataRC,
+      text: hoverDataRC,
+      hoverinfo: 'text',
       yaxis: 'y3',
       type: 'scatter',
       line: {
@@ -429,6 +449,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var trace3 = {
       x: xData,
       y: yData,
+      text: hoverData,
+      hoverinfo: 'text',
       mode: 'markers',
       type: 'scatter',
       marker: {
@@ -458,6 +480,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var trace4 = {
       x: xDataRC,
       y: yDataRC,
+      text: hoverDataRC,
+      hoverinfo: 'text',
       yaxis: 'y4',
       type: 'scatter',
       line: {
@@ -475,19 +499,21 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       // grid: {
       //   rows: 2, 
       //   columns: 1, 
-      //   subplots:['xy', 'xy2']
+      //   pattern: 'independent'
       // },
       width: 1000,
       height: 1000,
       yaxis: {
         title: "(GWAS) -log10(P-value)",
         range: [0, maxY],
-        domain: [0, 0.5]
+        domain: [0, 0.48],
+        zeroline: false
       },
       yaxis2: {
         title: "-log10(P-value)",
         range: [0, maxY],
-        domain: [0.5, 1]
+        domain: [0.52, 1],
+        zeroline: false
       },
       yaxis3: {
         title: 'Recombination Rate (cM/Mb)',
@@ -501,7 +527,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         side: 'right',
         range: [0, maxY * 10],
         showgrid: false,
-        dtick: 50
+        dtick: 50,
+        zeroline: false
       },
       yaxis4: {
         title: 'Recombination Rate (cM/Mb)',
@@ -515,10 +542,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         side: 'right',
         range: [0, maxY * 10],
         showgrid: false,
-        dtick: 50
+        dtick: 50,
+        zeroline: false
       },
       xaxis: {
-        title: "Chromosome " + chromosome + " (Mb)"
+        title: "Chromosome " + chromosome + " (Mb)",
+        zeroline: false
       },
       margin: {
         l: 40,
@@ -527,8 +556,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         t: 40
       },
       showlegend: false,
-      clickmode: 'event+select',
-      hovermode: 'closest'
+      clickmode: 'event',
+      hovermode: 'closest',
+      // paper_bgcolor: "#D3D3D3"
     };
     
     return {
@@ -547,12 +577,16 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var colorData = this.getColorData(geneData);
     var xDataRC = this.getXDataRC(geneDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
+    var hoverData = this.getHoverData(geneData);
+    var hoverDataRC = this.getHoverDataRC(geneDataRC);
 
     var pdata = [];
     // graph scatter
     var trace1 = {
       x: xData,
       y: yData,
+      text: hoverData,
+      hoverinfo: 'text',
       mode: 'markers',
       type: 'scatter',
       marker: {
@@ -579,6 +613,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var trace2 = {
       x: xDataRC,
       y: yDataRC,
+      text: hoverDataRC,
+      hoverinfo: 'text',
       yaxis: 'y2',
       type: 'scatter',
       line: {
@@ -595,7 +631,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       height: 600,
       yaxis: {
         title: "-log10(P-value)",
-        range: [0, maxY]
+        range: [0, maxY],
+        zeroline: false
       },
       yaxis2: {
         title: 'Recombination Rate (cM/Mb)',
@@ -609,10 +646,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         side: 'right',
         range: [0, maxY * 10],
         showgrid: false,
-        dtick: 50
+        dtick: 50,
+        zeroline: false
       },
       xaxis: {
-        title: "Chromosome " + chromosome + " (Mb)"
+        title: "Chromosome " + chromosome + " (Mb)",
+        zeroline: false
       },
       margin: {
         l: 40,
@@ -621,8 +660,28 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         t: 40
       },
       showlegend: false,
-      clickmode: 'event+select',
-      hovermode: 'closest'
+      clickmode: 'event',
+      hovermode: 'closest',
+      // annotations: []
+      // annotations: [{
+      //   x: 152.210492,
+      //   y: 14.477790583737521,
+      //   text: '<b>1:152210492</b>' + 
+      //                 '<br>P Value: <b>3.3282e-15</b>' + 
+      //                 '<br>Ref. Allele: <b> ATT</b>' + 
+      //                 '<br>────────────────<br>' + 
+      //                 '<a href="https://www.google.com"><b>Make LD Reference</b></a>' + 
+      //         '<br><a href="https://www.google.com"><b>Show Boxplots</b></a>',
+      //   align: "left",
+      //   showarrow: true,
+      //   clicktoshow: 'onout',
+      //   visible: false,
+      //   bordercolor: "black",
+      //   bgcolor: "white",
+      //   borderpad: 10, 
+      //   ax: 90,
+      //   ay: 0
+      // }]
     };
     return {
       data: pdata,
@@ -685,63 +744,75 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
   }
 
-  plotlyClick(event, plot: PlotComponent) {
-    if (event.points) {
-      var point = event.points[0];
-      console.log(point);
+  // plotlyClick(event, plot: PlotComponent) {
+  //   if (event.points) {
+  //     var point = event.points[0];
+  //     this.popoverData = this.locuszoomData[event.points[0].pointIndex];
+  //     var newAnnotation = {
+  //       x: point.xaxis.d2l(point.x),
+  //       y: point.yaxis.d2l(point.y),
+  //       text: '<b>' + this.popoverData['variant_id'] + '</b>' + 
+  //             '<br>P Value: <b>' + this.popoverData['pval_nominal'] + '</b>' + 
+  //             '<br>Ref. Allele: <b>' + this.popoverData['ref'] + '</b>' + 
+  //             '<br>────────────────<br>' + 
+  //             '<a (click)="makeLDRef()"><b>Make LD Reference</b></a>' + 
+  //             '<br><a href="https://www.google.com"><b>Show Boxplots</b></a>',
+  //       align: "left",
+  //       showarrow: true,
+  //       clicktoshow: 'onout',
+  //       visible: false,
+  //       bordercolor: "black",
+  //       bgcolor: "white",
+  //       borderpad: 10, 
+  //       ax: 90,
+  //       ay: 0,
+  //     };
+  //     console.log(newAnnotation);
 
-      var newAnnotation = {
-        x: point.xaxis.d2l(point.x),
-        y: point.yaxis.d2l(point.y),
-        text: '<b>1:152210492</b>' + 
-              '<br>P Value: <b>3.3282e-15</b>' + 
-              '<br>Ref. Allele: <b> ATT</b>' + 
-              '<br>────────────────<br>' + 
-              '<a href="https://www.google.com"><b>Make LD Reference</b></a>' + 
-              '<br><a href="https://www.google.com"><b>Show Boxplots</b></a>',
-        align: "left",
-        showarrow: true,
-        clicktoshow: 'onout',
-        visible: false,
-        bordercolor: "black",
-        bgcolor: "white",
-        borderpad: 10, 
-        ax: 90,
-        ay: 0,
-      };
-    }
-  }
+  //     // plot.relayout('div', 'annotations[' + this.annotationIndex + ']', newAnnotation);
+  //     console.log(this.graph);
+  //     if (this.graph.layout.annotations) {
+  //       this.graph.layout.annotations.push(newAnnotation);
+  //     } else {
+  //       this.graph.layout.annotations = [newAnnotation];
+  //     }
+  //   }
+  // }
 
   clickPoint(event, plot: PlotComponent) {
-    // console.log(event.event);
+    // console.log(event.points);
     if (event.points) {
-      var top = event.event.pointerY;
-      var left = event.event.pointerX;
-      // console.log("event", event);
-      // console.log("event.event", event.event);
-      // console.log("pointerY", top);
-      // console.log("pointerX", left);
-      // console.log("pageY", event.event.pageY);
-      // console.log("pageX", event.event.pageX);
-      // console.log(event.points[0]);
-      this.popoverData = this.locuszoomData[event.points[0].pointIndex];
-      $('.popover').show();
-      if (this.collapseInput) {
-        // console.log("INPUT PANEL COLLAPSED");
-        $('.popover').show().css({
-          position: "absolute",
-          top: top + 50, 
-          left: left + 190
-        });
-      } else {
-        // console.log("INPUT PANEL SHOWN");
-        $('.popover').show().css({
-          position: "absolute",
-          top: top + 50, 
-          left: left + 25
-        });
+      if (event.points[0].hasOwnProperty("marker.color")) {
+        // console.log("SHOW MARKER");
+        // only show popovers for scatter points not recomb line (points w/ markers)
+        var top = event.event.pointerY;
+        var left = event.event.pointerX;
+        // console.log("event", event);
+        // console.log("event.event", event.event);
+        // console.log("pointerY", top);
+        // console.log("pointerX", left);
+        // console.log("pageY", event.event.pageY);
+        // console.log("pageX", event.event.pageX);
+        // console.log(event.points[0]);
+        this.popoverData = this.locuszoomData[event.points[0].pointIndex];
+        $('.popover').show();
+        if (this.collapseInput) {
+          // console.log("INPUT PANEL COLLAPSED");
+          $('.popover').show().css({
+            position: "absolute",
+            top: top + 50, 
+            left: left + 190
+          });
+        } else {
+          // console.log("INPUT PANEL SHOWN");
+          $('.popover').show().css({
+            position: "absolute",
+            top: top + 50, 
+            left: left + 25
+          });
+        }
+        this.showPopover = true;
       }
-      this.showPopover = true;
     } else {
       this.closePopover2(event);
     }
