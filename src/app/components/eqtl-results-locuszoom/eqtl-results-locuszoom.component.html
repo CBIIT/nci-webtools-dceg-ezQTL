@@ -120,7 +120,7 @@
 </div>
 
 <!-- Show centered Plotly locuszoom manhattan plots if graph is generated -->
-<div 
+<!-- <div 
   class="d-flex justify-content-center" 
   id="eqtl-locuszoom-plot" 
   *ngIf="graph">
@@ -134,8 +134,8 @@
     (redraw)="closePopover2($event)"
     #plot>
   </plotly-plot>
-</div>
-<!-- <div 
+</div> -->
+<div 
   class="d-flex justify-content-center" 
   id="eqtl-locuszoom-plot" 
   *ngIf="graph">
@@ -146,12 +146,11 @@
     [config]="graph.config" 
     [divId]="graph.divId" 
     (click)="clickPoint($event, plot)" 
-    (hover)="hoverPoint($event, plot)" 
     (relayout)="closePopover2($event)" 
     (redraw)="closePopover2($event)"
     #plot>
   </plotly-plot>
-</div> -->
+</div>
 <!-- <div 
   class="d-flex justify-content-center" 
   id="eqtl-locuszoom-plot" 
