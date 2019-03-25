@@ -15,11 +15,11 @@ body {
 }
 
 .bg-primary, .btn-primary {
-  background-color: #2a71a5;
+  background-color: #2A71A5 !important;
 }
 
 .bg-primary-light, .btn-primary-light {
-  background-color: #2a7bb2;
+  background-color: #337AB7 !important;
 }
 
 .bg-light {

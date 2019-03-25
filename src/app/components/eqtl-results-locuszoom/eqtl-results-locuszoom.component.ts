@@ -401,7 +401,29 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
     var pdata = [];
 
-    // graph scatter
+    // highlight top point
+    var topAnnotHighlight1 = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      // text: hoverData,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red",
+        // fillcolor: "rgba(0, 0, 0, 0.1)",
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        // line: {
+          // color: 'red',
+          // width: 3
+        // }
+      }
+    };
+    pdata.push(topAnnotHighlight1);
+
+    // graph GWAS scatter
     var trace1 = {
       x: xData,
       y: yGWASData,
@@ -418,19 +440,41 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           color: 'black',
           width: 1
         },
-        showscale: true,
-        colorbar: {
-          title: 'R2',
-          dtick: 0.25,
-          xpad: 45,
-          thicknessmode: 'pixels',
-          thickness: 15
-        }
+        // showscale: true,
+        // colorbar: {
+        //   title: 'R2',
+        //   dtick: 0.25,
+        //   xpad: 45,
+        //   thicknessmode: 'pixels',
+        //   thickness: 15
+        // }
       },
       // xaxis: 'x',
       yaxis: 'y'
     };
     pdata.push(trace1);
+
+    // highlight top point
+    var topAnnotHighlight2 = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      // text: hoverData,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red",
+        // fillcolor: "rgba(0, 0, 0, 0.1)",
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        // line: {
+          // color: 'red',
+          // width: 3
+        // }
+      }
+    };
+    pdata.push(topAnnotHighlight2);
 
     // graph recombination rate line
     var trace2 = {
@@ -447,7 +491,29 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
     pdata.push(trace2);
 
-    // graph GWAS scatter
+    // highlight top point
+    var topAnnotHighlight3 = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      // text: hoverData,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red",
+        // fillcolor: "rgba(0, 0, 0, 0.1)",
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        // line: {
+          // color: 'red',
+          // width: 3
+        // }
+      }
+    };
+    pdata.push(topAnnotHighlight3);
+
+    // graph scatter
     var trace3 = {
       x: xData,
       y: yData,
@@ -478,7 +544,29 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
     pdata.push(trace3);
 
-    // graph GWAS recombination rate line
+    // highlight top point
+    var topAnnotHighlight4 = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      // text: hoverData,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red",
+        // fillcolor: "rgba(0, 0, 0, 0.1)",
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        // line: {
+          // color: 'red',
+          // width: 3
+        // }
+      }
+    };
+    pdata.push(topAnnotHighlight4);
+
+    // graph recombination rate line
     var trace4 = {
       x: xDataRC,
       y: yDataRC,
@@ -493,8 +581,30 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     };
     pdata.push(trace4);
 
+    // highlight top point
+    var topAnnotHighlight5 = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      // text: hoverData,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red",
+        // fillcolor: "rgba(0, 0, 0, 0.1)",
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        // line: {
+          // color: 'red',
+          // width: 3
+        // }
+      }
+    };
+    pdata.push(topAnnotHighlight5);
+
     // round most significant pval to next whole number
-    var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+    // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
 
     var playout = {
@@ -504,21 +614,25 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       //   pattern: 'independent'
       // },
       width: 1000,
-      height: 1000,
+      height: 1060,
       yaxis: {
-        title: "(GWAS) -log10(P-value)",
-        range: [0, maxY],
+        // range: [0, maxY],
+        autorange: true,
+        title: "GWAS -log10(P-value)",
         domain: [0, 0.48],
         zeroline: false
       },
       yaxis2: {
+        // range: [0, maxY],
+        autorange: true,
         title: "-log10(P-value)",
-        range: [0, maxY],
         domain: [0.52, 1],
         zeroline: false
       },
       yaxis3: {
-        title: 'Recombination Rate (cM/Mb)',
+        // range: [0, maxY * 10],
+        autorange: true,
+        title: 'GWAS Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
@@ -527,12 +641,13 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         },
         overlaying: 'y',
         side: 'right',
-        range: [0, maxY * 10],
         showgrid: false,
         dtick: 50,
         zeroline: false
       },
       yaxis4: {
+        // range: [0, maxY * 10],
+        autorange: true,
         title: 'Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
@@ -542,20 +657,33 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         },
         overlaying: 'y2',
         side: 'right',
-        range: [0, maxY * 10],
         showgrid: false,
         dtick: 50,
         zeroline: false
       },
       xaxis: {
+        autorange: true,
         title: "Chromosome " + chromosome + " (Mb)",
         zeroline: false
       },
+      images: [
+        {
+          x: 0,
+          y: 1,
+          sizex: 0.5,
+          sizey: 0.5,
+          source: "../../../assets/images/eqtl_locuszoom_r2_legend_rotated.png",
+          xanchor: "left",
+          xref: "paper",
+          yanchor: "bottom",
+          yref: "paper"
+        }
+      ],
       margin: {
         l: 40,
         r: 40,
         b: 80,
-        t: 40
+        t: 100
       },
       showlegend: false,
       clickmode: 'event',
@@ -575,8 +703,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
-    console.log("GENE DATA");
-    console.log(geneData);
+    // console.log("GENE DATA");
+    // console.log(geneData);
     console.log("Q DATA TOP ANNOT");
     console.log(qDataTopAnnot);
     var xData = this.getXData(geneData);
@@ -588,6 +716,29 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
 
     var pdata = [];
+
+    // highlight top point
+    var topAnnotHighlight = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      // text: hoverData,
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red",
+        // fillcolor: "rgba(0, 0, 0, 0.1)",
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        // line: {
+          // color: 'red',
+          // width: 3
+        // }
+      }
+    };
+    pdata.push(topAnnotHighlight);
+
     // graph scatter
     var trace1 = {
       x: xData,
@@ -605,17 +756,18 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           color: 'black',
           width: 1
         },
-        showscale: true,
-        colorbar: {
-          title: 'R2',
-          dtick: 0.25,
-          xpad: 45,
-          thicknessmode: 'pixels',
-          thickness: 15
-        }
+        // showscale: true,
+        // colorbar: {
+        //   title: 'R2',
+        //   dtick: 0.25,
+        //   xpad: 45,
+        //   thicknessmode: 'pixels',
+        //   thickness: 15
+        // }
       }
     };
     pdata.push(trace1);
+    
     // graph recombination rate line
     var trace2 = {
       x: xDataRC,
@@ -630,18 +782,23 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       }
     };
     pdata.push(trace2);
+    
     // round most significant pval to next whole number
-    var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+    // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
+    
     var playout = {
       width: 1000,
-      height: 600,
+      height: 660,
       yaxis: {
+        // range: [0, maxY],
+        autorange: true,
         title: "-log10(P-value)",
-        range: [0, maxY],
         zeroline: false
       },
       yaxis2: {
+        // range: [0, maxY * 10],
+        autorange: true,
         title: 'Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
@@ -651,20 +808,33 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         },
         overlaying: 'y',
         side: 'right',
-        range: [0, maxY * 10],
         showgrid: false,
         dtick: 50,
         zeroline: false
       },
       xaxis: {
+        autorange: true,
         title: "Chromosome " + chromosome + " (Mb)",
         zeroline: false
       },
+      images: [
+        {
+          x: 0,
+          y: 1,
+          sizex: 0.5,
+          sizey: 0.5,
+          source: "../../../assets/images/eqtl_locuszoom_r2_legend_rotated.png",
+          xanchor: "left",
+          xref: "paper",
+          yanchor: "bottom",
+          yref: "paper"
+        }
+      ],
       margin: {
         l: 40,
         r: 40,
         b: 80,
-        t: 40
+        t: 100
       },
       showlegend: false,
       clickmode: 'event',
