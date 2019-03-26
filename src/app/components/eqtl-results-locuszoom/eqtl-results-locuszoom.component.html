@@ -14,13 +14,13 @@
         <!-- Edit dropdown placeholder -->
         <mat-select-trigger>
           <span *ngIf="selectedPop.length < 26">
-            <span *ngIf="selectedPop.length <= 3">
-              {{ selectedPop.join('+') }}
+            <span *ngIf="selectedPopFinal.length <= 3">
+              {{ selectedPopFinal.join('+') }}
             </span>
-            <span *ngIf="selectedPop.length > 3">
-              {{ selectedPop[0] }} 
+            <span *ngIf="selectedPopFinal.length > 3">
+              {{ selectedPopFinal[0] }} 
               <span class="example-additional-selection">
-                (+{{selectedPop.length - 1}} {{ selectedPop?.length === 2 ? 'other' : 'others'}})
+                (+{{selectedPopFinal.length - 1}} {{ selectedPopFinal?.length === 2 ? 'other' : 'others'}})
               </span>
             </span>
           </span>

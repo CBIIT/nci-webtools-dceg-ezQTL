@@ -40,6 +40,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   selectedGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
+  selectedPopFinal: string[];
   public graph = null;
   showPopover: boolean;
   collapseInput: boolean;
@@ -67,6 +68,11 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
+    this.populationGroups = this.populatePopulationDropdown();
+    this.selectedPopFinal = [];
+    this.populationSelectedAll = false;
+    this.inputChanged = false;
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
     });
@@ -106,17 +112,15 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         }
       }
     });
-    this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
-    this.populationGroups = this.populatePopulationDropdown();
-
-    
     if (this.recalculatePopAttempt == "false") {
       this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+      this.returnPopulationGroupFinal();
     } else {
       var newSelectedPopList = this.newSelectedPop.split('+');
       this.selectedPop = newSelectedPopList; // recalculated new population selection
       // this.selectedGene = this.newSelectedGene; // recalculated new gene selection
       this.recalculatePopAttempt = "false";
+      this.returnPopulationGroupFinal();
     }
     if (this.geneList) {
       if(this.recalculateGeneAttempt == "false") {
@@ -132,9 +136,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.selectedRef = this.newSelectedRef; // recalculated new gene selection
       this.recalculateRefAttempt = "false";
     }
-
-    this.populationSelectedAll = false;
-    this.inputChanged = false;
   }
 
   populatePopulationDropdown() {
@@ -219,6 +220,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     this.inputChanged = true;
     this.recalculatePopAttempt = "true";
+    this.returnPopulationGroupFinal();
   }
 
   unique(value, index, self) {
@@ -319,6 +321,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     this.inputChanged = true;
     this.recalculatePopAttempt = "true";
+    this.returnPopulationGroupFinal();
   }
 
   getXData(geneData) {
@@ -705,8 +708,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
     // console.log("GENE DATA");
     // console.log(geneData);
-    console.log("Q DATA TOP ANNOT");
-    console.log(qDataTopAnnot);
+    // console.log("Q DATA TOP ANNOT");
+    // console.log(qDataTopAnnot);
     var xData = this.getXData(geneData);
     var yData = this.getYData(geneData);
     var colorData = this.getColorData(geneData);
@@ -959,7 +962,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   clickPoint(event, plot: PlotComponent) {
     if (event.points) {
-      console.log(event);
+      // console.log(event);
       if (event.points[0].hasOwnProperty("marker.color")) {
         // console.log("SHOW MARKER");
         // only show popovers for scatter points not recomb line (points w/ markers)
@@ -1016,35 +1019,35 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.data.changeErrorMessage(errorMessage);
   }
 
-  // returnPopulationGroupFinal() {
-  //   var selectedPopFinal = this.selectedPop;
-  //   var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
-  //   var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
-  //   var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
-  //   var european = ["CEU", "TSI", "FIN", "GBR", "IBS"];
-  //   var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
-  //   if (this.containsAll(african, this.selectedPop)) {
-  //     selectedPopFinal = this.removeAll(african, selectedPopFinal);
-  //     selectedPopFinal.push("AFR");
-  //   }
-  //   if (this.containsAll(mixedAmerican, this.selectedPop)) {
-  //     selectedPopFinal = this.removeAll(mixedAmerican, selectedPopFinal);
-  //     selectedPopFinal.push("AMR");
-  //   }
-  //   if (this.containsAll(eastAsian, this.selectedPop)) {
-  //     selectedPopFinal = this.removeAll(eastAsian, selectedPopFinal);
-  //     selectedPopFinal.push("EAS");
-  //   }
-  //   if (this.containsAll(european, this.selectedPop)) {
-  //     selectedPopFinal = this.removeAll(european, selectedPopFinal);
-  //     selectedPopFinal.push("EUR");
-  //   }
-  //   if (this.containsAll(southAsian, this.selectedPop)) {
-  //     selectedPopFinal = this.removeAll(southAsian, selectedPopFinal);
-  //     selectedPopFinal.push("SAS");
-  //   }
-  //   return selectedPopFinal;
-  // }
+  returnPopulationGroupFinal() {
+    this.selectedPopFinal = this.selectedPop;
+    var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
+    var mixedAmerican = ["MXL", "PUR", "CLM", "PEL"];
+    var eastAsian = ["CHB", "JPT", "CHS", "CDX", "KHV"];
+    var european = ["CEU", "TSI", "FIN", "GBR", "IBS"];
+    var southAsian = ["GIH", "PJL", "BEB", "STU", "ITU"];
+    if (this.containsAll(african, this.selectedPop)) {
+      this.selectedPopFinal = this.removeAll(african, this.selectedPopFinal);
+      this.selectedPopFinal.push("AFR");
+    }
+    if (this.containsAll(mixedAmerican, this.selectedPop)) {
+      this.selectedPopFinal = this.removeAll(mixedAmerican, this.selectedPopFinal);
+      this.selectedPopFinal.push("AMR");
+    }
+    if (this.containsAll(eastAsian, this.selectedPop)) {
+      this.selectedPopFinal = this.removeAll(eastAsian, this.selectedPopFinal);
+      this.selectedPopFinal.push("EAS");
+    }
+    if (this.containsAll(european, this.selectedPop)) {
+      this.selectedPopFinal = this.removeAll(european, this.selectedPopFinal);
+      this.selectedPopFinal.push("EUR");
+    }
+    if (this.containsAll(southAsian, this.selectedPop)) {
+      this.selectedPopFinal = this.removeAll(southAsian, this.selectedPopFinal);
+      this.selectedPopFinal.push("SAS");
+    }
+    return this.selectedPopFinal;
+  }
 
   async recalculatePopGene() {
     // console.log("Recalculate!");
@@ -1058,8 +1061,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var recalculateAttempt = "true";
     var recalculatePop = this.recalculatePopAttempt;
     var recalculateGene = this.recalculateGeneAttempt;
-    console.log("recalculatePop", recalculatePop);
-    console.log("recalculateGene", recalculateGene);
+    // console.log("recalculatePop", recalculatePop);
+    // console.log("recalculateGene", recalculateGene);
     var recalculateRef = "false";
     this.inputChanged = false;
     this.recalculatePopAttempt = "false";
