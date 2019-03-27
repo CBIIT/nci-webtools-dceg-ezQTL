@@ -105,7 +105,7 @@ export class EqtlResultsLocuszoomBoxplotsComponent implements OnInit {
         }
       };
       pdata.push(result);
-    };
+    }
 
     var playout = {
         width: 1000,

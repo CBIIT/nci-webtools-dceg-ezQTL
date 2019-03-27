@@ -46,8 +46,4 @@ Thumbs.db
 /r-calculations/.Rhistory
 .Rhistory
 
-r-calculations/eQTL/ALL.chr1.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz
-r-calculations/eQTL/ALL.chr1.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz.tbi
-
-r-calculations/eQTL/archive/
-
+r-calculations/data/1000G/

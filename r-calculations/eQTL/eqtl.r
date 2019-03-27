@@ -23,7 +23,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
   }
 
   ## load 1kg pop panel file ##
-  kgpanel <- read_delim('eQTL/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
+  kgpanel <- read_delim('data/Population_Panel/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
     select(sample:gender)
   popinfo <- kgpanel %>% 
     select(pop,super_pop) %>% 
@@ -99,7 +99,7 @@ locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnu
   minpos <- min(qdata$pos)
   maxpos <- max(qdata$pos)
 
-  kgvcfpath <- paste0(workDir, '/eQTL/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
+  kgvcfpath <- paste0(workDir, '/data/1000G/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
   
@@ -107,7 +107,7 @@ locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnu
 
   popshort <- "CEU"  ### need to find the superpop recomendation data 
 
-  cmd = paste0("tabix Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/",request,'.',"rc_temp",".txt")
+  cmd = paste0("tabix data/Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/",request,'.',"rc_temp",".txt")
   system(cmd)
   rcdata <- read_delim(paste0('tmp/',request,'.','rc_temp','.txt'),delim = "\t",col_names = F)
   colnames(rcdata) <- c('chr','pos','rate','map','filtered')

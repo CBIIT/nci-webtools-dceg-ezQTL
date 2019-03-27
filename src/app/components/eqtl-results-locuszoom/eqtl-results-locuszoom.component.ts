@@ -402,29 +402,19 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var hoverData = this.getHoverData(geneData);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
 
-    var pdata = [];
-
     // highlight top point
-    var topAnnotHighlight1 = {
+    var topAnnotHighlight = {
       x: [qDataTopAnnot['pos'] / 1000000.0],
       y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      // text: hoverData,
       hoverinfo: 'none',
       mode: 'markers',
       type: 'scatter',
       marker: {
         size: 15,
-        color: "red",
-        // fillcolor: "rgba(0, 0, 0, 0.1)",
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        // line: {
-          // color: 'red',
-          // width: 3
-        // }
-      }
+        color: "red"
+      },
+      yaxis: 'y2'
     };
-    pdata.push(topAnnotHighlight1);
 
     // graph GWAS scatter
     var trace1 = {
@@ -443,41 +433,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           color: 'black',
           width: 1
         },
-        // showscale: true,
-        // colorbar: {
-        //   title: 'R2',
-        //   dtick: 0.25,
-        //   xpad: 45,
-        //   thicknessmode: 'pixels',
-        //   thickness: 15
-        // }
       },
       // xaxis: 'x',
       yaxis: 'y'
     };
-    pdata.push(trace1);
-
-    // highlight top point
-    var topAnnotHighlight2 = {
-      x: [qDataTopAnnot['pos'] / 1000000.0],
-      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      // text: hoverData,
-      hoverinfo: 'none',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 15,
-        color: "red",
-        // fillcolor: "rgba(0, 0, 0, 0.1)",
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        // line: {
-          // color: 'red',
-          // width: 3
-        // }
-      }
-    };
-    pdata.push(topAnnotHighlight2);
 
     // graph recombination rate line
     var trace2 = {
@@ -492,29 +451,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         width: 1
       }
     };
-    pdata.push(trace2);
-
-    // highlight top point
-    var topAnnotHighlight3 = {
-      x: [qDataTopAnnot['pos'] / 1000000.0],
-      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      // text: hoverData,
-      hoverinfo: 'none',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 15,
-        color: "red",
-        // fillcolor: "rgba(0, 0, 0, 0.1)",
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        // line: {
-          // color: 'red',
-          // width: 3
-        // }
-      }
-    };
-    pdata.push(topAnnotHighlight3);
 
     // graph scatter
     var trace3 = {
@@ -533,41 +469,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           color: 'black',
           width: 1
         },
-        // showscale: true,
-        // colorbar: {
-        //   title: 'R2',
-        //   dtick: 0.25,
-        //   xpad: 100,
-        //   thicknessmode: 'pixels',
-        //   thickness: 15
-        // }
       },
       // xaxis: 'x',
       yaxis: 'y2'
     };
-    pdata.push(trace3);
-
-    // highlight top point
-    var topAnnotHighlight4 = {
-      x: [qDataTopAnnot['pos'] / 1000000.0],
-      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      // text: hoverData,
-      hoverinfo: 'none',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 15,
-        color: "red",
-        // fillcolor: "rgba(0, 0, 0, 0.1)",
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        // line: {
-          // color: 'red',
-          // width: 3
-        // }
-      }
-    };
-    pdata.push(topAnnotHighlight4);
 
     // graph recombination rate line
     var trace4 = {
@@ -582,29 +487,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         width: 1
       }
     };
-    pdata.push(trace4);
 
-    // highlight top point
-    var topAnnotHighlight5 = {
-      x: [qDataTopAnnot['pos'] / 1000000.0],
-      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      // text: hoverData,
-      hoverinfo: 'none',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 15,
-        color: "red",
-        // fillcolor: "rgba(0, 0, 0, 0.1)",
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        // line: {
-          // color: 'red',
-          // width: 3
-        // }
-      }
-    };
-    pdata.push(topAnnotHighlight5);
+    var pdata = [topAnnotHighlight, trace1, trace2, trace3, trace4];
 
     // round most significant pval to next whole number
     // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
@@ -706,10 +590,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   }
 
   locuszoomPlot(geneData, geneDataRC, qDataTopAnnot) {
-    // console.log("GENE DATA");
-    // console.log(geneData);
-    // console.log("Q DATA TOP ANNOT");
-    // console.log(qDataTopAnnot);
     var xData = this.getXData(geneData);
     var yData = this.getYData(geneData);
     var colorData = this.getColorData(geneData);
@@ -718,29 +598,18 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var hoverData = this.getHoverData(geneData);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
 
-    var pdata = [];
-
     // highlight top point
     var topAnnotHighlight = {
       x: [qDataTopAnnot['pos'] / 1000000.0],
       y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      // text: hoverData,
       hoverinfo: 'none',
       mode: 'markers',
       type: 'scatter',
       marker: {
         size: 15,
-        color: "red",
-        // fillcolor: "rgba(0, 0, 0, 0.1)",
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        // line: {
-          // color: 'red',
-          // width: 3
-        // }
+        color: "red"
       }
     };
-    pdata.push(topAnnotHighlight);
 
     // graph scatter
     var trace1 = {
@@ -759,17 +628,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           color: 'black',
           width: 1
         },
-        // showscale: true,
-        // colorbar: {
-        //   title: 'R2',
-        //   dtick: 0.25,
-        //   xpad: 45,
-        //   thicknessmode: 'pixels',
-        //   thickness: 15
-        // }
       }
     };
-    pdata.push(trace1);
     
     // graph recombination rate line
     var trace2 = {
@@ -784,8 +644,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         width: 1
       }
     };
-    pdata.push(trace2);
     
+    var pdata = [topAnnotHighlight, trace1, trace2];
+
     // round most significant pval to next whole number
     // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
