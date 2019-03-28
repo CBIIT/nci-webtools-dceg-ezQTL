@@ -750,7 +750,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
   }
 
-  // makeLDRef(boxplotData) {
   async makeLDRef() {
     // console.log("Recalculate!");
     // console.log(boxplotData.point_index);
@@ -773,6 +772,26 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         res => this.data.changeMainData(res),
         error => this.handleError(error)
       )
+  } 
+
+  linkLDproxy() {
+    var selectedRefString = this.popoverData["rsnum"];
+    var selectedPopString = this.selectedPop.join('%2B');
+    console.log("selectedRefString: ", selectedRefString);
+    console.log("selectedPopString: ", selectedPopString);
+    var url = "https://ldlink.nci.nih.gov/?tab=ldproxy&var=" + selectedRefString + "&pop=" + selectedPopString + "&r2_d=r2"
+    console.log("url: ", url);
+    var win = window.open(url, '_blank');
+    win.focus();
+  } 
+
+  linkGWAS() {
+    var selectedRefString = this.popoverData["rsnum"];
+    console.log("selectedRefString: ", selectedRefString);
+    var url = " https://www.ebi.ac.uk/gwas/search?query=" + selectedRefString
+    console.log("url: ", url);
+    var win = window.open(url, '_blank');
+    win.focus();
   } 
 
   async showBoxplot() {
@@ -842,14 +861,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           // console.log("INPUT PANEL COLLAPSED");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 50, 
+            top: top + 30, 
             left: left + 190
           });
         } else {
           // console.log("INPUT PANEL SHOWN");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 50, 
+            top: top + 30, 
             left: left + 25
           });
         }

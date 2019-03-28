@@ -104,8 +104,11 @@
     <br>
     Ref. Allele: <b>{{ popoverData.ref }}</b>
     <hr>
-    <!-- <a (click)="makeLDRef(popoverData)">Make LD Reference</a> -->
     <a (click)="makeLDRef()">Make LD Reference</a>
+    <br>
+    <a (click)="linkLDproxy()">LDproxy</a>
+    <br>
+    <a (click)="linkGWAS()">Potential GWAS</a>
     <br>
     <div id="eqtl-enable-locuszoom-boxplots" *ngIf="!disableGeneExpressions">
       <a (click)="showBoxplot(popoverData)">Show Boxplots</a>
