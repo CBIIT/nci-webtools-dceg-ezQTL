@@ -39,7 +39,7 @@ export class EqtlResultsService {
   constructor(private http: HttpClient) { }
 
   calculateMain(formData: FormData) {
-    const url = environment.endpoint + '/eqtl-calculate-main';
+    const url = environment.endpoint + 'eqtl-calculate-main';
     return this.http.post(url, formData);
   }
 
@@ -61,7 +61,7 @@ export class EqtlResultsService {
     // console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    const url = environment.endpoint + '/eqtl-recalculate-main';
+    const url = environment.endpoint + 'eqtl-recalculate-main';
     return this.http.post(url, JSON.stringify(recalculateParameters), {headers: headers});
     // return this.http.post(url, formData);
   }
@@ -74,7 +74,7 @@ export class EqtlResultsService {
     };
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
-    const url = environment.endpoint + '/eqtl-locuszoom-boxplots';
+    const url = environment.endpoint + 'eqtl-locuszoom-boxplots';
     return this.http.post(url, JSON.stringify(locuszoomBoxplotsParameters), {headers: headers});
   }
 
