@@ -779,7 +779,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   linkLDpop() {
     var selectedRefString = this.popoverData["rsnum"];
-    var QTopAnnotRef = this.locuszoomDataQTopAnnot["rsmum"];
+    var QTopAnnotRef = this.locuszoomDataQTopAnnot["rsnum"];
     var selectedPopString = this.selectedPop.join('%2B');
     var url = "https://ldlink.nci.nih.gov/?tab=ldpop&var1=" + selectedRefString + "&var2=" + QTopAnnotRef + "&pop=" + selectedPopString + "&r2_d=r2"
     var win = window.open(url, '_blank');
@@ -871,14 +871,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           // console.log("INPUT PANEL COLLAPSED");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 20, 
+            top: top + 10, 
             left: left + 190
           });
         } else {
           // console.log("INPUT PANEL SHOWN");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 20, 
+            top: top + 10, 
             left: left + 25
           });
         }
