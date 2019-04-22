@@ -343,7 +343,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   getHoverData(geneData) {
     var hoverData = [];
     for (var i = 0; i < geneData.length; i++) {
-      hoverData.push(geneData[i]['variant_id'] + '<br>' + 'P Value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Ref. Allele: ' + geneData[i]['ref']);
+      hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'P-Value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt']);
     }
     return hoverData;
   }
@@ -351,7 +351,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   getHoverDataRC(geneDataRC) {
     var hoverDataRC = [];
     for (var i = 0; i < geneDataRC.length; i++) {
-      hoverDataRC.push(geneDataRC[i]['chr'] + ':' + geneDataRC[i]['pos'] + '<br>' + 'Rate: ' + geneDataRC[i]['rate']);
+      hoverDataRC.push('chr' + geneDataRC[i]['chr'] + ':' + geneDataRC[i]['pos'] + '<br>' + 'Rate: ' + geneDataRC[i]['rate']);
     }
     return hoverDataRC;
   }
@@ -495,13 +495,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var chromosome = qDataTopAnnot['chr'];
 
     var playout = {
-      // grid: {
-      //   rows: 2, 
-      //   columns: 1, 
-      //   pattern: 'independent'
-      // },
+      title: {
+        text: 'Locuszoom Plot',
+        xref: 'paper'
+      },
       width: 1000,
-      height: 1060,
+      height: 1100,
       yaxis: {
         // range: [0, maxY],
         autorange: true,
@@ -512,7 +511,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       yaxis2: {
         // range: [0, maxY],
         autorange: true,
-        title: "-log10(P-value)",
+        title: "eQTL -log10(P-value)",
         domain: [0.52, 1],
         zeroline: false
       },
@@ -535,7 +534,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       yaxis4: {
         // range: [0, maxY * 10],
         autorange: true,
-        title: 'Recombination Rate (cM/Mb)',
+        title: 'eQTL Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
@@ -570,7 +569,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         l: 40,
         r: 40,
         b: 80,
-        t: 100
+        t: 140
       },
       showlegend: false,
       clickmode: 'event',
@@ -652,18 +651,22 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var chromosome = qDataTopAnnot['chr'];
     
     var playout = {
+      title: {
+        text: 'Locuszoom Plot',
+        xref: 'paper'
+      },
       width: 1000,
-      height: 660,
+      height: 700,
       yaxis: {
         // range: [0, maxY],
         autorange: true,
-        title: "-log10(P-value)",
+        title: "eQTL -log10(P-value)",
         zeroline: false
       },
       yaxis2: {
         // range: [0, maxY * 10],
         autorange: true,
-        title: 'Recombination Rate (cM/Mb)',
+        title: 'eQTL Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
@@ -698,7 +701,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         l: 40,
         r: 40,
         b: 80,
-        t: 100
+        t: 140
       },
       showlegend: false,
       clickmode: 'event',
@@ -774,25 +777,32 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       )
   } 
 
-  linkLDproxy() {
+  linkLDpop() {
     var selectedRefString = this.popoverData["rsnum"];
+    var QTopAnnotRef = this.locuszoomDataQTopAnnot["rsmum"];
     var selectedPopString = this.selectedPop.join('%2B');
-    console.log("selectedRefString: ", selectedRefString);
-    console.log("selectedPopString: ", selectedPopString);
-    var url = "https://ldlink.nci.nih.gov/?tab=ldproxy&var=" + selectedRefString + "&pop=" + selectedPopString + "&r2_d=r2"
-    console.log("url: ", url);
+    var url = "https://ldlink.nci.nih.gov/?tab=ldpop&var1=" + selectedRefString + "&var2=" + QTopAnnotRef + "&pop=" + selectedPopString + "&r2_d=r2"
     var win = window.open(url, '_blank');
     win.focus();
   } 
 
   linkGWAS() {
     var selectedRefString = this.popoverData["rsnum"];
-    console.log("selectedRefString: ", selectedRefString);
-    var url = " https://www.ebi.ac.uk/gwas/search?query=" + selectedRefString
-    console.log("url: ", url);
+    var url = "https://www.ebi.ac.uk/gwas/search?query=" + selectedRefString
     var win = window.open(url, '_blank');
     win.focus();
-  } 
+  }
+
+  linkGenomADBrowser() {
+    var variant_id = this.popoverData["variant_id"].split(":");
+    var chromosome = variant_id[0];
+    var position = variant_id[1];
+    var ref = this.popoverData["ref"];
+    var alt = this.popoverData["alt"];
+    var url = "http://gnomad.broadinstitute.org/variant/" + chromosome + "-" + position + "-" + ref + "-" + alt
+    var win = window.open(url, '_blank');
+    win.focus();
+  }
 
   async showBoxplot() {
     if (this.popoverData) {
@@ -861,14 +871,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           // console.log("INPUT PANEL COLLAPSED");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 30, 
+            top: top + 20, 
             left: left + 190
           });
         } else {
           // console.log("INPUT PANEL SHOWN");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 30, 
+            top: top + 20, 
             left: left + 25
           });
         }

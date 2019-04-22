@@ -98,17 +98,23 @@
     <span aria-hidden="true">&times;</span>
   </button>
   <div class="popover-content" *ngIf="popoverData">
-    <b>{{ popoverData.variant_id }}</b>
+    <b>chr{{ popoverData.variant_id }}</b>
     <br>
-    P Value: <b>{{ popoverData.pval_nominal }}</b>
+    <span *ngIf="popoverData.rsnum">
+      <b>{{ popoverData.rsnum }}</b>
+      <br>
+    </span>
+    Ref/Alt: <b>{{ popoverData.ref }}</b>/<b>{{ popoverData.alt }}</b>
     <br>
-    Ref. Allele: <b>{{ popoverData.ref }}</b>
+    P-Value: <b>{{ popoverData.pval_nominal }}</b>
     <hr>
     <a (click)="makeLDRef()">Make LD Reference</a>
     <br>
-    <a (click)="linkLDproxy()">LDproxy</a>
+    <a (click)="linkLDpop()">LDpop</a>
     <br>
     <a (click)="linkGWAS()">Potential GWAS</a>
+    <br>
+    <a (click)="linkGenomADBrowser()">genomAD browser</a>
     <br>
     <div id="eqtl-enable-locuszoom-boxplots" *ngIf="!disableGeneExpressions">
       <a (click)="showBoxplot(popoverData)">Show Boxplots</a>
