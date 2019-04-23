@@ -1,0 +1,20 @@
+<div 
+  class="alert alert-danger" 
+  role="alert"  
+  *ngIf="errorMessage">
+  Unable to calculate: {{errorMessage}} — please check input files. Reset form to try again.
+</div>
+
+<div 
+  class="alert alert-warning alert-dismissible fade show" 
+  role="alert"  
+  *ngIf="warningMessage && !disableGeneExpressions">
+  Warning: {{warningMessage}}
+  <button 
+    type="button" 
+    class="close" 
+    data-dismiss="alert" 
+    aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>

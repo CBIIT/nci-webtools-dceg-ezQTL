@@ -38,9 +38,12 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-package-lock.json
+# package-lock.json
 
 # R Calculations
-/r-calculations/uploads/
+/r-calculations/tmp/
 /r-calculations/.RData
 /r-calculations/.Rhistory
+.Rhistory
+
+r-calculations/data/1000G/

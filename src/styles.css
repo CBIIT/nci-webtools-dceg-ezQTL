@@ -10,24 +10,28 @@ body {
 
 /* Bootstrap overrides */
 
+.container {
+  min-width: 1400px;
+}
+
 .bg-primary, .btn-primary {
-  background-color: #2a71a5;
+  background-color: #2A71A5 !important;
 }
 
 .bg-primary-light, .btn-primary-light {
-  background-color: #2a7bb2;
-}
-
-a {
-  color: #00A2EC;
+  background-color: #337AB7 !important;
 }
 
 .bg-light {
-  background-color: #f7f7f1 !important;
+  background-color: #EEEEEE !important;
 }
 
 .bg-white {
   background-color: white !important;
+}
+
+.border-light {
+  border-color: #E8E8E8 !important;
 }
 
 .bg-dark-gradient {
@@ -45,6 +49,10 @@ a {
 
 .bg-dark-red {
   background-color: #BB0E3D;
+}
+
+.bg-red {
+  background-color: #c12650;
 }
 
 .vh-100 {
@@ -175,6 +183,24 @@ textarea {
   z-index: 1;
 }
 
+/* disabled web element */
+.disabled-overlay {
+  color: #A6A6A6 !important;
+  pointer-events: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;   
+}
+
+.disabled-overlay a {
+  color: #A6A6A6 !important;
+}
+
+.disabled-overlay .datafile-title {
+  color: #A6A6A6 !important;
+}
+
 /** Creates an overlay that covers the entire screen */
 .fullscreen-overlay {
   position: fixed;
@@ -207,44 +233,7 @@ textarea {
   }
 }
 
-
-/* Tachyons Override */
-.cf:before, .cf:after {
-  content: " ";
-  display: table;
-}
-
-.cf:after {
-  clear: both;
-}
-
-.cf {
-  *zoom: 1;
-}
-
-.fl {
-  float: left;
-  _display: inline;
-}
-
-.w-100 {
-  width: 100%;
-}
-
-.bg-light-gray {
-  background-color: #eee;
-}
-
-.bg-near-white {
-  background-color: #f4f4f4;
-}
-
-.tc {
-  text-align: center;
-}
-
-@media screen and (min-width: 30em) {
-  .w-50-ns {
-      width: 50%;
-  }
+.populationPanel {
+  min-width: 500px !important;
+  min-height: 500px !important;
 }
