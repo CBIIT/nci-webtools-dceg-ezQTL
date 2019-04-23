@@ -3,6 +3,7 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
+import { environment } from '../../../environments/environment'
 // import * as Plotly from '../../../../node_modules/plotly.js/dist/plotly.js';
 
 
@@ -558,7 +559,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           y: 1,
           sizex: 0.5,
           sizey: 0.5,
-          source: "../../../assets/images/eqtl_locuszoom_r2_legend_rotated.png",
+          source: environment.endpoint + "assets/images/eqtl_locuszoom_r2_legend_rotated.png",
           xanchor: "left",
           xref: "paper",
           yanchor: "bottom",
@@ -690,7 +691,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           y: 1,
           sizex: 0.5,
           sizey: 0.5,
-          source: "../../../assets/images/eqtl_locuszoom_r2_legend_rotated.png",
+          source: environment.endpoint + "assets/images/eqtl_locuszoom_r2_legend_rotated.png",
           xanchor: "left",
           xref: "paper",
           yanchor: "bottom",
