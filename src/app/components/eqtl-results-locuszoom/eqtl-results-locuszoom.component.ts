@@ -344,7 +344,11 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   getHoverData(geneData) {
     var hoverData = [];
     for (var i = 0; i < geneData.length; i++) {
-      hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'P-Value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt']);
+      if ('rsnum' in geneData[i]) {
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope']);
+      } else {
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope']);
+      }
     }
     return hoverData;
   }
@@ -872,14 +876,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
           // console.log("INPUT PANEL COLLAPSED");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 10, 
+            top: top, 
             left: left + 190
           });
         } else {
           // console.log("INPUT PANEL SHOWN");
           $('.popover').show().css({
             position: "absolute",
-            top: top + 10, 
+            top: top, 
             left: left + 25
           });
         }
