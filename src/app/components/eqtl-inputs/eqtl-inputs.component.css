@@ -1,6 +1,16 @@
-#inputs {
+.eqtl-inputs {
     font-size: 9pt;
     font-weight: bold;
+}
+
+.eqtl-inputs a {
+    color: #00A2EC;
+    text-decoration: none;
+}
+
+.datafile-title {
+    color: #595959 !important;
+    font-size: 1.2em;
 }
 
 .cf:before, .cf:after {
@@ -25,8 +35,8 @@
     width: 100%;
 }
 
-.bg-light-gray {
-    background-color: #eee;
+.bg-light-grey {
+    background-color: #F8F9FA;
 }
 
 .bg-near-white {

@@ -1,0 +1,12 @@
+version: '3.0'
+
+services:
+  vqtl:
+    image: kvnjng/vqtl
+    build: .
+    container_name: vqtl-dev
+    volumes:
+      - ./:/deploy
+    ports:
+      - "3000:3000"
+      - "8787:8787"
