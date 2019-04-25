@@ -13,6 +13,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   geneSymbols: string[];
   geneExpressionsData: Object;
   totalNumGenes: number;
+  totalNumGenesArray: string[];
   selectNumGenes: string;
   warningMessage: string;
   public graph = null;
@@ -30,7 +31,13 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
             this.geneExpressionsData = mainData["gene_expressions"]["data"][0]; // gene expression data
             if (this.geneSymbols) {
               this.totalNumGenes = this.geneSymbols.length;
+              this.selectNumGenes = "15"; // default number of genes displayed
+              this.totalNumGenesArray = [];
+              for(var i = 1; i <= this.totalNumGenes; i++) {
+                this.totalNumGenesArray.push(i.toString());
+              }
               if (this.totalNumGenes > 15) {
+                this.totalNumGenesArray = this.totalNumGenesArray.slice(0, 15);
                 this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
               }
             }
@@ -39,7 +46,7 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
             }
           }
         });
-        this.selectNumGenes = "15"; // default number of genes displayed
+        // this.selectNumGenes = "15"; // default number of genes displayed
         this.data.currentWarningMessage.subscribe(warningMessage => {
           this.warningMessage = warningMessage;
         });
@@ -186,7 +193,6 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   }
 
   triggerReplot() {
-    // var limitedGeneSymbols = this.getGeneSymbols(this.mainData).slice(0,parseInt(this.selectNumGenes));
     var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
     this.replotExpressionsBoxPlot(this.geneExpressionsData, limitedGeneSymbols);
   }

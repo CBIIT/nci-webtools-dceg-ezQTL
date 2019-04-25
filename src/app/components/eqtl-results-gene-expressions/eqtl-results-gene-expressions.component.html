@@ -5,21 +5,11 @@
     <mat-form-field>
       <mat-label>Number of Genes (for Plot)</mat-label>
       <mat-select #numGenes [(value)]="selectNumGenes" (selectionChange)="triggerReplot()" required>
-        <mat-option value="15">All (15 max.)</mat-option>
-        <mat-option value="1">1</mat-option>
-        <mat-option value="2">2</mat-option>
-        <mat-option value="3">3</mat-option>
-        <mat-option value="4">4</mat-option>
-        <mat-option value="5">5</mat-option>
-        <mat-option value="6">6</mat-option>
-        <mat-option value="7">7</mat-option>
-        <mat-option value="8">8</mat-option>
-        <mat-option value="9">9</mat-option>
-        <mat-option value="10">10</mat-option>
-        <mat-option value="11">11</mat-option>
-        <mat-option value="12">12</mat-option>
-        <mat-option value="13">13</mat-option>
-        <mat-option value="14">14</mat-option>
+        <mat-option 
+          *ngFor="let num of totalNumGenesArray" 
+          [value]="num">
+          {{ num }}
+        </mat-option>
       </mat-select>
     </mat-form-field>
   </div>
