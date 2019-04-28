@@ -1,7 +1,11 @@
+.locuszoom-result-tab {
+  overflow: hidden !important;
+}
+
 .example-additional-selection {
-    opacity: 0.75;
-    font-size: 0.75em;
-  }
+  opacity: 0.75;
+  font-size: 0.75em;
+}
 
 .popover {
   position: absolute !important;

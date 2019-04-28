@@ -1,6 +1,6 @@
 .result-main {
     min-height: 450px;
-    overflow: hidden !important;
+    /* overflow: hidden !important; */
 }
 .mat-tab-label.mat-tab-label-active {
     color: #3F51B5 !important;

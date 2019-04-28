@@ -32,7 +32,7 @@ export interface ReferenceGene {
 })
 export class EqtlResultsLocuszoomComponent implements OnInit {
 
-  locuszoomData: string;
+  locuszoomData: Object;
   locuszoomDataRC: Object;
   locuszoomDataQTopAnnot: Object;
   GWASData: Object;
@@ -561,9 +561,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         {
           x: 0,
           y: 1,
-          sizex: 0.5,
-          sizey: 0.5,
-          source: environment.endpoint + "assets/images/eqtl_locuszoom_r2_legend_rotated.png",
+          sizex: 1.0,
+          sizey: 1.0,
+          source: environment.endpoint + "assets/images/eqtl_locuszoom_r2_legend.png",
           xanchor: "left",
           xref: "paper",
           yanchor: "bottom",
@@ -693,9 +693,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         {
           x: 0,
           y: 1,
-          sizex: 0.5,
-          sizey: 0.5,
-          source: environment.endpoint + "assets/images/eqtl_locuszoom_r2_legend_rotated.png",
+          sizex: 1.0,
+          sizey: 1.0,
+          source: environment.endpoint + "assets/images/eqtl_locuszoom_r2_legend.png",
           xanchor: "left",
           xref: "paper",
           yanchor: "bottom",
