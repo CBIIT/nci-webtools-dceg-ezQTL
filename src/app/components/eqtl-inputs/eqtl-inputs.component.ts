@@ -156,7 +156,7 @@ export class EqtlInputsComponent implements OnInit {
     this.data.changeResultStatus(false);
     this.data.changeMainData(null);
     this.data.changeErrorMessage('');
-    this.data.changeWarningMessage('');
+    // this.data.changeWarningMessage('');
     this.data.changeSelectedTab(0);
     $("#eqtl-input-expression-file").addClass("disabled-overlay");
     $("#eqtl-input-genotype-file").addClass("disabled-overlay");

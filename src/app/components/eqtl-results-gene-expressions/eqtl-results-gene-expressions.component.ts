@@ -38,7 +38,8 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
               }
               if (this.totalNumGenes > 15) {
                 this.totalNumGenesArray = this.totalNumGenesArray.slice(0, 15);
-                this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+                // this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.');
+                this.warningMessage = 'Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.';
               }
             }
             if (this.geneExpressionsData) {
@@ -47,9 +48,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
           }
         });
         // this.selectNumGenes = "15"; // default number of genes displayed
-        this.data.currentWarningMessage.subscribe(warningMessage => {
-          this.warningMessage = warningMessage;
-        });
+        // this.data.currentWarningMessage.subscribe(warningMessage => {
+        //   this.warningMessage = warningMessage;
+        // });
       }
     });
   }
