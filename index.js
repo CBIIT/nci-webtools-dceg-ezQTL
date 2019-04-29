@@ -15,12 +15,16 @@ console.log("Server started.");
 // Upload files with file extension and original name
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const dir = 'r-calculations/tmp/';
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
+    const tmp_dir = 'r-calculations/tmp/';
+    const static_tmp_dir = 'static/tmp/';
+    if (!fs.existsSync(tmp_dir)) {
+      fs.mkdirSync(tmp_dir);
+    }
+    if (!fs.existsSync(static_tmp_dir)) {
+      fs.mkdirSync(static_tmp_dir);
     }
     // fs.mkdir(dir, err => cb(err, dir))
-    cb(null, dir);
+    cb(null, tmp_dir);
   },
   filename: function (req, file, cb) {
     let ext = ''; // set default extension (if any)
