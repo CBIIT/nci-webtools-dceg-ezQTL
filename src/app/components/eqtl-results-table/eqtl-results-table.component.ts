@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, MatPaginator, MatTableDataSource } from '@angular/material';
 import { EqtlResultsService } from '../../services/eqtl-results.service';
+import { environment } from '../../../environments/environment' 
 
 export interface Variant {
   gene_id: string;
@@ -43,6 +44,7 @@ export class EqtlResultsTableComponent implements OnInit {
   VARIANT_DATA: Variant[];
   selectedPop: string[];
   newSelectedPop: string;
+  requestID: number;
   displayedColumns: string[] = ['gene_id', 'gene_symbol', 'variant_id', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'R2', 'LDpop', 'GWAS', 'genomAD'];
   dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
 
@@ -57,6 +59,7 @@ export class EqtlResultsTableComponent implements OnInit {
         this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.locuszoomDataQTopAnnot = mainData["locuszoom"]["top"][0][0]; // locuszoom Top Gene data
+        this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
       }
       this.selectedPop = this.newSelectedPop.split('+');; // recalculated new population selection
       this.expandPopulationGroup();
@@ -99,6 +102,30 @@ export class EqtlResultsTableComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  linkGTExGeneID(gene_id) {
+    var url = "https://gtexportal.org/home/gene/" + gene_id
+    var win = window.open(url, '_blank');
+    win.focus();
+  } 
+
+  // linkGTExGeneSymbol(gene_symbol) {
+  //   var url = "https://gtexportal.org/home/gene/" + gene_symbol
+  //   var win = window.open(url, '_blank');
+  //   win.focus();
+  // } 
+
+  linkGTExVariantID(chr, pos, ref, alt) {
+    var url = "https://gtexportal.org/home/snp/" + chr + "_" + pos + "_" + ref + "_" + alt + "_b37"
+    var win = window.open(url, '_blank');
+    win.focus();
+  } 
+
+  // linkGTExRSNum(rsnum) {
+  //   var url = "https://gtexportal.org/home/snp/" + rsnum
+  //   var win = window.open(url, '_blank');
+  //   win.focus();
+  // } 
+
   linkLDpop(rsnum) {
     var QTopAnnotRef = this.locuszoomDataQTopAnnot["rsnum"];
     var selectedPopString = this.selectedPop.join('%2B');
@@ -118,6 +145,13 @@ export class EqtlResultsTableComponent implements OnInit {
     var win = window.open(url, '_blank');
     win.focus();
   }
+
+  downloadTable() {
+    var url = environment.endpoint + "tmp/" + this.requestID + ".variant_details.txt";
+    console.log(url);
+    var win = window.open(url, '_blank');
+    win.focus();
+  } 
 
   unique(value, index, self) {
     return self.indexOf(value) === index;
