@@ -3,7 +3,9 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { EqtlResultsLocuszoomBoxplotsComponent } from '../eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
-import { environment } from '../../../environments/environment'
+import { environment } from '../../../environments/environment' 
+import { FormControl, Validators } from '@angular/forms';
+
 // import * as Plotly from '../../../../node_modules/plotly.js/dist/plotly.js';
 
 
@@ -65,6 +67,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   newSelectedPop: string;
   newSelectedGene: string;
   newSelectedRef: string;
+  rsnumSearch: string;
+  searchEnabled: boolean;
+
+  rsnumber = new FormControl('', [Validators.pattern("^rs[0-9]+$")]);
 
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
@@ -74,6 +80,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.selectedPopFinal = [];
     this.populationSelectedAll = false;
     this.inputChanged = false;
+    this.rsnumSearch = "";
+    this.searchEnabled= false;
+
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
     });
@@ -133,9 +142,12 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     if (this.recalculateRefAttempt == "false") {
       this.selectedRef = "false"; // default ref rsnum
+      this.rsnumSearch = this.locuszoomDataQTopAnnot["rsnum"];
     } else {
       this.selectedRef = this.newSelectedRef; // recalculated new gene selection
       this.recalculateRefAttempt = "false";
+      this.searchEnabled = false;
+      this.rsnumSearch = this.selectedRef;
     }
   }
 
@@ -259,7 +271,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     return newArray;
   }
-
 
   selectPopulationGroup(groupName) {
     var african = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
@@ -782,6 +793,27 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       )
   } 
 
+  async makeLDRefSearch() {
+    var selectedRefString = this.rsnumSearch;
+    // console.log("makeLDRefSearch()", selectedRefString);
+    var selectedGeneString = this.selectedGene;
+    var selectedPopString = this.selectedPop.join('+');
+    var recalculateAttempt = "true";
+    var recalculatePop = this.recalculatePopAttempt;
+    var recalculateGene = this.recalculateGeneAttempt;
+    var recalculateRef = "true";
+    this.inputChanged = false;
+    // reset
+    this.data.changeMainData(null);
+    this.data.changeSelectedTab(0);
+    // calculate
+    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+      .subscribe(
+        res => this.data.changeMainData(res),
+        error => this.handleError(error)
+      )
+  } 
+
   linkLDpop() {
     var selectedRefString = this.popoverData["rsnum"];
     var QTopAnnotRef = this.locuszoomDataQTopAnnot["rsnum"];
@@ -903,6 +935,16 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.inputChanged = true;
     this.recalculateGeneAttempt = "true";
     // console.log(this.selectedGene);
+  }
+
+  enableSearch(rsnumSearchInputValue) {
+    // console.log(rsnumSearchInputValue);
+    if (rsnumSearchInputValue.length > 0) {
+      this.rsnumSearch = rsnumSearchInputValue
+      this.searchEnabled = true;
+    } else {
+      this.searchEnabled = false;
+    }
   }
 
   handleError(error) {

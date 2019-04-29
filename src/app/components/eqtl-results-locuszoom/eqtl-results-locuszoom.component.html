@@ -91,6 +91,32 @@
       </button>
     </div>
 
+    <!-- Browse by RS number -->
+    <div class="col-md-auto p-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="Browse rs number" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-auto p-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        [disabled]="!searchEnabled || rsnumber.invalid" 
+        mat-raised-button color="primary" 
+        (click)="makeLDRefSearch()">
+        Search
+      </button>
+    </div>
+
   </div>
 
   <!-- Popover -->
