@@ -6,3 +6,10 @@ table {
   font-size: 14px;
   width: 100%;
 }
+
+.variant-details-table a {
+  color: #0000EE;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}

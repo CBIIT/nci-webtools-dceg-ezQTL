@@ -4,7 +4,7 @@
   </mat-form-field>
 </div>
 
-<table mat-table [dataSource]="dataSource" matSort>
+<table class="variant-details-table" mat-table [dataSource]="dataSource" matSort>
   <!--- Note that these columns can be defined in any order.
         The actual rendered columns are set as a property on the row definition" -->
 
@@ -84,6 +84,30 @@
   <ng-container matColumnDef="R2">
     <th mat-header-cell *matHeaderCellDef mat-sort-header> R2 </th>
     <td mat-cell *matCellDef="let variant"> {{variant.R2}} </td>
+  </ng-container>
+
+  <!-- LDpop Column -->
+  <ng-container matColumnDef="LDpop">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> LDpop </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkLDpop(variant.rsnum)">{{variant.LDpop}}</a>
+    </td>
+  </ng-container>
+
+  <!-- GWAS Column -->
+  <ng-container matColumnDef="GWAS">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> NHGRI GWAS </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkGWAS(variant.rsnum)">{{variant.GWAS}}</a>
+    </td>
+  </ng-container>
+
+  <!-- genomAD Column -->
+  <ng-container matColumnDef="genomAD">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> genomAD </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkGenomADBrowser(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.genomAD}}</a>
+    </td>
   </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
