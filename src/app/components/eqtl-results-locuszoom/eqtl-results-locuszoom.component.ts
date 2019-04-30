@@ -8,7 +8,6 @@ import { FormControl, Validators } from '@angular/forms';
 
 // import * as Plotly from '../../../../node_modules/plotly.js/dist/plotly.js';
 
-
 declare let $: any;
 
 export interface PopulationGroup {
@@ -38,8 +37,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   locuszoomDataRC: Object;
   locuszoomDataQTopAnnot: Object;
   GWASData: Object;
-
   geneList: ReferenceGene[];
+  geneVariantList: string[];
   selectedGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
@@ -48,11 +47,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   showPopover: boolean;
   collapseInput: boolean;
   selectedRef: string;
-
   populationSelectedAll: boolean;
-
   popoverData: Object;
-
   disableGeneExpressions: boolean;
   inputChanged: boolean;
   requestID: number;
@@ -69,6 +65,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   newSelectedRef: string;
   rsnumSearch: string;
   searchEnabled: boolean;
+  warningMessage: string;
 
   rsnumber = new FormControl('', [Validators.pattern("^rs[0-9]+$")]);
 
@@ -81,6 +78,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.populationSelectedAll = false;
     this.inputChanged = false;
     this.rsnumSearch = "";
+    this.warningMessage = "";
     this.searchEnabled= false;
 
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
@@ -107,11 +105,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.GWASData = mainData["gwas"]["data"][0]; // gwas data
       }
       if (this.locuszoomData) {
-        // if (this.geneList) {
-        //   if(this.recalculateGeneAttempt == "false") {
-        //     this.selectedGene = this.locuszoomDataQTopAnnot["gene_id"]; // default reference gene
-        //   } 
-        // }
+        this.geneVariantList = this.populateGeneVariantList(this.locuszoomData);
         // check if there is data in GWAS object
         if (this.GWASData[0]) {
           // if there is, graph GWAS plot
@@ -149,6 +143,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.searchEnabled = false;
       this.rsnumSearch = this.selectedRef;
     }
+  }
+
+  populateGeneVariantList(geneData) {
+    var variantList = [];
+    for (var i = 0; i < geneData.length; i++) {
+      variantList.push(geneData[i]['rsnum']);
+    }
+    return variantList;
   }
 
   populatePopulationDropdown() {
@@ -794,25 +796,33 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   } 
 
   async makeLDRefSearch() {
-    var selectedRefString = this.rsnumSearch;
-    // console.log("makeLDRefSearch()", selectedRefString);
-    var selectedGeneString = this.selectedGene;
-    var selectedPopString = this.selectedPop.join('+');
-    var recalculateAttempt = "true";
-    var recalculatePop = this.recalculatePopAttempt;
-    var recalculateGene = this.recalculateGeneAttempt;
-    var recalculateRef = "true";
-    this.inputChanged = false;
-    // reset
-    this.data.changeMainData(null);
-    this.data.changeSelectedTab(0);
-    // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-      .subscribe(
-        res => this.data.changeMainData(res),
-        error => this.handleError(error)
-      )
-  } 
+    if (this.geneVariantList.includes(this.rsnumSearch)) {
+      var selectedRefString = this.rsnumSearch;
+      // console.log("makeLDRefSearch()", selectedRefString);
+      var selectedGeneString = this.selectedGene;
+      var selectedPopString = this.selectedPop.join('+');
+      var recalculateAttempt = "true";
+      var recalculatePop = this.recalculatePopAttempt;
+      var recalculateGene = this.recalculateGeneAttempt;
+      var recalculateRef = "true";
+      this.inputChanged = false;
+      // reset
+      this.data.changeMainData(null);
+      this.data.changeSelectedTab(0);
+      // calculate
+      this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+        .subscribe(
+          res => this.data.changeMainData(res),
+          error => this.handleError(error)
+        )
+    } else {
+      this.warningMessage = this.rsnumSearch + " not found in Locuszoom gene data."
+    }
+  }
+
+  closeWarning() {
+    this.warningMessage = "";
+  }
 
   linkLDpop() {
     var selectedRefString = this.popoverData["rsnum"];

@@ -157,6 +157,22 @@
     </div>
   </div>
 
+  <!-- Show warning message if searched rs number is not found -->
+  <div 
+    id="locuszoom-search-warning"
+    class="ml-2 mr-2 alert alert-warning alert-dismissible fade show" 
+    role="alert"  
+    *ngIf="warningMessage">
+    Warning: {{warningMessage}}
+    <button 
+      type="button" 
+      class="close" 
+      (click)="closeWarning()" 
+      aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
   <!-- Show centered Plotly locuszoom manhattan plots if graph is generated -->
   <!-- <div 
     class="d-flex justify-content-center" 
