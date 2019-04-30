@@ -1,48 +1,55 @@
-<div class="row justify-content-between">
+<div class="gene-expressions-result-tab">
+  <div class="row justify-content-between">
 
-  <!-- Number of Genes input -->
-  <div class="col-md-auto p-4">
-    <mat-form-field>
-      <mat-label>Number of Genes (for Plot)</mat-label>
-      <mat-select #numGenes [(value)]="selectNumGenes" (selectionChange)="triggerReplot()" required>
-        <mat-option value="15">All (15 max.)</mat-option>
-        <mat-option value="1">1</mat-option>
-        <mat-option value="2">2</mat-option>
-        <mat-option value="3">3</mat-option>
-        <mat-option value="4">4</mat-option>
-        <mat-option value="5">5</mat-option>
-        <mat-option value="6">6</mat-option>
-        <mat-option value="7">7</mat-option>
-        <mat-option value="8">8</mat-option>
-        <mat-option value="9">9</mat-option>
-        <mat-option value="10">10</mat-option>
-        <mat-option value="11">11</mat-option>
-        <mat-option value="12">12</mat-option>
-        <mat-option value="13">13</mat-option>
-        <mat-option value="14">14</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <!-- Number of Genes input -->
+    <div class="col-md-auto p-4">
+      <mat-form-field>
+        <mat-label>Number of Genes (for Plot)</mat-label>
+        <mat-select #numGenes [(value)]="selectNumGenes" (selectionChange)="triggerReplot()" required>
+          <mat-option 
+            *ngFor="let num of totalNumGenesArray" 
+            [value]="num">
+            {{ num }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Message showing number of genes displayed and total number of genes -->
+    <div class="col-md-auto p-4" id="display-number">
+      Showing <u>{{ numGenes.value }}</u> of <u>{{ totalNumGenes }}</u> genes
+    </div>
+    
   </div>
 
-  <!-- Message showing number of genes displayed and total number of genes -->
-  <div class="col-md-auto p-4" id="display-number">
-    Showing <u>{{ numGenes.value }}</u> of <u>{{ totalNumGenes }}</u> genes
+  <!-- Show centered Plotly gene expressions boxplot if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="eqtl-gene-expressions-plot" 
+    *ngIf="graph">
+      <plotly-plot 
+        [data]="graph.data" 
+        [layout]="graph.layout" 
+        [config]="graph.config">
+      </plotly-plot>
   </div>
-  
+
+  <!-- Show warning message if more than 15 genes in eQTL data file -->
+  <div 
+    class="m-2 alert alert-warning alert-dismissible fade show" 
+    role="alert"  
+    *ngIf="warningMessage && !disableGeneExpressions">
+    Warning: {{warningMessage}}
+    <button 
+      type="button" 
+      class="close" 
+      data-dismiss="alert" 
+      aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <br>
+
+  <!-- <pre>{{ mainData | json }}</pre> -->
 </div>
-
-<!-- Show centered Plotly gene expressions boxplot if graph is generated -->
-<div 
-  class="d-flex justify-content-center" 
-  id="eqtl-gene-expressions-plot" 
-  *ngIf="graph">
-    <plotly-plot 
-      [data]="graph.data" 
-      [layout]="graph.layout" 
-      [config]="graph.config">
-    </plotly-plot>
-</div>
-
-<br>
-
-<!-- <pre>{{ mainData | json }}</pre> -->

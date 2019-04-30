@@ -197,9 +197,11 @@ locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnu
     colnames(ld_info) <- "R2"
     rownames(ld_info) <- ld_data$info$id
     qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
+    write.table(qdata_region, file = paste0("../static/tmp/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
     locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
   } else {
     qdata_region$R2 <- NA
+    write.table(qdata_region, file = paste0("../static/tmp/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
     locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
   }
   return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))

@@ -90,9 +90,9 @@ export class EqtlResultsService {
     this.errorMessage.next(errorMessage);
   }
 
-  changeWarningMessage(warningMessage: string) {
-    this.warningMessage.next(warningMessage);
-  }
+  // changeWarningMessage(warningMessage: string) {
+  //   this.warningMessage.next(warningMessage);
+  // }
 
   changeDisableGeneExpressions(disableGeneExpressions: boolean) {
     this.disableGeneExpressions.next(disableGeneExpressions);
