@@ -1,3 +1,15 @@
 table {
-    width: 100%;
-  }
+  width: 100%;
+}
+
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
+
+.variant-details-table a {
+  color: #0000EE;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
+}

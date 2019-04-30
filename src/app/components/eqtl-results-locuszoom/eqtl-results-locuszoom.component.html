@@ -1,196 +1,240 @@
-<div class="row">
+<div class="locuszoom-result-tab">
+  <div class="row">
 
-  <!-- Choose Population -->
-  <div class="col-md-auto p-4">
-    <mat-form-field>
-      <mat-label>Population</mat-label>
-      <mat-select 
-        panelClass="populationPanel" 
-        [(value)]="selectedPop" 
-        (selectionChange)="changePop()" 
-        multiple 
-        required 
-        #population>
-        <!-- Edit dropdown placeholder -->
-        <mat-select-trigger>
-          <span *ngIf="selectedPop.length < 26">
-            <span *ngIf="selectedPopFinal.length <= 3">
-              {{ selectedPopFinal.join('+') }}
-            </span>
-            <span *ngIf="selectedPopFinal.length > 3">
-              {{ selectedPopFinal[0] }} 
-              <span class="example-additional-selection">
-                (+{{selectedPopFinal.length - 1}} {{ selectedPopFinal?.length === 2 ? 'other' : 'others'}})
+    <!-- Choose Population -->
+    <div class="col-md-auto p-4">
+      <mat-form-field>
+        <mat-label>Population</mat-label>
+        <mat-select 
+          panelClass="populationPanel" 
+          [(value)]="selectedPop" 
+          (selectionChange)="changePop()" 
+          multiple 
+          required 
+          #population>
+          <!-- Edit dropdown placeholder -->
+          <mat-select-trigger>
+            <span *ngIf="selectedPop.length < 26">
+              <span *ngIf="selectedPopFinal.length <= 3">
+                {{ selectedPopFinal.join('+') }}
+              </span>
+              <span *ngIf="selectedPopFinal.length > 3">
+                {{ selectedPopFinal[0] }} 
+                <span class="example-additional-selection">
+                  (+{{selectedPopFinal.length - 1}} {{ selectedPopFinal?.length === 2 ? 'other' : 'others'}})
+                </span>
               </span>
             </span>
-          </span>
-          <!-- Display placeholder if all populations selected (26 total) -->
-          <span *ngIf="selectedPop.length == 26">
-            (ALL) All Populations
-          </span>
-        </mat-select-trigger>
-        <br>
-        <mat-checkbox 
-          class="p-3" 
-          (change)="selectAll()" 
-          color="primary" 
-          [checked]="populationSelectedAll" 
-          style="width: 500px;">
-          (ALL) All Populations
-        </mat-checkbox>
-        <!-- Populate dropdown with all populations -->
-        <div *ngFor="let group of populationGroups">
-          <!-- Populate subpopulation groups -->
-          <div class="pl-3">
-            <span 
-              (click)="selectPopulationGroup(group.namecode)" 
-              style="cursor: pointer; user-select: none;">
-              (<u>{{ group.namecode }}</u>)<u> {{ group.name }}</u>
+            <!-- Display placeholder if all populations selected (26 total) -->
+            <span *ngIf="selectedPop.length == 26">
+              (ALL) All Populations
             </span>
+          </mat-select-trigger>
+          <br>
+          <mat-checkbox 
+            class="p-3" 
+            (change)="selectAll()" 
+            color="primary" 
+            [checked]="populationSelectedAll" 
+            style="width: 500px;">
+            (ALL) All Populations
+          </mat-checkbox>
+          <!-- Populate dropdown with all populations -->
+          <div *ngFor="let group of populationGroups">
+            <!-- Populate subpopulation groups -->
+            <div class="pl-3">
+              <span 
+                (click)="selectPopulationGroup(group.namecode)" 
+                style="cursor: pointer; user-select: none;">
+                (<u>{{ group.namecode }}</u>)<u> {{ group.name }}</u>
+              </span>
+            </div>
+            <!-- Populate individual populations -->
+            <mat-option 
+              class="pl-5" 
+              *ngFor="let subPopulation of group.subPopulations" 
+              [value]="subPopulation.value">
+              ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
+            </mat-option>
           </div>
-          <!-- Populate individual populations -->
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Choose Reference Gene -->
+    <div class="col-md-auto p-4">
+      <mat-form-field>
+        <mat-label>Reference Gene</mat-label>
+        <mat-select 
+          [(value)]="selectedGene" 
+          (selectionChange)="refGeneChange()" 
+          required 
+          #refGene>
           <mat-option 
-            class="pl-5" 
-            *ngFor="let subPopulation of group.subPopulations" 
-            [value]="subPopulation.value">
-            ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
+            *ngFor="let gene of geneList" 
+            [value]="gene.gene_id">
+            {{ gene.gene_symbol }}
           </mat-option>
-        </div>
-      </mat-select>
-    </mat-form-field>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Re-calculate Button -->
+    <div class="col-md-auto p-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        [disabled]="!inputChanged || selectedPop.length == 0" 
+        mat-raised-button color="primary" 
+        (click)="recalculatePopGene()">
+        Recalculate
+      </button>
+    </div>
+
+    <!-- Browse by RS number -->
+    <div class="col-md-auto p-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="Browse rs number" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Search Button -->
+    <div class="col-md-auto p-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        [disabled]="!searchEnabled || rsnumber.invalid" 
+        mat-raised-button color="primary" 
+        (click)="makeLDRefSearch()">
+        Search
+      </button>
+    </div>
+
   </div>
 
-  <!-- Choose Reference Gene -->
-  <div class="col-md-auto p-4">
-    <mat-form-field>
-      <mat-label>Reference Gene</mat-label>
-      <mat-select 
-        [(value)]="selectedGene" 
-        (selectionChange)="refGeneChange()" 
-        required 
-        #refGene>
-        <mat-option 
-          *ngFor="let gene of geneList" 
-          [value]="gene.gene_id">
-          {{ gene.gene_symbol }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
+  <!-- Popover -->
+  <div class="popover">
+    <button type="button" class="close" aria-label="Close" (click)="closePopover()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="popover-content" *ngIf="popoverData">
+      <b>chr{{ popoverData.variant_id }}</b>
+      <br>
+      <span *ngIf="popoverData.rsnum">
+        <b>{{ popoverData.rsnum }}</b>
+        <br>
+      </span>
+      Ref/Alt: <b>{{ popoverData.ref }}</b>/<b>{{ popoverData.alt }}</b>
+      <br>
+      P-value: <b>{{ popoverData.pval_nominal }}</b>
+      <br>
+      Slope: <b>{{ popoverData.slope }}</b>
+      <hr>
+      <a (click)="makeLDRef()">Make LD Reference</a>
+      <br>
+      <a (click)="linkLDpop()">LDpop</a>
+      <br>
+      <a (click)="linkGWAS()">Potential GWAS</a>
+      <br>
+      <a (click)="linkGenomADBrowser()">genomAD browser</a>
+      <br>
+      <div id="eqtl-enable-locuszoom-boxplots" *ngIf="!disableGeneExpressions">
+        <a (click)="showBoxplot(popoverData)">Show Boxplots</a>
+      </div>
+      <div id="eqtl-disable-locuszoom-boxplots" class="disabled-overlay" *ngIf="disableGeneExpressions">
+        <a>Show Boxplots</a>
+      </div>
+    </div>
+    <div class="popover-content" *ngIf="!popoverData">
+      No data
+    </div>
   </div>
 
-  <!-- Re-calculate Button -->
-  <div class="col-md-auto p-4">
+  <!-- Show warning message if searched rs number is not found -->
+  <div 
+    id="locuszoom-search-warning"
+    class="ml-2 mr-2 alert alert-warning alert-dismissible fade show" 
+    role="alert"  
+    *ngIf="warningMessage">
+    Warning: {{warningMessage}}
     <button 
-      type="submit" 
-      class="mt-2" 
-      [disabled]="!inputChanged || selectedPop.length == 0" 
-      mat-raised-button color="primary" 
-      (click)="recalculatePopGene()">
-      Recalculate
+      type="button" 
+      class="close" 
+      (click)="closeWarning()" 
+      aria-label="Close">
+      <span aria-hidden="true">&times;</span>
     </button>
   </div>
 
-</div>
-
-<!-- Popover -->
-<div class="popover">
-  <button type="button" class="close" aria-label="Close" (click)="closePopover()">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  <div class="popover-content" *ngIf="popoverData">
-    <b>chr{{ popoverData.variant_id }}</b>
-    <br>
-    <span *ngIf="popoverData.rsnum">
-      <b>{{ popoverData.rsnum }}</b>
-      <br>
-    </span>
-    Ref/Alt: <b>{{ popoverData.ref }}</b>/<b>{{ popoverData.alt }}</b>
-    <br>
-    P-value: <b>{{ popoverData.pval_nominal }}</b>
-    <br>
-    Slope: <b>{{ popoverData.slope }}</b>
-    <hr>
-    <a (click)="makeLDRef()">Make LD Reference</a>
-    <br>
-    <a (click)="linkLDpop()">LDpop</a>
-    <br>
-    <a (click)="linkGWAS()">Potential GWAS</a>
-    <br>
-    <a (click)="linkGenomADBrowser()">genomAD browser</a>
-    <br>
-    <div id="eqtl-enable-locuszoom-boxplots" *ngIf="!disableGeneExpressions">
-      <a (click)="showBoxplot(popoverData)">Show Boxplots</a>
-    </div>
-    <div id="eqtl-disable-locuszoom-boxplots" class="disabled-overlay" *ngIf="disableGeneExpressions">
-      <a>Show Boxplots</a>
-    </div>
+  <!-- Show centered Plotly locuszoom manhattan plots if graph is generated -->
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="eqtl-locuszoom-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locuszoom-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      (click)="plotlyClick($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
+  </div> -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="eqtl-locuszoom-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locuszoom-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      [divId]="graph.divId" 
+      (click)="clickPoint($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
   </div>
-  <div class="popover-content" *ngIf="!popoverData">
-    No data
-  </div>
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="eqtl-locuszoom-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locuszoom-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      (click)="clickPoint($event, plot)" 
+      (hover)="hoverPoint($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
+  </div> -->
+
+  <br>
+
+  <!-- <pre>{{ geneList }}</pre> -->
+
+  <!-- <pre>{{ eqtlGWASData | json }}</pre> -->
+
+  <!-- <pre>{{ mainData | json }}</pre> -->
+
+  <!-- <pre>{{ mainDataRC | json }}</pre> -->
+
+  <!-- <pre>{{ eqtlQDataTopAnnot | json }}</pre> -->
+
+  <!-- <pre>{{ selectedPop }}</pre> -->
+
+  <!-- <pre>{{ popoverPoint | json }}</pre> -->
 </div>
-
-<!-- Show centered Plotly locuszoom manhattan plots if graph is generated -->
-<!-- <div 
-  class="d-flex justify-content-center" 
-  id="eqtl-locuszoom-plot" 
-  *ngIf="graph">
-  <plotly-plot 
-    id="locuszoom-plot" 
-    [data]="graph.data" 
-    [layout]="graph.layout" 
-    [config]="graph.config" 
-    (click)="plotlyClick($event, plot)" 
-    (relayout)="closePopover2($event)" 
-    (redraw)="closePopover2($event)"
-    #plot>
-  </plotly-plot>
-</div> -->
-<div 
-  class="d-flex justify-content-center" 
-  id="eqtl-locuszoom-plot" 
-  *ngIf="graph">
-  <plotly-plot 
-    id="locuszoom-plot" 
-    [data]="graph.data" 
-    [layout]="graph.layout" 
-    [config]="graph.config" 
-    [divId]="graph.divId" 
-    (click)="clickPoint($event, plot)" 
-    (relayout)="closePopover2($event)" 
-    (redraw)="closePopover2($event)"
-    #plot>
-  </plotly-plot>
-</div>
-<!-- <div 
-  class="d-flex justify-content-center" 
-  id="eqtl-locuszoom-plot" 
-  *ngIf="graph">
-  <plotly-plot 
-    id="locuszoom-plot" 
-    [data]="graph.data" 
-    [layout]="graph.layout" 
-    [config]="graph.config" 
-    (click)="clickPoint($event, plot)" 
-    (hover)="hoverPoint($event, plot)" 
-    (relayout)="closePopover2($event)" 
-    (redraw)="closePopover2($event)"
-    #plot>
-  </plotly-plot>
-</div> -->
-
-<br>
-
-<!-- <pre>{{ geneList }}</pre> -->
-
-<!-- <pre>{{ eqtlGWASData | json }}</pre> -->
-
-<!-- <pre>{{ mainData | json }}</pre> -->
-
-<!-- <pre>{{ mainDataRC | json }}</pre> -->
-
-<!-- <pre>{{ eqtlQDataTopAnnot | json }}</pre> -->
-
-<!-- <pre>{{ selectedPop }}</pre> -->
-
-<!-- <pre>{{ popoverPoint | json }}</pre> -->

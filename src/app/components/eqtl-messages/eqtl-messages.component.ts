@@ -10,15 +10,15 @@ import { EqtlResultsService } from '../../services/eqtl-results.service';
 export class EqtlMessagesComponent implements OnInit {
 
   errorMessage: string;
-  warningMessage: string;
+  // warningMessage: string;
   disableGeneExpressions: boolean;
 
   constructor(private cdr: ChangeDetectorRef, private data: EqtlResultsService) { }
 
   ngAfterViewChecked(){
-    this.data.currentWarningMessage.subscribe(warningMessage => {
-      this.warningMessage = warningMessage;
-    });
+    // this.data.currentWarningMessage.subscribe(warningMessage => {
+    //   this.warningMessage = warningMessage;
+    // });
     this.cdr.detectChanges();
   }
 
