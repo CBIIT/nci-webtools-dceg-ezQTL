@@ -94,13 +94,13 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
   }
 
   geneExpressionsHeatmap(geneHeatmapData) {
-    console.log(geneHeatmapData);
+    // console.log(geneHeatmapData);
     var xData = this.getHeatmapX(geneHeatmapData);
-    console.log("xData", xData);
+    // console.log("xData", xData);
     var yData = this.getHeatmapY(geneHeatmapData);
-    console.log("yData", yData);
+    // console.log("yData", yData);
     var zData = this.getHeatmapZ(geneHeatmapData, xData);
-    console.log("zData", zData);
+    // console.log("zData", zData);
     var pdata = [
       {
         x: xData,
