@@ -48,21 +48,24 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
   # added code to isolate gene_symbols and put in variable
   # gene_symbols <- list(qdata_tmp$gene_symbol)
   gene_list <- qdata_tmp %>%
-    select(gene_id, gene_symbol) 
-  gene_list_data <- list(setNames(as.data.frame(gene_list),c("gene_id","gene_symbol")))
+    select(gene_id, gene_symbol)
+  gene_list_colnames <- colnames(gene_list)
+  gene_list_data <- list(setNames(as.data.frame(gene_list), gene_list_colnames))
 
   ## call calculations for eqtl modules: locuszoom and gene expressions ##
   ## locuszoom calculations ##
-  locuszoom_data <- locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-  locus_zoom_data <- locuszoom_data[[1]]
-  rcdata_region_data <- locuszoom_data[[2]]
-  qdata_top_annotation_data <- locuszoom_data[[3]]
+  locuszoom <- locuszoom(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+  locuszoom_data <- locuszoom[[1]]
+  rcdata_region_data <- locuszoom[[2]]
+  qdata_top_annotation_data <- locuszoom[[3]]
   ## gene expressions calculations ##
-  gene_expressions_data <- gene_expressions(workDir, qdata_tmp, exprFile, genoFile)
+  gene_expressions <- gene_expressions(workDir, qdata_tmp, exprFile, genoFile)
+  gene_expressions_data <- gene_expressions[[1]]
+  gene_expressions_heatmap_data <- gene_expressions[[2]]
   ## locuszoom gwas data ##
   gwas_example_data <- gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), locuszoom=list(data=locus_zoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), gene_expressions_heatmap=list(data=gene_expressions_heatmap_data), locuszoom=list(data=locuszoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
@@ -149,10 +152,12 @@ locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnu
     filter(gene_id==gene)
   rcdata_region <- rcdata %>% 
     filter(pos<=max(qdata_region$pos),pos>=min(qdata_region$pos))
-  rcdata_region_data <- list(setNames(as.data.frame(rcdata_region),c("chr","pos","rate","map","filtered")))
+  rcdata_region_colnames <- colnames(rcdata_region)
+  rcdata_region_data <- list(setNames(as.data.frame(rcdata_region), rcdata_region_colnames))
   qdata_top_annotation <- qdata_region %>% 
     filter(variant_id==variant)
-  qdata_top_annotation_data <- list(setNames(as.data.frame(qdata_top_annotation),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se")))
+  qdata_top_annotation_colnames <- colnames(qdata_top_annotation)
+  qdata_top_annotation_data <- list(setNames(as.data.frame(qdata_top_annotation), qdata_top_annotation_colnames))
 
   source('eQTL/emeraLD2R.r')
 
@@ -198,18 +203,32 @@ locuszoom <- function(workDir, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnu
     rownames(ld_info) <- ld_data$info$id
     qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
     write.table(qdata_region, file = paste0("../static/tmp/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
-    locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
+    qdata_region_colnames <- colnames(qdata_region)
+    locuszoom_data <- list(setNames(as.data.frame(qdata_region), qdata_region_colnames))
   } else {
     qdata_region$R2 <- NA
     write.table(qdata_region, file = paste0("../static/tmp/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
-    locus_zoom_data <- list(setNames(as.data.frame(qdata_region),c("gene_id","gene_symbol","variant_id","rsnum","chr","pos","ref","alt","tss_distance","pval_nominal","slope","slope_se","R2")))
+    qdata_region_colnames <- colnames(qdata_region)
+    locuszoom_data <- list(setNames(as.data.frame(qdata_region), qdata_region_colnames))
   }
-  return(list(locus_zoom_data, rcdata_region_data, qdata_top_annotation_data))
+  return(list(locuszoom_data, rcdata_region_data, qdata_top_annotation_data))
+}
+
+gene_expressions_heatmap <- function(edata_boxplot) {
+  tmpdata <- edata_boxplot %>% 
+    select(Sample,gene_symbol,exp) %>% 
+    spread(Sample,exp) 
+
+  tmpdata_colnames <- colnames(tmpdata)
+
+  return(list(setNames(as.data.frame(tmpdata), tmpdata_colnames)))
 }
 
 gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
   # initialize boxplot data as empty until data file detected
   gene_expressions_data <- list(c())
+  # initialize heatmap data as empty until data file detected
+  gene_expressions_heatmap_data <- list(c())
   # check to see if boxplot data files are present
   if (!identical(genoFile, 'false') & !identical(exprFile, 'false')) {
     gdatafile <- paste0('tmp/', genoFile)
@@ -230,9 +249,12 @@ gene_expressions <- function(workDir, tmp, exprFile, genoFile) {
       left_join(tmp %>% select(gene_id,pval_nominal)) %>% 
       mutate(gene_symbol=fct_reorder(gene_symbol,(pval_nominal)))
 
-    gene_expressions_data <- list(setNames(as.data.frame(edata_boxplot),c("chr","start","end","gene_id","Sample","exp","gene_symbol","mean","pval_nominal")))
+    edata_boxplot_colnames <- colnames(edata_boxplot)
+    gene_expressions_data <- list(setNames(as.data.frame(edata_boxplot), edata_boxplot_colnames))
+
+    gene_expressions_heatmap_data <- gene_expressions_heatmap(edata_boxplot)
   }
-  return(gene_expressions_data)
+  return(list(gene_expressions_data, gene_expressions_heatmap_data))
 }
 
 gwas_example <- function(workDir, gwasFile) {
@@ -242,7 +264,8 @@ gwas_example <- function(workDir, gwasFile) {
   if (!identical(gwasFile, 'false')) {
     gwasdatafile <- paste0('tmp/', gwasFile)
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
-    gwas_example_data <- list(setNames(as.data.frame(gwasdata),c("chr","pos","ref","alt","rs","pvalue")))
+    gwasdata_colnames <- colnames(gwasdata)
+    gwas_example_data <- list(setNames(as.data.frame(gwasdata), gwasdata_colnames))
   }
   return(gwas_example_data)
 }
@@ -275,7 +298,8 @@ locuszoom_boxplots <- function(workDir, exprFile, genoFile, info) {
       right_join(info) %>%
       left_join(cexpdata)
 
-    locuszoom_boxplots_data <- list(setNames(as.data.frame(cexpdata),c("chr","pos","ref","alt","Sample","Genotype","gene_id","gene_symbol","variant_id","rsnum","start","end","exp")))
+    cexpdata_colnames <- colnames(cexpdata)
+    locuszoom_boxplots_data <- list(setNames(as.data.frame(cexpdata), cexpdata_colnames))
   }
   dataSourceJSON <- c(toJSON(list(locuszoom_boxplots=list(data=locuszoom_boxplots_data))))
   return(dataSourceJSON)
