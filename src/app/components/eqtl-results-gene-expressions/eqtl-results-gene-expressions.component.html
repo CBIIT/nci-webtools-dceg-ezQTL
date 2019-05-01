@@ -22,7 +22,19 @@
     
   </div>
 
-  <!-- Show centered Plotly gene expressions boxplot if graph is generated -->
+  <!-- Show centered Plotly gene expressions heatmap if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="eqtl-gene-expressions-heatmap" 
+    *ngIf="heatmap">
+      <plotly-plot 
+        [data]="heatmap.data" 
+        [layout]="heatmap.layout" 
+        [config]="heatmap.config">
+      </plotly-plot>
+  </div>
+
+  <!-- Show centered Plotly gene expressions violin boxplot if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
     id="eqtl-gene-expressions-plot" 
