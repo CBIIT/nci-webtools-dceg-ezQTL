@@ -173,7 +173,19 @@
     </button>
   </div>
 
-  <!-- Show centered Plotly locuszoom manhattan plots if graph is generated -->
+  <!-- Show centered Plotly locuszoom scatter plot if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="eqtl-locuszoom-scatter-plot" 
+    *ngIf="scatter">
+    <plotly-plot 
+      [data]="scatter.data" 
+      [layout]="scatter.layout" 
+      [config]="scatter.config">
+    </plotly-plot>
+  </div>
+
+  <!-- Show centered Plotly locuszoom manhattan plot(s) if graph is generated -->
   <!-- <div 
     class="d-flex justify-content-center" 
     id="eqtl-locuszoom-plot" 
@@ -194,15 +206,13 @@
     id="eqtl-locuszoom-plot" 
     *ngIf="graph">
     <plotly-plot 
-      id="locuszoom-plot" 
       [data]="graph.data" 
       [layout]="graph.layout" 
       [config]="graph.config" 
       [divId]="graph.divId" 
       (click)="clickPoint($event, plot)" 
       (relayout)="closePopover2($event)" 
-      (redraw)="closePopover2($event)"
-      #plot>
+      (redraw)="closePopover2($event)">
     </plotly-plot>
   </div>
   <!-- <div 
