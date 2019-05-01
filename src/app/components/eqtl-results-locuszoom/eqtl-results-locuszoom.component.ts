@@ -36,6 +36,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   locuszoomData: Object;
   locuszoomDataRC: Object;
   locuszoomDataQTopAnnot: Object;
+  locuszoomScatterData: Object;
+  locuszoomScatterTitle: string;
   GWASData: Object;
   geneList: ReferenceGene[];
   geneVariantList: string[];
@@ -44,6 +46,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   selectedPop: string[];
   selectedPopFinal: string[];
   public graph = null;
+  public scatter = null;
   showPopover: boolean;
   collapseInput: boolean;
   selectedRef: string;
@@ -102,16 +105,19 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
         this.locuszoomDataRC = mainData["locuszoom"]["rc"][0]; // locuszoom RC data
         this.locuszoomDataQTopAnnot = mainData["locuszoom"]["top"][0][0]; // locuszoom Top Gene data
+        this.locuszoomScatterData = mainData["locuszoom_scatter"]["data"][0]; // locuszoom scatter data
+        this.locuszoomScatterTitle = mainData["locuszoom_scatter"]["title"][0]; // locuszoom scatter title
         this.GWASData = mainData["gwas"]["data"][0]; // gwas data
       }
       if (this.locuszoomData) {
         this.geneVariantList = this.populateGeneVariantList(this.locuszoomData);
         // check if there is data in GWAS object
-        if (this.GWASData[0]) {
-          // if there is, graph GWAS plot
+        if (this.GWASData[0] && this.locuszoomScatterData[0]) {
+          // if there is, graph GWAS plot and scatter plot
           this.graph = this.locuszoomPlotGWAS(this.locuszoomData, this.GWASData, this.locuszoomDataRC, this.locuszoomDataQTopAnnot);
+          this.scatter = this.locuszoomScatterPlot(this.locuszoomScatterData, this.locuszoomScatterTitle);
         } else {
-          // if not, do not graph GWAS plot
+          // if not, do not graph GWAS plot or scatter plot
           this.graph = this.locuszoomPlot(this.locuszoomData, this.locuszoomDataRC, this.locuszoomDataQTopAnnot)
         }
       }
@@ -1023,6 +1029,139 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         res => this.data.changeMainData(res),
         error => this.handleError(error)
       )
+  }
+  getScatterX(scatterData) {
+    var p_values = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
+    }
+    return p_values;
+  }
+
+  getScatterY(scatterData) {
+    var pval_nominals = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
+    }
+    return pval_nominals;
+  }
+
+  getSum(arr) {
+    var sum = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (isFinite(arr[i])) {
+        sum += arr[i];
+      } else {
+        // console.log("NOT FINITE", arr[i]);
+      }
+    }
+    return sum;
+  }
+
+  getLinearRegression(xData, yData) {
+    // console.log("xData", xData);
+    // console.log("yData", yData);
+    // var sum = (accumulator, currentValue) => accumulator + currentValue;
+    var n = (xData.length + yData.length) / 2;
+    var xy = []
+    var x2 = xData.map(x => x * x);
+    for (var i = 0; i < xData.length; i++) {
+      xy.push(xData[i] * yData[i]);
+    }
+    var sum_x = this.getSum(xData);
+    // console.log("sum_x", sum_x);
+    var sum_y = this.getSum(yData);
+    // console.log("sum_y", sum_y);
+    var sum_xy = this.getSum(xy);
+    // console.log("sum_xy", sum_xy);
+    var sum_x2 = this.getSum(x2);
+    // console.log("sum_x2", sum_x2);
+    var a_numer = (sum_y * sum_x2) - (sum_x * sum_xy);
+    var a_denom = (n * sum_x2) - (sum_x * sum_x);
+    var a = a_numer / a_denom;
+    var b_numer = (n * sum_xy) - (sum_x * sum_y);
+    var b_denom = (n * sum_x2) - (sum_x * sum_x);
+    var b = b_numer / b_denom;
+    return [a, b];
+  }
+
+  locuszoomScatterPlot(scatterData, scatterTitle) {
+    var xData = this.getScatterX(scatterData);
+    // console.log("xData", xData);
+    var yData = this.getScatterY(scatterData);
+    // console.log("yData", yData);
+    var trace1 = {
+      x: xData,
+      y: yData,
+      // hoverinfo: 'x+y',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 5,
+        color: "grey",
+        line: {
+          color: 'black',
+          width: 1
+        },
+      }
+    };
+    // [a, b] -> Y = a + bX
+    var linear_regression = this.getLinearRegression(xData, yData);
+    var a = linear_regression[0];
+    // console.log("a", a);
+    var b = linear_regression[1];
+    // console.log("b", b);
+    var xMin = Math.min.apply(null, xData);
+    // console.log("xMin", xMin);
+    var xMax = Math.max.apply(null, xData);
+    // console.log("xMax", xMax);
+    var yMin = a + (b * xMin);
+    // console.log("yMin", yMin);
+    var yMax = a + (b * xMax);
+    // console.log("yMax", yMax);
+    var trace2 = {
+      x: [xMin, xMax],
+      y: [yMin, yMax],
+      // hoverinfo: 'x+y',
+      mode: 'lines',
+      type: 'scatter',
+      name: "lines",
+      line: {
+        color: "blue",
+      }
+    };
+    var pdata = [trace1, trace2];
+    // var pdata = [trace1];
+    var playout = {
+      title: {
+        text: scatterTitle,
+        xref: 'paper'
+      },
+      width: 1000,
+      height: 700,
+      yaxis: {
+        autorange: true,
+        title: "-log10(eQTL nominal pval)",
+      },
+      xaxis: {
+        autorange: true,
+        title: "-log10(GWAS pvalue)",
+      },
+      margin: {
+        l: 40,
+        r: 40,
+        b: 80,
+      },
+      showlegend: false,
+    };
+    return {
+      data: pdata,
+      layout: playout,
+      config: {
+        displaylogo: false,
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+      }
+    };
   }
 
 }
