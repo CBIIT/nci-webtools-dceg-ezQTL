@@ -145,6 +145,11 @@ app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
   }
 });
 
+app.get('/ping', async (request, response) => {
+  console.log("pong");
+  response.send(true);
+});
+
 app.use('/', express.static('static'));
 
 app.listen(3000);
