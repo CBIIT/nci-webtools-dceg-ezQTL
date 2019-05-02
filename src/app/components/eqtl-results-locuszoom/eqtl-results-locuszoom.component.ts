@@ -943,7 +943,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
             $('.popover').show().css({
               position: "absolute",
               top: top + 700, 
-              left: left + 190
+              left: left + 25
             });
           } else {
             $('.popover').show().css({
