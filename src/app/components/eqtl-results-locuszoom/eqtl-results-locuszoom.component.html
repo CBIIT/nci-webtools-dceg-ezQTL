@@ -91,13 +91,13 @@
       </button>
     </div>
 
-    <!-- Browse by RS number -->
+    <!-- LD Reference input -->
     <div class="col-md-auto p-4">
       <mat-form-field>
         <input 
           #rsnumSearchInput
           matInput 
-          placeholder="Browse rs number" 
+          placeholder="LD Reference" 
           (keyup)="enableSearch(rsnumSearchInput.value)" 
           [(value)]="rsnumSearch" 
           [formControl]="rsnumber">
