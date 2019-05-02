@@ -922,18 +922,36 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         $('.popover').show();
         if (this.collapseInput) {
           // console.log("INPUT PANEL COLLAPSED");
-          $('.popover').show().css({
-            position: "absolute",
-            top: top, 
-            left: left + 190
-          });
+          // GWAS scatter shown
+          if (this.GWASData[0] && this.locuszoomScatterData[0]) {
+            $('.popover').show().css({
+              position: "absolute",
+              top: top + 700, 
+              left: left + 190
+            });
+          } else {
+            $('.popover').show().css({
+              position: "absolute",
+              top: top, 
+              left: left + 190
+            });
+          }
         } else {
           // console.log("INPUT PANEL SHOWN");
-          $('.popover').show().css({
-            position: "absolute",
-            top: top, 
-            left: left + 25
-          });
+          // GWAS scatter shown
+          if (this.GWASData[0] && this.locuszoomScatterData[0]) {
+            $('.popover').show().css({
+              position: "absolute",
+              top: top + 700, 
+              left: left + 190
+            });
+          } else {
+            $('.popover').show().css({
+              position: "absolute",
+              top: top, 
+              left: left + 25
+            });
+          }
         }
         this.showPopover = true;
       }
