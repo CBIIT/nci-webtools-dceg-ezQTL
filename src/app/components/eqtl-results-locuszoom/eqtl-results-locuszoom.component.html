@@ -79,18 +79,6 @@
       </mat-form-field>
     </div>
 
-    <!-- Re-calculate Button -->
-    <div class="col-md-auto p-4">
-      <button 
-        type="submit" 
-        class="mt-2" 
-        [disabled]="!inputChanged || selectedPop.length == 0" 
-        mat-raised-button color="primary" 
-        (click)="recalculatePopGene()">
-        Recalculate
-      </button>
-    </div>
-
     <!-- LD Reference input -->
     <div class="col-md-auto p-4">
       <mat-form-field>
@@ -105,8 +93,36 @@
       </mat-form-field>
     </div>
 
-    <!-- Search Button -->
+    <!-- [disabled]="!inputChanged || selectedPop.length == 0 || !searchEnabled || rsnumber.invalid"  -->
+    <!-- [disabled]="!inputChanged || selectedPop.length == 0 || rsnumber.invalid"  -->
+    <!-- Re-calculate Button -->
     <div class="col-md-auto p-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        mat-raised-button color="primary" 
+        [disabled]="!inputChanged || selectedPop.length == 0 || rsnumber.invalid" 
+        (click)="recalculatePopGeneRef()">
+        Recalculate
+      </button>
+    </div>
+
+    <!-- LD Reference input -->
+    <!-- <div class="col-md-auto p-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="LD Reference" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div> -->
+
+    <!-- Search Button -->
+    <!-- <div class="col-md-auto p-4">
       <button 
         type="submit" 
         class="mt-2" 
@@ -115,7 +131,7 @@
         (click)="makeLDRefSearch()">
         Search
       </button>
-    </div>
+    </div> -->
 
   </div>
 
