@@ -11,5 +11,18 @@ table {
   color: #0000EE;
   text-decoration: underline;
   cursor: pointer;
-  font-weight: bold;
+  /* font-weight: bold; */
+}
+
+/* .variant-details-headers {
+  font-size: large !important;
+} */
+
+.mat-header-cell {
+  font-size: 13px !important;
+  font-weight: bold !important;
+}
+
+.mat-cell {
+  padding: 0 6px 0 6px !important;
 }
