@@ -45,11 +45,9 @@ export class EqtlResultsGeneExpressionsComponent implements OnInit {
                 this.warningMessage = 'Data files contain ' + this.totalNumGenes + ' genes. Only top 15 gene expressions with most significant p-values will be displayed.';
               }
             }
-            if (this.geneExpressionsHeatmapData) {
-              this.heatmap = this.geneExpressionsHeatmap(this.geneExpressionsHeatmapData);
-            }
-            if (this.geneExpressionsData) {
+            if (this.geneExpressionsData[0] && this.geneExpressionsHeatmapData[0]) {
               this.graph = this.geneExpressionsViolinBoxPlot(this.geneExpressionsData);
+              this.heatmap = this.geneExpressionsHeatmap(this.geneExpressionsHeatmapData);
             }
           }
         });

@@ -76,9 +76,9 @@ export class EqtlResultsTableComponent implements OnInit {
       variant['slope'] = geneData[i]['slope'];
       variant['slope_se'] = geneData[i]['slope_se'];
       variant['R2'] = geneData[i]['R2'];
-      variant['LDpop'] = "Link";
-      variant['GWAS'] = "Link";
-      variant['genomAD'] = "Link";
+      variant['LDpop'] = "Go to";
+      variant['GWAS'] = "Go to";
+      variant['genomAD'] = "Go to";
       data.push(variant);
     }
     // console.log(data);
