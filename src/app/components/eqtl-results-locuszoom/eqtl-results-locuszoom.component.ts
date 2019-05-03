@@ -70,7 +70,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   searchEnabled: boolean;
   warningMessage: string;
 
-  rsnumber = new FormControl('', [Validators.pattern("^rs[0-9]+$")]);
+  rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
 
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
@@ -799,31 +799,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         res => this.data.changeMainData(res),
         error => this.handleError(error)
       )
-  } 
-
-  async makeLDRefSearch() {
-    if (this.geneVariantList.includes(this.rsnumSearch)) {
-      var selectedRefString = this.rsnumSearch;
-      // console.log("makeLDRefSearch()", selectedRefString);
-      var selectedGeneString = this.selectedGene;
-      var selectedPopString = this.selectedPop.join('+');
-      var recalculateAttempt = "true";
-      var recalculatePop = this.recalculatePopAttempt;
-      var recalculateGene = this.recalculateGeneAttempt;
-      var recalculateRef = "true";
-      this.inputChanged = false;
-      // reset
-      this.data.changeMainData(null);
-      this.data.changeSelectedTab(0);
-      // calculate
-      this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-        .subscribe(
-          res => this.data.changeMainData(res),
-          error => this.handleError(error)
-        )
-    } else {
-      this.warningMessage = this.rsnumSearch + " not found in Locuszoom gene data."
-    }
   }
 
   closeWarning() {
@@ -965,21 +940,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   //   // Plotly.Fx.hover([{curveNumber:event.points[0].curveNumber - 2, pointNumber: event.points[0].pointIndex}]);
   // }
 
-  refGeneChange() {
-    this.inputChanged = true;
-    this.recalculateGeneAttempt = "true";
-    // console.log(this.selectedGene);
-  }
-
-  enableSearch(rsnumSearchInputValue) {
-    // console.log(rsnumSearchInputValue);
-    if (rsnumSearchInputValue.length > 0) {
-      this.rsnumSearch = rsnumSearchInputValue
-      this.searchEnabled = true;
-    } else {
-      this.searchEnabled = false;
-    }
-  }
+  
 
   handleError(error) {
     console.log(error);
@@ -1020,34 +981,105 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return this.selectedPopFinal;
   }
 
-  async recalculatePopGene() {
-    // console.log("Recalculate!");
-    // console.log("Request ID: ", this.requestID);
-    // console.log("Selected gene: ", this.selectedGene);
+  // async makeLDRefSearch() {
+  //   if (this.geneVariantList.includes(this.rsnumSearch)) {
+  //     var selectedRefString = this.rsnumSearch;
+  //     // console.log("makeLDRefSearch()", selectedRefString);
+  //     var selectedGeneString = this.selectedGene;
+  //     var selectedPopString = this.selectedPop.join('+');
+  //     var recalculateAttempt = "true";
+  //     var recalculatePop = this.recalculatePopAttempt;
+  //     var recalculateGene = this.recalculateGeneAttempt;
+  //     var recalculateRef = "true";
+  //     this.inputChanged = false;
+  //     // reset
+  //     this.data.changeMainData(null);
+  //     this.data.changeSelectedTab(0);
+  //     // calculate
+  //     this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+  //       .subscribe(
+  //         res => this.data.changeMainData(res),
+  //         error => this.handleError(error)
+  //       )
+  //   } else {
+  //     this.warningMessage = this.rsnumSearch + " not found in Locuszoom gene data."
+  //   }
+  // }
+
+  refGeneChange() {
+    this.inputChanged = true;
+    this.recalculateGeneAttempt = "true";
+    // console.log(this.selectedGene);
+  }
+
+  enableSearch(rsnumSearchInputValue) {
+    // console.log(rsnumSearchInputValue);
+    // if (rsnumSearchInputValue.length > 0) {
+      this.rsnumSearch = rsnumSearchInputValue
+      this.searchEnabled = true;
+      this.inputChanged = true;
+      this.recalculateRefAttempt = "true";
+    // } else {
+    //   this.searchEnabled = false;
+    // }
+  }
+
+  async recalculatePopGeneRef() {
     var selectedGeneString = this.selectedGene;
-    // console.log("Selected populations: ", this.selectedPop);
     var selectedPopString = this.selectedPop.join('+');
-    // console.log("Selected populations RETURNED: ", selectedPopString);
-    var selectedRefString = this.selectedRef;
     var recalculateAttempt = "true";
     var recalculatePop = this.recalculatePopAttempt;
     var recalculateGene = this.recalculateGeneAttempt;
-    // console.log("recalculatePop", recalculatePop);
-    // console.log("recalculateGene", recalculateGene);
-    var recalculateRef = "false";
     this.inputChanged = false;
-    this.recalculatePopAttempt = "false";
-    this.recalculateGeneAttempt = "false";
-    // reset
-    this.data.changeMainData(null);
-    this.data.changeSelectedTab(0);
-    // calculate
-    this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-      .subscribe(
-        res => this.data.changeMainData(res),
-        error => this.handleError(error)
-      )
+    // this.recalculatePopAttempt = "false";
+    // this.recalculateGeneAttempt = "false";
+
+    // if gene is being recalculated, do not recalculate LD reference
+    if (recalculateGene == "true") {
+      console.log("DO NOT RECALCULATE LD REFERENCE");
+      var selectedRefString = "false";
+      var recalculateRef = "false";
+
+      // reset
+      this.data.changeMainData(null);
+      this.data.changeSelectedTab(0);
+      // calculate
+      this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+        .subscribe(
+          res => this.data.changeMainData(res),
+          error => this.handleError(error)
+        );
+      this.recalculateRefAttempt = "false";
+      this.recalculatePopAttempt = "false";
+      this.recalculateGeneAttempt = "false";
+    } else {
+      console.log("RECALCULATE LD REFERENCE");
+      if (this.geneVariantList.includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
+        var selectedRefString = this.rsnumSearch;
+        var recalculateRef = this.recalculateRefAttempt;
+        if (this.rsnumSearch.length == 0) {
+          selectedRefString = "false";
+          recalculateRef = "false";
+        }
+        
+        // reset
+        this.data.changeMainData(null);
+        this.data.changeSelectedTab(0);
+        // calculate
+        this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+          .subscribe(
+            res => this.data.changeMainData(res),
+            error => this.handleError(error)
+          );
+        this.recalculateRefAttempt = "false";
+        this.recalculatePopAttempt = "false";
+        this.recalculateGeneAttempt = "false";
+      } else {
+        this.warningMessage = this.rsnumSearch + " not found in Locuszoom gene data."
+      }
+    }
   }
+
   getScatterX(scatterData) {
     var p_values = [];
     for (var i = 0; i < scatterData.length; i++) {
