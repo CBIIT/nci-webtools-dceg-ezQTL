@@ -920,37 +920,65 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         // console.log(event.points[0]);
         this.popoverData = this.locuszoomData[event.points[0].pointIndex];
         $('.popover').show();
-        if (this.collapseInput) {
-          // console.log("INPUT PANEL COLLAPSED");
-          // GWAS scatter shown
-          if (this.GWASData[0] && this.locuszoomScatterData[0]) {
-            $('.popover').show().css({
-              position: "absolute",
-              top: top + 700, 
-              left: left + 190
-            });
-          } else {
-            $('.popover').show().css({
-              position: "absolute",
-              top: top, 
-              left: left + 190
-            });
+        if (this.collapseInput) { // input panel collapsed
+          if (this.GWASData[0] && this.locuszoomScatterData[0]) { // GWAS scatter shown
+            if (this.warningMessage.length > 0) { // warning message shown
+              $('.popover').show().css({
+                position: "absolute",
+                top: top + 766, 
+                left: left + 190
+              });
+            } else {  // warning message hidden
+              $('.popover').show().css({
+                position: "absolute",
+                top: top + 700, 
+                left: left + 190
+              });
+            }
+          } else { // GWAS scatter hidden
+            if (this.warningMessage.length > 0) { // warning message shown
+              $('.popover').show().css({
+                position: "absolute",
+                top: top + 66, 
+                left: left + 190
+              });
+            } else {  // warning message hidden
+              $('.popover').show().css({
+                position: "absolute",
+                top: top, 
+                left: left + 190
+              });
+            }
           }
-        } else {
-          // console.log("INPUT PANEL SHOWN");
-          // GWAS scatter shown
-          if (this.GWASData[0] && this.locuszoomScatterData[0]) {
-            $('.popover').show().css({
-              position: "absolute",
-              top: top + 700, 
-              left: left + 25
-            });
-          } else {
-            $('.popover').show().css({
-              position: "absolute",
-              top: top, 
-              left: left + 25
-            });
+        } else { // input panel shown
+          if (this.GWASData[0] && this.locuszoomScatterData[0]) { // GWAS scatter shown
+            if (this.warningMessage.length > 0) { // warning message shown
+              $('.popover').show().css({
+                position: "absolute",
+                top: top + 766, 
+                left: left + 25
+              });
+            } else {  // warning message hidden
+              $('.popover').show().css({
+                position: "absolute",
+                top: top + 700, 
+                left: left + 25
+              });
+            }
+          } else {  // GWAS scatter hidden
+            if (this.warningMessage.length > 0) { // warning message shown
+              $('.popover').show().css({
+                position: "absolute",
+                top: top + 66, 
+                left: left + 25
+              });
+            } else { // warning message hidden
+              $('.popover').show().css({
+                position: "absolute",
+                top: top, 
+                left: left + 25
+              });
+            }
           }
         }
         this.showPopover = true;
@@ -1075,7 +1103,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.recalculatePopAttempt = "false";
       this.recalculateGeneAttempt = "false";
     } else {
-      this.warningMessage = this.rsnumSearch + " not found in the eQTL association data file for the chosen reference gene. Please check input file or enter another variant."
+      this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
     }
   }
 
