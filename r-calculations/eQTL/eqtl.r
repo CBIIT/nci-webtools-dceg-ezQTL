@@ -38,12 +38,24 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
     slice(1) %>% 
     ungroup()
 
+  # return all gene variants
+  all_gene_variants <- qdata %>%
+    select(gene_id, rsnum)
+  all_gene_variants_colnames <- colnames(all_gene_variants)
+  all_gene_variants_data <- list(setNames(as.data.frame(all_gene_variants), all_gene_variants_colnames))
+
   qdata_tmp <- qdata %>% 
     group_by(gene_id,gene_symbol) %>% 
     arrange(pval_nominal) %>% 
     slice(1) %>% 
     ungroup() %>% 
     arrange(pval_nominal)
+
+  # return most significant variants for all genes
+  top_gene_variants <- qdata_tmp %>%
+    select(gene_id, gene_symbol, rsnum)
+  top_gene_variants_colnames <- colnames(top_gene_variants)
+  top_gene_variants_data <- list(setNames(as.data.frame(top_gene_variants), top_gene_variants_colnames))
 
   # added code to isolate gene_symbols and put in variable
   # gene_symbols <- list(qdata_tmp$gene_symbol)
@@ -68,7 +80,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
   ## locuszoom gwas data ##
   gwas_example_data <- gwas_example(workDir, gwasFile)
   ## combine results from eqtl modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), gene_expressions_heatmap=list(data=gene_expressions_heatmap_data), locuszoom=list(data=locuszoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locuszoom_scatter=list(data=locuszoom_scatter_data, title=locuszoom_scatter_title), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), gene_expressions=list(data=gene_expressions_data), gene_expressions_heatmap=list(data=gene_expressions_heatmap_data), locuszoom=list(data=locuszoom_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locuszoom_scatter=list(data=locuszoom_scatter_data, title=locuszoom_scatter_title), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
