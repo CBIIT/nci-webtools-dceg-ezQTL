@@ -26,6 +26,13 @@ export interface ReferenceGene {
   gene_symbol: string;
 }
 
+export interface GeneVariants {
+  gene_id: string;
+  gene_symbol: string;
+  rsnum: string;
+}
+
+
 @Component({
   selector: 'app-eqtl-results-locuszoom',
   templateUrl: './eqtl-results-locuszoom.component.html',
@@ -40,7 +47,9 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   locuszoomScatterTitle: string;
   GWASData: Object;
   geneList: ReferenceGene[];
-  geneVariantList: string[];
+  topGeneVariants: GeneVariants[];
+  allGeneVariants: GeneVariants[];
+  allGeneVariantsOrganized: Object;
   selectedGene: string;
   populationGroups: PopulationGroup[];
   selectedPop: string[];
@@ -67,10 +76,10 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   newSelectedGene: string;
   newSelectedRef: string;
   rsnumSearch: string;
-  searchEnabled: boolean;
   warningMessage: string;
 
   rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
+
 
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
@@ -82,7 +91,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.inputChanged = false;
     this.rsnumSearch = "";
     this.warningMessage = "";
-    this.searchEnabled= false;
 
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
@@ -102,6 +110,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.newSelectedRef = mainData["info"]["inputs"]["select_ref"][0]; // inputted ref
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
         this.geneList = mainData["info"]["gene_list"]["data"][0]; // get gene list & populate ref gene dropdown
+        this.allGeneVariants = mainData["info"]["all_gene_variants"]["data"][0]; // get list of all rsnums for all genes
+        this.topGeneVariants = mainData["info"]["top_gene_variants"]["data"][0]; // get list of top rsnum for all genes
         this.locuszoomData = mainData["locuszoom"]["data"][0]; // locuszoom data
         this.locuszoomDataRC = mainData["locuszoom"]["rc"][0]; // locuszoom RC data
         this.locuszoomDataQTopAnnot = mainData["locuszoom"]["top"][0][0]; // locuszoom Top Gene data
@@ -110,7 +120,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
         this.GWASData = mainData["gwas"]["data"][0]; // gwas data
       }
       if (this.locuszoomData) {
-        this.geneVariantList = this.populateGeneVariantList(this.locuszoomData);
+        // this.geneVariantList = this.populateGeneVariantList(this.locuszoomData);
         // check if there is data in GWAS object
         if (this.GWASData[0] && this.locuszoomScatterData[0]) {
           // if there is, graph GWAS plot and scatter plot
@@ -146,17 +156,32 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     } else {
       this.selectedRef = this.newSelectedRef; // recalculated new gene selection
       this.recalculateRefAttempt = "false";
-      this.searchEnabled = false;
       this.rsnumSearch = this.selectedRef;
+    }
+    if (this.allGeneVariants && this.geneList) {
+      this.populateAllGeneVariantLists(this.allGeneVariants, this.geneList); // organize all eQTL variants by gene
     }
   }
 
-  populateGeneVariantList(geneData) {
-    var variantList = [];
-    for (var i = 0; i < geneData.length; i++) {
-      variantList.push(geneData[i]['rsnum']);
+  populateAllGeneVariantLists(geneData, geneList) {
+    var geneVariants = {};
+    var geneIDList = this.getGeneIDs(geneList);
+    // initialize allGeneVariantsOrganized dict key value structure
+    for (var x = 0; x < geneIDList.length; x++) {
+      geneVariants[geneIDList[x]] = [];
     }
-    return variantList;
+    for(var y = 0; y < geneData.length; y++) {
+      geneVariants[geneData[y]["gene_id"]].push(geneData[y]["rsnum"]);
+    }
+    this.allGeneVariantsOrganized = geneVariants;
+  }
+
+  getGeneIDs(geneList) {
+    var geneIDs = [];
+    for (var i = 0; i < geneList.length; i++) {
+      geneIDs.push(geneList[i]['gene_id']);
+    }
+    return geneIDs;
   }
 
   populatePopulationDropdown() {
@@ -1009,19 +1034,17 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   refGeneChange() {
     this.inputChanged = true;
     this.recalculateGeneAttempt = "true";
-    // console.log(this.selectedGene);
+    for(var i = 0; i < this.topGeneVariants.length; i++) {
+      if (this.topGeneVariants[i]['gene_id'] == this.selectedGene) {
+        this.rsnumSearch = this.topGeneVariants[i]['rsnum'];
+      }
+    }
   }
 
   enableSearch(rsnumSearchInputValue) {
-    // console.log(rsnumSearchInputValue);
-    // if (rsnumSearchInputValue.length > 0) {
-      this.rsnumSearch = rsnumSearchInputValue
-      this.searchEnabled = true;
       this.inputChanged = true;
       this.recalculateRefAttempt = "true";
-    // } else {
-    //   this.searchEnabled = false;
-    // }
+      this.rsnumSearch = rsnumSearchInputValue;
   }
 
   async recalculatePopGeneRef() {
@@ -1031,15 +1054,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var recalculatePop = this.recalculatePopAttempt;
     var recalculateGene = this.recalculateGeneAttempt;
     this.inputChanged = false;
-    // this.recalculatePopAttempt = "false";
-    // this.recalculateGeneAttempt = "false";
-
-    // if gene is being recalculated, do not recalculate LD reference
-    if (recalculateGene == "true") {
-      console.log("DO NOT RECALCULATE LD REFERENCE");
-      var selectedRefString = "false";
-      var recalculateRef = "false";
-
+    if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
+      var selectedRefString = this.rsnumSearch;
+      var recalculateRef = this.recalculateRefAttempt;
+      if (this.rsnumSearch.length == 0) {
+        selectedRefString = "false";
+        recalculateRef = "false";
+      }
+      
       // reset
       this.data.changeMainData(null);
       this.data.changeSelectedTab(0);
@@ -1053,30 +1075,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.recalculatePopAttempt = "false";
       this.recalculateGeneAttempt = "false";
     } else {
-      console.log("RECALCULATE LD REFERENCE");
-      if (this.geneVariantList.includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
-        var selectedRefString = this.rsnumSearch;
-        var recalculateRef = this.recalculateRefAttempt;
-        if (this.rsnumSearch.length == 0) {
-          selectedRefString = "false";
-          recalculateRef = "false";
-        }
-        
-        // reset
-        this.data.changeMainData(null);
-        this.data.changeSelectedTab(0);
-        // calculate
-        this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-          .subscribe(
-            res => this.data.changeMainData(res),
-            error => this.handleError(error)
-          );
-        this.recalculateRefAttempt = "false";
-        this.recalculatePopAttempt = "false";
-        this.recalculateGeneAttempt = "false";
-      } else {
-        this.warningMessage = this.rsnumSearch + " not found in Locuszoom gene data."
-      }
+      this.warningMessage = this.rsnumSearch + " not found in eQTL Association Data File. Please check input file or enter another variant."
     }
   }
 
