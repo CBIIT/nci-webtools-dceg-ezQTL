@@ -1075,7 +1075,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
       this.recalculatePopAttempt = "false";
       this.recalculateGeneAttempt = "false";
     } else {
-      this.warningMessage = this.rsnumSearch + " not found in eQTL Association Data File. Please check input file or enter another variant."
+      this.warningMessage = this.rsnumSearch + " not found in the eQTL association data file for the chosen reference gene. Please check input file or enter another variant."
     }
   }
 
