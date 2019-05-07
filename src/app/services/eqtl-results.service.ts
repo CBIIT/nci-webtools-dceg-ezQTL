@@ -36,6 +36,10 @@ export class EqtlResultsService {
   private collapseInput = new BehaviorSubject(false);
   currentCollapseInput = this.collapseInput.asObservable();
 
+  // boolean: whether or not to display the blur loading spinner
+  private blurLoad = new BehaviorSubject(false);
+  currentBlurLoad = this.blurLoad.asObservable();
+
   constructor(private http: HttpClient) { }
 
   calculateMain(formData: FormData) {
@@ -104,5 +108,9 @@ export class EqtlResultsService {
 
   changeCollapseInput(collapseInput: boolean) {
     this.collapseInput.next(collapseInput);
+  }
+
+  changeBlurLoad(blurLoad: boolean) {
+    this.blurLoad.next(blurLoad);
   }
 }

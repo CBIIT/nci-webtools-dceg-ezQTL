@@ -116,7 +116,8 @@ export class EqtlInputsComponent implements OnInit {
 
   async submit() {
     this.data.changeResultStatus(true);
-    
+    this.data.changeBlurLoad(true);
+    $(".blur-loading").addClass("blur-overlay");
     const { associationFile, expressionFile, genotypeFile, gwasFile } = this.eqtlForm.value;
     // console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
     // console.log(this.eqtlForm.value);
@@ -145,8 +146,16 @@ export class EqtlInputsComponent implements OnInit {
 
     this.data.calculateMain(formData)
       .subscribe(
-        res => this.data.changeMainData(res),
-        error => this.handleError(error)
+        res => {
+          this.data.changeMainData(res);
+          this.data.changeBlurLoad(false);
+          $(".blur-loading").removeClass("blur-overlay");
+        },
+        error => {
+          this.handleError(error);
+          this.data.changeBlurLoad(false);
+          $(".blur-loading").removeClass("blur-overlay");
+        }
       )
   } 
 
@@ -154,6 +163,8 @@ export class EqtlInputsComponent implements OnInit {
     this.selectLoadBoxplotData = false;
     this.selectLoadGWASData = false;
     this.data.changeResultStatus(false);
+    this.data.changeBlurLoad(false);
+    $(".blur-loading").removeClass("blur-overlay");
     this.data.changeMainData(null);
     this.data.changeErrorMessage('');
     // this.data.changeWarningMessage('');

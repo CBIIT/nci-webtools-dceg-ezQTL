@@ -22,21 +22,25 @@ import { EqtlResultsLocuszoomBoxplotsComponent } from './components/eqtl-results
 import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
 
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
-
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCheckboxModule } from '@angular/material'; // import needed UI modules
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule, MatInput } from '@angular/material/input';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatTableModule } from '@angular/material/table'
 import { PlotlyModule } from 'angular-plotly.js';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { 
+  MatButtonModule, 
+  MatCheckboxModule, 
+  MatGridListModule, 
+  MatSelectModule, 
+  MatInputModule, 
+  MatTabsModule, 
+  MatProgressSpinnerModule, 
+  MatFormFieldModule, 
+  MatDialogModule, 
+  MatTableModule, 
+  MatPaginatorModule, 
+  MatSortModule, 
+  MatIconModule 
+} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -64,6 +68,9 @@ import { MatSortModule } from '@angular/material/sort';
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PlotlyModule,
     MatButtonModule, //import need UI modules
     MatCheckboxModule,
     MatGridListModule,
@@ -71,14 +78,12 @@ import { MatSortModule } from '@angular/material/sort';
     MatFormFieldModule,
     MatInputModule,
     MatTabsModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatProgressSpinnerModule,
-    PlotlyModule,
     MatDialogModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent],

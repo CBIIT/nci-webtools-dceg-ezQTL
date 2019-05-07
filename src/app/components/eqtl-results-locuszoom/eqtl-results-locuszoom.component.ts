@@ -77,6 +77,8 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   newSelectedRef: string;
   rsnumSearch: string;
   warningMessage: string;
+  blurLoad: boolean;
+  disableInputs: boolean;
 
   rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
 
@@ -84,6 +86,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
   constructor(private data: EqtlResultsService, public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.data.currentBlurLoad.subscribe(blurLoad => this.blurLoad = blurLoad);
     this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
     this.populationGroups = this.populatePopulationDropdown();
     this.selectedPopFinal = [];
@@ -91,6 +94,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     this.inputChanged = false;
     this.rsnumSearch = "";
     this.warningMessage = "";
+    this.disableInputs = false;
 
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => {
       this.disableGeneExpressions = disableGeneExpressions;
@@ -152,11 +156,14 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     }
     if (this.recalculateRefAttempt == "false") {
       this.selectedRef = "false"; // default ref rsnum
+      // console.log(this.locuszoomDataQTopAnnot["rsnum"]);
       this.rsnumSearch = this.locuszoomDataQTopAnnot["rsnum"];
+      // console.log("reached 1", this.rsnumSearch);
     } else {
       this.selectedRef = this.newSelectedRef; // recalculated new gene selection
       this.recalculateRefAttempt = "false";
       this.rsnumSearch = this.selectedRef;
+      // console.log("reached 2", this.rsnumSearch);
     }
     if (this.allGeneVariants && this.geneList) {
       this.populateAllGeneVariantLists(this.allGeneVariants, this.geneList); // organize all eQTL variants by gene
@@ -807,6 +814,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     // console.log(boxplotData.point_index);
     // var selectedRefString = this.locuszoomData[boxplotData["point_index"]]["rsnum"];
     var selectedRefString = this.popoverData["rsnum"];
+    this.rsnumSearch = selectedRefString;
     // console.log(selectedRefString);
     var selectedGeneString = this.selectedGene;
     var selectedPopString = this.selectedPop.join('+');
@@ -816,13 +824,30 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var recalculateRef = "true";
     this.inputChanged = false;
     // reset
-    this.data.changeMainData(null);
+    // this.data.changeMainData(null);
+    this.data.changeBlurLoad(true);
+    this.disableInputs = true;
+    $(".blur-loading").addClass("blur-overlay");
     this.data.changeSelectedTab(0);
     // calculate
     this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
       .subscribe(
-        res => this.data.changeMainData(res),
-        error => this.handleError(error)
+        res => {
+          this.data.changeMainData(res);
+          this.data.changeBlurLoad(false);
+          this.disableInputs = false;
+          $(".blur-loading").removeClass("blur-overlay");
+          this.recalculateRefAttempt = "false";
+          this.recalculatePopAttempt = "false";
+          this.recalculateGeneAttempt = "false";
+          this.warningMessage = "";
+        },
+        error => {
+          this.handleError(error);
+          this.data.changeBlurLoad(false);
+          this.disableInputs = false;
+          $(".blur-loading").removeClass("blur-overlay");
+        }
       )
   }
 
@@ -997,6 +1022,7 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
 
   handleError(error) {
     console.log(error);
+    this.closePopover();
     var errorTrimmed = error.error.trim().split('\n');
     // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
     var errorMessage = errorTrimmed[2];
@@ -1034,31 +1060,6 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     return this.selectedPopFinal;
   }
 
-  // async makeLDRefSearch() {
-  //   if (this.geneVariantList.includes(this.rsnumSearch)) {
-  //     var selectedRefString = this.rsnumSearch;
-  //     // console.log("makeLDRefSearch()", selectedRefString);
-  //     var selectedGeneString = this.selectedGene;
-  //     var selectedPopString = this.selectedPop.join('+');
-  //     var recalculateAttempt = "true";
-  //     var recalculatePop = this.recalculatePopAttempt;
-  //     var recalculateGene = this.recalculateGeneAttempt;
-  //     var recalculateRef = "true";
-  //     this.inputChanged = false;
-  //     // reset
-  //     this.data.changeMainData(null);
-  //     this.data.changeSelectedTab(0);
-  //     // calculate
-  //     this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
-  //       .subscribe(
-  //         res => this.data.changeMainData(res),
-  //         error => this.handleError(error)
-  //       )
-  //   } else {
-  //     this.warningMessage = this.rsnumSearch + " not found in Locuszoom gene data."
-  //   }
-  // }
-
   refGeneChange() {
     this.inputChanged = true;
     this.recalculateGeneAttempt = "true";
@@ -1083,25 +1084,45 @@ export class EqtlResultsLocuszoomComponent implements OnInit {
     var recalculateGene = this.recalculateGeneAttempt;
     this.inputChanged = false;
     if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
+      this.warningMessage = "";
       var selectedRefString = this.rsnumSearch;
       var recalculateRef = this.recalculateRefAttempt;
       if (this.rsnumSearch.length == 0) {
         selectedRefString = "false";
         recalculateRef = "false";
       }
-      
       // reset
-      this.data.changeMainData(null);
+      // this.data.changeMainData(null);
+      this.data.changeBlurLoad(true);
+      this.disableInputs = true;
+      $(".blur-loading").addClass("blur-overlay");
       this.data.changeSelectedTab(0);
       // calculate
       this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
         .subscribe(
-          res => this.data.changeMainData(res),
-          error => this.handleError(error)
+          res => {
+            this.data.changeMainData(res);
+            this.data.changeBlurLoad(false);
+            this.disableInputs = false;
+            this.closePopover();
+            $(".blur-loading").removeClass("blur-overlay");
+            this.recalculateRefAttempt = "false";
+            this.recalculatePopAttempt = "false";
+            this.recalculateGeneAttempt = "false";
+            if (this.rsnumSearch.length == 0) {
+              this.rsnumSearch = this.locuszoomDataQTopAnnot["rsnum"];
+            }
+          },
+          error => {
+            this.handleError(error);
+            this.data.changeBlurLoad(false);
+            this.disableInputs = false;
+            $(".blur-loading").removeClass("blur-overlay");
+          }
         );
-      this.recalculateRefAttempt = "false";
-      this.recalculatePopAttempt = "false";
-      this.recalculateGeneAttempt = "false";
+      // this.recalculateRefAttempt = "false";
+      // this.recalculatePopAttempt = "false";
+      // this.recalculateGeneAttempt = "false";
     } else {
       this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
     }
