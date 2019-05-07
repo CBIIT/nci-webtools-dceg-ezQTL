@@ -16,6 +16,7 @@ export class EqtlResultsComponent implements OnInit {
   errorMessage: string;
   disableGeneExpressions: boolean;
   selectedTab: number;
+  blurLoad: boolean;
 
   constructor(private data: EqtlResultsService) { }
 
@@ -25,6 +26,7 @@ export class EqtlResultsComponent implements OnInit {
     this.data.currentErrorMessage.subscribe(errorMessage => this.errorMessage = errorMessage);
     this.data.currentGeneExpressions.subscribe(disableGeneExpressions => this.disableGeneExpressions = disableGeneExpressions);
     this.data.currentSelectedTab.subscribe(selectedTab => this.selectedTab = selectedTab);
+    this.data.currentBlurLoad.subscribe(blurLoad => this.blurLoad = blurLoad);
   }
 
 }

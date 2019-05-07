@@ -3,35 +3,43 @@
     <div class="row">
 
       <!-- Locuszoom Result Tab -->
-      <mat-tab [disabled]="!mainData" id="locuszoom-results" label="Locuszoom Plot"> 
+      <mat-tab [disabled]="!mainData || blurLoad" id="locuszoom-results" label="Locuszoom Plot"> 
         <div class="col" class="result-main">
-          <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
+          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage"> -->
+          <div class="p-2 blur-loading" *ngIf="!mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>
           <div class="p-2" *ngIf="errorMessage && !mainData">
             Please check input files — reset form to try again.
           </div>
-          <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !mainData && !errorMessage" id="results">
-            <mat-spinner></mat-spinner>
+          <!-- *ngIf="resultStatus && !mainData && !errorMessage"  -->
+          <div 
+            class="d-flex justify-content-center loading-overlay" 
+            *ngIf="blurLoad && !errorMessage">
+            <div class="d-flex align-content-center flex-wrap">
+              <mat-spinner></mat-spinner>
+            </div>
           </div>
-          <div *ngIf="mainData">             
+          <div class="blur-loading" *ngIf="mainData">             
             <app-eqtl-results-locuszoom></app-eqtl-results-locuszoom>
           </div>
         </div>
       </mat-tab>
 
       <!-- Table Result Tab -->
-      <mat-tab [disabled]="!mainData" id="table-results" label="Variant Details Table"> 
+      <mat-tab [disabled]="!mainData || blurLoad" id="table-results" label="Variant Details Table"> 
         <div class="col" class="result-main">
-          <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
+          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>
           <div class="p-2" *ngIf="errorMessage && !mainData">
             Please check input files — reset form to try again.
           </div>
-          <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !mainData && !errorMessage" id="results">
+          <div 
+            class="mt-5 d-flex justify-content-center" 
+            *ngIf="resultStatus && !mainData && !errorMessage">
             <mat-spinner></mat-spinner>
-          </div>
+          </div> -->
           <div *ngIf="mainData">
             <app-eqtl-results-table></app-eqtl-results-table>
           </div>
@@ -39,17 +47,19 @@
       </mat-tab>
 
       <!-- Gene Expressions Result Tab -->
-      <mat-tab [disabled]="!mainData || disableGeneExpressions" id="gene-expressions-results" label="Gene Expressions"> 
+      <mat-tab [disabled]="!mainData || blurLoad || disableGeneExpressions" id="gene-expressions-results" label="Gene Expressions"> 
         <div class="col" class="result-main">
-          <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
+          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>
           <div class="p-2" *ngIf="errorMessage && !mainData">
             Please check input files — reset form to try again.
           </div>
-          <div class="mt-5 d-flex justify-content-center" *ngIf="resultStatus && !mainData && !errorMessage" id="results">
+          <div 
+            class="mt-5 d-flex justify-content-center" 
+            *ngIf="resultStatus && !mainData && !errorMessage">
             <mat-spinner></mat-spinner>
-          </div>
+          </div> -->
           <div *ngIf="mainData">  
             <app-eqtl-results-gene-expressions></app-eqtl-results-gene-expressions>
           </div>
