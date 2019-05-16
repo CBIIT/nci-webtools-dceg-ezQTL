@@ -2,8 +2,8 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
-    console.log("Execute main eqtl calculation.");
+function qtlsCalculateMain(rfile, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
+    console.log("Execute main qtls calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
         console.log("R Working directory:", workingDirectory);
@@ -40,7 +40,7 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        // code += `eqtl_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
+        // code += `qtls_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
         code += `main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
         // console.log(code);
 
@@ -75,8 +75,8 @@ function eqtlCalculateMain(rfile, associationFile, expressionFile, genotypeFile,
     });
 }
 
-function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, info) {
-    console.log("Execute eqtl locuszoom boxplots calculation.");
+function qtlsCalculateLocusAlignmentBoxplots(rfile, expressionFile, genotypeFile, info) {
+    console.log("Execute qtls locus alignment boxplots calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
         console.log("R Working directory:", workingDirectory);
@@ -94,7 +94,7 @@ function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, inf
         var code = readFileSync(rfile).toString();
         
         // make sure the R statement below is not appended to a comment in R code file
-        code += `locuszoom_boxplots(${workingDirectory}, ${expressionFile}, ${genotypeFile}, ${info})`;
+        code += `locus_alignment_boxplots(${workingDirectory}, ${expressionFile}, ${genotypeFile}, ${info})`;
         // console.log(code);
 
         const rcode = `
@@ -128,6 +128,6 @@ function eqtlCalculateLocuszoomBoxplots(rfile, expressionFile, genotypeFile, inf
 }
 
 module.exports = {
-    eqtlCalculateMain,
-    eqtlCalculateLocuszoomBoxplots
+    qtlsCalculateMain,
+    qtlsCalculateLocusAlignmentBoxplots
 };

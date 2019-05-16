@@ -58,7 +58,7 @@ app.use(function(req, res, next) {
 //   });
 // });
 
-app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
+app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   console.log(request.files);
   console.log("Main data files uploaded.");
 
@@ -90,7 +90,7 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -99,7 +99,7 @@ app.post('/eqtl-calculate-main', upload.any(), async (request, response) => {
   }
 });
 
-app.post('/eqtl-recalculate-main', async (request, response) => {
+app.post('/qtls-recalculate-main', async (request, response) => {
   console.log("Recalculation info received.");
 
   var associationFile = request.body.associationFile;
@@ -116,7 +116,7 @@ app.post('/eqtl-recalculate-main', async (request, response) => {
   var recalculateRef = request.body.recalculateRef;
 
   try {
-    const data = await rscript.eqtlCalculateMain('./r-calculations/eQTL/eqtl.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -125,9 +125,9 @@ app.post('/eqtl-recalculate-main', async (request, response) => {
   }
 });
 
-app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
-  console.log("Locuszoom boxplot info received.");
-  console.log("REQUEST BODY - locuszoom boxplot point info");
+app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
+  console.log("Locus Alignment boxplot info received.");
+  console.log("REQUEST BODY - locus alignment boxplot point info");
   console.log(request.body);
   var info = request.body.boxplotDataDetailed;
   var expressionFile = request.body.expressionFile; // optional data file
@@ -136,7 +136,7 @@ app.post('/eqtl-locuszoom-boxplots', async (request, response) => {
   // var genotypeFile = "0000000000000.1q21_3.genotyping.txt"; // debug data file
 
   try {
-    const data = await rscript.eqtlCalculateLocuszoomBoxplots('./r-calculations/eQTL/eqtl.r', expressionFile, genotypeFile, info);
+    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', expressionFile, genotypeFile, info);
     response.json(data);
   } catch(err) {
     console.log(err);

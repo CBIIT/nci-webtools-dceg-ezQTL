@@ -1,0 +1,258 @@
+<div class="locus-alignment-result-tab">
+  <!-- <div class="row"> -->
+
+    <!-- Choose Population -->
+    <!-- <div class="col-md-auto p-4">
+      <mat-form-field>
+        <mat-label>Population</mat-label>
+        <mat-select 
+          panelClass="populationPanel" 
+          [(value)]="selectedPop" 
+          (selectionChange)="changePop()" 
+          multiple 
+          required 
+          #population> -->
+          <!-- Edit dropdown placeholder -->
+          <!-- <mat-select-trigger>
+            <span *ngIf="selectedPop.length < 26">
+              <span *ngIf="selectedPopFinal.length <= 3">
+                {{ selectedPopFinal.join('+') }}
+              </span>
+              <span *ngIf="selectedPopFinal.length > 3">
+                {{ selectedPopFinal[0] }} 
+                <span class="example-additional-selection">
+                  (+{{selectedPopFinal.length - 1}} {{ selectedPopFinal?.length === 2 ? 'other' : 'others'}})
+                </span>
+              </span>
+            </span> -->
+            <!-- Display placeholder if all populations selected (26 total) -->
+            <!-- <span *ngIf="selectedPop.length == 26">
+              (ALL) All Populations
+            </span>
+          </mat-select-trigger>
+          <br>
+          <mat-checkbox 
+            class="p-3" 
+            (change)="selectAll()" 
+            color="primary" 
+            [checked]="populationSelectedAll" 
+            style="width: 500px;">
+            (ALL) All Populations
+          </mat-checkbox> -->
+          <!-- Populate dropdown with all populations -->
+          <!-- <div *ngFor="let group of populationGroups"> -->
+            <!-- Populate subpopulation groups -->
+            <!-- <div class="pl-3">
+              <span 
+                (click)="selectPopulationGroup(group.namecode)" 
+                style="cursor: pointer; user-select: none;">
+                (<u>{{ group.namecode }}</u>)<u> {{ group.name }}</u>
+              </span>
+            </div> -->
+            <!-- Populate individual populations -->
+            <!-- <mat-option 
+              class="pl-5" 
+              *ngFor="let subPopulation of group.subPopulations" 
+              [value]="subPopulation.value">
+              ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
+            </mat-option>
+          </div>
+        </mat-select>
+      </mat-form-field>
+    </div> -->
+
+    <!-- Choose Reference Gene -->
+    <!-- <div class="col-md-auto p-4">
+      <mat-form-field>
+        <mat-label>Reference Gene</mat-label>
+        <mat-select 
+          [(value)]="selectedGene" 
+          (selectionChange)="refGeneChange()" 
+          required 
+          #refGene>
+          <mat-option 
+            *ngFor="let gene of geneList" 
+            [value]="gene.gene_id">
+            {{ gene.gene_symbol }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div> -->
+
+    <!-- LD Reference input -->
+    <!-- <div class="col-md-auto p-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="LD Reference" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <button mat-button *ngIf="rsnumSearch" matSuffix mat-icon-button aria-label="Clear" (click)="rsnumSearch=''">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div> -->
+
+    <!-- [disabled]="!inputChanged || selectedPop.length == 0 || !searchEnabled || rsnumber.invalid"  -->
+    <!-- [disabled]="!inputChanged || selectedPop.length == 0 || rsnumber.invalid"  -->
+    <!-- Re-calculate Button -->
+    <!-- <div class="col-md-auto p-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        mat-raised-button color="primary" 
+        [disabled]="!inputChanged || selectedPop.length == 0 || rsnumber.invalid" 
+        (click)="recalculatePopGeneRef()">
+        Recalculate
+      </button>
+    </div> -->
+
+    <!-- LD Reference input -->
+    <!-- <div class="col-md-auto p-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="LD Reference" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div> -->
+
+    <!-- Search Button -->
+    <!-- <div class="col-md-auto p-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        [disabled]="!searchEnabled || rsnumber.invalid" 
+        mat-raised-button color="primary" 
+        (click)="makeLDRefSearch()">
+        Search
+      </button>
+    </div> -->
+
+  <!-- </div> -->
+
+  <!-- Popover -->
+  <div class="popover">
+    <button type="button" class="close" aria-label="Close" (click)="closePopover()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="popover-content" *ngIf="popoverData">
+      <b>chr{{ popoverData.variant_id }}</b>
+      <br>
+      <span *ngIf="popoverData.rsnum">
+        <b>{{ popoverData.rsnum }}</b>
+        <br>
+      </span>
+      Ref/Alt: <b>{{ popoverData.ref }}</b>/<b>{{ popoverData.alt }}</b>
+      <br>
+      P-value: <b>{{ popoverData.pval_nominal }}</b>
+      <br>
+      Slope: <b>{{ popoverData.slope }}</b>
+      <hr>
+      <a (click)="makeLDRef()">Make LD Reference</a>
+      <br>
+      <a (click)="linkLDpop()">LDpop</a>
+      <br>
+      <a (click)="linkGWAS()">Potential GWAS</a>
+      <br>
+      <a (click)="linkGnomADBrowser()">gnomAD browser</a>
+      <br>
+      <div id="qtls-enable-locus-alignment-boxplots" *ngIf="!disableLocusQuantification">
+        <a (click)="showBoxplot(popoverData)">Show Boxplots</a>
+      </div>
+      <div id="qtls-disable-locus-alignment-boxplots" class="disabled-overlay" *ngIf="disableLocusQuantification">
+        <a>Show Boxplots</a>
+      </div>
+    </div>
+    <div class="popover-content" *ngIf="!popoverData">
+      No data
+    </div>
+  </div>
+
+  <!-- Show warning message if searched rs number is not found -->
+  <!-- <div 
+    id="locus-alignment-search-warning"
+    class="ml-2 mr-2 alert alert-warning alert-dismissible fade show" 
+    role="alert"  
+    *ngIf="warningMessage">
+    {{warningMessage}}
+    <button 
+      type="button" 
+      class="close" 
+      (click)="closeWarning()" 
+      aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div> -->
+
+  <!-- Show centered Plotly locus alignment scatter plot if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-scatter-plot" 
+    *ngIf="scatter">
+    <plotly-plot 
+      [data]="scatter.data" 
+      [layout]="scatter.layout" 
+      [config]="scatter.config">
+    </plotly-plot>
+  </div>
+
+  <!-- Show centered Plotly locus alignment manhattan plot(s) if graph is generated -->
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locus-alignment-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      (click)="plotlyClick($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
+  </div> -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      [divId]="graph.divId" 
+      (click)="clickPoint($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)">
+    </plotly-plot>
+  </div>
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locus-alignment-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      (click)="clickPoint($event, plot)" 
+      (hover)="hoverPoint($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
+  </div> -->
+
+  <br>
+
+  <!-- <pre>{{ mainData | json }}</pre> -->
+
+</div>
