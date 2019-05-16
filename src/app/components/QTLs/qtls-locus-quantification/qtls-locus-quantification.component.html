@@ -22,18 +22,6 @@
     
   </div>
 
-  <!-- Show centered Plotly locus quantification heatmap if graph is generated -->
-  <div 
-    class="d-flex justify-content-center" 
-    id="qtls-gene-expressions-heatmap" 
-    *ngIf="heatmap">
-      <plotly-plot 
-        [data]="heatmap.data" 
-        [layout]="heatmap.layout" 
-        [config]="heatmap.config">
-      </plotly-plot>
-  </div>
-
   <!-- Show centered Plotly locus quantification violin boxplot if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
@@ -59,6 +47,18 @@
       aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
+  </div>
+
+  <!-- Show centered Plotly locus quantification heatmap if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-gene-expressions-heatmap" 
+    *ngIf="heatmap">
+      <plotly-plot 
+        [data]="heatmap.data" 
+        [layout]="heatmap.layout" 
+        [config]="heatmap.config">
+      </plotly-plot>
   </div>
 
   <br>
