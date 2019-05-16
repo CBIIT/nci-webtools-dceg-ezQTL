@@ -106,38 +106,27 @@ export class QTLsCalculationInputsComponent implements OnInit {
 
 
         if (this.recalculateAttempt == "false" && this.newSelectedPop == "EUR") {
-          console.log("REACHED 1");
-          console.log("Population recalculation: No");
           this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
           this.returnPopulationGroupFinal();
         } else {
-          console.log("REACHED 2");
-          console.log("Population recalculation: Yes");
           var newSelectedPopList = this.newSelectedPop.split('+');
           this.selectedPop = newSelectedPopList; // recalculated new population selection
           this.recalculatePopAttempt = "false";
           this.returnPopulationGroupFinal();
         }
         if(this.newSelectedGene == "false") {
-          console.log("Gene recalculation: No");
           this.selectedGene = this.locusAlignmentDataQTopAnnot["gene_id"]; // default reference gene
         } else {
-          console.log("Gene recalculation: Yes");
           this.selectedGene = this.newSelectedGene; // recalculated new gene selection
           this.recalculateGeneAttempt = "false";
         }
         if (this.newSelectedRef == "false") {
-          console.log("LD Ref recalculation: No");
           this.selectedRef = "false"; // default ref rsnum
-          // console.log(this.locusAlignmentDataQTopAnnot["rsnum"]);
           this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
-          // console.log("reached 1", this.rsnumSearch);
         } else {
-          console.log("LD Ref recalculation: Yes");
           this.selectedRef = this.newSelectedRef; // recalculated new gene selection
           this.recalculateRefAttempt = "false";
           this.rsnumSearch = this.selectedRef;
-          // console.log("reached 2", this.rsnumSearch);
         }
         if (this.allGeneVariants && this.geneList) {
           this.populateAllGeneVariantLists(this.allGeneVariants, this.geneList); // organize all QTLs variants by gene
@@ -460,9 +449,6 @@ export class QTLsCalculationInputsComponent implements OnInit {
             $(".blur-loading").removeClass("blur-overlay");
           }
         );
-      // this.recalculateRefAttempt = "false";
-      // this.recalculatePopAttempt = "false";
-      // this.recalculateGeneAttempt = "false";
     } else {
       this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
     }
