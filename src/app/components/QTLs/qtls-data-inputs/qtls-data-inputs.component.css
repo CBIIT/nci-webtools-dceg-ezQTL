@@ -1,0 +1,58 @@
+.qtls-data-inputs {
+    font-size: 9pt;
+    font-weight: bold;
+}
+
+.qtls-data-inputs a {
+    color: #00A2EC;
+    text-decoration: none;
+}
+
+.datafile-title {
+    color: #595959 !important;
+    font-size: 1.2em;
+}
+
+.cf:before, .cf:after {
+    content: " ";
+    display: table;
+}
+
+.cf:after {
+    clear: both;
+}
+
+.cf {
+    *zoom: 1;
+}
+
+.fl {
+    float: left;
+    _display: inline;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.bg-light-grey {
+    background-color: #F8F9FA;
+}
+
+.bg-near-white {
+    background-color: #f4f4f4;
+}
+
+.tc {
+    text-align: center;
+}
+
+@media screen and (min-width: 30em) {
+    .w-50-ns {
+        width: 50%;
+    }
+}
+
+#qtls-data-input-gtex-select {
+    font-size: 12pt !important;
+}
