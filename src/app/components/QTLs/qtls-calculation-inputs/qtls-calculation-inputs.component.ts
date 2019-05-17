@@ -106,8 +106,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.topGeneVariants = mainData["info"]["top_gene_variants"]["data"][0]; // get list of top rsnum for all genes
         this.locusAlignmentDataQTopAnnot = mainData["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
 
-        console.log("INIT RECALC ATTEMPT", this.recalculateAttempt);
-        console.log("INIT NEW SELECTED POP", this.newSelectedPop);
+        // console.log("INIT RECALC ATTEMPT", this.recalculateAttempt);
+        // console.log("INIT NEW SELECTED POP", this.newSelectedPop);
         if (this.recalculateAttempt == "false" && this.newSelectedPop == "EUR") {
           this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
           this.returnPopulationGroupFinal();
