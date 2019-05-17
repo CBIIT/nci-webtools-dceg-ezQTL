@@ -75,16 +75,16 @@ export class QTLsLocusTableComponent implements OnInit {
       variant['ref'] = geneData[i]['ref'];
       variant['alt'] = geneData[i]['alt'];
       variant['tss_distance'] = geneData[i]['tss_distance'];
-      variant['pval_nominal'] = geneData[i]['pval_nominal'];
+      variant['pval_nominal'] = geneData[i]['pval_nominal'].toString();
       variant['slope'] = geneData[i]['slope'];
       variant['slope_se'] = geneData[i]['slope_se'];
-      variant['R2'] = geneData[i]['R2'];
+      variant['R2'] = (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString();
       variant['LDpop'] = "Go to";
       variant['GWAS'] = "Go to";
       variant['genomAD'] = "Go to";
       data.push(variant);
     }
-    // console.log(data);
+    console.log(data);
     return data;
   }
   
