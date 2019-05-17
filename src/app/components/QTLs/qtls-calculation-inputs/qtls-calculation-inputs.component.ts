@@ -81,6 +81,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.selectedRef = "";
     
     this.data.currentMainData.subscribe(mainData => {
+      this.warningMessage = "";
+      $("#ldref-search-warning").show();
       this.mainData = mainData;
       
       if (mainData) {
@@ -104,8 +106,12 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.topGeneVariants = mainData["info"]["top_gene_variants"]["data"][0]; // get list of top rsnum for all genes
         this.locusAlignmentDataQTopAnnot = mainData["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
 
-
+        console.log("INIT RECALC ATTEMPT", this.recalculateAttempt);
+        console.log("INIT NEW SELECTED POP", this.newSelectedPop);
         if (this.recalculateAttempt == "false" && this.newSelectedPop == "EUR") {
+          this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+          this.returnPopulationGroupFinal();
+        } else if (this.recalculateAttempt == "true" && this.newSelectedPop == "EUR") {
           this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
           this.returnPopulationGroupFinal();
         } else {
@@ -413,7 +419,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     var recalculateGene = this.recalculateGeneAttempt;
     this.inputChanged = false;
     if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
-      this.warningMessage = "";
+      this.closeWarning();
       var selectedRefString = this.rsnumSearch;
       var recalculateRef = this.recalculateRefAttempt;
       if (this.rsnumSearch.length == 0) {

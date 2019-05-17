@@ -4,7 +4,6 @@ import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { QTLsLocusAlignmentBoxplotsComponent } from '../qtls-locus-alignment-boxplots/qtls-locus-alignment-boxplots.component';
 import { environment } from '../../../../environments/environment' 
-import { FormControl, Validators } from '@angular/forms';
 
 // import * as Plotly from '../../../../node_modules/plotly.js/dist/plotly.js';
 
@@ -551,6 +550,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // this.data.changeMainData(null);
     this.data.changeBlurLoad(true);
     this.disableInputs = true;
+    $("#ldref-search-warning").hide();
     $(".blur-loading").addClass("blur-overlay");
     // this.data.changeSelectedTab(0);
     // calculate
@@ -564,7 +564,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           this.recalculateRefAttempt = "false";
           this.recalculatePopAttempt = "false";
           this.recalculateGeneAttempt = "false";
-          // this.warningMessage = "";
         },
         error => {
           this.handleError(error);
@@ -573,10 +572,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           $(".blur-loading").removeClass("blur-overlay");
         }
       )
-  }
-
-  closeWarning() {
-    // this.warningMessage = "";
   }
 
   linkLDpop() {
