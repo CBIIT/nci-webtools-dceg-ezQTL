@@ -18,7 +18,7 @@
       <br>
       Slope: <b>{{ popoverData.slope }}</b>
       <br>
-      R<sup>2</sup>: <b>{{ popoverData.R2 }}</b>
+      R<sup>2</sup>: <span *ngIf="popoverData.R2"><b>{{ popoverData.R2 }}</b></span><span *ngIf="!popoverData.R2"><b>NA</b></span>
       <hr>
       <a (click)="makeLDRef()">Make LD Reference</a>
       <br>
