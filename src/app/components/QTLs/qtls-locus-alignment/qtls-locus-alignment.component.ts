@@ -135,9 +135,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneData.length; i++) {
       if ('rsnum' in geneData[i]) {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope']);
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope']);
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -632,13 +632,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         if (this.collapseInput) { // input panel collapsed
           $('.popover').show().css({
             position: "absolute",
-            top: top - 115, 
+            top: top - 125, 
             left: left + 190
           });
         } else { // input panel shown
           $('.popover').show().css({
             position: "absolute",
-            top: top - 115, 
+            top: top - 125, 
             left: left + 25
           });
         }
