@@ -53,10 +53,13 @@ export class QTLsLocusTableComponent implements OnInit {
       if (this.locusAlignmentData) {
         this.VARIANT_DATA = this.populateVariantDataList(this.locusAlignmentData);
       }
+      this.dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
-    this.dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // this.dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
+    // this.dataSource.paginator = this.paginator;
+    // this.dataSource.sort = this.sort;
   }
 
   populateVariantDataList(geneData) {
