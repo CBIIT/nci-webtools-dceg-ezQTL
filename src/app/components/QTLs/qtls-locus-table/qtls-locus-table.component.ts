@@ -32,7 +32,7 @@ export class QTLsLocusTableComponent implements OnInit {
   selectedPop: string[];
   newSelectedPop: string;
   requestID: number;
-  displayedColumns: string[] = ['gene_id', 'gene_symbol', 'variant_id', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'R2', 'LDpop', 'GWAS', 'genomAD'];
+  displayedColumns: string[] = ['gene_id', 'gene_symbol', 'variant_id', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'R2', 'LDpop', 'GWAS', 'gnomAD'];
   dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -81,7 +81,7 @@ export class QTLsLocusTableComponent implements OnInit {
       variant['R2'] = (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString();
       variant['LDpop'] = "Go to";
       variant['GWAS'] = "Go to";
-      variant['genomAD'] = "Go to";
+      variant['gnomAD'] = "Go to";
       data.push(variant);
     }
     console.log(data);
@@ -130,7 +130,7 @@ export class QTLsLocusTableComponent implements OnInit {
     win.focus();
   }
 
-  linkGenomADBrowser(chr, pos, ref, alt) {
+  linkGnomADBrowser(chr, pos, ref, alt) {
     var url = "http://gnomad.broadinstitute.org/variant/" + chr + "-" + pos + "-" + ref + "-" + alt
     var win = window.open(url, '_blank');
     win.focus();
