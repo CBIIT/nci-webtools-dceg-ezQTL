@@ -135,7 +135,14 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
       layout: playout, 
       config: {
         displaylogo: false, 
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_alignment_boxplots',
+          width: 1000,
+          height: 600,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       } 
     };
 

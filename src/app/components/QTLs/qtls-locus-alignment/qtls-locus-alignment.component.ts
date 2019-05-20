@@ -378,7 +378,14 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       // divId: "qtls-locus-alignment-plot",
       config: {
         displaylogo: false,
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_alignment_manhattan_gwas',
+          width: 1000,
+          height: 1100,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       }
     };
   }
@@ -508,7 +515,14 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       // divId: "qtls-locus-alignment-plot",
       config: {
         displaylogo: false,
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_alignment_manhattan',
+          width: 1000,
+          height: 700,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       }
     };
   }
@@ -749,18 +763,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // [a, b] -> Y = a + bX
     var linear_regression = this.getLinearRegression(xData, yData);
     var a = linear_regression[0];
-    console.log("a", a);
+    // console.log("a", a);
     var b = linear_regression[1];
-    console.log("b", b);
+    // console.log("b", b);
     var xDataFinites = this.removeInfinities(xData);
     var xMin = Math.min.apply(null, xDataFinites);
-    console.log("xMin", xMin);
+    // console.log("xMin", xMin);
     var xMax = Math.max.apply(null, xDataFinites);
-    console.log("xMax", xMax);
+    // console.log("xMax", xMax);
     var yMin = a + (b * xMin);
-    console.log("yMin", yMin);
+    // console.log("yMin", yMin);
     var yMax = a + (b * xMax);
-    console.log("yMax", yMax);
+    // console.log("yMax", yMax);
     var trace2 = {
       x: [xMin, xMax],
       y: [yMin, yMax],
@@ -801,7 +815,14 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       layout: playout,
       config: {
         displaylogo: false,
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_alignment_gwas_scatter',
+          width: 1000,
+          height: 700,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       }
     };
   }

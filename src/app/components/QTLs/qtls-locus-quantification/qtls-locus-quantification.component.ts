@@ -143,7 +143,14 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       layout: playout, 
       config: {
         displaylogo: false, 
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_quantification_heatmap',
+          width: 900,
+          height: 800,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       } 
     };
   }
@@ -222,7 +229,14 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       layout: playout, 
       config: {
         displaylogo: false, 
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_quantification_gene_expressions',
+          width: 1000,
+          height: 600,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       } 
     };
 
@@ -281,7 +295,14 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       layout: playout, 
       config: {
         displaylogo: false, 
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"]
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_quantification_gene_expressions',
+          width: 1000,
+          height: 600,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
       } 
     };
   }
