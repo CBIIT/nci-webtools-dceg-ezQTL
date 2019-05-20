@@ -687,6 +687,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return sum;
   }
 
+  removeInfinities(arr) {
+    var finites = [];
+    for (var i = 0; i < arr.length; i ++) {
+      if (isFinite(arr[i])) {
+        finites.push(arr[i]);
+      } else {
+
+      }
+    }
+    return finites;
+  }
+
   getLinearRegression(xData, yData) {
     // console.log("xData", xData);
     // console.log("yData", yData);
@@ -737,17 +749,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // [a, b] -> Y = a + bX
     var linear_regression = this.getLinearRegression(xData, yData);
     var a = linear_regression[0];
-    // console.log("a", a);
+    console.log("a", a);
     var b = linear_regression[1];
-    // console.log("b", b);
-    var xMin = Math.min.apply(null, xData);
-    // console.log("xMin", xMin);
-    var xMax = Math.max.apply(null, xData);
-    // console.log("xMax", xMax);
+    console.log("b", b);
+    var xDataFinites = this.removeInfinities(xData);
+    var xMin = Math.min.apply(null, xDataFinites);
+    console.log("xMin", xMin);
+    var xMax = Math.max.apply(null, xDataFinites);
+    console.log("xMax", xMax);
     var yMin = a + (b * xMin);
-    // console.log("yMin", yMin);
+    console.log("yMin", yMin);
     var yMax = a + (b * xMax);
-    // console.log("yMax", yMax);
+    console.log("yMax", yMax);
     var trace2 = {
       x: [xMin, xMax],
       y: [yMin, yMax],

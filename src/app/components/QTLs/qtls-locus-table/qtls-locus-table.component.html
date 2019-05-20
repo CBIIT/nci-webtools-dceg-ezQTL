@@ -112,11 +112,11 @@
     </td>
   </ng-container>
 
-  <!-- genomAD Column -->
-  <ng-container matColumnDef="genomAD">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header> genomAD </th>
+  <!-- gnomAD Column -->
+  <ng-container matColumnDef="gnomAD">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> gnomAD </th>
     <td mat-cell *matCellDef="let variant"> 
-      <a (click)="linkGenomADBrowser(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.genomAD}}</a>
+      <a (click)="linkGnomADBrowser(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.gnomAD}}</a>
     </td>
   </ng-container>
 
