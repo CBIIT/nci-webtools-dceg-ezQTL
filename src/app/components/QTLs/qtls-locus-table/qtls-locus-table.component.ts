@@ -57,9 +57,6 @@ export class QTLsLocusTableComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
     });
-    // this.dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
-    // this.dataSource.paginator = this.paginator;
-    // this.dataSource.sort = this.sort;
   }
 
   populateVariantDataList(geneData) {
@@ -84,7 +81,7 @@ export class QTLsLocusTableComponent implements OnInit {
       variant['gnomAD'] = "Go to";
       data.push(variant);
     }
-    console.log(data);
+    // console.log(data);
     return data;
   }
   

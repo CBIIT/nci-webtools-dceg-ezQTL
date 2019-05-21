@@ -37,7 +37,6 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
       this.genotypeFile = this.mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
       this.locusAlignmentData = this.mainData["locus_alignment"]["data"][0]; // locus alignment data
       if (this.expressionFile != 'false' && this.genotypeFile != 'false') {
-        // console.log("HERE I GO CALCULATING !!!!!!");
         this.data.calculateLocusAlignmentBoxplots(this.expressionFile, this.genotypeFile, this.boxplotData)
         .subscribe(
           res => { 
