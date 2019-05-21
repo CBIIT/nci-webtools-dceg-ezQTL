@@ -1,0 +1,106 @@
+<div class="locus-alignment-result-tab">
+
+  <!-- Popover -->
+  <div class="popover">
+    <button type="button" class="close" aria-label="Close" (click)="closePopover()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="popover-content" *ngIf="popoverData">
+      <b>chr{{ popoverData.variant_id }}</b>
+      <br>
+      <span *ngIf="popoverData.rsnum">
+        <b>{{ popoverData.rsnum }}</b>
+        <br>
+      </span>
+      Ref/Alt: <b>{{ popoverData.ref }}</b>/<b>{{ popoverData.alt }}</b>
+      <br>
+      P-value: <b>{{ popoverData.pval_nominal }}</b>
+      <br>
+      Slope: <b>{{ popoverData.slope }}</b>
+      <br>
+      R<sup>2</sup>: <span *ngIf="popoverData.R2"><b>{{ popoverData.R2 }}</b></span><span *ngIf="!popoverData.R2"><b>NA</b></span>
+      <hr>
+      <a (click)="makeLDRef()">Make LD Reference</a>
+      <br>
+      <a (click)="linkLDpop()">LDpop</a>
+      <br>
+      <a (click)="linkGWAS()">Potential GWAS</a>
+      <br>
+      <a (click)="linkGnomADBrowser()">gnomAD browser</a>
+      <br>
+      <div id="qtls-enable-locus-alignment-boxplots" *ngIf="!disableLocusQuantification">
+        <a (click)="showBoxplot(popoverData)">Show Boxplots</a>
+      </div>
+      <div id="qtls-disable-locus-alignment-boxplots" class="disabled-overlay" *ngIf="disableLocusQuantification">
+        <a>Show Boxplots</a>
+      </div>
+    </div>
+    <div class="popover-content" *ngIf="!popoverData">
+      No data
+    </div>
+  </div>
+
+  <!-- Show centered Plotly locus alignment manhattan plot(s) if graph is generated -->
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locus-alignment-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      (click)="plotlyClick($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
+  </div> -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      [divId]="graph.divId" 
+      (click)="clickPoint($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)">
+    </plotly-plot>
+  </div>
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-plot" 
+    *ngIf="graph">
+    <plotly-plot 
+      id="locus-alignment-plot" 
+      [data]="graph.data" 
+      [layout]="graph.layout" 
+      [config]="graph.config" 
+      (click)="clickPoint($event, plot)" 
+      (hover)="hoverPoint($event, plot)" 
+      (relayout)="closePopover2($event)" 
+      (redraw)="closePopover2($event)"
+      #plot>
+    </plotly-plot>
+  </div> -->
+
+  <!-- Show centered Plotly locus alignment scatter plot if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-scatter-plot" 
+    *ngIf="scatter">
+    <plotly-plot 
+      [data]="scatter.data" 
+      [layout]="scatter.layout" 
+      [config]="scatter.config">
+    </plotly-plot>
+  </div>
+
+  <br>
+
+  <!-- <pre>{{ mainData | json }}</pre> -->
+
+</div>
