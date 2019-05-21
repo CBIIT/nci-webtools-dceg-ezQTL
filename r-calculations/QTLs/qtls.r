@@ -7,7 +7,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
   ## parameters define ##
   if (identical(select_pop, 'false')) {
     ## set default population to EUR if none chosen
-    select_pop <- "EUR"
+    select_pop <- "CEU+TSI+FIN+GBR+IBS"
   }
   if (identical(select_gene, 'false')) {
     ## set default gene to top gene if none chosen

@@ -306,7 +306,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis2: {
         // range: [0, maxY],
         autorange: true,
-        title: "eQTL -log10(P-value)",
+        title: "QTLs -log10(P-value)",
         domain: [0.52, 1],
         zeroline: false
       },
@@ -329,7 +329,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis4: {
         // range: [0, maxY * 10],
         autorange: true,
-        title: 'eQTL Recombination Rate (cM/Mb)',
+        title: 'QTLs Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
@@ -462,13 +462,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis: {
         // range: [0, maxY],
         autorange: true,
-        title: "eQTL -log10(P-value)",
+        title: "QTLs -log10(P-value)",
         zeroline: false
       },
       yaxis2: {
         // range: [0, maxY * 10],
         autorange: true,
-        title: 'eQTL Recombination Rate (cM/Mb)',
+        title: 'QTLs Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
