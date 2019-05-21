@@ -399,6 +399,20 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = this.getHoverData(geneData);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
 
+    // graph recombination rate line
+    var trace1 = {
+      x: xDataRC,
+      y: yDataRC,
+      text: hoverDataRC,
+      hoverinfo: 'text',
+      yaxis: 'y2',
+      type: 'scatter',
+      line: {
+        color: 'blue',
+        width: 1
+      }
+    };
+
     // highlight top point
     var topAnnotHighlight = {
       x: [qDataTopAnnot['pos'] / 1000000.0],
@@ -413,7 +427,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     };
 
     // graph scatter
-    var trace1 = {
+    var trace2 = {
       x: xData,
       y: yData,
       text: hoverData,
@@ -432,21 +446,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       }
     };
     
-    // graph recombination rate line
-    var trace2 = {
-      x: xDataRC,
-      y: yDataRC,
-      text: hoverDataRC,
-      hoverinfo: 'text',
-      yaxis: 'y2',
-      type: 'scatter',
-      line: {
-        color: 'blue',
-        width: 1
-      }
-    };
-    
-    var pdata = [topAnnotHighlight, trace1, trace2];
+    var pdata = [trace1, topAnnotHighlight, trace2];
 
     // round most significant pval to next whole number
     // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
