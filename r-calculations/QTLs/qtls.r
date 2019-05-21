@@ -115,7 +115,7 @@ locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, in_path, 
 gwas_example_scatter <- function(gwasdata, qdata_region) {
   ## coloculization ####
   tmpdata <- qdata_region %>% 
-    select(chr,pos,ref,alt,pval_nominal) %>% 
+    select(chr,pos,ref,alt,pval_nominal,R2) %>% 
     left_join(gwasdata) %>% 
     filter(!is.na(pvalue),!is.na(pval_nominal)) 
 
