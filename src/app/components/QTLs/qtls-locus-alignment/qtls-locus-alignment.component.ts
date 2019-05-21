@@ -159,6 +159,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return yData;
   }
 
+  getYLDRefGWAS(xData, yGWASData) {
+    var LDRefPos = this.locusAlignmentDataQTopAnnot['pos'] / 1000000.0;
+    var pointIndex = xData.indexOf(LDRefPos);
+    var yLDRef = yGWASData[pointIndex];
+    return yLDRef;
+  }
+
   getColorData(geneData) {
     var colorData = [];
     for (var i = 0; i < geneData.length; i++) {
@@ -196,11 +203,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var yDataRC = this.getYDataRC(geneDataRC);
     var hoverData = this.getHoverData(geneData);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
+    var xLDRef = qDataTopAnnot['pos'] / 1000000.0;
+    var yLDRef = Math.log10(qDataTopAnnot['pval_nominal']) * -1.0;
 
     // highlight top point
     var topAnnotHighlight = {
-      x: [qDataTopAnnot['pos'] / 1000000.0],
-      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      x: [xLDRef],
+      y: [yLDRef],
       hoverinfo: 'none',
       mode: 'markers',
       type: 'scatter',
@@ -209,6 +218,20 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: "red"
       },
       yaxis: 'y2'
+    };
+
+    // highlight top point GWAS
+    var topAnnotHighlightGWAS = {
+      x: [xLDRef],
+      y: [this.getYLDRefGWAS(xData, yGWASData)],
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 15,
+        color: "red"
+      }
+      // yaxis: 'y2'
     };
 
     // graph GWAS scatter
@@ -283,7 +306,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       }
     };
 
-    var pdata = [topAnnotHighlight, trace1, trace2, trace3, trace4];
+    var pdata = [topAnnotHighlight, topAnnotHighlightGWAS, trace1, trace2, trace3, trace4];
 
     // round most significant pval to next whole number
     // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
@@ -689,6 +712,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return pval_nominals;
   }
 
+  getScatterColorData(scatterData) {
+    var colorData = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      if (scatterData[i]['R2']) {
+        colorData.push(scatterData[i]['R2']);
+      } else {
+        colorData.push(0.0);
+      }
+    }
+    return colorData;
+  }
+
   getSum(arr) {
     var sum = 0;
     for (var i = 0; i < arr.length; i++) {
@@ -745,6 +780,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // console.log("xData", xData);
     var yData = this.getScatterY(scatterData);
     // console.log("yData", yData);
+    // console.log(scatterData);
+    var scatterColorData = this.getScatterColorData(scatterData);
     var trace1 = {
       x: xData,
       y: yData,
@@ -752,8 +789,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       mode: 'markers',
       type: 'scatter',
       marker: {
-        size: 5,
-        color: "grey",
+        size: 7,
+        color: scatterColorData,
+        colorscale: 'Viridis',
+        reversescale: true,
         line: {
           color: 'black',
           width: 1
