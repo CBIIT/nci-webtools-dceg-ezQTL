@@ -1,0 +1,317 @@
+<!-- Inputs -->
+<div class="border border-light rounded p-3">
+  <!-- <form class="row" [formGroup]="qtlsForm" id="input-files"> -->
+  <form [formGroup]="qtlsForm" id="input-files">
+
+    <!-- GWAS Data Checkbox -->
+    <div class="qtls-data-inputs">
+      <mat-checkbox 
+        (change)="loadGWASData()" 
+        [checked]="(selectLoadGWASData || qtlsForm.value.gwasFile)" 
+        [disabled]="resultStatus" 
+        color="primary">
+        Load GWAS data
+      </mat-checkbox>
+    </div>
+
+    <!-- GWAS Data File -->
+    <div class="qtls-data-inputs disabled-overlay" id="qtls-data-input-gwas-file">
+      <div class="row mb-2" id="input-files">
+        <div class="ml-3 datafile-title">
+          GWAS Data File<span *ngIf="(selectLoadGWASData || qtlsForm.value.gwasFile)" style="color:red">*</span>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <input 
+          type="file" 
+          formControlName="gwasFile" 
+          class="ng-hide" 
+          id="gwas-file" 
+          name="input-files" 
+          accept=".txt" 
+          hidden 
+          #gwasInput>
+          <!-- formControlName="gwasFile" -->
+        <button 
+          style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+          (click)="gwasInput.click()" 
+          [disabled]="resultStatus || !selectLoadGWASData" 
+          class="ml-3 mr-3" 
+          mat-stroked-button>
+          Choose File
+          <!-- {{ !qtlsForm.value.gwasFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
+        </button>
+        <div>
+          <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a>
+          <br>
+          <div 
+            *ngIf="(selectLoadGWASData || qtlsForm.value.gwasFile)" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.gwasFile ? '' : (qtlsForm.value?.gwasFile[0]?.name || '') }}
+          </div>
+          <div 
+            *ngIf="(!selectLoadGWASData && !qtlsForm.value.gwasFile)" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.gwasFile ? '' : (qtlsForm.value?.gwasFile[0]?.name || '') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-100 mt-2 mb-2 border border-light"></div>
+    
+    <!-- Locus Quantification Checkbox -->
+    <div class="qtls-data-inputs">
+      <mat-checkbox
+        (change)="loadBoxplotData()" 
+        [checked]="(selectLoadBoxplotData || (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile))" 
+        [disabled]="resultStatus" 
+        color="primary">
+        Load Boxplot data
+      </mat-checkbox>
+    </div>
+  
+    <!-- Association Data File -->
+    <div class="qtls-data-inputs" id="qtls-data-input-association-file">
+      <div class="row mb-2">
+        <div class="ml-3 datafile-title">
+          Association Data File<span style="color:red">*</span>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <input  
+          type="file" 
+          formControlName="associationFile"
+          class="ng-hide" 
+          id="association-file" 
+          name="input-files" 
+          accept=".txt" 
+          hidden  
+          #associationInput>
+        <button 
+          style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+          (click)="associationInput.click()" 
+          [disabled]="resultStatus" 
+          class="ml-3 mr-3" 
+          mat-stroked-button>
+          Choose File
+          <!-- {{ !qtlsForm.value.associationFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
+        </button>
+        <div>
+          <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.eQTL.txt" download>Download Sample</a>
+          <br>
+          <div 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.associationFile ? '' : (qtlsForm.value?.associationFile[0]?.name || '') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expression Data File -->
+    <div class="qtls-data-inputs disabled-overlay" id="qtls-data-input-expression-file">
+      <div class="row mb-2">
+        <div class="ml-3 datafile-title">
+          Expression Data File<span *ngIf="(selectLoadBoxplotData || (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile))" style="color:red">*</span>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <input 
+          type="file" 
+          formControlName="expressionFile"  
+          class="ng-hide" 
+          id="expression-file" 
+          name="input-files" 
+          accept=".txt"  
+          hidden 
+          #expressionInput>
+        <button 
+          style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+          (click)="expressionInput.click()" 
+          [disabled]="resultStatus || !selectLoadBoxplotData" 
+          class="ml-3 mr-3" 
+          mat-stroked-button>
+          Choose File
+          <!-- {{ !qtlsForm.value.expressionFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
+        </button>
+        <div>
+          <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a>
+          <br>
+          <div 
+            *ngIf="(selectLoadBoxplotData || (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile))" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.expressionFile ? '' : (qtlsForm.value?.expressionFile[0]?.name || '') }}
+          </div>
+          <div 
+            *ngIf="(!selectLoadBoxplotData && (!qtlsForm.value.expressionFile || !qtlsForm.value.genotypeFile))" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.expressionFile ? '' : (qtlsForm.value?.expressionFile[0]?.name || '') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Genotype Data File -->
+    <div class="qtls-data-inputs disabled-overlay" id="qtls-data-input-genotype-file">
+      <div class="row mb-2">
+        <div class="ml-3 datafile-title">
+          Genotype Data File<span *ngIf="(selectLoadBoxplotData || (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile))" style="color:red">*</span>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <input 
+          type="file" 
+          formControlName="genotypeFile" 
+          class="ng-hide" 
+          id="genotype-file" 
+          name="input-files" 
+          accept=".txt" 
+          hidden 
+          #genotypeInput>
+          <button 
+            style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+            (click)="genotypeInput.click()" 
+            [disabled]="resultStatus || !selectLoadBoxplotData" 
+            class="ml-3 mr-3" 
+            mat-stroked-button>
+            Choose File
+            <!-- {{ !qtlsForm.value.genotypeFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
+          </button>
+        <div>
+          <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
+          <br>
+          <div 
+            *ngIf="(selectLoadBoxplotData || (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile))" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.genotypeFile ? '' : (qtlsForm.value?.genotypeFile[0]?.name || '') }}
+          </div>
+          <div 
+            *ngIf="(!selectLoadBoxplotData && (!qtlsForm.value.expressionFile || !qtlsForm.value.genotypeFile))" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.genotypeFile ? '' : (qtlsForm.value?.genotypeFile[0]?.name || '') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-100 mt-2 mb-2 border border-light"></div>
+
+    <!-- GTEx Checkbox -->
+    <!-- [checked]="(selectLoadBoxplotData || (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile))"  -->
+    <div class="qtls-data-inputs">
+      <mat-checkbox
+        (change)="loadGTExData()" 
+        [checked]="(selectLoadGTExData)" 
+        [disabled]="resultStatus" 
+        color="primary">
+        Load GTEx data
+      </mat-checkbox>
+    </div>
+
+    <div class="qtls-data-inputs border border-light rounded disabled-overlay" id="qtls-data-input-gtex-select">
+      <mat-form-field class="pl-2 pr-2" style="width: 100%">
+        <mat-label>GTEx Dataset</mat-label>
+        <mat-select 
+          [disabled]="resultStatus || !selectLoadGTExData">
+          <mat-option *ngFor="let GTExDataset of GTExDatasets" [value]="GTExDataset.value">
+            {{GTExDataset.viewValue}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="w-100 mt-2 mb-2 border border-light"></div>
+
+    <!-- LD Checkbox -->
+    <div class="qtls-data-inputs">
+      <mat-checkbox
+        (change)="loadLDData()" 
+        [checked]="(selectLoadLDData || qtlsForm.value.ldFile)" 
+        [disabled]="resultStatus" 
+        color="primary">
+        Load LD data
+      </mat-checkbox>
+    </div>
+
+    <!-- LD Data File -->
+    <div class="qtls-data-inputs disabled-overlay" id="qtls-data-input-ld-file">
+      <div class="row mb-2" id="input-files">
+        <div class="ml-3 datafile-title">
+          LD Data File<span *ngIf="(selectLoadLDData || qtlsForm.value.ldFile)" style="color:red">*</span>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <input 
+          type="file" 
+          formControlName="ldFile" 
+          class="ng-hide" 
+          id="ld-file" 
+          name="input-files" 
+          accept=".txt" 
+          hidden 
+          #ldInput>
+        <button 
+          style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+          (click)="ldInput.click()" 
+          [disabled]="resultStatus || !selectLoadLDData" 
+          class="ml-3 mr-3" 
+          mat-stroked-button>
+          Choose File
+        </button>
+        <div>
+          <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a>
+          <br>
+          <div 
+            *ngIf="(selectLoadLDData || qtlsForm.value.ldFile)" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.ldFile ? '' : (qtlsForm.value?.ldFile[0]?.name || '') }}
+          </div>
+          <div 
+            *ngIf="(!selectLoadLDData && !qtlsForm.value.ldFile)" 
+            class="text-secondary" 
+            style="overflow:hidden; text-overflow:ellipsis;">
+            {{ !qtlsForm.value.ldFile ? '' : (qtlsForm.value?.ldFile[0]?.name || '') }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-100 mt-2 mb-2 border border-light"></div>
+
+    <!-- Submit and Reset Button   -->
+    <div class="qtls-data-inputs" id="qtls-data-input-submit-reset">
+      <div class="row">
+        <div class="col text-center">
+          <button 
+            type="submit" 
+            class="mt-3 mr-3" 
+            [disabled]="(!qtlsForm.valid || resultStatus)" 
+            mat-raised-button color="primary" 
+            (click)="submit()">
+            Calculate
+          </button>
+          <button 
+            type="reset" 
+            class="mt-3" 
+            mat-raised-button 
+            (click)="reset()" 
+            [color]="resetColor">
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+
+ 
+

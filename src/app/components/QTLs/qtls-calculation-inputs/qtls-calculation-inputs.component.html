@@ -1,0 +1,143 @@
+<div *ngIf="mainData" class="border border-light rounded pt-3 pl-3 pr-3 mb-3">
+  <div class="row blur-loading">
+    <!-- Choose Population -->
+    <div class="col-md-auto pl-4 pr-4">
+      <mat-form-field>
+        <mat-label>Population</mat-label>
+        <mat-select 
+          panelClass="populationPanel" 
+          [(value)]="selectedPop" 
+          (selectionChange)="changePop()" 
+          multiple 
+          required 
+          #population>
+          <!-- Edit dropdown placeholder -->
+          <mat-select-trigger>
+            <span *ngIf="selectedPop.length < 26">
+              <span *ngIf="selectedPopFinal.length <= 3">
+                {{ selectedPopFinal.join('+') }}
+              </span>
+              <span *ngIf="selectedPopFinal.length > 3">
+                {{ selectedPopFinal[0] }} 
+                <span class="example-additional-selection">
+                  (+{{selectedPopFinal.length - 1}} {{ selectedPopFinal?.length === 2 ? 'other' : 'others'}})
+                </span>
+              </span>
+            </span>
+            <!-- Display placeholder if all populations selected (26 total) -->
+            <span *ngIf="selectedPop.length == 26">
+              (ALL) All Populations
+            </span>
+          </mat-select-trigger>
+          <br>
+          <mat-checkbox 
+            class="p-3" 
+            (change)="selectAll()" 
+            color="primary" 
+            [checked]="populationSelectedAll" 
+            style="width: 500px;">
+            (ALL) All Populations
+          </mat-checkbox>
+          <!-- Populate dropdown with all populations -->
+          <div *ngFor="let group of populationGroups">
+            <!-- Populate subpopulation groups -->
+            <div class="pl-3">
+              <span 
+                (click)="selectPopulationGroup(group.namecode)" 
+                style="cursor: pointer; user-select: none;">
+                (<u>{{ group.namecode }}</u>)<u> {{ group.name }}</u>
+              </span>
+            </div>
+            <!-- Populate individual populations -->
+            <mat-option 
+              class="pl-5" 
+              *ngFor="let subPopulation of group.subPopulations" 
+              [value]="subPopulation.value">
+              ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
+            </mat-option>
+          </div>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Choose Reference Gene -->
+    <div class="col-md-auto pl-4 pr-4">
+      <mat-form-field>
+        <mat-label>Reference Gene</mat-label>
+        <mat-select 
+          [(value)]="selectedGene" 
+          (selectionChange)="refGeneChange()" 
+          required 
+          #refGene>
+          <mat-option 
+            *ngFor="let gene of geneList" 
+            [value]="gene.gene_id">
+            {{ gene.gene_symbol }}
+          </mat-option>
+        </mat-select>
+        <!-- <input type="text" 
+          placeholder="Reference Gene" 
+          aria-label="Gene Symbol" 
+          (change)="refGeneChange()" 
+          matInput 
+          [(value)]="selectedGene" 
+          [formControl]="myControl" 
+          [matAutocomplete]="auto" 
+          required 
+          #refGene>
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            {{ option }}
+          </mat-option>
+        </mat-autocomplete> -->
+      </mat-form-field>
+    </div>
+
+    <!-- LD Reference input -->
+    <div class="col-md-auto pl-4 pr-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="LD Reference" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <button mat-button *ngIf="rsnumSearch" matSuffix mat-icon-button aria-label="Clear" (click)="rsnumSearch=''">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Re-calculate Button -->
+    <div class="col-md-auto pl-4 pr-4">
+      <button 
+        type="submit" 
+        class="mt-2" 
+        mat-raised-button color="primary" 
+        [disabled]="!inputChanged || selectedPop.length == 0 || rsnumber.invalid" 
+        (click)="recalculatePopGeneRef()">
+        Recalculate
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Show warning message if searched rs number is not found -->
+  <div 
+    id="ldref-search-warning"
+    class="ml-2 mr-2 alert alert-warning alert-dismissible fade show" 
+    role="alert"  
+    *ngIf="warningMessage">
+    {{warningMessage}}
+    <button 
+      type="button" 
+      class="close" 
+      (click)="closeWarning()" 
+      aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+</div>

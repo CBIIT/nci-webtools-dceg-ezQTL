@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
-import { EQTLComponent } from './components/e-qtl/e-qtl.component';
+import { QTLsComponent } from './components/QTLs/qtls-analysis/qtls-analysis.component';
 import { SQTLComponent } from './components/s-qtl/s-qtl.component';
 import { MeQTLComponent } from './components/me-qtl/me-qtl.component';
 import { MiQTLComponent } from './components/mi-qtl/mi-qtl.component';
@@ -13,35 +13,41 @@ import { AppRoutingModule } from './router/app-routing.module';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
-import { EqtlInputsComponent } from './components/eqtl-inputs/eqtl-inputs.component';
-import { EqtlMessagesComponent } from './components/eqtl-messages/eqtl-messages.component';
-import { EqtlResultsComponent } from './components/eqtl-results/eqtl-results.component';
-import { EqtlResultsGeneExpressionsComponent } from './components/eqtl-results-gene-expressions/eqtl-results-gene-expressions.component';
-import { EqtlResultsLocuszoomComponent } from './components/eqtl-results-locuszoom/eqtl-results-locuszoom.component';
-import { EqtlResultsLocuszoomBoxplotsComponent } from './components/eqtl-results-locuszoom-boxplots/eqtl-results-locuszoom-boxplots.component';
-import { EqtlResultsTableComponent } from './components/eqtl-results-table/eqtl-results-table.component';
+import { QTLsDataInputsComponent } from './components/QTLs/qtls-data-inputs/qtls-data-inputs.component';
+import { QTLsErrorMessagesComponent } from './components/QTLs/qtls-error-messages/qtls-error-messages.component';
+import { QTLsResultsComponent } from './components/QTLs/qtls-results/qtls-results.component';
+import { QTLsLocusQuanitificationComponent } from './components/QTLs/qtls-locus-quantification/qtls-locus-quantification.component';
+import { QTLsLocusAlignmentComponent } from './components/QTLs/qtls-locus-alignment/qtls-locus-alignment.component';
+import { QTLsLocusAlignmentBoxplotsComponent } from './components/QTLs/qtls-locus-alignment-boxplots/qtls-locus-alignment-boxplots.component';
+import { QTLsLocusTableComponent } from './components/QTLs/qtls-locus-table/qtls-locus-table.component';
+import { QTLsCalculationInputsComponent } from './components/QTLs/qtls-calculation-inputs/qtls-calculation-inputs.component';
 
 import { FileValueAccessorDirective } from './directives/file-value-accessor.directive';
-
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatCheckboxModule } from '@angular/material'; // import needed UI modules
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatSelectModule } from '@angular/material/select';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatInputModule, MatInput } from '@angular/material/input';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatTableModule } from '@angular/material/table'
 import { PlotlyModule } from 'angular-plotly.js';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSortModule } from '@angular/material/sort';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { 
+  MatButtonModule, 
+  MatCheckboxModule, 
+  MatGridListModule, 
+  MatSelectModule, 
+  MatInputModule, 
+  MatTabsModule, 
+  MatProgressSpinnerModule, 
+  MatFormFieldModule, 
+  MatDialogModule, 
+  MatTableModule, 
+  MatPaginatorModule, 
+  MatSortModule, 
+  MatIconModule, 
+  MatAutocompleteModule 
+} from '@angular/material';
 
 @NgModule({
   declarations: [
     AppComponent,
-    EQTLComponent,
+    QTLsComponent,
     SQTLComponent,
     MeQTLComponent,
     MiQTLComponent,
@@ -50,20 +56,24 @@ import { MatSortModule } from '@angular/material/sort';
     NavbarComponent,
     FooterComponent,
     HomeComponent,
-    EqtlInputsComponent,
-    EqtlResultsComponent,
+    QTLsDataInputsComponent,
+    QTLsResultsComponent,
     FileValueAccessorDirective,
-    EqtlResultsGeneExpressionsComponent,
-    EqtlResultsLocuszoomComponent,
-    EqtlResultsTableComponent,
-    EqtlResultsLocuszoomBoxplotsComponent,
-    EqtlMessagesComponent
+    QTLsLocusQuanitificationComponent,
+    QTLsLocusAlignmentComponent,
+    QTLsLocusTableComponent,
+    QTLsLocusAlignmentBoxplotsComponent,
+    QTLsErrorMessagesComponent,
+    QTLsCalculationInputsComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PlotlyModule,
     MatButtonModule, //import need UI modules
     MatCheckboxModule,
     MatGridListModule,
@@ -71,17 +81,16 @@ import { MatSortModule } from '@angular/material/sort';
     MatFormFieldModule,
     MatInputModule,
     MatTabsModule,
-    FormsModule,
-    ReactiveFormsModule,
     MatProgressSpinnerModule,
-    PlotlyModule,
     MatDialogModule,
     MatTableModule,
     MatPaginatorModule,
-    MatSortModule
+    MatSortModule,
+    MatIconModule,
+    MatAutocompleteModule
   ],
   providers: [],
   bootstrap: [AppComponent],
-  entryComponents: [EqtlResultsLocuszoomBoxplotsComponent]
+  entryComponents: [QTLsLocusAlignmentBoxplotsComponent]
 })
 export class AppModule { }

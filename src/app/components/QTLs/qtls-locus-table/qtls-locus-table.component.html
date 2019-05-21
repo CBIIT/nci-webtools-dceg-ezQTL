@@ -1,0 +1,131 @@
+<div class="ml-2 mr-2">
+  <mat-form-field>
+    <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+  </mat-form-field>
+</div>
+
+<table class="variant-details-table" mat-table [dataSource]="dataSource" matSort matSortActive="R2" matSortDirection="desc" matSortStart="desc">
+  <!--- Note that these columns can be defined in any order.
+        The actual rendered columns are set as a property on the row definition" -->
+
+  <!-- gene_id Column -->
+  <ng-container matColumnDef="gene_id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="gene_id"> Gene ID </th>
+    <td mat-cell *matCellDef="let variant">
+      <a (click)="linkGTExGeneID(variant.gene_id)">{{variant.gene_id}}</a>
+    </td>
+  </ng-container>
+
+  <!-- gene_symbol Column -->
+  <ng-container matColumnDef="gene_symbol">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="gene_symbol"> Gene Symbol </th>
+    <td mat-cell *matCellDef="let variant">
+      {{variant.gene_symbol}}
+      <!-- <a (click)="linkGTExGeneSymbol(variant.gene_symbol)">{{variant.gene_symbol}}</a> -->
+    </td>
+  </ng-container>
+
+  <!-- variant_id Column -->
+  <ng-container matColumnDef="variant_id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="variant_id"> Variant ID </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkGTExVariantID(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.variant_id}}</a>
+    </td>
+  </ng-container>
+
+  <!-- rsnum Column -->
+  <ng-container matColumnDef="rsnum">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="rsnum"> RS Number </th>
+    <td mat-cell *matCellDef="let variant">
+      {{variant.rsnum}} 
+      <!-- <a (click)="linkGTExRSNum(variant.rsnum)">{{variant.rsnum}}</a> -->
+    </td>
+  </ng-container>
+
+  <!-- chr Column -->
+  <ng-container matColumnDef="chr">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="chr"> Chromosome </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.chr}} </td>
+  </ng-container>
+
+  <!-- pos Column -->
+  <ng-container matColumnDef="pos">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="pos"> Position </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.pos}} </td>
+  </ng-container>
+
+  <!-- ref Column -->
+  <ng-container matColumnDef="ref">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="ref"> Ref </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.ref}} </td>
+  </ng-container>
+
+  <!-- alt Column -->
+  <ng-container matColumnDef="alt">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="alt"> Alt </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.alt}} </td>
+  </ng-container>
+
+  <!-- tss_distance Column -->
+  <ng-container matColumnDef="tss_distance">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="tss_distance"> TSS Distance </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.tss_distance}} </td>
+  </ng-container>
+
+  <!-- pval_nominal Column -->
+  <ng-container matColumnDef="pval_nominal">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="pval_nominal">Nomimal P-value</th>
+    <td mat-cell *matCellDef="let variant"> {{variant.pval_nominal}} </td>
+  </ng-container>
+
+  <!-- slope Column -->
+  <ng-container matColumnDef="slope">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="slope"> Slope </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.slope}} </td>
+  </ng-container>
+
+  <!-- slope_se Column -->
+  <ng-container matColumnDef="slope_se">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="slope_se"> Slope SE </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.slope_se}} </td>
+  </ng-container>
+
+  <!-- R2 Column -->
+  <ng-container matColumnDef="R2">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header="R2"> R2 to LD Reference </th>
+    <td mat-cell *matCellDef="let variant"> {{variant.R2}} </td>
+  </ng-container>
+
+  <!-- LDpop Column -->
+  <ng-container matColumnDef="LDpop">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> LDpop </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkLDpop(variant.rsnum)">{{variant.LDpop}}</a>
+    </td>
+  </ng-container>
+
+  <!-- GWAS Column -->
+  <ng-container matColumnDef="GWAS">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> NHGRI GWAS </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkGWAS(variant.rsnum)">{{variant.GWAS}}</a>
+    </td>
+  </ng-container>
+
+  <!-- gnomAD Column -->
+  <ng-container matColumnDef="gnomAD">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header> gnomAD </th>
+    <td mat-cell *matCellDef="let variant"> 
+      <a (click)="linkGnomADBrowser(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.gnomAD}}</a>
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
+
+<mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+
+<div class="ml-4 mb-4 variant-details-table">
+  <a (click)="downloadTable()">Download Locus Table</a>
+</div>
