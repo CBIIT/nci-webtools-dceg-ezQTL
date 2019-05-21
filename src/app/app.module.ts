@@ -40,7 +40,8 @@ import {
   MatTableModule, 
   MatPaginatorModule, 
   MatSortModule, 
-  MatIconModule 
+  MatIconModule, 
+  MatAutocompleteModule 
 } from '@angular/material';
 
 @NgModule({
@@ -85,7 +86,8 @@ import {
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
-    MatIconModule
+    MatIconModule,
+    MatAutocompleteModule
   ],
   providers: [],
   bootstrap: [AppComponent],
