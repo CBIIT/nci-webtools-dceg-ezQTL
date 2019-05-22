@@ -110,6 +110,23 @@
       </mat-form-field>
     </div>
 
+    <!-- cis-QTL Distance input -->
+    <!-- <div class="col-md-auto pl-4 pr-4">
+      <mat-form-field>
+        <input 
+          #rsnumSearchInput
+          matInput 
+          placeholder="cis-QTL Distance (Kb)" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="rsnumSearch" 
+          [formControl]="rsnumber">
+        <button mat-button *ngIf="rsnumSearch" matSuffix mat-icon-button aria-label="Clear" (click)="rsnumSearch=''">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
+      </mat-form-field>
+    </div> -->
+
     <!-- Re-calculate Button -->
     <div class="col-md-auto pl-4 pr-4">
       <button 
