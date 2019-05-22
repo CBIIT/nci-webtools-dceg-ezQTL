@@ -65,8 +65,11 @@ export class QTLsCalculationInputsComponent implements OnInit {
   inputChanged: boolean;
   disableInputs: boolean;
   warningMessage: string;
-  rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
 
+  // cisDistance: number;
+
+  rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
+  // cisDistanceInput = new FormControl('', [Validators.pattern("^([0-9]+)?$")]);
 
   constructor(private data: QTLsResultsService) { }
 
@@ -75,6 +78,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.selectedPopFinal = [];
     this.populationSelectedAll = false;
     this.rsnumSearch = "";
+    // this.cisDistance = 100;
     this.warningMessage = "";
     this.selectedPop = [];
     this.selectedGene = "";
