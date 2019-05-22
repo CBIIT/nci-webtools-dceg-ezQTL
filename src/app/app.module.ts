@@ -41,8 +41,10 @@ import {
   MatPaginatorModule, 
   MatSortModule, 
   MatIconModule, 
-  MatAutocompleteModule 
+  MatAutocompleteModule, 
+  MatRadioModule
 } from '@angular/material';
+import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-colocalization/qtls-locus-colocalization.component';
 
 @NgModule({
   declarations: [
@@ -64,7 +66,8 @@ import {
     QTLsLocusTableComponent,
     QTLsLocusAlignmentBoxplotsComponent,
     QTLsErrorMessagesComponent,
-    QTLsCalculationInputsComponent
+    QTLsCalculationInputsComponent,
+    QtlsLocusColocalizationComponent
   ],
   imports: [
     BrowserModule,
@@ -87,7 +90,8 @@ import {
     MatPaginatorModule,
     MatSortModule,
     MatIconModule,
-    MatAutocompleteModule
+    MatAutocompleteModule, 
+    MatRadioModule
   ],
   providers: [],
   bootstrap: [AppComponent],

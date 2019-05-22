@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment'
 })
 export class QTLsResultsService {
 
-  // data output from R calculation to plot
+  // object: data output from R calculation to plot
   private mainDataSource = new BehaviorSubject<Object>(null);
   currentMainData = this.mainDataSource.asObservable();
 
@@ -16,19 +16,23 @@ export class QTLsResultsService {
   private resultStatus = new BehaviorSubject(false);
   currentResultStatus = this.resultStatus.asObservable();
 
-  // error message output from R calculation
+  // string: error message output from R calculation
   private errorMessage = new BehaviorSubject('');
   currentErrorMessage = this.errorMessage.asObservable();
 
-  // warning message if uploaded data files has > 30 genes
+  // string: warning message if uploaded data files has > 30 genes
   // private warningMessage = new BehaviorSubject('');
   // currentWarningMessage = this.warningMessage.asObservable();
 
-  // disable/enable gene expressions result tab
+  // boolean: disable/enable locus colocalizaion result tab
+  private disableLocusColocalization = new BehaviorSubject(true);
+  currentLocusColocalization = this.disableLocusColocalization.asObservable();
+
+  // boolean: disable/enable locus quantification result tab
   private disableLocusQuantification = new BehaviorSubject(true);
   currentLocusQuantification = this.disableLocusQuantification.asObservable();
 
-  // programmatically select result tab
+  // number: programmatically select result tab
   private selectedTab = new BehaviorSubject(0);
   currentSelectedTab = this.selectedTab.asObservable();
 
@@ -39,6 +43,10 @@ export class QTLsResultsService {
   // boolean: whether or not to display the blur loading spinner
   private blurLoad = new BehaviorSubject(false);
   currentBlurLoad = this.blurLoad.asObservable();
+
+  // string: error message output from R calculation
+  private qtlsType = new BehaviorSubject('assoc');
+  currentQtlsType = this.qtlsType.asObservable();
 
   constructor(private http: HttpClient) { }
 
@@ -98,6 +106,10 @@ export class QTLsResultsService {
   //   this.warningMessage.next(warningMessage);
   // }
 
+  changeDisableLocusColocalization(disableLocusColocalization: boolean) {
+    this.disableLocusColocalization.next(disableLocusColocalization);
+  }
+
   changeDisableLocusQuantification(disableLocusQuantification: boolean) {
     this.disableLocusQuantification.next(disableLocusQuantification);
   }
@@ -112,5 +124,9 @@ export class QTLsResultsService {
 
   changeBlurLoad(blurLoad: boolean) {
     this.blurLoad.next(blurLoad);
+  }
+
+  changeQtlsType(qtlsType: string) {
+    this.qtlsType.next(qtlsType);
   }
 }

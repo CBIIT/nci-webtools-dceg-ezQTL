@@ -26,7 +26,7 @@ export class QTLsDataInputsComponent implements OnInit {
     expressionFile: new FormControl({value: '', disabled: true}), 
     genotypeFile: new FormControl({value: '', disabled: true}), 
     gwasFile: new FormControl({value: '', disabled: true}),
-    ldFile: new FormControl({value: '', disabled: true})
+    LDFile: new FormControl({value: '', disabled: true})
   });
 
   mainData: Object;
@@ -37,9 +37,9 @@ export class QTLsDataInputsComponent implements OnInit {
   selectLoadBoxplotData: boolean;
   selectLoadGWASData: boolean;
   selectLoadLDData: boolean;
-  selectLoadGTExData: boolean;
   selectedTab: number;
   popoverData: Object;
+  qtlsType: string;
 
   GTExDatasets: GTExDataset[] = [
     {value: 'ds-0', viewValue: 'Dataset 1'},
@@ -64,6 +64,9 @@ export class QTLsDataInputsComponent implements OnInit {
     this.data.currentMainData.subscribe(mainData => this.mainData = mainData);
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
     this.data.currentSelectedTab.subscribe(selectedTab => this.selectedTab = selectedTab);
+    this.data.currentQtlsType.subscribe(qtlsType => {
+      this.qtlsType = qtlsType;
+    });
     this.data.currentErrorMessage.subscribe(errorMessage => {
       this.errorMessage = errorMessage;
       if (this.errorMessage) {
@@ -76,7 +79,36 @@ export class QTLsDataInputsComponent implements OnInit {
     this.selectLoadBoxplotData = false;
     this.selectLoadGWASData = false;
     this.selectLoadLDData = false;
-    this.selectLoadGTExData = false;
+  }
+
+  clearAssociationFile() {
+    this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
+    this.qtlsForm.value.associationFile = false;
+    $("#association-file").val("");
+  }
+
+  clearExpressionFile() {
+    this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}, Validators.required));
+    this.qtlsForm.value.expressionFile = false;
+    $("#expression-file").val("");
+  }
+
+  clearGenotypeFile() {
+    this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}, Validators.required));
+    this.qtlsForm.value.genotypeFile = false;
+    $("#genotype-file").val("");
+  }
+
+  clearGWASFile() {
+    this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}, Validators.required));
+    this.qtlsForm.value.gwasFile = false;
+    $("#gwas-file").val("");
+  }
+
+  clearLDFile() {
+    this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}, Validators.required));
+    this.qtlsForm.value.LDFile = false;
+    $("#LD-file").val("");
   }
 
   loadBoxplotData() {
@@ -113,42 +145,28 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#gwas-file").val("");
       $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
       // $("#gwas-file").prop("disabled", true);
+      this.data.changeDisableLocusColocalization(true);
     } else {
       this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}, Validators.required));
       this.selectLoadGWASData = true;
       $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
       // $("#gwas-file").prop("disabled", false);
+      this.data.changeDisableLocusColocalization(false);
     }
   }
 
   loadLDData() {
     if (this.selectLoadLDData == true) {
-      this.qtlsForm.setControl('ldFile', new FormControl({value: '', disabled: true}));
+      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: true}));
       this.selectLoadLDData = false;
-      this.qtlsForm.value.ldFile = false;
-      $("#ld-file").val("");
-      $("#qtls-data-input-ld-file").addClass("disabled-overlay");
+      this.qtlsForm.value.LDFile = false;
+      $("#LD-file").val("");
+      $("#qtls-data-input-LD-file").addClass("disabled-overlay");
       // $("#gwas-file").prop("disabled", true);
     } else {
-      this.qtlsForm.setControl('ldFile', new FormControl({value: '', disabled: false}, Validators.required));
+      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}, Validators.required));
       this.selectLoadLDData = true;
-      $("#qtls-data-input-ld-file").removeClass("disabled-overlay");
-      // $("#gwas-file").prop("disabled", false);
-    }
-  }
-
-  loadGTExData() {
-    if (this.selectLoadGTExData == true) {
-      // this.qtlsForm.setControl('ldFile', new FormControl({value: '', disabled: true}));
-      this.selectLoadGTExData = false;
-      // this.qtlsForm.value.gtexFile = false;
-      // $("#ld-file").val("");
-      $("#qtls-data-input-gtex-select").addClass("disabled-overlay");
-      // $("#gwas-file").prop("disabled", true);
-    } else {
-      // this.qtlsForm.setControl('ldFile', new FormControl({value: '', disabled: false}, Validators.required));
-      this.selectLoadGTExData = true;
-      $("#qtls-data-input-gtex-select").removeClass("disabled-overlay");
+      $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
       // $("#gwas-file").prop("disabled", false);
     }
   }
@@ -208,15 +226,16 @@ export class QTLsDataInputsComponent implements OnInit {
   } 
 
   reset() {
+    // this.qtlsType = "assoc";
     this.selectLoadBoxplotData = false;
     this.selectLoadGWASData = false;
     this.selectLoadLDData = false;
-    this.selectLoadGTExData = false;
     this.data.changeResultStatus(false);
     this.data.changeBlurLoad(false);
     $(".blur-loading").removeClass("blur-overlay");
     this.data.changeMainData(null);
     this.data.changeErrorMessage('');
+    this.data.changeQtlsType("assoc");
     // this.data.changeWarningMessage('');
     this.data.changeSelectedTab(0);
     $("#qtls-data-input-expression-file").addClass("disabled-overlay");
@@ -231,6 +250,7 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: true}));
     this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: true}));
     this.qtlsForm.setControl('ldFile', new FormControl({valie: '', disabled: true}));
+    this.data.changeDisableLocusColocalization(true);
     this.data.changeDisableLocusQuantification(true);
   }
 

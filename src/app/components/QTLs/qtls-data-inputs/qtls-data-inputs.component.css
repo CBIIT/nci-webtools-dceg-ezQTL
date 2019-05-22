@@ -3,14 +3,17 @@
     font-weight: bold;
 }
 
-.qtls-data-inputs a {
+.qtls-data-files a {
     color: #00A2EC;
     text-decoration: none;
+    cursor: pointer;
+    font-size: 9pt;
+    font-weight: bold;
 }
 
 .datafile-title {
     color: #595959 !important;
-    font-size: 1.2em;
+    /* font-size: 1.2em; */
 }
 
 .cf:before, .cf:after {
@@ -53,6 +56,6 @@
     }
 }
 
-#qtls-data-input-gtex-select {
-    font-size: 12pt !important;
+.qtls-data-input-gtex-select {
+    font-size: 11pt !important;
 }
