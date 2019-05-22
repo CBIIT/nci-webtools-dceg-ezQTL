@@ -1,4 +1,4 @@
-main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
+main <- function(workDir, select_qtls_samples, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -30,7 +30,11 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
     unique()
 
   ## read and parse association data file ###
-  qdatafile <- paste0('tmp/', assocFile)
+  if (identical(select_qtls_samples, 'true')) {
+    qdatafile <- paste0('../static/assets/files/', '1q21_3.eQTL.txt') 
+  } else {
+    qdatafile <- paste0('tmp/', assocFile)
+  }
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
   qdata <- qdata %>% 
     arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% 
@@ -74,13 +78,13 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, request, sele
   locus_alignment_scatter_data <- locus_alignment_scatter[[1]]
   locus_alignment_scatter_title <- locus_alignment_scatter[[2]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, qdata_tmp, exprFile, genoFile)
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile)
   locus_quantification_data <- locus_quantification[[1]]
   locus_quantification_heatmap_data <- locus_quantification[[2]]
   ## locus alignment gwas data ##
   gwas_example_data <- gwas_example(workDir, gwasFile)
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_scatter=list(data=locus_alignment_scatter_data, title=locus_alignment_scatter_title), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_scatter=list(data=locus_alignment_scatter_data, title=locus_alignment_scatter_title), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
@@ -263,16 +267,21 @@ locus_quantification_heatmap <- function(edata_boxplot) {
   return(list(setNames(as.data.frame(tmpdata), tmpdata_colnames)))
 }
 
-locus_quantification <- function(workDir, tmp, exprFile, genoFile) {
+locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile) {
   # initialize boxplot data as empty until data file detected
   locus_quantification_data <- list(c())
   # initialize heatmap data as empty until data file detected
   locus_quantification_heatmap_data <- list(c())
   # check to see if boxplot data files are present
-  if (!identical(genoFile, 'false') & !identical(exprFile, 'false')) {
-    gdatafile <- paste0('tmp/', genoFile)
-    edatafile <- paste0('tmp/', exprFile)
-
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
+    if (identical(select_qtls_samples, 'false')) {
+      gdatafile <- paste0('tmp/', genoFile)
+      edatafile <- paste0('tmp/', exprFile)
+    } else {
+      gdatafile <- paste0('../static/assets/files/', '1q21_3.genotyping.txt') 
+      edatafile <- paste0('../static/assets/files/', '1q21_3.expression.txt') 
+    }
+    
     gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
     edata <- read_delim(edatafile,delim = "\t",col_names = T)
 
@@ -309,16 +318,21 @@ gwas_example <- function(workDir, gwasFile) {
   return(gwas_example_data)
 }
 
-locus_alignment_boxplots <- function(workDir, exprFile, genoFile, info) {
+locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
   # initialize locus alignment boxplots data as empty until data file detected
   locus_alignment_boxplots_data <- list(c())
-  if (!identical(genoFile, 'false') & !identical(exprFile, 'false')) {
-    gdatafile <- paste0('tmp/', genoFile)
-    edatafile <- paste0('tmp/', exprFile)
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
+    if (identical(select_qtls_samples, 'false')) {
+      gdatafile <- paste0('tmp/', genoFile)
+      edatafile <- paste0('tmp/', exprFile)
+    } else {
+      gdatafile <- paste0('../static/assets/files/', '1q21_3.genotyping.txt') 
+      edatafile <- paste0('../static/assets/files/', '1q21_3.expression.txt') 
+    }
 
     gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
     edata <- read_delim(edatafile,delim = "\t",col_names = T)

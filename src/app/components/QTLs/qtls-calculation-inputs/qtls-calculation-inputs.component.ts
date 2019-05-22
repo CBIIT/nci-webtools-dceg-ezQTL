@@ -66,6 +66,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
   disableInputs: boolean;
   warningMessage: string;
 
+  select_qtls_samples: string;
+
   // cisDistance: number;
 
   rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
@@ -100,6 +102,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.recalculatePopAttempt = mainData["info"]["recalculatePop"][0]; // recalculation attempt when pop changed ?
         this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
         this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
+
+        this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
 
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
@@ -437,7 +441,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       $(".blur-loading").addClass("blur-overlay");
       // this.data.changeSelectedTab(0);
       // calculate
-      this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+      this.data.recalculateMain(this.select_qtls_samples, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
         .subscribe(
           res => {
             this.data.changeMainData(res);
