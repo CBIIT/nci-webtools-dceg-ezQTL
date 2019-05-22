@@ -260,20 +260,19 @@ export class QTLsDataInputsComponent implements OnInit {
     formData.append('recalculatePop', "false");
     formData.append('recalculateGene', "false");
     formData.append('recalculateRef', "false");
+    if (this.selectLoadQTLsSamples) {
+      formData.append('select_qtls_samples', "true");
+    } else {
+      formData.append('select_qtls_samples', "false");
+    }
 
     formData.append('association-file', associationFile[0]);
 
-    console.log(expressionFile);
-    console.log(genotypeFile);
-    console.log(expressionFile != null);
-    console.log(genotypeFile != null);
     if ((expressionFile != null && expressionFile.length > 0) && (genotypeFile != null && genotypeFile.length > 0)) {
-      console.log("enable locus quantification");
       formData.append('expression-file', expressionFile[0]);
       formData.append('genotype-file', genotypeFile[0]);
       this.data.changeDisableLocusQuantification(false);
     } else {
-      console.log("disable locus quantification");
       this.data.changeDisableLocusQuantification(true);
     }
     
@@ -322,10 +321,11 @@ export class QTLsDataInputsComponent implements OnInit {
     // $("#expression-file").prop("disabled", true);
     // $("#genotype-file").prop("disabled", true);
     // $("#gwas-file").prop("disabled", true);
-    // this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: true}));
-    // this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: true}));
-    // this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: true}));
-    // this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: true}));
+    this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
+    this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}));
+    this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
+    this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
+    // this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
     this.data.changeDisableLocusColocalization(true);
     this.data.changeDisableLocusQuantification(true);
     $("#qtls-data-input-association-file").removeClass("disabled-overlay");
