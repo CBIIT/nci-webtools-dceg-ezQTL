@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function qtlsCalculateMain(rfile, select_qtls_samples, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
+function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
     console.log("Execute main qtls calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -21,6 +21,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, associationFile, expressi
         recalculateGene = JSON.stringify(recalculateGene);
         recalculateRef = JSON.stringify(recalculateRef);
         select_qtls_samples = JSON.stringify(select_qtls_samples);
+        select_gwas_sample = JSON.stringify(select_gwas_sample);
 
 
         console.log("Association File:", associationFile);
@@ -28,6 +29,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, associationFile, expressi
         console.log("Genotype File:", genotypeFile);
         console.log("GWAS File:", gwasFile);
         console.log("Selected QTLs Sample Files:", select_qtls_samples);
+        console.log("Selected GWAS Sample File:", select_gwas_sample)
         console.log("Request: ", request);
         // var debugRequest = JSON.stringify("0000000000000");
         // console.log("Debug Request: ", debugRequest);
@@ -43,7 +45,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, associationFile, expressi
         
         // make sure the R statement below is not appended to a comment in R code file
         // code += `qtls_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
-        code += `main(${workingDirectory}, ${select_qtls_samples}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
+        code += `main(${workingDirectory}, ${select_qtls_samples}, ${select_gwas_sample}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
         // console.log(code);
 
         const rcode = `
