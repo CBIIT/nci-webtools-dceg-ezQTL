@@ -42,7 +42,8 @@ import {
   MatSortModule, 
   MatIconModule, 
   MatAutocompleteModule, 
-  MatRadioModule
+  MatRadioModule, 
+  MatTooltipModule
 } from '@angular/material';
 import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-colocalization/qtls-locus-colocalization.component';
 
@@ -91,7 +92,8 @@ import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-c
     MatSortModule,
     MatIconModule,
     MatAutocompleteModule, 
-    MatRadioModule
+    MatRadioModule,
+    MatTooltipModule
   ],
   providers: [],
   bootstrap: [AppComponent],

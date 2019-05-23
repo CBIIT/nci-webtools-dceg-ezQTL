@@ -159,9 +159,12 @@
             (click)="expressionInput.click()" 
             [disabled]="resultStatus || selectLoadQTLsSamples" 
             class="ml-3 mr-3" 
-            mat-stroked-button>
+            mat-stroked-button 
+            id="expression-file-tooltip" 
+            data-toggle="tooltip" 
+            data-placement="right" 
+            title="Please input accompanying Expression Data File with Genotype Data File.">
             Choose File
-            <!-- {{ !qtlsForm.value.expressionFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
           </button>
           <div>
             <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a> -->
@@ -238,9 +241,12 @@
               (click)="genotypeInput.click()" 
               [disabled]="resultStatus || selectLoadQTLsSamples" 
               class="ml-3 mr-3" 
-              mat-stroked-button>
+              mat-stroked-button 
+              id="genotype-file-tooltip" 
+              data-toggle="tooltip" 
+              data-placement="right" 
+              title="Please input accompanying Genotype Data File with Expression Data File.">
               Choose File
-              <!-- {{ !qtlsForm.value.genotypeFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
             </button>
           <div>
             <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a> -->
