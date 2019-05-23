@@ -262,90 +262,102 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   async submit() {
-    this.data.changeResultStatus(true);
-    this.data.changeBlurLoad(true);
-    $(".blur-loading").addClass("blur-overlay");
-    $(".disabled-post-calc").addClass("disabled-overlay");
-    $("#qtls-data-input-association-file").addClass("disabled-overlay");
-    $("#qtls-data-input-expression-file").addClass("disabled-overlay");
-    $("#qtls-data-input-genotype-file").addClass("disabled-overlay");
-    $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
-    $("#qtls-data-input-LD-file").addClass("disabled-overlay");
     const { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
-    // console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
-    // console.log(this.qtlsForm.value);
-    // console.log(associationFile);
-    // console.log(expressionFile);
-    // console.log(genotypeFile);
-    // console.log(gwasFile);
-
     const formData = new FormData();
-    formData.append('request_id', Date.now().toString()); // generate calculation request ID
-    formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
-    formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
-    formData.append('select_ref', "false"); // set default rsnum to 'false' -> QData top gene's rsnum in R
-    formData.append('recalculateAttempt', "false");
-    formData.append('recalculatePop', "false");
-    formData.append('recalculateGene', "false");
-    formData.append('recalculateRef', "false");
-    if (this.selectLoadQTLsSamples) {
-      formData.append('select_qtls_samples', "true");
+    // custom tooltip validation - if expression file is submitted, need genotype file and vice versa. All or none.
+    if ((expressionFile == null || expressionFile == false || expressionFile.length == 0) && (genotypeFile != null && genotypeFile.length > 0)) {
+      // console.log("no expression - yes genotype"); 
+      $("#expression-file-tooltip").tooltip("enable");
+      $("#expression-file-tooltip").tooltip("show");
+      $("#expression-file-tooltip").tooltip("disable");
+    } else if ((expressionFile != null && expressionFile.length > 0) && (genotypeFile == null || genotypeFile == false || genotypeFile.length == 0)) {
+      // console.log("yes expression - no genotype");
+      $("#genotype-file-tooltip").tooltip("enable");
+      $("#genotype-file-tooltip").tooltip("show");
+      $("#genotype-file-tooltip").tooltip("disable");
     } else {
-      formData.append('select_qtls_samples', "false");
-    }
-    if (this.selectLoadGWASSample) {
-      formData.append('select_gwas_sample', "true");
-    } else {
-      formData.append('select_gwas_sample', "false");
-    }
+      // console.log("yes/no expression - yes/no genotype");
+      this.data.changeResultStatus(true);
+      this.data.changeBlurLoad(true);
+      $(".blur-loading").addClass("blur-overlay");
+      $(".disabled-post-calc").addClass("disabled-overlay");
+      $("#qtls-data-input-association-file").addClass("disabled-overlay");
+      $("#qtls-data-input-expression-file").addClass("disabled-overlay");
+      $("#qtls-data-input-genotype-file").addClass("disabled-overlay");
+      $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
+      $("#qtls-data-input-LD-file").addClass("disabled-overlay");
+      formData.append('request_id', Date.now().toString()); // generate calculation request ID
+      formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
+      formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
+      formData.append('select_ref', "false"); // set default rsnum to 'false' -> QData top gene's rsnum in R
+      formData.append('recalculateAttempt', "false");
+      formData.append('recalculatePop', "false");
+      formData.append('recalculateGene', "false");
+      formData.append('recalculateRef', "false");
+      if (this.selectLoadQTLsSamples) {
+        formData.append('select_qtls_samples', "true");
+      } else {
+        formData.append('select_qtls_samples', "false");
+      }
+      if (this.selectLoadGWASSample) {
+        formData.append('select_gwas_sample', "true");
+      } else {
+        formData.append('select_gwas_sample', "false");
+      }
 
-    if (associationFile != null && associationFile.length > 0) {
-      formData.append('association-file', associationFile[0]);
-    }
+      if (associationFile != null && associationFile.length > 0) {
+        formData.append('association-file', associationFile[0]);
+      }
 
-    if ((expressionFile != null && expressionFile.length > 0) && (genotypeFile != null && genotypeFile.length > 0)) {
-      formData.append('expression-file', expressionFile[0]);
-      formData.append('genotype-file', genotypeFile[0]);
-      this.data.changeDisableLocusQuantification(false);
-    } else if (this.selectLoadQTLsSamples) {
-      this.data.changeDisableLocusQuantification(false);
-    } else {
-      this.data.changeDisableLocusQuantification(true);
-    }
-    
-    if (gwasFile != null && gwasFile.length > 0) {
-      formData.append('gwas-file', gwasFile[0]);
-      this.data.changeDisableLocusColocalization(false);
-    } else if (this.selectLoadGWASSample) {
-      this.data.changeDisableLocusColocalization(false);
-    } else {
-      this.data.changeDisableLocusColocalization(true);
-    }
+      if ((expressionFile != null && expressionFile.length > 0) && (genotypeFile != null && genotypeFile.length > 0)) {
+        formData.append('expression-file', expressionFile[0]);
+        formData.append('genotype-file', genotypeFile[0]);
+        this.data.changeDisableLocusQuantification(false);
+      } else if (this.selectLoadQTLsSamples) {
+        this.data.changeDisableLocusQuantification(false);
+      } else {
+        this.data.changeDisableLocusQuantification(true);
+      }
+      
+      if (gwasFile != null && gwasFile.length > 0) {
+        formData.append('gwas-file', gwasFile[0]);
+        this.data.changeDisableLocusColocalization(false);
+      } else if (this.selectLoadGWASSample) {
+        this.data.changeDisableLocusColocalization(false);
+      } else {
+        this.data.changeDisableLocusColocalization(true);
+      }
 
-    this.data.calculateMain(formData)
-      .subscribe(
-        res => {
-          this.data.changeMainData(res);
-          this.data.changeBlurLoad(false);
-          $(".blur-loading").removeClass("blur-overlay");
-          $("#qtls-data-input-association-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
-        },
-        error => {
-          this.handleError(error);
-          this.data.changeBlurLoad(false);
-          $(".blur-loading").removeClass("blur-overlay");
-          $("#qtls-data-input-association-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
-          $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
-        }
-      )
+      this.data.calculateMain(formData)
+        .subscribe(
+          res => {
+            this.data.changeMainData(res);
+            this.data.changeBlurLoad(false);
+            $(".blur-loading").removeClass("blur-overlay");
+            $("#qtls-data-input-association-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
+          },
+          error => {
+            this.handleError(error);
+            this.data.changeBlurLoad(false);
+            $(".blur-loading").removeClass("blur-overlay");
+            $("#qtls-data-input-association-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
+            $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
+          }
+        )
+    }
   } 
+
+  testClick() {
+    console.log("click");
+    $("#expression-file-tooltip").trigger("click");
+  }
 
   reset() {
     // this.qtlsType = "assoc";
