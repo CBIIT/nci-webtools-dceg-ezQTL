@@ -164,8 +164,13 @@
             <!-- {{ !qtlsForm.value.expressionFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
           </button>
           <div>
-            <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a>
-            <br>
+            <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a> -->
+            <div *ngIf="!selectLoadQTLsSamples">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a>
+            </div>
+            <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a>
+            </div>
             <!-- <div 
               *ngIf="!selectLoadQTLsSamples && (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile)"  -->
             <div 
@@ -238,8 +243,13 @@
               <!-- {{ !qtlsForm.value.genotypeFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
             </button>
           <div>
-            <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
-            <br>
+            <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a> -->
+            <div *ngIf="!selectLoadQTLsSamples">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
+            </div>
+            <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
+            </div>
             <!-- <div 
               *ngIf="!selectLoadQTLsSamples && (qtlsForm.value.expressionFile && qtlsForm.value.genotypeFile)"  -->
             <div 
@@ -340,15 +350,20 @@
           <button 
             style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
             (click)="gwasInput.click()" 
-            [disabled]="resultStatus" 
+            [disabled]="resultStatus || selectLoadGWASSample" 
             class="ml-3 mr-3" 
             mat-stroked-button>
             Choose File
             <!-- {{ !qtlsForm.value.gwasFile ? 'Choose File' : ('File Selected' || 'Choose File') }} -->
           </button>
           <div>
-            <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a>
-            <br>
+            <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a> -->
+            <div *ngIf="!selectLoadGWASSample">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a>
+            </div>
+            <div class="disabled-overlay" *ngIf="selectLoadGWASSample">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a>
+            </div>
             <div 
               *ngIf="!selectLoadGWASSample && qtlsForm.value.gwasFile" 
               class="text-secondary" 
@@ -401,8 +416,11 @@
             <div>
               <b>LD Data File</b>
             </div>
-            <div>
+            <div class="disabled-post-calc" *ngIf="!selectLoadLDSample">
               <i class="fas fa-file-export mr-1"></i><a (click)="loadLDSampleDataFile()">Load Sample</a>
+            </div>
+            <div class="disabled-post-calc" *ngIf="selectLoadLDSample">
+              <i class="fas fa-file-excel mr-1"></i><a (click)="loadLDSampleDataFile()">Unload Sample</a>
             </div>
           </div>
         </div>
@@ -441,16 +459,21 @@
           <button 
             style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
             (click)="LDInput.click()" 
-            [disabled]="resultStatus" 
+            [disabled]="resultStatus || selectLoadLDSample" 
             class="ml-3 mr-3" 
             mat-stroked-button>
             Choose File
           </button>
           <div>
-            <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a>
-            <br>
+            <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a> -->
+            <div *ngIf="!selectLoadLDSample">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a>
+            </div>
+            <div class="disabled-overlay" *ngIf="selectLoadLDSample">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a>
+            </div>
             <div 
-              *ngIf="qtlsForm.value.LDFile" 
+              *ngIf="!selectLoadLDSample && qtlsForm.value.LDFile" 
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;">
               <!-- {{ !qtlsForm.value.LDFile ? '' : (qtlsForm.value?.LDFile[0]?.name || '') }} -->
@@ -459,8 +482,9 @@
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.LDFile" 
-                (click)="clearLDFile()">
+                *ngIf="qtlsForm.value.LDFile && !resultStatus" 
+                (click)="clearLDFile()" 
+                [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -478,11 +502,19 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div> -->
+            <div 
+              class="text-secondary" 
+              style="overflow:hidden; text-overflow:ellipsis;" 
+              *ngIf="selectLoadLDSample">
+              1q21_3.LD.txt
+              <!-- {{ qtlsForm.value.gwasFile }} -->
+            </div>
           </div>
         </div>
       </div>
+
     </div>
-    <!-- <div class="w-100 mt-2 mb-2 border border-light"></div> -->
+
   </div>
 
   <!-- Submit and Reset Button   -->

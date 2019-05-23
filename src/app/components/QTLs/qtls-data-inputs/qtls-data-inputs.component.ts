@@ -44,6 +44,7 @@ export class QTLsDataInputsComponent implements OnInit {
 
   selectLoadQTLsSamples: boolean;
   selectLoadGWASSample: boolean;
+  selectLoadLDSample: boolean;
 
   GTExDatasets: GTExDataset[] = [
     {value: 'ds-0', viewValue: 'Dataset 1'},
@@ -87,6 +88,7 @@ export class QTLsDataInputsComponent implements OnInit {
 
     this.selectLoadQTLsSamples = false;
     this.selectLoadGWASSample = false;
+    this.selectLoadLDSample = false;
   }
 
   clearAssociationFile() {
@@ -122,7 +124,6 @@ export class QTLsDataInputsComponent implements OnInit {
   loadQTLsSampleDataFiles() {
     if (this.selectLoadQTLsSamples == true) {
       this.selectLoadQTLsSamples = false;
-
       this.disableQTLsToggle = false;
       this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
       this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}));
@@ -160,7 +161,6 @@ export class QTLsDataInputsComponent implements OnInit {
   loadGWASSampleDataFile() {
     if (this.selectLoadGWASSample == true) {
       this.selectLoadGWASSample = false;
-
       this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
       $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
       this.qtlsForm.value.gwasFile = false;
@@ -177,7 +177,19 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   loadLDSampleDataFile() {
-    console.log("LOAD LD SAMPLE DATA FILE");
+    if (this.selectLoadLDSample == true) {
+      this.selectLoadLDSample = false;
+      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
+      $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
+      this.qtlsForm.value.LDFile = false;
+      $("#LD-file").val("");
+    } else {
+      this.selectLoadLDSample = true;
+      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
+      $("#qtls-data-input-LD-file").addClass("disabled-overlay");
+      this.qtlsForm.value.LDFile = false;
+      $("#LD-file").val("");
+    }
   }
 
   // loadBoxplotData() {
@@ -362,6 +374,7 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
+    this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
     // this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
     this.data.changeDisableLocusColocalization(true);
     this.data.changeDisableLocusQuantification(true);
@@ -374,12 +387,15 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.value.expressionFile = false;
     this.qtlsForm.value.genotypeFile = false;
     this.qtlsForm.value.gwasFile = false;
+    this.qtlsForm.value.LDFile = false;
     $("#association-file").val("");
     $("#expression-file").val("");
     $("#genotype-file").val("");
     $("#gwas-file").val("");
+    $("#LD-file").val("");
     this.selectLoadQTLsSamples = false;
     this.selectLoadGWASSample = false;
+    this.selectLoadLDSample = false;
   }
 
 
