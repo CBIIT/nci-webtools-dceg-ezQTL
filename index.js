@@ -59,10 +59,18 @@ app.use(function(req, res, next) {
 // });
 
 app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
-  console.log(request.files);
-  console.log("Main data files uploaded.");
+  console.log("Main calculation reached.");
+  // create tmp directories if do not exist
+  const tmp_dir = 'r-calculations/tmp/';
+  const static_tmp_dir = 'static/tmp/';
+  if (!fs.existsSync(tmp_dir)) {
+    fs.mkdirSync(tmp_dir);
+  }
+  if (!fs.existsSync(static_tmp_dir)) {
+    fs.mkdirSync(static_tmp_dir);
+  }
 
-  var associationFile = request.files[0].filename; // required file
+  var associationFile = 'false'; // required file
   var expressionFile = 'false'; // optional data file
   var genotypeFile = 'false'; // optional data file
   var gwasFile = 'false'; // optional data file
@@ -74,23 +82,27 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   var recalculatePop = request.body.recalculatePop;
   var recalculateGene = request.body.recalculateGene;
   var recalculateRef = request.body.recalculateRef;
+  var select_qtls_samples = request.body.select_qtls_samples;
+  var select_gwas_sample = request.body.select_gwas_sample;
 
-  // assign filenames to variable depending on how many files are uploaded
-  if (request.files.length == 2) {
-    gwasFile = request.files[1].filename;
-  }
-  if (request.files.length == 3) {
-    expressionFile = request.files[1].filename;
-    genotypeFile = request.files[2].filename;
-  } 
-  if (request.files.length == 4) {
-    expressionFile = request.files[1].filename;
-    genotypeFile = request.files[2].filename;
-    gwasFile = request.files[3].filename;
+  for (var i = 0; i < request.files.length; i++) {
+    console.log(request.files[i]);
+    if (request.files[i]['fieldname'] == 'association-file') {
+      associationFile = request.files[i].filename;
+    }
+    if (request.files[i]['fieldname'] == 'expression-file') {
+      expressionFile = request.files[i].filename;
+    }
+    if (request.files[i]['fieldname'] == 'genotype-file') {
+      genotypeFile = request.files[i].filename;
+    }
+    if (request.files[i]['fieldname'] == 'gwas-file') {
+      gwasFile = request.files[i].filename;
+    }
   }
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -114,9 +126,11 @@ app.post('/qtls-recalculate-main', async (request, response) => {
   var recalculatePop = request.body.recalculatePop;
   var recalculateGene = request.body.recalculateGene;
   var recalculateRef = request.body.recalculateRef;
+  var select_qtls_samples = request.body.select_qtls_samples;
+  var select_gwas_sample = request.body.select_gwas_sample;
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -132,11 +146,13 @@ app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
   var info = request.body.boxplotDataDetailed;
   var expressionFile = request.body.expressionFile; // optional data file
   var genotypeFile = request.body.genotypeFile; // optional data file
+  var select_qtls_samples = request.body.select_qtls_samples;
+  // console.log("LOCUS ALIGNMENT BOXPLOT USE SAMPLE:", select_qtls_samples);
   // var expressionFile = "0000000000000.1q21_3.expression.txt"; // debug data file
   // var genotypeFile = "0000000000000.1q21_3.genotyping.txt"; // debug data file
 
   try {
-    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', expressionFile, genotypeFile, info);
+    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', select_qtls_samples, expressionFile, genotypeFile, info);
     response.json(data);
   } catch(err) {
     console.log(err);

@@ -1,7 +1,8 @@
 <div *ngIf="mainData" class="border border-light rounded pt-3 pl-3 pr-3 mb-3">
+<!-- <div class="border border-light rounded pt-3 pl-3 pr-3 mb-3"> -->
   <div class="row blur-loading">
     <!-- Choose Population -->
-    <div class="col-md-auto pl-4 pr-4">
+    <div class="col-md-auto pl-3 pr-3">
       <mat-form-field>
         <mat-label>Population</mat-label>
         <mat-select 
@@ -61,7 +62,7 @@
     </div>
 
     <!-- Choose Reference Gene -->
-    <div class="col-md-auto pl-4 pr-4">
+    <div class="col-md-auto pl-3 pr-3">
       <mat-form-field>
         <mat-label>Reference Gene</mat-label>
         <mat-select 
@@ -94,7 +95,7 @@
     </div>
 
     <!-- LD Reference input -->
-    <div class="col-md-auto pl-4 pr-4">
+    <div class="col-md-auto pl-3 pr-3">
       <mat-form-field>
         <input 
           #rsnumSearchInput
@@ -110,8 +111,25 @@
       </mat-form-field>
     </div>
 
+    <!-- cis-QTL Distance input -->
+    <!-- <div class="col-md-auto pl-3 pr-3">
+      <mat-form-field>
+        <input 
+          #cisDistanceInput
+          matInput 
+          placeholder="cis-QTL Distance (Kb)" 
+          (keyup)="enableSearch(rsnumSearchInput.value)" 
+          [(value)]="cisDistance" 
+          [formControl]="cisDistanceInput">
+        <button mat-button *ngIf="cisDistance" matSuffix mat-icon-button aria-label="Clear" (click)="cisDistance=''">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-error *ngIf="cisDistanceInput.invalid">Invalid cis-QTL Distance</mat-error>
+      </mat-form-field>
+    </div> -->
+
     <!-- Re-calculate Button -->
-    <div class="col-md-auto pl-4 pr-4">
+    <div class="col-md-auto pl-3 pr-3">
       <button 
         type="submit" 
         class="mt-2" 

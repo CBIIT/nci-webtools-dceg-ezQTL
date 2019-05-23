@@ -65,8 +65,14 @@ export class QTLsCalculationInputsComponent implements OnInit {
   inputChanged: boolean;
   disableInputs: boolean;
   warningMessage: string;
-  rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
 
+  select_qtls_samples: string;
+  select_gwas_sample: string;
+
+  // cisDistance: number;
+
+  rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
+  // cisDistanceInput = new FormControl('', [Validators.pattern("^([0-9]+)?$")]);
 
   constructor(private data: QTLsResultsService) { }
 
@@ -75,6 +81,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.selectedPopFinal = [];
     this.populationSelectedAll = false;
     this.rsnumSearch = "";
+    // this.cisDistance = 100;
     this.warningMessage = "";
     this.selectedPop = [];
     this.selectedGene = "";
@@ -96,6 +103,9 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.recalculatePopAttempt = mainData["info"]["recalculatePop"][0]; // recalculation attempt when pop changed ?
         this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
         this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
+
+        this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+        this.select_gwas_sample = mainData["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
 
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
@@ -433,7 +443,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       $(".blur-loading").addClass("blur-overlay");
       // this.data.changeSelectedTab(0);
       // calculate
-      this.data.recalculateMain(this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+      this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
         .subscribe(
           res => {
             this.data.changeMainData(res);
