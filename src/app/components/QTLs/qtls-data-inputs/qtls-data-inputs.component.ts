@@ -1,8 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
 
-import { FormGroup, FormControl } from '@angular/forms';
-import { Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 // declare var $; // declare jquery $
 // import * as $ from 'jquery';
