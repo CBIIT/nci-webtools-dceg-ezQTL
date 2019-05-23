@@ -83,6 +83,7 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   var recalculateGene = request.body.recalculateGene;
   var recalculateRef = request.body.recalculateRef;
   var select_qtls_samples = request.body.select_qtls_samples;
+  var select_gwas_sample = request.body.select_gwas_sample;
 
   for (var i = 0; i < request.files.length; i++) {
     console.log(request.files[i]);
@@ -101,7 +102,7 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -126,9 +127,10 @@ app.post('/qtls-recalculate-main', async (request, response) => {
   var recalculateGene = request.body.recalculateGene;
   var recalculateRef = request.body.recalculateRef;
   var select_qtls_samples = request.body.select_qtls_samples;
+  var select_gwas_sample = request.body.select_gwas_sample;
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);

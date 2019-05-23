@@ -34,15 +34,16 @@ export class QTLsDataInputsComponent implements OnInit {
   errorMessage: string;
   warningMessage: string;
   public resetColor = null;
-  selectLoadBoxplotData: boolean;
-  selectLoadGWASData: boolean;
-  selectLoadLDData: boolean;
+  // selectLoadBoxplotData: boolean;
+  // selectLoadGWASData: boolean;
+  // selectLoadLDData: boolean;
   selectedTab: number;
   popoverData: Object;
   qtlsType: string;
   disableQTLsToggle: boolean;
 
   selectLoadQTLsSamples: boolean;
+  selectLoadGWASSample: boolean;
 
   GTExDatasets: GTExDataset[] = [
     {value: 'ds-0', viewValue: 'Dataset 1'},
@@ -80,11 +81,12 @@ export class QTLsDataInputsComponent implements OnInit {
     });
     this.disableQTLsToggle = false;
 
-    this.selectLoadBoxplotData = true;
-    this.selectLoadGWASData = true;
-    this.selectLoadLDData = true;
+    // this.selectLoadBoxplotData = true;
+    // this.selectLoadGWASData = true;
+    // this.selectLoadLDData = true;
 
     this.selectLoadQTLsSamples = false;
+    this.selectLoadGWASSample = false;
   }
 
   clearAssociationFile() {
@@ -94,28 +96,24 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   clearExpressionFile() {
-    // this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.expressionFile = false;
     $("#expression-file").val("");
   }
 
   clearGenotypeFile() {
-    // this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.genotypeFile = false;
     $("#genotype-file").val("");
   }
 
   clearGWASFile() {
-    // this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.gwasFile = false;
     $("#gwas-file").val("");
   }
 
   clearLDFile() {
-    // this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.LDFile = false;
     $("#LD-file").val("");
@@ -141,28 +139,41 @@ export class QTLsDataInputsComponent implements OnInit {
       this.data.changeDisableLocusQuantification(true);
     } else {
       this.selectLoadQTLsSamples = true;
-
       this.qtlsType = "assoc";
       this.disableQTLsToggle = true;
-      
-      this.qtlsForm.setControl('associationFile', new FormControl({value: '1q21_3.eQTL.txt', disabled: true}, Validators.required));
-      this.qtlsForm.setControl('expressionFile', new FormControl({value: '1q21_3.expression.txt', disabled: true}));
-      this.qtlsForm.setControl('genotypeFile', new FormControl({value: '1q21_3.genotyping.txt', disabled: true}));
+      this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}));
+      this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}));
+      this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
       $("#qtls-data-input-association-file").addClass("disabled-overlay");
       $("#qtls-data-input-expression-file").addClass("disabled-overlay");
       $("#qtls-data-input-genotype-file").addClass("disabled-overlay");
-      this.qtlsForm.value.associationFile = '1q21_3.eQTL.txt';
-      this.qtlsForm.value.expressionFile = '1q21_3.expression.txt';
-      this.qtlsForm.value.genotypeFile = '1q21_3.genotyping.txt';
-      // $("#association-file").val('1q21_3.eQTL.txt');
-      // $("#expression-file").val("");
-      // $("#genotype-file").val("");
+      this.qtlsForm.value.associationFile = false;
+      this.qtlsForm.value.expressionFile = false;
+      this.qtlsForm.value.genotypeFile = false;
+      $("#association-file").val("");
+      $("#expression-file").val("");
+      $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(false);
     }
   }
 
   loadGWASSampleDataFile() {
-    console.log("LOAD GWAS SAMPLE DATA FILE");
+    if (this.selectLoadGWASSample == true) {
+      this.selectLoadGWASSample = false;
+
+      this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
+      $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
+      this.qtlsForm.value.gwasFile = false;
+      $("#gwas-file").val("");
+      this.data.changeDisableLocusColocalization(true);
+    } else {
+      this.selectLoadGWASSample = true;
+      this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
+      $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
+      this.qtlsForm.value.gwasFile = false;
+      $("#gwas-file").val("");
+      this.data.changeDisableLocusColocalization(false);
+    }
   }
 
   loadLDSampleDataFile() {
@@ -213,21 +224,21 @@ export class QTLsDataInputsComponent implements OnInit {
   //   }
   // }
 
-  loadLDData() {
-    if (this.selectLoadLDData == true) {
-      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: true}));
-      this.selectLoadLDData = false;
-      this.qtlsForm.value.LDFile = false;
-      $("#LD-file").val("");
-      $("#qtls-data-input-LD-file").addClass("disabled-overlay");
-      // $("#gwas-file").prop("disabled", true);
-    } else {
-      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}, Validators.required));
-      this.selectLoadLDData = true;
-      $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
-      // $("#gwas-file").prop("disabled", false);
-    }
-  }
+  // loadLDData() {
+  //   if (this.selectLoadLDData == true) {
+  //     this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: true}));
+  //     this.selectLoadLDData = false;
+  //     this.qtlsForm.value.LDFile = false;
+  //     $("#LD-file").val("");
+  //     $("#qtls-data-input-LD-file").addClass("disabled-overlay");
+  //     // $("#gwas-file").prop("disabled", true);
+  //   } else {
+  //     this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}, Validators.required));
+  //     this.selectLoadLDData = true;
+  //     $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
+  //     // $("#gwas-file").prop("disabled", false);
+  //   }
+  // }
 
   handleError(error) {
     console.log(error);
@@ -243,6 +254,11 @@ export class QTLsDataInputsComponent implements OnInit {
     this.data.changeBlurLoad(true);
     $(".blur-loading").addClass("blur-overlay");
     $(".disabled-post-calc").addClass("disabled-overlay");
+    $("#qtls-data-input-association-file").addClass("disabled-overlay");
+    $("#qtls-data-input-expression-file").addClass("disabled-overlay");
+    $("#qtls-data-input-genotype-file").addClass("disabled-overlay");
+    $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
+    $("#qtls-data-input-LD-file").addClass("disabled-overlay");
     const { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
     // console.log([expressionFile[0].name, genotypeFile[0].name, associationFile[0].name]);
     // console.log(this.qtlsForm.value);
@@ -265,12 +281,21 @@ export class QTLsDataInputsComponent implements OnInit {
     } else {
       formData.append('select_qtls_samples', "false");
     }
+    if (this.selectLoadGWASSample) {
+      formData.append('select_gwas_sample', "true");
+    } else {
+      formData.append('select_gwas_sample', "false");
+    }
 
-    formData.append('association-file', associationFile[0]);
+    if (associationFile != null && associationFile.length > 0) {
+      formData.append('association-file', associationFile[0]);
+    }
 
     if ((expressionFile != null && expressionFile.length > 0) && (genotypeFile != null && genotypeFile.length > 0)) {
       formData.append('expression-file', expressionFile[0]);
       formData.append('genotype-file', genotypeFile[0]);
+      this.data.changeDisableLocusQuantification(false);
+    } else if (this.selectLoadQTLsSamples) {
       this.data.changeDisableLocusQuantification(false);
     } else {
       this.data.changeDisableLocusQuantification(true);
@@ -278,6 +303,8 @@ export class QTLsDataInputsComponent implements OnInit {
     
     if (gwasFile != null && gwasFile.length > 0) {
       formData.append('gwas-file', gwasFile[0]);
+      this.data.changeDisableLocusColocalization(false);
+    } else if (this.selectLoadGWASSample) {
       this.data.changeDisableLocusColocalization(false);
     } else {
       this.data.changeDisableLocusColocalization(true);
@@ -289,11 +316,21 @@ export class QTLsDataInputsComponent implements OnInit {
           this.data.changeMainData(res);
           this.data.changeBlurLoad(false);
           $(".blur-loading").removeClass("blur-overlay");
+          $("#qtls-data-input-association-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
         },
         error => {
           this.handleError(error);
           this.data.changeBlurLoad(false);
           $(".blur-loading").removeClass("blur-overlay");
+          $("#qtls-data-input-association-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
+          $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
         }
       )
   } 
@@ -342,6 +379,7 @@ export class QTLsDataInputsComponent implements OnInit {
     $("#genotype-file").val("");
     $("#gwas-file").val("");
     this.selectLoadQTLsSamples = false;
+    this.selectLoadGWASSample = false;
   }
 
 

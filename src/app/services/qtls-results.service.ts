@@ -55,7 +55,7 @@ export class QTLsResultsService {
     return this.http.post(url, formData);
   }
 
-  recalculateMain(select_qtls_samples: string, associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateRef: string) {
+  recalculateMain(select_qtls_samples: string, select_gwas_sample: string, associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateRef: string) {
     let recalculateParameters = {
       associationFile: associationFile, 
       expressionFile: expressionFile, 
@@ -69,7 +69,8 @@ export class QTLsResultsService {
       recalculatePop: recalculatePop, 
       recalculateGene: recalculateGene, 
       recalculateRef: recalculateRef,
-      select_qtls_samples: select_qtls_samples
+      select_qtls_samples: select_qtls_samples,
+      select_gwas_sample: select_gwas_sample
     };
     // console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();

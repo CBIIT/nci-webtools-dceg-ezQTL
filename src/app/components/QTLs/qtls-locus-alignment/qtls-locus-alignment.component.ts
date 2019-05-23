@@ -67,6 +67,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   disableInputs: boolean;
 
   select_qtls_samples: string;
+  select_gwas_sample: string;
 
   constructor(private data: QTLsResultsService, public dialog: MatDialog) { }
 
@@ -86,6 +87,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
         this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
         this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+        this.select_gwas_sample = mainData["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
         this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
@@ -594,7 +596,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     $(".blur-loading").addClass("blur-overlay");
     // this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.select_qtls_samples, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
       .subscribe(
         res => {
           this.data.changeMainData(res);
