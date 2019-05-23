@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment'
 })
 export class QTLsResultsService {
 
-  // data output from R calculation to plot
+  // object: data output from R calculation to plot
   private mainDataSource = new BehaviorSubject<Object>(null);
   currentMainData = this.mainDataSource.asObservable();
 
@@ -16,19 +16,23 @@ export class QTLsResultsService {
   private resultStatus = new BehaviorSubject(false);
   currentResultStatus = this.resultStatus.asObservable();
 
-  // error message output from R calculation
+  // string: error message output from R calculation
   private errorMessage = new BehaviorSubject('');
   currentErrorMessage = this.errorMessage.asObservable();
 
-  // warning message if uploaded data files has > 30 genes
+  // string: warning message if uploaded data files has > 30 genes
   // private warningMessage = new BehaviorSubject('');
   // currentWarningMessage = this.warningMessage.asObservable();
 
-  // disable/enable gene expressions result tab
+  // boolean: disable/enable locus colocalizaion result tab
+  private disableLocusColocalization = new BehaviorSubject(true);
+  currentLocusColocalization = this.disableLocusColocalization.asObservable();
+
+  // boolean: disable/enable locus quantification result tab
   private disableLocusQuantification = new BehaviorSubject(true);
   currentLocusQuantification = this.disableLocusQuantification.asObservable();
 
-  // programmatically select result tab
+  // number: programmatically select result tab
   private selectedTab = new BehaviorSubject(0);
   currentSelectedTab = this.selectedTab.asObservable();
 
@@ -40,6 +44,10 @@ export class QTLsResultsService {
   private blurLoad = new BehaviorSubject(false);
   currentBlurLoad = this.blurLoad.asObservable();
 
+  // string: error message output from R calculation
+  private qtlsType = new BehaviorSubject('assoc');
+  currentQtlsType = this.qtlsType.asObservable();
+
   constructor(private http: HttpClient) { }
 
   calculateMain(formData: FormData) {
@@ -47,7 +55,7 @@ export class QTLsResultsService {
     return this.http.post(url, formData);
   }
 
-  recalculateMain(associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateRef: string) {
+  recalculateMain(select_qtls_samples: string, select_gwas_sample: string, associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, request_id: number, select_pop: string, select_gene: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateRef: string) {
     let recalculateParameters = {
       associationFile: associationFile, 
       expressionFile: expressionFile, 
@@ -60,7 +68,9 @@ export class QTLsResultsService {
       recalculateAttempt: recalculateAttempt,
       recalculatePop: recalculatePop, 
       recalculateGene: recalculateGene, 
-      recalculateRef: recalculateRef
+      recalculateRef: recalculateRef,
+      select_qtls_samples: select_qtls_samples,
+      select_gwas_sample: select_gwas_sample
     };
     // console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();
@@ -70,11 +80,12 @@ export class QTLsResultsService {
     // return this.http.post(url, formData);
   }
 
-  calculateLocusAlignmentBoxplots(expressionFile: string, genotypeFile: string, boxplotDataDetailed: Object) {
+  calculateLocusAlignmentBoxplots(select_qtls_samples: string, expressionFile: string, genotypeFile: string, boxplotDataDetailed: Object) {
     let locusAlignmentBoxplotsParameters= {
       expressionFile: expressionFile,
       genotypeFile: genotypeFile,
-      boxplotDataDetailed: boxplotDataDetailed
+      boxplotDataDetailed: boxplotDataDetailed, 
+      select_qtls_samples: select_qtls_samples
     };
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
@@ -98,6 +109,10 @@ export class QTLsResultsService {
   //   this.warningMessage.next(warningMessage);
   // }
 
+  changeDisableLocusColocalization(disableLocusColocalization: boolean) {
+    this.disableLocusColocalization.next(disableLocusColocalization);
+  }
+
   changeDisableLocusQuantification(disableLocusQuantification: boolean) {
     this.disableLocusQuantification.next(disableLocusQuantification);
   }
@@ -112,5 +127,9 @@ export class QTLsResultsService {
 
   changeBlurLoad(blurLoad: boolean) {
     this.blurLoad.next(blurLoad);
+  }
+
+  changeQtlsType(qtlsType: string) {
+    this.qtlsType.next(qtlsType);
   }
 }
