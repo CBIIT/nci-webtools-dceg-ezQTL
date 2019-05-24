@@ -38,7 +38,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
   });
   qtlsCalculationFormCISDistance = new FormGroup({
-    cisDistanceInput: new FormControl(100, [Validators.pattern("^(-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
+    cisDistanceInput: new FormControl("100", [Validators.pattern("^(-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
   });
 
   mainData: Object;
@@ -59,6 +59,9 @@ export class QTLsCalculationInputsComponent implements OnInit {
   selectedGene: string;
   newSelectedGene: string;
 
+  selectedDist: string;
+  newSelectedDist: string;
+
   allGeneVariants: GeneVariants[];
   topGeneVariants: GeneVariants[];
   allGeneVariantsOrganized: Object;
@@ -69,8 +72,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
   recalculateAttempt: string;
   recalculatePopAttempt: string;
   recalculateGeneAttempt: string;
-  recalculateRefAttempt: string;
   recalculateDistAttempt: string;
+  recalculateRefAttempt: string;
   inputChanged: boolean;
   disableInputs: boolean;
   warningMessage: string;
@@ -78,7 +81,6 @@ export class QTLsCalculationInputsComponent implements OnInit {
   select_qtls_samples: string;
   select_gwas_sample: string;
 
-  cisDistance: number;
 
   constructor(private data: QTLsResultsService) { }
 
@@ -87,10 +89,10 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.selectedPopFinal = [];
     this.populationSelectedAll = false;
     this.rsnumSearch = "";
-    this.cisDistance = 100;
     this.warningMessage = "";
     this.selectedPop = [];
     this.selectedGene = "";
+    this.selectedDist = "";
     this.selectedRef = "";
     
     this.data.currentMainData.subscribe(mainData => {
@@ -108,6 +110,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.recalculateAttempt = mainData["info"]["recalculateAttempt"][0]; // recalculation attempt ?
         this.recalculatePopAttempt = mainData["info"]["recalculatePop"][0]; // recalculation attempt when pop changed ?
         this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
+        this.recalculateDistAttempt = mainData["info"]["recalculateDist"][0]; // recalculation attempt when cis-QTL distance changed ? 
         this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
 
         this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
@@ -115,6 +118,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
 
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
+        this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted dist
         this.newSelectedRef = mainData["info"]["inputs"]["select_ref"][0]; // inputted ref
 
         this.geneList = mainData["info"]["gene_list"]["data"][0]; // get gene list & populate ref gene dropdown
@@ -122,8 +126,6 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.topGeneVariants = mainData["info"]["top_gene_variants"]["data"][0]; // get list of top rsnum for all genes
         this.locusAlignmentDataQTopAnnot = mainData["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
 
-        // console.log("INIT RECALC ATTEMPT", this.recalculateAttempt);
-        // console.log("INIT NEW SELECTED POP", this.newSelectedPop);
         if (this.recalculateAttempt == "false" && this.newSelectedPop == "EUR") {
           this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
           this.returnPopulationGroupFinal();
@@ -141,6 +143,12 @@ export class QTLsCalculationInputsComponent implements OnInit {
         } else {
           this.selectedGene = this.newSelectedGene; // recalculated new gene selection
           this.recalculateGeneAttempt = "false";
+        }
+        if (this.newSelectedDist == "false") {
+          this.selectedDist = "100"; // default cis-QTL distance (in Kb)
+        } else {
+          this.selectedDist = this.newSelectedDist; // recalculated new cis-QTL distance (in Kb)
+          this.recalculateDistAttempt = "false";
         }
         if (this.newSelectedRef == "false") {
           this.selectedRef = "false"; // default ref rsnum
@@ -416,7 +424,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   enableSearchCISDistance(event: any) {
     this.inputChanged = true;
     this.recalculateDistAttempt = "true";
-    this.cisDistance = event.target.value;
+    this.selectedDist = event.target.value;
     this.qtlsCalculationFormCISDistance.value.cisDistanceInput = event.target.value;
   }
 
@@ -426,7 +434,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   }
 
   clearCISDistField() {
-    this.cisDistance = null;
+    this.selectedDist = null;
     this.qtlsCalculationFormCISDistance.value.cisDistanceInput = '';
   }
 
@@ -463,13 +471,20 @@ export class QTLsCalculationInputsComponent implements OnInit {
     $('.popover').hide();
   }
 
-  async recalculatePopGeneRef() {
-    var selectedGeneString = this.selectedGene;
+  async recalculatePopGeneDistRef() {
+    // get new parameters as string
     var selectedPopString = this.selectedPop.join('+');
+    var selectedGeneString = this.selectedGene;
+    var selectedDistNumber = this.selectedDist;
+    // retrieve recalculate statuses
     var recalculateAttempt = "true";
     var recalculatePop = this.recalculatePopAttempt;
     var recalculateGene = this.recalculateGeneAttempt;
+    var recalculateDist = this.recalculateDistAttempt;
+    // change recalculate status to false to disable recalculate button after recalculation completes
     this.inputChanged = false;
+    // check if rs number ld ref entered is listed as a variant for ref gene
+    // if not, prevent calculation and throw warning
     if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
       this.closeWarning();
       var selectedRefString = this.rsnumSearch;
@@ -479,13 +494,11 @@ export class QTLsCalculationInputsComponent implements OnInit {
         recalculateRef = "false";
       }
       // reset
-      // this.data.changeMainData(null);
       this.data.changeBlurLoad(true);
       this.disableInputs = true;
       $(".blur-loading").addClass("blur-overlay");
-      // this.data.changeSelectedTab(0);
       // calculate
-      this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+      this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
         .subscribe(
           res => {
             this.data.changeMainData(res);
@@ -493,9 +506,10 @@ export class QTLsCalculationInputsComponent implements OnInit {
             this.disableInputs = false;
             this.closePopover();
             $(".blur-loading").removeClass("blur-overlay");
-            this.recalculateRefAttempt = "false";
             this.recalculatePopAttempt = "false";
             this.recalculateGeneAttempt = "false";
+            this.recalculateDistAttempt = "false";
+            this.recalculateRefAttempt = "false";
             if (this.rsnumSearch.length == 0) {
               this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
               this.qtlsCalculationFormRSNumber.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
@@ -509,6 +523,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
           }
         );
     } else {
+      // if rs number ld ref entered is not listed as a variant for ref gene, throw warning alert
       this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
     }
   }
