@@ -103,7 +103,7 @@
             matInput 
             placeholder="cis-QTL Distance (Kb) *" 
             (keyup)="enableSearchCISDistance($event)" 
-            [(ngModel)]="cisDistance" 
+            [(ngModel)]="selectedDist" 
             formControlName="cisDistanceInput">
           <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearCISDistField()">
             <mat-icon>close</mat-icon>
@@ -139,7 +139,7 @@
         class="mt-2" 
         mat-raised-button color="primary" 
         [disabled]="!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid" 
-        (click)="recalculatePopGeneRef()">
+        (click)="recalculatePopGeneDistRef()">
         Recalculate
       </button>
     </div>
