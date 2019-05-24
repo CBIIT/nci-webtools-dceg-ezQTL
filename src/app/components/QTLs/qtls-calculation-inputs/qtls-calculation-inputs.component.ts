@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
-import { FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 
 declare let $: any;
 
@@ -29,9 +29,17 @@ export interface GeneVariants {
 @Component({
   selector: 'app-qtls-calculation-inputs',
   templateUrl: './qtls-calculation-inputs.component.html',
-  styleUrls: ['./qtls-calculation-inputs.component.css']
+  styleUrls: ['./qtls-calculation-inputs.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class QTLsCalculationInputsComponent implements OnInit {
+
+  qtlsCalculationFormRSNumber = new FormGroup({
+    rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
+  });
+  qtlsCalculationFormCISDistance = new FormGroup({
+    cisDistanceInput: new FormControl(100, [Validators.pattern("^(-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
+  });
 
   mainData: Object;
   locusAlignmentDataQTopAnnot: Object;
@@ -62,6 +70,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   recalculatePopAttempt: string;
   recalculateGeneAttempt: string;
   recalculateRefAttempt: string;
+  recalculateDistAttempt: string;
   inputChanged: boolean;
   disableInputs: boolean;
   warningMessage: string;
@@ -69,10 +78,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   select_qtls_samples: string;
   select_gwas_sample: string;
 
-  // cisDistance: number;
-
-  rsnumber = new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")]);
-  // cisDistanceInput = new FormControl('', [Validators.pattern("^([0-9]+)?$")]);
+  cisDistance: number;
 
   constructor(private data: QTLsResultsService) { }
 
@@ -81,7 +87,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.selectedPopFinal = [];
     this.populationSelectedAll = false;
     this.rsnumSearch = "";
-    // this.cisDistance = 100;
+    this.cisDistance = 100;
     this.warningMessage = "";
     this.selectedPop = [];
     this.selectedGene = "";
@@ -139,10 +145,12 @@ export class QTLsCalculationInputsComponent implements OnInit {
         if (this.newSelectedRef == "false") {
           this.selectedRef = "false"; // default ref rsnum
           this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
+          this.qtlsCalculationFormRSNumber.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
         } else {
           this.selectedRef = this.newSelectedRef; // recalculated new gene selection
           this.recalculateRefAttempt = "false";
           this.rsnumSearch = this.selectedRef;
+          this.qtlsCalculationFormRSNumber.value.rsnumber = this.selectedRef;
         }
         if (this.allGeneVariants && this.geneList) {
           this.populateAllGeneVariantLists(this.allGeneVariants, this.geneList); // organize all QTLs variants by gene
@@ -393,14 +401,48 @@ export class QTLsCalculationInputsComponent implements OnInit {
     for(var i = 0; i < this.topGeneVariants.length; i++) {
       if (this.topGeneVariants[i]['gene_id'] == this.selectedGene) {
         this.rsnumSearch = this.topGeneVariants[i]['rsnum'];
+        this.qtlsCalculationFormRSNumber.value.rsnumber = this.topGeneVariants[i]['rsnum'];
       }
     }
   }
 
-  enableSearch(rsnumSearchInputValue) {
+  enableSearchLDRef(event: any) {
     this.inputChanged = true;
     this.recalculateRefAttempt = "true";
-    this.rsnumSearch = rsnumSearchInputValue;
+    this.rsnumSearch = event.target.value;
+    this.qtlsCalculationFormRSNumber.value.rsnumber = event.target.value;
+  }
+
+  enableSearchCISDistance(event: any) {
+    this.inputChanged = true;
+    this.recalculateDistAttempt = "true";
+    this.cisDistance = event.target.value;
+    this.qtlsCalculationFormCISDistance.value.cisDistanceInput = event.target.value;
+  }
+
+  clearLDRefField() {
+    this.rsnumSearch = '';
+    this.qtlsCalculationFormRSNumber.value.rsnumber = '';
+  }
+
+  clearCISDistField() {
+    this.cisDistance = null;
+    this.qtlsCalculationFormCISDistance.value.cisDistanceInput = '';
+  }
+
+  cisDistErrorMsg() {
+    var msg = "";
+    if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput > 2000) {
+      msg = "Distance must be <= 2000 Kb";
+    } else if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput < 1) {
+      msg = "Distance must be >= 1 Kb";
+    } else {
+      msg = "Invalid cis-QTL Distance";
+    }
+    if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput == null || this.qtlsCalculationFormCISDistance.value.cisDistanceInput == '') {
+      msg = "Input required";
+    }
+    return msg;
   }
 
   handleError(error) {
@@ -456,6 +498,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
             this.recalculateGeneAttempt = "false";
             if (this.rsnumSearch.length == 0) {
               this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
+              this.qtlsCalculationFormRSNumber.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
             }
           },
           error => {
