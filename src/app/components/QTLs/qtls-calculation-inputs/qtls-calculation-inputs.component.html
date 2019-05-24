@@ -94,39 +94,43 @@
       </mat-form-field>
     </div>
 
-    <!-- LD Reference input -->
+    <!-- cis-QTL Distance input -->
     <div class="col-md-auto pl-3 pr-3">
-      <mat-form-field>
-        <input 
-          #rsnumSearchInput
-          matInput 
-          placeholder="LD Reference" 
-          (keyup)="enableSearch(rsnumSearchInput.value)" 
-          [(value)]="rsnumSearch" 
-          [formControl]="rsnumber">
-        <button mat-button *ngIf="rsnumSearch" matSuffix mat-icon-button aria-label="Clear" (click)="rsnumSearch=''">
-          <mat-icon>close</mat-icon>
-        </button>
-        <mat-error *ngIf="rsnumber.invalid">Invalid rs number</mat-error>
-      </mat-form-field>
+      <form [formGroup]="qtlsCalculationFormCISDistance">
+        <mat-form-field class="calculation-input-field">
+          <input 
+            #cisDistanceInput
+            matInput 
+            placeholder="cis-QTL Distance (Kb) *" 
+            (keyup)="enableSearchCISDistance($event)" 
+            [(ngModel)]="cisDistance" 
+            formControlName="cisDistanceInput">
+          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearCISDistField()">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="qtlsCalculationFormCISDistance.invalid">{{ cisDistErrorMsg() }}</mat-error>
+        </mat-form-field>
+      </form>
     </div>
 
-    <!-- cis-QTL Distance input -->
-    <!-- <div class="col-md-auto pl-3 pr-3">
-      <mat-form-field>
-        <input 
-          #cisDistanceInput
-          matInput 
-          placeholder="cis-QTL Distance (Kb)" 
-          (keyup)="enableSearch(rsnumSearchInput.value)" 
-          [(value)]="cisDistance" 
-          [formControl]="cisDistanceInput">
-        <button mat-button *ngIf="cisDistance" matSuffix mat-icon-button aria-label="Clear" (click)="cisDistance=''">
-          <mat-icon>close</mat-icon>
-        </button>
-        <mat-error *ngIf="cisDistanceInput.invalid">Invalid cis-QTL Distance</mat-error>
-      </mat-form-field>
-    </div> -->
+    <!-- LD Reference input -->
+    <div class="col-md-auto pl-3 pr-3">
+      <form [formGroup]="qtlsCalculationFormRSNumber">
+        <mat-form-field class="calculation-input-field">
+          <input 
+            #rsnumSearchInput
+            matInput 
+            placeholder="LD Reference" 
+            (keyup)="enableSearchLDRef($event)" 
+            [(ngModel)]="rsnumSearch" 
+            formControlName="rsnumber">
+          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearLDRefField()">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="qtlsCalculationFormRSNumber.invalid">Invalid rs number</mat-error>
+        </mat-form-field>
+      </form>
+    </div>
 
     <!-- Re-calculate Button -->
     <div class="col-md-auto pl-3 pr-3">
@@ -134,7 +138,7 @@
         type="submit" 
         class="mt-2" 
         mat-raised-button color="primary" 
-        [disabled]="!inputChanged || selectedPop.length == 0 || rsnumber.invalid" 
+        [disabled]="!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid" 
         (click)="recalculatePopGeneRef()">
         Recalculate
       </button>
