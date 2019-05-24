@@ -2,7 +2,7 @@ const { readFileSync, writeFileSync } = require('fs');
 const { exec } = require('child_process');
 const { fileSync } = require('tmp');
 
-function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
+function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
     console.log("Execute main qtls calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -15,10 +15,12 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
         request = JSON.stringify(request);
         select_pop = JSON.stringify(select_pop);
         select_gene = JSON.stringify(select_gene);
+        select_dist = JSON.stringify(select_dist);
         select_ref = JSON.stringify(select_ref);
         recalculateAttempt = JSON.stringify(recalculateAttempt);
         recalculatePop = JSON.stringify(recalculatePop);
         recalculateGene = JSON.stringify(recalculateGene);
+        recalculateDist = JSON.stringify(recalculateDist);
         recalculateRef = JSON.stringify(recalculateRef);
         select_qtls_samples = JSON.stringify(select_qtls_samples);
         select_gwas_sample = JSON.stringify(select_gwas_sample);
@@ -30,23 +32,19 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
         console.log("GWAS File:", gwasFile);
         console.log("Selected QTLs Sample Files:", select_qtls_samples);
         console.log("Selected GWAS Sample File:", select_gwas_sample)
-        console.log("Request: ", request);
-        // var debugRequest = JSON.stringify("0000000000000");
-        // console.log("Debug Request: ", debugRequest);
-        console.log("Selected Pop: ", select_pop);
-        console.log("Selected Gene: ", select_gene);
-        console.log("Selected Ref: ", select_ref);
+        console.log("Request:", request);
+        console.log("Selected Pop:", select_pop);
+        console.log("Selected Gene:", select_gene);
+        console.log("Selected Dist:", select_dist);
+        console.log("Selected Ref:", select_ref);
         console.log("Recalculate Attempt?", recalculateAttempt);
         console.log("Recalculate Pop?", recalculatePop);
         console.log("Recalculate Gene?", recalculateGene);
+        console.log("Recalculate Dist?", recalculateDist);
         console.log("Recalculate Ref?", recalculateRef);
 
         var code = readFileSync(rfile).toString();
-        
-        // make sure the R statement below is not appended to a comment in R code file
-        // code += `qtls_main(${workingDirectory}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${debugRequest}, ${request}, ${select_pop})`;
-        code += `main(${workingDirectory}, ${select_qtls_samples}, ${select_gwas_sample}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateRef})`;
-        // console.log(code);
+        code += `main(${workingDirectory}, ${select_qtls_samples}, ${select_gwas_sample}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${request}, ${select_pop}, ${select_gene}, ${select_dist}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateDist}, ${recalculateRef})`;
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(
@@ -87,20 +85,14 @@ function qtlsCalculateLocusAlignmentBoxplots(rfile, select_qtls_samples, express
 
         expressionFile = JSON.stringify(expressionFile);
         genotypeFile = JSON.stringify(genotypeFile);
-        // expressionFile = JSON.stringify("1q21_3.expression.txt");
-        // genotypeFile = JSON.stringify("1q21_3.genotyping.txt");
         info = JSON.stringify(JSON.stringify(info));
         select_qtls_samples = JSON.stringify(select_qtls_samples);
         console.log("Expression File:", expressionFile);
         console.log("Genotype File:", genotypeFile);
-        // console.log("Info:", info);
-        // console.log("Request:", request);
     
         var code = readFileSync(rfile).toString();
-        
         // make sure the R statement below is not appended to a comment in R code file
         code += `locus_alignment_boxplots(${workingDirectory}, ${select_qtls_samples}, ${expressionFile}, ${genotypeFile}, ${info})`;
-        // console.log(code);
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(

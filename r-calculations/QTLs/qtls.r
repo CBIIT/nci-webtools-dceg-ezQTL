@@ -1,4 +1,4 @@
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef) {
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -20,6 +20,12 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     rsnum <- NULL
   } else {
     rsnum <- select_ref
+  }
+  if (identical(select_dist, 'false')) {
+    ## set default cisDistance to 100 Kb (100,000 bp) if none supplied
+    cedistance <- 100 * 1000
+  } else {
+    cedistance <- strtoi(select_dist, base = 0L) * 1000
   }
 
   ## load 1kg pop panel file ##
@@ -70,7 +76,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef, gwasFile)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
@@ -84,7 +90,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   ## locus alignment gwas data ##
   gwas_example_data <- gwas_example(workDir, select_gwas_sample, gwasFile)
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_scatter=list(data=locus_alignment_scatter_data, title=locus_alignment_scatter_title), gwas=list(data=gwas_example_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_scatter=list(data=locus_alignment_scatter_data, title=locus_alignment_scatter_title), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
@@ -93,8 +99,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   return(dataSourceJSON)
 }
 
-locus_alignment_define_window <- function(recalculateAttempt, in_path, kgvcfpath, chromosome, minpos, maxpos) {
-  if (identical(recalculateAttempt, 'false')) {
+locus_alignment_define_window <- function(recalculateAttempt, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos) {
+  if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true')) {
     cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
     system(cmd)
     cmd <- paste0('bcftools index ', in_path)
@@ -102,8 +108,8 @@ locus_alignment_define_window <- function(recalculateAttempt, in_path, kgvcfpath
   }
 }
 
-locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, in_path, request, locus, chromosome, qdata_region_pos) {
-  if (identical(recalculateAttempt, 'false') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
+locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, locus, chromosome, qdata_region_pos) {
+  if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
     cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
     system(cmd)
     cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')
@@ -132,16 +138,34 @@ gwas_example_scatter <- function(gwasdata, qdata_region) {
   return(list(gwas_example_scatter_data, tmptitle))
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef, gwasFile) { 
-  chromosome <- unique(qdata$chr)
-  minpos <- min(qdata$pos)
-  maxpos <- max(qdata$pos)
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants) { 
+  if (identical(select_ref, 'false')) {
+    ## set default rsnum to top gene's rsnum if no ref gene or ld ref chosen
+    if (is.null(gene)) {
+      rsnum <- top_gene_variants$rsnum[[1]]
+    } else {
+      rsnum <- top_gene_variants[top_gene_variants$gene_id == gene,]$rsnum[[1]]
+    }
+  } else {
+    rsnum <- rsnum
+  }
+  index <- which(qdata$rsnum==rsnum)[1]
+  rsnum <- qdata$rsnum[index]
+  chromosome <- qdata$chr[index]
+  minpos <- qdata$pos[index] - cedistance
+  if (minpos < 0) { 
+    minpos = 0 
+  }
+  maxpos <- qdata$pos[index] + cedistance
+  # chromosome <- unique(qdata$chr)
+  # minpos <- min(qdata$pos)
+  # maxpos <- max(qdata$pos)
 
   kgvcfpath <- paste0(workDir, '/data/1000G/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
   
-  locus_alignment_define_window(recalculateAttempt, in_path, kgvcfpath, chromosome, minpos, maxpos)
+  locus_alignment_define_window(recalculateAttempt, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos)
 
   popshort <- "CEU"  ### need to find the superpop recomendation data 
 
@@ -224,7 +248,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     }
   }
 
-  locus_alignment_get_ld(recalculateAttempt, recalculatePop, in_path, request, locus, chromosome, qdata_region$pos)
+  locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, locus, chromosome, qdata_region$pos)
 
   ld_data <- readRDS(paste0("tmp/",request,".ld_data.rds"))
 
