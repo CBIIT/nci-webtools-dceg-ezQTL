@@ -44,8 +44,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   locusAlignmentScatterData: Object;
   locusAlignmentScatterTitle: string;
   GWASData: Object;
-  selectedGene: string;
   selectedPop: string[];
+  selectedGene: string;
+  selectedDist: string;
   public graph = null;
   public scatter = null;
   showPopover: boolean;
@@ -60,9 +61,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   recalculateAttempt: string;
   recalculatePopAttempt: string;
   recalculateGeneAttempt: string;
+  recalculateDistAttempt: string;
   recalculateRefAttempt: string;
   newSelectedPop: string;
   newSelectedGene: string;
+  newSelectedDist: string;
   blurLoad: boolean;
   disableInputs: boolean;
 
@@ -85,6 +88,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.recalculateAttempt = mainData["info"]["recalculateAttempt"][0]; // recalculation attempt ?
         this.recalculatePopAttempt = mainData["info"]["recalculatePop"][0]; // recalculation attempt when pop changed ?
         this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
+        this.recalculateDistAttempt = mainData["info"]["recalculateDist"][0]; // recalculation attempt when cis-QTL distance changed ?
         this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
         this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
         this.select_gwas_sample = mainData["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
@@ -94,6 +98,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
+        this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
         this.locusAlignmentData = mainData["locus_alignment"]["data"][0]; // locus alignment data
         this.locusAlignmentDataRC = mainData["locus_alignment"]["rc"][0]; // locus alignment RC data
@@ -105,6 +110,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         var newSelectedPopList = this.newSelectedPop.split('+');
         this.selectedPop = newSelectedPopList; // recalculated new population selection
         this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+        this.selectedDist = this.newSelectedDist;
       }
       if (this.locusAlignmentData) {
         // check if there is data in GWAS object
@@ -571,41 +577,32 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   async makeLDRef() {
-    // console.log("Recalculate!");
-    // console.log(boxplotData.point_index);
-    // var selectedRefString = this.locusAlignmentData[boxplotData["point_index"]]["rsnum"];
-    var selectedRefString = this.popoverData["rsnum"];
-    // this.rsnumSearch = selectedRefString;
-    // console.log(selectedRefString);
     var selectedGeneString = this.selectedGene;
-    // console.log(selectedGeneString);
     var selectedPopString = this.selectedPop.join('+');
-    // console.log(selectedPopString);
+    var selectedDistNumber = this.selectedDist;
+    var selectedRefString = this.popoverData["rsnum"];
     var recalculateAttempt = "true";
-    // var recalculatePop = this.recalculatePopAttempt;
-    // var recalculateGene = this.recalculateGeneAttempt;
     var recalculatePop = "false";
     var recalculateGene = "false";
+    var recalculateDist = "false";
     var recalculateRef = "true";
-    // this.inputChanged = false;
     // reset
-    // this.data.changeMainData(null);
     this.data.changeBlurLoad(true);
     this.disableInputs = true;
     $("#ldref-search-warning").hide();
     $(".blur-loading").addClass("blur-overlay");
-    // this.data.changeSelectedTab(0);
     // calculate
-    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateRef)
+    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
       .subscribe(
         res => {
           this.data.changeMainData(res);
           this.data.changeBlurLoad(false);
           this.disableInputs = false;
           $(".blur-loading").removeClass("blur-overlay");
-          this.recalculateRefAttempt = "false";
           this.recalculatePopAttempt = "false";
           this.recalculateGeneAttempt = "false";
+          this.recalculateDistAttempt = "false";
+          this.recalculateRefAttempt = "false";
         },
         error => {
           this.handleError(error);
