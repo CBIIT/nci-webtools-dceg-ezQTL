@@ -141,7 +141,7 @@ gwas_example_scatter <- function(gwasdata, qdata_region) {
 locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants) { 
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's rsnum if none chosen
-    rsnum <- top_gene_variants$rsnum[[1]]
+    rsnum <- top_gene_variants[top_gene_variants$gene_id == gene,]$rsnum[[1]]
   } else {
     rsnum <- rsnum
   }
