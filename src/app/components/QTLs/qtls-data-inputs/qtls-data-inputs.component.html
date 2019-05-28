@@ -84,7 +84,7 @@
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.associationFile && !resultStatus" 
+                *ngIf="qtlsForm.value.associationFile && qtlsForm.value.associationFile.length > 0 && !resultStatus" 
                 (click)="clearAssociationFile()" 
                 [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>
@@ -166,7 +166,7 @@
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.expressionFile && !resultStatus" 
+                *ngIf="qtlsForm.value.expressionFile && qtlsForm.value.expressionFile.length > 0 && !resultStatus" 
                 (click)="clearExpressionFile()" 
                 [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>
@@ -227,7 +227,7 @@
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.genotypeFile && !resultStatus" 
+                *ngIf="qtlsForm.value.genotypeFile && qtlsForm.value.genotypeFile.length > 0 && !resultStatus" 
                 (click)="clearGenotypeFile()" 
                 [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>
@@ -306,7 +306,7 @@
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.gwasFile && !resultStatus" 
+                *ngIf="qtlsForm.value.gwasFile && qtlsForm.value.gwasFile.length > 0 && !resultStatus" 
                 (click)="clearGWASFile()" 
                 [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>
@@ -384,7 +384,7 @@
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.LDFile && !resultStatus" 
+                *ngIf="qtlsForm.value.LDFile && qtlsForm.value.LDFile.length > 0 && !resultStatus" 
                 (click)="clearLDFile()" 
                 [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>

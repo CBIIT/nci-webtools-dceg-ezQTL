@@ -140,10 +140,11 @@ gwas_example_scatter <- function(gwasdata, qdata_region) {
 
 locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants) { 
   if (identical(select_ref, 'false')) {
-    ## set default rsnum to top gene's rsnum if no ref gene or ld ref chosen
+    ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
       rsnum <- top_gene_variants$rsnum[[1]]
     } else {
+      ## set default rsnum to ref gene's top rsnum if ref gene is chosen 
       rsnum <- top_gene_variants[top_gene_variants$gene_id == gene,]$rsnum[[1]]
     }
   } else {
