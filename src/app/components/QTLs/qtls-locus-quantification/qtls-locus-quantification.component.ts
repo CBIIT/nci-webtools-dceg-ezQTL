@@ -16,6 +16,8 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
   totalNumGenes: number;
   totalNumGenesArray: string[];
   selectNumGenes: string;
+  selectedScale: string;
+  selectedMedianSort: string;
   warningMessage: string;
   public graph = null;
   public heatmap = null;
@@ -50,6 +52,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
               this.graph = this.locusQuantificationViolinBoxPlot(this.locusQuantificationData);
               this.heatmap = this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData);
             }
+            this.selectedScale = "log"
           }
         });
         // this.selectNumGenes = "15"; // default number of genes displayed
@@ -163,7 +166,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     return geneSymbols;
   }
 
-  getGeneYData(geneData, xData) {
+  getGeneYDataLog(geneData, xData) {
     var yData = [];
     for (var i = 0; i < xData.length; i++) {
       var tmp = [];
@@ -177,9 +180,23 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     return yData;
   }
 
+  getGeneYDataLinear(geneData, xData) {
+    var yData = [];
+    for (var i = 0; i < xData.length; i++) {
+      var tmp = [];
+      for (var j = 0; j < geneData.length; j++) {
+        if (xData[i] == geneData[j]['gene_symbol']) {
+          tmp.push(geneData[j]['exp']);
+        } 
+      }
+      yData.push(tmp);
+    }
+    return yData;
+  }
+
   locusQuantificationViolinBoxPlot(geneData) {
     var xData = this.geneSymbols;
-    var yData = this.getGeneYData(geneData, xData);
+    var yData = this.getGeneYDataLog(geneData, xData);
     var pdata = [];
 
     for ( var i = 0; i < xData.length; i++ ) {
@@ -212,7 +229,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
           autorange: true,
           showgrid: true,
           zeroline: true,
-          dtick: 4,
+          // dtick: 4,
           gridwidth: 1
         },
         margin: {
@@ -242,43 +259,108 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
 
   }
 
-  replotExpressionsViolinBoxPlot(geneData, xData) {
+  getMedian(data) {
+    data.sort(function(a,b){
+      return a - b;
+    });
+    var half = Math.floor(data.length / 2);
+    if (data.length % 2)
+      return data[half];
+    else
+      return (data[half - 1] + data[half]) / 2.0;
+  }
 
-    var yData = this.getGeneYData(geneData, xData);
+  compareMedian(a, b) {
+    return a[0] - b[0];
+  }
+
+  sortMedian(xData, yData, medianSort) {
+    var dataSorted = [];
+
+    for ( var i = 0; i < xData.length; i ++) {
+      var median = this.getMedian(yData[i]);
+      console.log(median);
+      var geneData = [median].concat([xData[i]].concat(yData[i]));
+      dataSorted.push(geneData);
+    }
+    console.log("before sort:", dataSorted);
+    dataSorted = dataSorted.sort(this.compareMedian);
+
+    if (medianSort == "desc") {
+      dataSorted = dataSorted.reverse();
+    }
+
+    console.log("after sort:", dataSorted);
+    return dataSorted;
+  }
+
+  replotExpressionsViolinBoxPlot(geneData, xData, numGenes, scale, medianSort) {
+
+    // var yData = this.getGeneYDataLog(geneData, xData);
+    if (scale == "log") {
+      var yData = this.getGeneYDataLog(geneData, xData);
+    } else {
+      var yData = this.getGeneYDataLinear(geneData, xData);
+    }
+    console.log(yData);
 
     var pdata = [];
-
-    for ( var i = 0; i < xData.length; i ++ ) {
-      var result = {
-        type: 'violin',
-        y: yData[i],
-        name: xData[i],
-        box: {
-          visible: true
-        }, 
-        points: 'all',
-        jitter: 0.5,
-        pointpos: 0,
-        fillcolor: 'cls',
-        marker: {
-          size: 2
-        },
-        line: {
-          width: 1
-        }
+    if (medianSort == "asc" || medianSort == "desc") {
+      var dataSorted = this.sortMedian(xData, yData, medianSort);
+      for ( var i = 0; i < numGenes; i ++ ) {
+        var resultSorted = {
+          type: 'violin',
+          y: dataSorted[i].slice(2, dataSorted[i].length),
+          name: dataSorted[i][1],
+          box: {
+            visible: true
+          }, 
+          points: 'all',
+          jitter: 0.5,
+          pointpos: 0,
+          fillcolor: 'cls',
+          marker: {
+            size: 2
+          },
+          line: {
+            width: 1
+          }
+        };
+        pdata.push(resultSorted);
       };
-      pdata.push(result);
-    };
+    } else {
+      for ( var i = 0; i < numGenes; i ++ ) {
+        var result = {
+          type: 'violin',
+          y: yData[i],
+          name: xData[i],
+          box: {
+            visible: true
+          }, 
+          points: 'all',
+          jitter: 0.5,
+          pointpos: 0,
+          fillcolor: 'cls',
+          marker: {
+            size: 2
+          },
+          line: {
+            width: 1
+          }
+        };
+        pdata.push(result);
+      };
+    }
 
     var playout = {
         width: 1000,
         height: 600,
         yaxis: {
-          title: "Gene Expressions (log2)",
+          title: (scale == "log") ? "Gene Expressions (log2)" : "Gene Expressions",
           autorange: true,
           showgrid: true,
           zeroline: true,
-          dtick: 4,
+          // dtick: 4,
           gridwidth: 1
         },
         margin: {
@@ -308,8 +390,29 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
   }
 
   triggerReplot() {
-    var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
-    this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols);
+    console.log("scale:", this.selectedScale);
+    console.log("median sort:", this.selectedMedianSort);
+    // var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
+    this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, this.geneSymbols, parseInt(this.selectNumGenes), this.selectedScale, this.selectedMedianSort);
+  }
+
+  // toggleScale() {
+  //   console.log("scale:", this.selectedScale);
+  //   var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
+  //   this.replotScaleViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale);
+  // }
+
+  // toggleMedianSort() {
+  //   console.log("median sort:", this.selectedMedianSort);
+  // }
+
+  resetSort() {
+    console.log("reset sort");
+    this.selectedMedianSort = "";
+    console.log("scale:", this.selectedScale);
+    console.log("median sort:", this.selectedMedianSort);
+    // var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
+    this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, this.geneSymbols, parseInt(this.selectNumGenes), this.selectedScale, this.selectedMedianSort);
   }
 
 }
