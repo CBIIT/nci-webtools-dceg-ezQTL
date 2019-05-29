@@ -1,4 +1,4 @@
-<div class="gene-expressions-result-tab">
+<div class="locus-quantification-result-tab">
   <div class="row p-3 justify-content-between">
 
     <!-- Number of Genes input -->
@@ -55,7 +55,7 @@
   <!-- Show centered Plotly locus quantification violin boxplot if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
-    id="qtls-gene-expressions-plot" 
+    id="qtls-locus-quantification-plot" 
     *ngIf="graph">
       <plotly-plot 
         [data]="graph.data" 
@@ -82,7 +82,7 @@
   <!-- Show centered Plotly locus quantification heatmap if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
-    id="qtls-gene-expressions-heatmap" 
+    id="qtls-locus-quantification-heatmap" 
     *ngIf="heatmap">
       <plotly-plot 
         [data]="heatmap.data" 

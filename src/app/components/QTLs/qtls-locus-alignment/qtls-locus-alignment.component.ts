@@ -123,6 +123,27 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           this.graph = this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot)
         }
       }
+      // ensure graphs are properly positioned when data input panel collapse is toggled
+      if (this.collapseInput) { // input panel collapsed
+        if ($("#qtls-locus-alignment-plot").hasClass("justify-content-start")) {
+          $("#qtls-locus-alignment-plot").addClass("justify-content-center");
+          $("#qtls-locus-alignment-plot").removeClass("justify-content-start");
+        }
+        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
+          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
+          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
+        }
+      } else { // input panel shown
+        if ($("#qtls-locus-alignment-plot").hasClass("justify-content-center")) {
+          $("#qtls-locus-alignment-plot").addClass("justify-content-start");
+          $("#qtls-locus-alignment-plot").removeClass("justify-content-center");
+        }
+        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
+          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
+          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
+        }
+      }
+
     });
   }
 
@@ -676,7 +697,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           $('.popover').show().css({
             position: "absolute",
             top: top - 125, 
-            left: left + 190
+            left: left + 245
           });
         } else { // input panel shown
           $('.popover').show().css({
