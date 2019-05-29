@@ -276,19 +276,16 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
 
   sortMedian(xData, yData, medianSort) {
     var dataSorted = [];
-
     for ( var i = 0; i < xData.length; i ++) {
       var geneData = [this.getMedian(yData[i])].concat([xData[i]].concat(yData[i]));
       dataSorted.push(geneData);
     }
-    console.log("before sort:", dataSorted);
+    // console.log("before sort:", dataSorted);
     dataSorted = dataSorted.sort(this.compareMedian);
-
     if (medianSort == "desc") {
       dataSorted = dataSorted.reverse();
     }
-
-    console.log("after sort:", dataSorted);
+    // console.log("after sort:", dataSorted);
     return dataSorted;
   }
 
@@ -300,8 +297,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     } else {
       var yData = this.getGeneYDataLinear(geneData, xData);
     }
-    console.log(yData);
-
+    // console.log(yData);
     var pdata = [];
     if (medianSort == "asc" || medianSort == "desc") {
       var dataSorted = this.sortMedian(xData, yData, medianSort);
@@ -388,27 +384,17 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
   }
 
   triggerReplot() {
-    console.log("scale:", this.selectedScale);
-    console.log("median sort:", this.selectedMedianSort);
+    // console.log("scale:", this.selectedScale);
+    // console.log("median sort:", this.selectedMedianSort);
     var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
     this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
   }
 
-  // toggleScale() {
-  //   console.log("scale:", this.selectedScale);
-  //   var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
-  //   this.replotScaleViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale);
-  // }
-
-  // toggleMedianSort() {
-  //   console.log("median sort:", this.selectedMedianSort);
-  // }
-
   resetSort() {
-    console.log("reset sort");
+    // console.log("reset sort");
     this.selectedMedianSort = "";
-    console.log("scale:", this.selectedScale);
-    console.log("median sort:", this.selectedMedianSort);
+    // console.log("scale:", this.selectedScale);
+    // console.log("median sort:", this.selectedMedianSort);
     var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
     this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
   }
