@@ -1,8 +1,8 @@
 <div class="gene-expressions-result-tab">
-  <div class="row justify-content-between">
+  <div class="row p-3 justify-content-between">
 
     <!-- Number of Genes input -->
-    <div class="col-md-auto p-4">
+    <div class="col-md-auto pl-3 pr-3">
       <mat-form-field>
         <mat-label>Number of Genes (for Plot)</mat-label>
         <mat-select #numGenes [(value)]="selectNumGenes" (selectionChange)="triggerReplot()" required>
@@ -15,8 +15,38 @@
       </mat-form-field>
     </div>
 
+    <!-- Violin-boxplot Options -->
+    <div class="col-md-auto">
+      <div class="row">
+        <div class="col-md-auto pl-3 pr-3">
+          Scale:
+          <mat-button-toggle-group 
+            name="fontStyle" 
+            aria-label="Font Style" 
+            [(ngModel)]="selectedScale" 
+            (change)="triggerReplot()">
+            <mat-button-toggle value="log">Log</mat-button-toggle>
+            <mat-button-toggle value="linear">Linear</mat-button-toggle>
+          </mat-button-toggle-group>
+        </div>
+        <div class="col-md-auto pl-3 pr-3">
+          Median Sort:
+          <mat-button-toggle-group 
+            name="fontStyle" 
+            aria-label="Font Style" 
+            [(ngModel)]="selectedMedianSort" 
+            (change)="triggerReplot()">
+            <mat-button-toggle value="asc"><i class="fas fa-caret-up"></i></mat-button-toggle>
+            <mat-button-toggle value="desc"><i class="fas fa-caret-down"></i></mat-button-toggle>
+          </mat-button-toggle-group>
+
+          <button mat-button (click)="resetSort()">Reset</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Message showing number of genes displayed and total number of genes -->
-    <div class="col-md-auto p-4" id="display-number">
+    <div class="col-md-auto pl-3 pr-3" id="display-number-genes">
       Showing <u>{{ numGenes.value }}</u> of <u>{{ totalNumGenes }}</u> genes
     </div>
     
