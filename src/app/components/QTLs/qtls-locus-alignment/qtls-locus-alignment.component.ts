@@ -148,7 +148,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       if ('rsnum' in geneData[i]) {
         hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -185,6 +185,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       } else {
         colorData.push(0.0);
       }
+    }
+    // normalize R2 color data between 0 and 1 for color spectrum
+    for (var i = 0; i < colorData.length; i++) {
+      colorData[i] = (colorData[i] / (Math.max.apply(null, colorData) / 100) ) / 100.0;
     }
     return colorData;
   }
@@ -714,6 +718,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return pval_nominals;
   }
 
+  getScatterHoverData(scatterData) {
+    var hoverData = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      if ('rs' in scatterData[i]) {
+        hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+      } else {
+        hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+      }
+    }
+    return hoverData;
+  }
+
   getScatterColorData(scatterData) {
     var colorData = [];
     for (var i = 0; i < scatterData.length; i++) {
@@ -722,6 +738,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       } else {
         colorData.push(0.0);
       }
+    }
+    // normalize R2 color data between 0 and 1 for color spectrum
+    for (var i = 0; i < colorData.length; i++) {
+      colorData[i] = (colorData[i] / (Math.max.apply(null, colorData) / 100) ) / 100.0;
     }
     return colorData;
   }
@@ -784,10 +804,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // console.log("yData", yData);
     // console.log(scatterData);
     var scatterColorData = this.getScatterColorData(scatterData);
+    var hoverData = this.getScatterHoverData(scatterData);
     var trace1 = {
       x: xData,
       y: yData,
-      // hoverinfo: 'x+y',
+      text: hoverData,
+      hoverinfo: 'text',
       mode: 'markers',
       type: 'scatter',
       marker: {
