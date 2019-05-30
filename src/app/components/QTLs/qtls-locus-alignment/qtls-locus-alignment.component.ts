@@ -274,10 +274,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var topPvalIdxGWAS = yGWASData.indexOf(topPvalYGWAS);
     // mark point with most significant P-value
     var topPvalMarker = {
-      x: [xData[topPvalIdx]],
-      y: [topPvalY],
-      mode: 'markers',
-      type: 'scatter',
+      x: [xData[topPvalIdx]], 
+      y: [topPvalY], 
+      hoverinfo: 'none', 
+      mode: 'markers', 
+      type: 'scatter', 
       marker: {
         symbol: "diamond",
         size: 14,
@@ -297,6 +298,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var topPvalMarkerGWAS = {
     //   x: [xData[topPvalIdxGWAS]],
     //   y: [topPvalYGWAS],
+    //   hoverinfo: 'none',
     //   mode: 'markers',
     //   type: 'scatter',
     //   marker: {
@@ -527,6 +529,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var topPvalMarker = {
       x: [xData[topPvalIdx]],
       y: [topPvalY],
+      hoverinfo: 'none',
       mode: 'markers',
       type: 'scatter',
       marker: {

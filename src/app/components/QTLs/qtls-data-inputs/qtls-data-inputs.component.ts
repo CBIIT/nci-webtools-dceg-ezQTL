@@ -84,6 +84,11 @@ export class QTLsDataInputsComponent implements OnInit {
     this.selectLoadLDSample = false;
   }
 
+  toggleAssocGTEx() {
+    console.log(this.qtlsType);
+    this.clearAssociationFile();
+  }
+
   clearAssociationFile() {
     this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.value.associationFile = false;
@@ -116,6 +121,7 @@ export class QTLsDataInputsComponent implements OnInit {
 
   loadQTLsSampleDataFiles() { // if user unloads sample QTLs data files
     if (this.selectLoadQTLsSamples == true) {
+      this.loadGWASSampleDataFile(); // toggle load GWAS data file
       this.selectLoadQTLsSamples = false;
       this.disableQTLsToggle = false;
       this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
@@ -132,6 +138,7 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(true);
     } else { // if user loads sample QTLs data files
+      this.loadGWASSampleDataFile(); // toggle load GWAS data file
       this.selectLoadQTLsSamples = true;
       this.qtlsType = "assoc";
       this.disableQTLsToggle = true;
