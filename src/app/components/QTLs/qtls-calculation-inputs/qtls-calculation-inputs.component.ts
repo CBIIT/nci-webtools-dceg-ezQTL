@@ -494,6 +494,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
         recalculateRef = "false";
       }
       // reset
+      this.closePopover();
       this.data.changeBlurLoad(true);
       this.disableInputs = true;
       $(".blur-loading").addClass("blur-overlay");
@@ -504,7 +505,6 @@ export class QTLsCalculationInputsComponent implements OnInit {
             this.data.changeMainData(res);
             this.data.changeBlurLoad(false);
             this.disableInputs = false;
-            this.closePopover();
             $(".blur-loading").removeClass("blur-overlay");
             this.recalculatePopAttempt = "false";
             this.recalculateGeneAttempt = "false";

@@ -1,6 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
+import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
+
+PlotlyModule.plotlyjs = PlotlyJS;
+
+@NgModule({
+    imports: [CommonModule, PlotlyModule],
+})
 
 @Component({
   selector: 'app-qtls-locus-quantification',
@@ -50,7 +60,9 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
             }
             if (this.locusQuantificationData[0] && this.locusQuantificationHeatmapData[0]) {
               this.graph = this.locusQuantificationViolinBoxPlot(this.locusQuantificationData);
+              // this.locusQuantificationViolinBoxPlot(this.locusQuantificationData);
               this.heatmap = this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData);
+              // this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData);
             }
             this.selectedScale = "log"
           }
@@ -113,18 +125,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         showscale: false
       }
     ];
-
-    // var pdata = [
-    //   {
-    //     z: [[1, 20, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
-    //     x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    //     y: ['Morning', 'Afternoon', 'Evening'],
-    //     type: 'heatmap',
-    //     colorscale: "Viridis",
-    //     showscale: false
-    //   }
-    // ];
-
     var playout = {
         width: 900,
         height: 800,
@@ -140,7 +140,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         },
         showlegend: false
     };
-
     return { 
       data: pdata, 
       layout: playout, 
@@ -156,6 +155,18 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         }
       } 
     };
+    // var pconfig = {
+    //   displaylogo: false, 
+    //   modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+    //   toImageButtonOptions: {
+    //     format: 'svg', // one of png, svg, jpeg, webp
+    //     filename: 'locus_quantification_heatmap',
+    //     width: 900,
+    //     height: 800,
+    //     scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    //   }
+    // };
+    // PlotlyJS.newPlot("qtls-locus-quantification-heatmap", pdata, playout, pconfig);
   }
 
   getGeneSymbols(geneList) {
@@ -198,7 +209,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     var xData = this.geneSymbols;
     var yData = this.getGeneYDataLog(geneData, xData);
     var pdata = [];
-
     for ( var i = 0; i < xData.length; i++ ) {
       var result = {
         type: 'violin',
@@ -220,7 +230,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       };
       pdata.push(result);
     };
-
     var playout = {
         width: 1000,
         height: 600,
@@ -240,7 +249,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         },
         showlegend: false
     };
-
     return { 
       data: pdata, 
       layout: playout, 
@@ -256,7 +264,18 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         }
       } 
     };
-
+    // var pconfig = {
+    //   displaylogo: false, 
+    //   modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+    //   toImageButtonOptions: {
+    //     format: 'svg', // one of png, svg, jpeg, webp
+    //     filename: 'locus_quantification_gene_expressions',
+    //     width: 1000,
+    //     height: 600,
+    //     scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    //   }
+    // };
+    // PlotlyJS.newPlot("qtls-locus-quantification-plot", pdata, playout, pconfig);
   }
 
   getMedian(data) {
@@ -290,7 +309,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
   }
 
   replotExpressionsViolinBoxPlot(geneData, xData, scale, medianSort) {
-
     // var yData = this.getGeneYDataLog(geneData, xData);
     if (scale == "log") {
       var yData = this.getGeneYDataLog(geneData, xData);
@@ -345,7 +363,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         pdata.push(result);
       };
     }
-
     var playout = {
         width: 1000,
         height: 600,
@@ -365,7 +382,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         },
         showlegend: false
     };
-
     this.graph = { 
       data: pdata, 
       layout: playout, 
@@ -381,6 +397,18 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         }
       } 
     };
+    // var pconfig = {
+    //   displaylogo: false, 
+    //   modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+    //   toImageButtonOptions: {
+    //     format: 'svg', // one of png, svg, jpeg, webp
+    //     filename: 'locus_quantification_gene_expressions',
+    //     width: 1000,
+    //     height: 600,
+    //     scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    //   }
+    // } 
+    // PlotlyJS.react("qtls-locus-quantification-plot", pdata, playout, pconfig);
   }
 
   triggerReplot() {
