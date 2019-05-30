@@ -1,9 +1,17 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
-import { PlotComponent } from 'angular-plotly.js';
 import { MatDialog } from '@angular/material';
 import { QTLsLocusAlignmentBoxplotsComponent } from '../qtls-locus-alignment-boxplots/qtls-locus-alignment-boxplots.component';
 import { environment } from '../../../../environments/environment' 
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
+
+PlotlyModule.plotlyjs = PlotlyJS;
+
 
 // import * as Plotly from '../../../../node_modules/plotly.js/dist/plotly.js';
 
@@ -30,6 +38,10 @@ export interface GeneVariants {
   gene_symbol: string;
   rsnum: string;
 }
+
+@NgModule({
+  imports: [CommonModule, PlotlyModule],
+})
 
 @Component({
   selector: 'app-qtls-locus-alignment',
@@ -121,6 +133,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         } else {
           // if not, do not graph GWAS plot or scatter plot
           this.graph = this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot)
+          // this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
         }
       }
       // ensure graphs are properly positioned when data input panel collapse is toggled
@@ -230,6 +243,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return yData;
   }
 
+  getMaxFinite(data) {
+    var max = Number.NEGATIVE_INFINITY;
+    for(var i = 0; 0 < data.length; i++) {
+      if (isFinite(data[i])) {
+        if (data[i] > max) {
+          max = data[i];
+        }
+      }
+    }
+    return max;
+  }
+
   locusAlignmentPlotGWAS(geneData, geneGWASData, geneDataRC, qDataTopAnnot) {
     var xData = this.getXData(geneData);
     var yData = this.getYData(geneData);
@@ -241,9 +266,55 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
     var xLDRef = qDataTopAnnot['pos'] / 1000000.0;
     var yLDRef = Math.log10(qDataTopAnnot['pval_nominal']) * -1.0;
-
+    var yDataFinites = this.removeInfinities(yData);
+    var topPvalY = Math.max.apply(null, yDataFinites);
+    var topPvalIdx = yData.indexOf(topPvalY);
+    // var yGWASDataFinites = this.removeInfinities(yGWASData);
+    // var topPvalYGWAS = Math.max.apply(null, yGWASDataFinites);
+    // var topPvalIdxGWAS = yGWASData.indexOf(topPvalYGWAS);
+    // mark point with most significant P-value
+    var topPvalMarker = {
+      x: [xData[topPvalIdx]],
+      y: [topPvalY],
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        symbol: "diamond",
+        size: 14,
+        opacity: 1.0,
+        color: "red",
+        // color: [colorData[topIdx]],
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        line: {
+          color: 'red',
+          width: 2
+        },
+      },
+      yaxis: 'y2'
+    };
+    // mark GWAS point with most significant P-value
+    // var topPvalMarkerGWAS = {
+    //   x: [xData[topPvalIdxGWAS]],
+    //   y: [topPvalYGWAS],
+    //   mode: 'markers',
+    //   type: 'scatter',
+    //   marker: {
+    //     symbol: "diamond",
+    //     size: 14,
+    //     opacity: 1.0,
+    //     color: "red",
+    //     // color: [colorData[topIdx]],
+    //     // colorscale: 'Viridis',
+    //     // reversescale: true,
+    //     line: {
+    //       color: 'red',
+    //       width: 2
+    //     },
+    //   }
+    // };
     // highlight top point
-    var topAnnotHighlight = {
+    var LDRefHighlight = {
       x: [xLDRef],
       y: [yLDRef],
       hoverinfo: 'none',
@@ -255,9 +326,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
-
     // highlight top point GWAS
-    var topAnnotHighlightGWAS = {
+    var LDRefHighlightGWAS = {
       x: [xLDRef],
       y: [this.getYLDRefGWAS(xData, yGWASData)],
       hoverinfo: 'none',
@@ -269,7 +339,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       }
       // yaxis: 'y2'
     };
-
     // graph GWAS scatter
     var trace1 = {
       x: xData,
@@ -291,7 +360,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       // xaxis: 'x',
       yaxis: 'y'
     };
-
     // graph recombination rate line
     var trace2 = {
       x: xDataRC,
@@ -305,7 +373,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         width: 1
       }
     };
-
     // graph scatter
     var trace3 = {
       x: xData,
@@ -327,7 +394,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       // xaxis: 'x',
       yaxis: 'y2'
     };
-
     // graph recombination rate line
     var trace4 = {
       x: xDataRC,
@@ -341,13 +407,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         width: 1
       }
     };
-
-    var pdata = [topAnnotHighlight, topAnnotHighlightGWAS, trace1, trace2, trace3, trace4];
-
+    var pdata = [topPvalMarker, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4];
+    // var pdata = [topPvalMarker, topPvalMarkerGWAS, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4];
     // round most significant pval to next whole number
     // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
-
     var playout = {
       title: {
         text: 'Locus Alignment Plot',
@@ -372,7 +436,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis3: {
         // range: [0, maxY * 10],
         autorange: true,
-        title: 'GWAS Recombination Rate (cM/Mb)',
+        title: 'Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
@@ -388,7 +452,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis4: {
         // range: [0, maxY * 10],
         autorange: true,
-        title: 'QTLs Recombination Rate (cM/Mb)',
+        title: 'Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
         },
@@ -430,7 +494,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hovermode: 'closest',
       // paper_bgcolor: "#D3D3D3"
     };
-    
     return {
       data: pdata,
       layout: playout, 
@@ -457,9 +520,64 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var yDataRC = this.getYDataRC(geneDataRC);
     var hoverData = this.getHoverData(geneData);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
-
-    // graph recombination rate line
+    var yDataFinites = this.removeInfinities(yData);
+    var topPvalY = Math.max.apply(null, yDataFinites);
+    var topPvalIdx = yData.indexOf(topPvalY);
+    // mark point with most significant P-value
+    var topPvalMarker = {
+      x: [xData[topPvalIdx]],
+      y: [topPvalY],
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        symbol: "diamond",
+        size: 14,
+        opacity: 1.0,
+        color: "red",
+        // color: [colorData[topIdx]],
+        // colorscale: 'Viridis',
+        // reversescale: true,
+        line: {
+          color: 'red',
+          width: 2
+        },
+      }
+    };
+    // highlight top point
+    var LDRefHighlight = {
+      x: [qDataTopAnnot['pos'] / 1000000.0],
+      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        opacity: 1.0, 
+        size: 15,
+        color: "red"
+      }
+    };
+    // graph scatter
     var trace1 = {
+      x: xData,
+      y: yData,
+      text: hoverData,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        opacity: 1.0,
+        color: colorData,
+        colorscale: 'Viridis',
+        reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      }
+    };
+    // graph recombination rate line
+    var trace2 = {
       x: xDataRC,
       y: yDataRC,
       text: hoverDataRC,
@@ -471,46 +589,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         width: 1
       }
     };
-
-    // highlight top point
-    var topAnnotHighlight = {
-      x: [qDataTopAnnot['pos'] / 1000000.0],
-      y: [Math.log10(qDataTopAnnot['pval_nominal']) * -1.0],
-      hoverinfo: 'none',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 15,
-        color: "red"
-      }
-    };
-
-    // graph scatter
-    var trace2 = {
-      x: xData,
-      y: yData,
-      text: hoverData,
-      hoverinfo: 'text',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 7,
-        color: colorData,
-        colorscale: 'Viridis',
-        reversescale: true,
-        line: {
-          color: 'black',
-          width: 1
-        },
-      }
-    };
-    
-    var pdata = [trace1, topAnnotHighlight, trace2];
-
+    var pdata = [topPvalMarker, LDRefHighlight, trace1, trace2];
     // round most significant pval to next whole number
     // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
-    
     var playout = {
       title: {
         text: 'Locus Alignment Plot',
@@ -519,13 +601,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       width: 1000,
       height: 700,
       yaxis: {
-        // range: [0, maxY],
         autorange: true,
         title: "QTLs -log10(P-value)",
         zeroline: false
       },
       yaxis2: {
-        // range: [0, maxY * 10],
         autorange: true,
         title: 'QTLs Recombination Rate (cM/Mb)',
         titlefont: {
@@ -571,7 +651,6 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return {
       data: pdata,
       layout: playout,
-      // divId: "qtls-locus-alignment-plot",
       config: {
         displaylogo: false,
         modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
@@ -584,6 +663,26 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         }
       }
     };
+    // var pconfig = {
+    //   displaylogo: false,
+    //   modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
+    //   toImageButtonOptions: {
+    //     format: 'svg', // one of png, svg, jpeg, webp
+    //     filename: 'locus_alignment_manhattan',
+    //     width: 1000,
+    //     height: 700,
+    //     scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    //   }
+    // };
+    // PlotlyJS.newPlot("qtls-locus-alignment-plot", pdata, playout, pconfig);
+    // PlotlyJS.moveTraces("qtls-locus-alignment-plot", 1, 0);
+    // PlotlyJS.moveTraces("qtls-locus-alignment-plot", 2, 0);
+    // var manhattanPlot = $('#qtls-locus-alignment-plot')[0];
+    // // var helper = this.clickPoint(event);
+    // manhattanPlot.on('plotly_click', function(data){
+    //   this.clickPoint(data);
+    //   var dat = 0;
+    // });
   }
 
   closePopover() {
@@ -612,6 +711,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var recalculateDist = "false";
     var recalculateRef = "true";
     // reset
+    this.closePopover();
     this.data.changeBlurLoad(true);
     this.disableInputs = true;
     $("#ldref-search-warning").hide();
@@ -676,7 +776,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     }
   }
 
-  clickPoint(event, plot: PlotComponent) {
+  clickPoint(event) {
     if (event.points) {
       // console.log(event);
       if (event.points[0].hasOwnProperty("marker.color")) {
@@ -881,11 +981,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       height: 700,
       yaxis: {
         autorange: true,
-        title: "-log10(eQTL nominal pval)",
+        title: "-log10(QTLs P-value)",
       },
       xaxis: {
         autorange: true,
-        title: "-log10(GWAS pvalue)",
+        title: "-log10(GWAS P-value)",
       },
       margin: {
         l: 40,
