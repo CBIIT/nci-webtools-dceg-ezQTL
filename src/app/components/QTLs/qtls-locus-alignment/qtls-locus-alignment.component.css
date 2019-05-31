@@ -1,5 +1,7 @@
 .locus-alignment-result-tab {
-  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  min-height: 750px;
 }
 
 .example-additional-selection {
@@ -15,6 +17,7 @@
   padding: 10px;
   width: auto;
   box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+  white-space: nowrap;
 }
 
 .popover:after, .popover:before {

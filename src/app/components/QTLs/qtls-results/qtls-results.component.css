@@ -1,8 +1,18 @@
+#results {
+    min-width: 1148px;
+}
+
 .result-main {
     position: relative;
     min-height: 450px;
     /* overflow: hidden !important; */
 }
+
+#locus-alignment-results-main {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+}
+
 .mat-tab-label.mat-tab-label-active {
     color: #3F51B5 !important;
 }

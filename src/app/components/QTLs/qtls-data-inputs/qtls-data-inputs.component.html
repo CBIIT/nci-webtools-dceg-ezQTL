@@ -25,7 +25,8 @@
           [(ngModel)]="qtlsType" 
           [ngModelOptions]="{standalone: true}" 
           [disabled]="resultStatus || disableQTLsToggle" 
-          aria-label="Select either Association or GTEx data">
+          aria-label="Select either Association or GTEx data" 
+          (change)="toggleAssocGTEx()">
           <mat-radio-button 
             value="assoc" 
             color="primary">
@@ -70,10 +71,10 @@
           </button>
           <div>
             <div *ngIf="!selectLoadQTLsSamples">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.eQTL.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.eQTL.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.eQTL.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.eQTL.txt" download>Download Sample</a>
             </div>
             <div 
               class="text-secondary" 
@@ -94,7 +95,7 @@
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;" 
               *ngIf="selectLoadQTLsSamples">
-              1q21_3.eQTL.txt
+              MX2.eQTL.txt
             </div>
           </div>
         </div>
@@ -113,7 +114,7 @@
         <mat-form-field class="pl-2 pr-2 qtls-data-input-gtex-select" style="width: 100%">
           <mat-label>Choose Data Set</mat-label>
           <mat-select 
-          [disabled]="resultStatus || (qtlsType != 'gtex')">
+            [disabled]="resultStatus || (qtlsType != 'gtex')">
             <mat-option *ngFor="let GTExDataset of GTExDatasets" [value]="GTExDataset.value">
               {{ GTExDataset.viewValue }}
             </mat-option>
@@ -152,10 +153,10 @@
           </button>
           <div>
             <div *ngIf="!selectLoadQTLsSamples">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.quantification.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.expression.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.quantification.txt" download>Download Sample</a>
             </div>
             <div 
               *ngIf="!selectLoadQTLsSamples && qtlsForm.value.expressionFile" 
@@ -176,7 +177,7 @@
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;" 
               *ngIf="selectLoadQTLsSamples">
-              1q21_3.expression.txt
+              MX2.quantification.txt
             </div>
           </div>
         </div>
@@ -213,10 +214,10 @@
             </button>
           <div>
             <div *ngIf="!selectLoadQTLsSamples">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.genotyping.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.genotyping.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.genotyping.txt" download>Download Sample</a>
             </div>
             <div 
               *ngIf="!selectLoadQTLsSamples && qtlsForm.value.genotypeFile" 
@@ -237,7 +238,7 @@
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;" 
               *ngIf="selectLoadQTLsSamples">
-              1q21_3.genotyping.txt
+              MX2.genotyping.txt
             </div>
           </div>
         </div>
@@ -292,10 +293,10 @@
           </button>
           <div>
             <div *ngIf="!selectLoadGWASSample">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.GWAS.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadGWASSample">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.GWAS.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.GWAS.txt" download>Download Sample</a>
             </div>
             <div 
               *ngIf="!selectLoadGWASSample && qtlsForm.value.gwasFile" 
@@ -316,7 +317,7 @@
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;" 
               *ngIf="selectLoadGWASSample">
-              1q21_3.GWAS.txt
+              MX2.GWAS.txt
             </div>
           </div>
         </div>
@@ -370,10 +371,10 @@
           </button>
           <div>
             <div *ngIf="!selectLoadLDSample">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadLDSample">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/1q21_3.LD.txt" download>Download Sample</a>
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
             </div>
             <div 
               *ngIf="!selectLoadLDSample && qtlsForm.value.LDFile" 
@@ -394,7 +395,7 @@
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;" 
               *ngIf="selectLoadLDSample">
-              1q21_3.LD.txt
+              MX2.LD.txt
             </div>
           </div>
         </div>

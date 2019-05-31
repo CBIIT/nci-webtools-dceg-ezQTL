@@ -2,6 +2,17 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog } from "@angular/material";
 import { QTLsResultsService } from '../../../services/qtls-results.service';
 
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
+
+PlotlyModule.plotlyjs = PlotlyJS;
+
+@NgModule({
+  imports: [CommonModule, PlotlyModule],
+})
 
 @Component({
   selector: 'app-qtls-locus-alignment-boxplots',

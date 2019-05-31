@@ -41,58 +41,32 @@
   </div>
 
   <!-- Show centered Plotly locus alignment manhattan plot(s) if graph is generated -->
-  <!-- <div 
-    class="d-flex justify-content-center" 
-    id="qtls-locus-alignment-plot" 
-    *ngIf="graph">
-    <plotly-plot 
-      id="locus-alignment-plot" 
-      [data]="graph.data" 
-      [layout]="graph.layout" 
-      [config]="graph.config" 
-      (click)="plotlyClick($event, plot)" 
-      (relayout)="closePopover2($event)" 
-      (redraw)="closePopover2($event)"
-      #plot>
-    </plotly-plot>
-  </div> -->
   <div 
     class="d-flex justify-content-center" 
-    id="qtls-locus-alignment-plot" 
-    *ngIf="graph">
+    id="qtls-locus-alignment-plot">
     <plotly-plot 
+      *ngIf="graph"
       [data]="graph.data" 
       [layout]="graph.layout" 
       [config]="graph.config" 
       [divId]="graph.divId" 
-      (click)="clickPoint($event, plot)" 
+      (click)="clickPoint($event)" 
       (relayout)="closePopover2($event)" 
       (redraw)="closePopover2($event)">
     </plotly-plot>
   </div>
+
   <!-- <div 
     class="d-flex justify-content-center" 
-    id="qtls-locus-alignment-plot" 
-    *ngIf="graph">
-    <plotly-plot 
-      id="locus-alignment-plot" 
-      [data]="graph.data" 
-      [layout]="graph.layout" 
-      [config]="graph.config" 
-      (click)="clickPoint($event, plot)" 
-      (hover)="hoverPoint($event, plot)" 
-      (relayout)="closePopover2($event)" 
-      (redraw)="closePopover2($event)"
-      #plot>
-    </plotly-plot>
+    id="qtls-locus-alignment-plot">
   </div> -->
 
   <!-- Show centered Plotly locus alignment scatter plot if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
-    id="qtls-locus-alignment-scatter-plot" 
-    *ngIf="scatter">
+    id="qtls-locus-alignment-scatter-plot">
     <plotly-plot 
+      *ngIf="scatter"
       [data]="scatter.data" 
       [layout]="scatter.layout" 
       [config]="scatter.config">

@@ -4,7 +4,7 @@
 
       <!-- Locus Alignment Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoad" id="locus-alignment-results" label="Locus Alignment"> 
-        <div class="col" class="result-main">
+        <div class="col result-main" id="locus-alignment-results-main">
           <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage"> -->
           <div class="p-2 blur-loading" *ngIf="!mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
@@ -28,7 +28,7 @@
 
       <!-- Locus Table Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoad" id="table-results" label="Locus Table"> 
-        <div class="col" class="result-main">
+        <div class="col result-main" id="locus-table-results-main">
           <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>
@@ -55,7 +55,7 @@
 
       <!-- Locus Colocalization Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoad || disableLocusColocalization" id="locus-colocalization-results" label="Locus Colocalization"> 
-        <div class="col" class="result-main">
+        <div class="col result-main" id="locus-colocalization-results-main">
           <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>
@@ -82,7 +82,7 @@
 
       <!-- Locus Quantification Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoad || disableLocusQuantification" id="locus-quantification-results" label="Locus Quantification"> 
-        <div class="col" class="result-main">
+        <div class="col result-main" id="locus-quantification-results-main">
           <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
             Upload data files on the left panel and click Calculate to see results here.
           </div>

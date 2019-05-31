@@ -1,6 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
+import * as PlotlyJS from 'plotly.js/dist/plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
+
+PlotlyModule.plotlyjs = PlotlyJS;
+
+@NgModule({
+    imports: [CommonModule, PlotlyModule],
+})
 
 @Component({
   selector: 'app-qtls-locus-quantification',
@@ -44,118 +54,19 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
               if (this.totalNumGenes > 30) {
                 this.selectNumGenes = "30";
                 this.totalNumGenesArray = this.totalNumGenesArray.slice(0, 30);
-                // this.data.changeWarningMessage('Data files contain ' + this.totalNumGenes + ' genes. Only top 30 gene expressions with most significant p-values will be displayed.');
                 this.warningMessage = 'Data files contain ' + this.totalNumGenes + ' genes. Only top 30 gene expressions with most significant p-values will be displayed.';
               }
             }
+            this.selectedScale = "linear";
+            this.selectedMedianSort = "";
             if (this.locusQuantificationData[0] && this.locusQuantificationHeatmapData[0]) {
-              this.graph = this.locusQuantificationViolinBoxPlot(this.locusQuantificationData);
-              this.heatmap = this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData);
+              this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, this.geneSymbols, this.selectedScale, this.selectedMedianSort);
+              this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData, this.selectedScale);
             }
-            this.selectedScale = "log"
           }
         });
-        // this.selectNumGenes = "15"; // default number of genes displayed
-        // this.data.currentWarningMessage.subscribe(warningMessage => {
-        //   this.warningMessage = warningMessage;
-        // });
       }
     });
-  }
-
-  getHeatmapX(geneHeatmapData) {
-    var samples = [];
-    var firstObject = geneHeatmapData[0];
-    var geneHeatmapDataKeys = Object.keys(firstObject);
-    for(var i = 0; i < geneHeatmapDataKeys.length; i++) {
-      if (geneHeatmapDataKeys[i] != "gene_symbol") {
-        samples.push(geneHeatmapDataKeys[i]);
-      }
-    }
-    return samples;
-  }
-
-  getHeatmapY(geneHeatmapData) {
-    var geneSymbols = [];
-    for (var i = 0; i < geneHeatmapData.length; i++) {
-      geneSymbols.push(geneHeatmapData[i]['gene_symbol']);
-    }
-    return geneSymbols;
-  }
-
-  getHeatmapZ(geneHeatmapData, xData) {
-    var exp = [];
-    for (var x = 0; x < geneHeatmapData.length; x++) {
-      var row = [];
-      for (var y = 0; y < xData.length; y++) {
-        row.push(Math.log2(geneHeatmapData[x][xData[y]] + 0.1));
-      }
-      exp.push(row);
-    }
-    return exp;
-  }
-
-  locusQuantificationHeatmap(geneHeatmapData) {
-    // console.log(geneHeatmapData);
-    var xData = this.getHeatmapX(geneHeatmapData);
-    // console.log("xData", xData);
-    var yData = this.getHeatmapY(geneHeatmapData);
-    // console.log("yData", yData);
-    var zData = this.getHeatmapZ(geneHeatmapData, xData);
-    // console.log("zData", zData);
-    var pdata = [
-      {
-        x: xData,
-        y: yData,
-        z: zData,
-        type: 'heatmap',
-        colorscale: "Viridis",
-        showscale: false
-      }
-    ];
-
-    // var pdata = [
-    //   {
-    //     z: [[1, 20, 30, 50, 1], [20, 1, 60, 80, 30], [30, 60, 1, -10, 20]],
-    //     x: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-    //     y: ['Morning', 'Afternoon', 'Evening'],
-    //     type: 'heatmap',
-    //     colorscale: "Viridis",
-    //     showscale: false
-    //   }
-    // ];
-
-    var playout = {
-        width: 900,
-        height: 800,
-        yaxis: {
-          side: "right",
-          tickangle: 35
-        },
-        xaxis: {
-          showticklabels: false
-        },
-        margin: {
-          r: 100
-        },
-        showlegend: false
-    };
-
-    return { 
-      data: pdata, 
-      layout: playout, 
-      config: {
-        displaylogo: false, 
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
-        toImageButtonOptions: {
-          format: 'svg', // one of png, svg, jpeg, webp
-          filename: 'locus_quantification_heatmap',
-          width: 900,
-          height: 800,
-          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
-        }
-      } 
-    };
   }
 
   getGeneSymbols(geneList) {
@@ -194,80 +105,21 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     return yData;
   }
 
-  locusQuantificationViolinBoxPlot(geneData) {
-    var xData = this.geneSymbols;
-    var yData = this.getGeneYDataLog(geneData, xData);
-    var pdata = [];
-
-    for ( var i = 0; i < xData.length; i++ ) {
-      var result = {
-        type: 'violin',
-        y: yData[i],
-        name: xData[i],
-        box: {
-          visible: true
-        }, 
-        points: 'all',
-        jitter: 0.5,
-        pointpos: 0,
-        fillcolor: 'cls',
-        marker: {
-          size: 2
-        },
-        line: {
-          width: 1
-        }
-      };
-      pdata.push(result);
-    };
-
-    var playout = {
-        width: 1000,
-        height: 600,
-        yaxis: {
-          title: "Gene Expressions (log2)",
-          autorange: true,
-          showgrid: true,
-          zeroline: true,
-          // dtick: 4,
-          gridwidth: 1
-        },
-        margin: {
-          l: 40,
-          r: 15,
-          b: 80,
-          t: 40
-        },
-        showlegend: false
-    };
-
-    return { 
-      data: pdata, 
-      layout: playout, 
-      config: {
-        displaylogo: false, 
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
-        toImageButtonOptions: {
-          format: 'svg', // one of png, svg, jpeg, webp
-          filename: 'locus_quantification_gene_expressions',
-          width: 1000,
-          height: 600,
-          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
-        }
-      } 
-    };
-
-  }
-
   getMedian(data) {
-    data.sort(function(a,b){
+    var sortedData = data.sort(function(a, b) {
       return a - b;
     });
-    var half = Math.floor(data.length / 2);
-    if (data.length % 2)
-      return data[half];
-    else
-      return (data[half - 1] + data[half]) / 2.0;
+    // console.log("sortedData", sortedData);
+    var half = Math.floor(sortedData.length / 2.0);
+    // console.log("half", half);
+    if (sortedData.length % 2 == 1) {
+      // console.log("median odd", sortedData[half]);
+      return sortedData[half];
+    }
+    else {
+      // console.log("median even", (sortedData[half - 1] + sortedData[half]) / 2.0);
+      return (sortedData[half - 1] + sortedData[half]) / 2.0;
+    }
   }
 
   compareMedian(a, b) {
@@ -280,17 +132,14 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       var geneData = [this.getMedian(yData[i])].concat([xData[i]].concat(yData[i]));
       dataSorted.push(geneData);
     }
-    // console.log("before sort:", dataSorted);
     dataSorted = dataSorted.sort(this.compareMedian);
     if (medianSort == "desc") {
       dataSorted = dataSorted.reverse();
     }
-    // console.log("after sort:", dataSorted);
     return dataSorted;
   }
 
-  replotExpressionsViolinBoxPlot(geneData, xData, scale, medianSort) {
-
+  locusQuantificationViolinBoxPlot(geneData, xData, scale, medianSort) {
     // var yData = this.getGeneYDataLog(geneData, xData);
     if (scale == "log") {
       var yData = this.getGeneYDataLog(geneData, xData);
@@ -301,6 +150,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     var pdata = [];
     if (medianSort == "asc" || medianSort == "desc") {
       var dataSorted = this.sortMedian(xData, yData, medianSort);
+      // console.log(dataSorted);
       for ( var i = 0; i < xData.length; i ++ ) {
         var resultSorted = {
           type: 'violin',
@@ -345,12 +195,12 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         pdata.push(result);
       };
     }
-
     var playout = {
         width: 1000,
         height: 600,
         yaxis: {
-          title: (scale == "log") ? "Gene Expressions (log2)" : "Gene Expressions",
+          // title: (scale == "log") ? "Gene Expressions (log2)" : "Gene Expressions",
+          title: "Trait Quantification",
           autorange: true,
           showgrid: true,
           zeroline: true,
@@ -365,7 +215,6 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         },
         showlegend: false
     };
-
     this.graph = { 
       data: pdata, 
       layout: playout, 
@@ -381,13 +230,139 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         }
       } 
     };
+    // var pconfig = {
+    //   displaylogo: false, 
+    //   modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+    //   toImageButtonOptions: {
+    //     format: 'svg', // one of png, svg, jpeg, webp
+    //     filename: 'locus_quantification_gene_expressions',
+    //     width: 1000,
+    //     height: 600,
+    //     scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    //   }
+    // } 
+    // PlotlyJS.react("qtls-locus-quantification-plot", pdata, playout, pconfig);
+  }
+
+  getHeatmapX(geneHeatmapData) {
+    var samples = [];
+    var firstObject = geneHeatmapData[0];
+    var geneHeatmapDataKeys = Object.keys(firstObject);
+    for(var i = 0; i < geneHeatmapDataKeys.length; i++) {
+      if (geneHeatmapDataKeys[i] != "gene_symbol") {
+        samples.push(geneHeatmapDataKeys[i]);
+      }
+    }
+    return samples;
+  }
+
+  getHeatmapY(geneHeatmapData) {
+    var geneSymbols = [];
+    for (var i = 0; i < geneHeatmapData.length; i++) {
+      geneSymbols.push(geneHeatmapData[i]['gene_symbol']);
+    }
+    return geneSymbols;
+  }
+
+  getHeatmapZLog(geneHeatmapData, xData) {
+    var exp = [];
+    for (var x = 0; x < geneHeatmapData.length; x++) {
+      var row = [];
+      for (var y = 0; y < xData.length; y++) {
+        // console.log(geneHeatmapData[x][xData[y]]);
+        row.push(Math.log2(geneHeatmapData[x][xData[y]] + 0.1));
+      }
+      exp.push(row);
+    }
+    return exp;
+  }
+
+  getHeatmapZLinear(geneHeatmapData, xData) {
+    var exp = [];
+    for (var x = 0; x < geneHeatmapData.length; x++) {
+      var row = [];
+      for (var y = 0; y < xData.length; y++) {
+        // console.log(geneHeatmapData[x][xData[y]]);
+        row.push(geneHeatmapData[x][xData[y]]);
+      }
+      exp.push(row);
+    }
+    return exp;
+  }
+
+  locusQuantificationHeatmap(geneHeatmapData, scale) {
+    // console.log(geneHeatmapData);
+    var xData = this.getHeatmapX(geneHeatmapData);
+    // console.log("xData", xData);
+    var yData = this.getHeatmapY(geneHeatmapData);
+    // console.log("yData", yData);
+    if (scale == "log") {
+      var zData = this.getHeatmapZLog(geneHeatmapData, xData);
+      // console.log("zData Log", zData);
+    } else {
+      var zData = this.getHeatmapZLinear(geneHeatmapData, xData);
+      // console.log("zData Linear", zData);
+    }
+    var pdata = [
+      {
+        x: xData,
+        y: yData,
+        z: zData,
+        type: 'heatmap',
+        colorscale: "Viridis",
+        showscale: false
+      }
+    ];
+    var playout = {
+        width: 900,
+        height: 800,
+        yaxis: {
+          side: "right",
+          tickangle: 35
+        },
+        xaxis: {
+          showticklabels: false
+        },
+        margin: {
+          r: 100
+        },
+        showlegend: false
+    };
+    this.heatmap = { 
+      data: pdata, 
+      layout: playout, 
+      config: {
+        displaylogo: false, 
+        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+        toImageButtonOptions: {
+          format: 'svg', // one of png, svg, jpeg, webp
+          filename: 'locus_quantification_heatmap',
+          width: 900,
+          height: 800,
+          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        }
+      } 
+    };
+    // var pconfig = {
+    //   displaylogo: false, 
+    //   modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian"],
+    //   toImageButtonOptions: {
+    //     format: 'svg', // one of png, svg, jpeg, webp
+    //     filename: 'locus_quantification_heatmap',
+    //     width: 900,
+    //     height: 800,
+    //     scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+    //   }
+    // };
+    // PlotlyJS.newPlot("qtls-locus-quantification-heatmap", pdata, playout, pconfig);
   }
 
   triggerReplot() {
     // console.log("scale:", this.selectedScale);
     // console.log("median sort:", this.selectedMedianSort);
     var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
-    this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
+    this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
+    this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData, this.selectedScale);
   }
 
   resetSort() {
@@ -396,7 +371,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     // console.log("scale:", this.selectedScale);
     // console.log("median sort:", this.selectedMedianSort);
     var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
-    this.replotExpressionsViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
+    this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
   }
 
 }
