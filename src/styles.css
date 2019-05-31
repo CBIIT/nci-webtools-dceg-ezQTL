@@ -11,7 +11,7 @@ body {
 /* Bootstrap overrides */
 
 .container {
-  min-width: 1400px;
+  min-width: 1500px;
 }
 
 .bg-primary, .btn-primary {

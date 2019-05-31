@@ -37,6 +37,9 @@ export class QTLsComponent implements OnInit {
   toggleView() {
     // console.log("clicked");
     $("#toggle-view-button").toggleClass('fa-caret-left fa-caret-right');
+    // toggle position of locus alignment manhattan plot for popovers to fit
+    $("#qtls-locus-alignment-plot").toggleClass('justify-content-start justify-content-center');
+    $("#qtls-locus-alignment-scatter-plot").toggleClass('justify-content-start justify-content-center');
     // console.log($("#toggle-view-button").attr("class"));
     var direction = $("#toggle-view-button").attr("class");
     if (direction.includes("left")) {
@@ -47,7 +50,7 @@ export class QTLsComponent implements OnInit {
       // shift popovers to the left if any are open
       if ($(".popover").is(":visible")) {
         $('.popover').css({
-          left: $(".popover").position().left - 165 + "px"
+          left: $(".popover").position().left - 220 + "px"
         });
       }
     } else {
@@ -58,7 +61,7 @@ export class QTLsComponent implements OnInit {
       // shift popovers to the right if any are open
       if ($(".popover").is(":visible")) {
         $('.popover').css({
-          left: $(".popover").position().left + 165 + "px"
+          left: $(".popover").position().left + 220 + "px"
         });
       }
     }

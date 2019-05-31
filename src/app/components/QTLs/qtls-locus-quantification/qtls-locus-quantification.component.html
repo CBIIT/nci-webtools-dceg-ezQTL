@@ -1,4 +1,4 @@
-<div class="gene-expressions-result-tab">
+<div class="locus-quantification-result-tab">
   <div class="row p-3 justify-content-between">
 
     <!-- Number of Genes input -->
@@ -25,8 +25,8 @@
             aria-label="Font Style" 
             [(ngModel)]="selectedScale" 
             (change)="triggerReplot()">
-            <mat-button-toggle value="log">Log</mat-button-toggle>
             <mat-button-toggle value="linear">Linear</mat-button-toggle>
+            <mat-button-toggle value="log">Log</mat-button-toggle>
           </mat-button-toggle-group>
         </div>
         <div class="col-md-auto pl-3 pr-3">
@@ -55,7 +55,7 @@
   <!-- Show centered Plotly locus quantification violin boxplot if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
-    id="qtls-gene-expressions-plot" 
+    id="qtls-locus-quantification-plot" 
     *ngIf="graph">
       <plotly-plot 
         [data]="graph.data" 
@@ -63,6 +63,10 @@
         [config]="graph.config">
       </plotly-plot>
   </div>
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-quantification-plot">
+  </div> -->
 
   <!-- Show warning message if more than 15 genes in QTLs data file -->
   <div 
@@ -82,7 +86,7 @@
   <!-- Show centered Plotly locus quantification heatmap if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
-    id="qtls-gene-expressions-heatmap" 
+    id="qtls-locus-quantification-heatmap" 
     *ngIf="heatmap">
       <plotly-plot 
         [data]="heatmap.data" 
@@ -90,6 +94,10 @@
         [config]="heatmap.config">
       </plotly-plot>
   </div>
+  <!-- <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-quantification-heatmap">
+  </div> -->
 
   <br>
 

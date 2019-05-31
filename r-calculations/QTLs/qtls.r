@@ -37,7 +37,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## read and parse association data file ###
   if (identical(select_qtls_samples, 'true')) {
-    qdatafile <- paste0('../static/assets/files/', '1q21_3.eQTL.txt') 
+    qdatafile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
   } else {
     qdatafile <- paste0('tmp/', assocFile)
   }
@@ -221,7 +221,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
 
   source('QTLs/emeraLD2R.r')
 
-  locus <- "1q21_3"
+  locus <- "MX2"
 
   ### output region as bed file
   qdata_region %>% 
@@ -278,7 +278,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('tmp/', gwasFile)
     } else {
-      gwasdatafile <- paste0('../static/assets/files/', '1q21_3.GWAS.txt')
+      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
     }
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
     gwas_example_scatter_data_title <- gwas_example_scatter(gwasdata, qdata_region)
@@ -307,8 +307,8 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
       gdatafile <- paste0('tmp/', genoFile)
       edatafile <- paste0('tmp/', exprFile)
     } else {
-      gdatafile <- paste0('../static/assets/files/', '1q21_3.genotyping.txt') 
-      edatafile <- paste0('../static/assets/files/', '1q21_3.expression.txt') 
+      gdatafile <- paste0('../static/assets/files/', 'MX2.genotyping.txt') 
+      edatafile <- paste0('../static/assets/files/', 'MX2.quantification.txt') 
     }
     
     gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
@@ -342,7 +342,7 @@ gwas_example <- function(workDir, select_gwas_sample, gwasFile) {
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('tmp/', gwasFile)
     } else {
-      gwasdatafile <- paste0('../static/assets/files/', '1q21_3.GWAS.txt')
+      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
     }
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
     gwasdata_colnames <- colnames(gwasdata)
@@ -363,8 +363,8 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
       gdatafile <- paste0('tmp/', genoFile)
       edatafile <- paste0('tmp/', exprFile)
     } else {
-      gdatafile <- paste0('../static/assets/files/', '1q21_3.genotyping.txt') 
-      edatafile <- paste0('../static/assets/files/', '1q21_3.expression.txt') 
+      gdatafile <- paste0('../static/assets/files/', 'MX2.genotyping.txt') 
+      edatafile <- paste0('../static/assets/files/', 'MX2.quantification.txt') 
     }
 
     gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
