@@ -83,12 +83,13 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_alignment_scatter <- locus_alignment[[4]]
   locus_alignment_scatter_data <- locus_alignment_scatter[[1]]
   locus_alignment_scatter_title <- locus_alignment_scatter[[2]]
+  gwas_example_data <- locus_alignment[[5]]
   ## locus quantification calculations ##
   locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile)
   locus_quantification_data <- locus_quantification[[1]]
   locus_quantification_heatmap_data <- locus_quantification[[2]]
-  ## locus alignment gwas data ##
-  gwas_example_data <- gwas_example(workDir, select_gwas_sample, gwasFile)
+  # ## locus alignment gwas data ##
+  # gwas_example_data <- gwas_example(workDir, select_gwas_sample, gwasFile)
   ## combine results from QTLs modules calculations and return ##
   dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_scatter=list(data=locus_alignment_scatter_data, title=locus_alignment_scatter_title), gwas=list(data=gwas_example_data))))
   ## remove all generated temporary files in the /tmp directory
@@ -286,7 +287,9 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
     gwas_example_scatter_data_title <- gwas_example_scatter(gwasdata, qdata_region)
   }
-  return(list(locus_alignment_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_scatter_data_title))
+  ## locus alignment gwas data ##
+  gwas_example_data <- gwas_example(workDir, select_gwas_sample, gwasFile, qdata_region)
+  return(list(locus_alignment_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_scatter_data_title, gwas_example_data))
 }
 
 locus_quantification_heatmap <- function(edata_boxplot) {
@@ -337,7 +340,7 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
-gwas_example <- function(workDir, select_gwas_sample, gwasFile) {
+gwas_example <- function(workDir, select_gwas_sample, gwasFile, qdata_region) {
   # initialize GWAS data as empty until data file detected
   gwas_example_data <- list(c())
   # return outputs in list with GWAS data
@@ -348,6 +351,9 @@ gwas_example <- function(workDir, select_gwas_sample, gwasFile) {
       gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
     }
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
+    gwasdata <- merge(x = qdata_region, y = gwasdata, by = c("pos", "rsnum"), all.x = TRUE) %>%
+      select(chr.y,pos,variant_id,gene_id,gene_symbol,ref.y,alt.y,rsnum,pvalue,zscore,effect,slope,se,R2,tss_distance)
+    names(gwasdata) <- c("chr", "pos", "variant_id", "gene_id", "gene_symbol", "ref", "alt", "rsnum", "pvalue", "zscore", "effect", "slope", "se", "R2", "tss_distance")
     gwasdata_colnames <- colnames(gwasdata)
     gwas_example_data <- list(setNames(as.data.frame(gwasdata), gwasdata_colnames))
   }
