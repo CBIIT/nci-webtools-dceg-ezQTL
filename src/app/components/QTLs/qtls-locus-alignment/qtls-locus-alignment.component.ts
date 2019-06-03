@@ -188,6 +188,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return hoverData;
   }
 
+  getHoverDataGWAS(geneGWASData) {
+    var hoverData = [];
+    for (var i = 0; i < geneGWASData.length; i++) {
+      if ('rsnum' in geneGWASData[i]) {
+        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + 'P-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+      } else {
+        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + 'P-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+      }
+    }
+    return hoverData;
+  }
+
   getHoverDataRC(geneDataRC) {
     var hoverDataRC = [];
     for (var i = 0; i < geneDataRC.length; i++) {
@@ -263,6 +275,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var xDataRC = this.getXDataRC(geneDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
     var hoverData = this.getHoverData(geneData);
+    var hoverDataGWAS = this.getHoverDataGWAS(geneGWASData);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
     var xLDRef = qDataTopAnnot['pos'] / 1000000.0;
     var yLDRef = Math.log10(qDataTopAnnot['pval_nominal']) * -1.0;
@@ -345,7 +358,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var trace1 = {
       x: xData,
       y: yGWASData,
-      text: hoverData,
+      text: hoverDataGWAS,
       hoverinfo: 'text',
       mode: 'markers',
       type: 'scatter',
@@ -779,22 +792,31 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     }
   }
 
-  clickPoint(event) {
+  clickPoint(event) {    
     if (event.points) {
-      // console.log(event);
+      // console.log("pointIndex", event.points[0].pointIndex);
       if (event.points[0].hasOwnProperty("marker.color")) {
-        // console.log("SHOW MARKER");
         // only show popovers for scatter points not recomb line (points w/ markers)
         var top = event.event.pointerY;
         var left = event.event.pointerX;
-        // console.log("event", event);
-        // console.log("event.event", event.event);
-        // console.log("pointerY", top);
-        // console.log("pointerX", left);
-        // console.log("pageY", event.event.pageY);
-        // console.log("pageX", event.event.pageX);
-        // console.log(event.points[0]);
-        this.popoverData = this.locusAlignmentData[event.points[0].pointIndex];
+        // this.popoverData = this.locusAlignmentData[event.points[0].pointIndex];
+        // console.log("popoverData", this.popoverData);
+        if (this.GWASData[0]) { // if GWAS data is displayed in Manhattan plot
+          // console.log("GWAS data displayed");
+          if (event.points[0].curveNumber == 3) { // if GWAS data is clicked
+            // console.log("GWAS data clicked.");
+            this.popoverData = this.GWASData[event.points[0].pointIndex];
+            // console.log("popoverData", this.popoverData);
+          } else { // if Association data is clicked
+            // console.log("Association data clicked.");
+            this.popoverData = this.locusAlignmentData[event.points[0].pointIndex];
+            // console.log("popoverData", this.popoverData);
+          }
+        } else { // if no GWAS data is disaplyed in Manhattan plot
+          // console.log("No GWAS data displayed");
+          this.popoverData = this.locusAlignmentData[event.points[0].pointIndex];
+          // console.log("popoverData", this.popoverData);
+        }
         $('.popover').show();
         if (this.collapseInput) { // input panel collapsed
           $('.popover').show().css({
