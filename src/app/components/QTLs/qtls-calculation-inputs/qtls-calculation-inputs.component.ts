@@ -38,7 +38,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
   });
   qtlsCalculationFormCISDistance = new FormGroup({
-    cisDistanceInput: new FormControl("100", [Validators.pattern("^(-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
+    cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
   });
 
   mainData: Object;
