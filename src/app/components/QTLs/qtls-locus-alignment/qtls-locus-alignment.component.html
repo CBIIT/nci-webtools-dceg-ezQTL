@@ -72,6 +72,27 @@
       [config]="scatter.config">
     </plotly-plot>
   </div>
+  
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-scatter-threshold"
+    *ngIf="scatter">
+    <form [formGroup]="GWASScatterThreshold">
+      <mat-form-field class="pval-threshold-input-field">
+        <input 
+          #pvalThreshold
+          matInput 
+          placeholder="P-value Threshold" 
+          (keyup)="changePvalThreshold($event)" 
+          [(ngModel)]="selectedPvalThreshold" 
+          formControlName="pvalThreshold">
+        <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearPvalThreshold()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-error *ngIf="GWASScatterThreshold.invalid">{{ pvalThresholdErrorMsg() }}</mat-error>
+      </mat-form-field>
+    </form>
+  </div>
 
   <br>
 
