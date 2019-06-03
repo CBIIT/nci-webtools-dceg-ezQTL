@@ -109,9 +109,9 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculateGene, r
   }
 }
 
-locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, locus, chromosome, qdata_region_pos) {
+locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
   if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
-    cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.',locus,'.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
+    cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.','locus.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
     system(cmd)
     cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')
     system(cmd)
@@ -225,15 +225,13 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
 
   source('QTLs/emeraLD2R.r')
 
-  locus <- "MX2"
-
   ### output region as bed file
   qdata_region %>% 
     mutate(start=pos-1) %>% 
     select(chr,start,pos) %>% 
     arrange(chr,start,pos) %>% 
     unique() %>% 
-    write_delim(paste0('tmp/',request,'.',locus,'.bed'),delim = '\t',col_names = F)
+    write_delim(paste0('tmp/',request,'.','locus.bed'),delim = '\t',col_names = F)
 
   ## remove any previous extracted panel if exists
   unlink(paste0('tmp/',request,'.','extracted','.panel'))
@@ -253,7 +251,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     }
   }
 
-  locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, locus, chromosome, qdata_region$pos)
+  locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
 
   ld_data <- readRDS(paste0("tmp/",request,".ld_data.rds"))
 
