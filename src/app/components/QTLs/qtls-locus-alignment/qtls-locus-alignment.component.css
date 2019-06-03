@@ -63,3 +63,7 @@
   padding: 0px;
   margin: 0px;
 }
+
+.pval-threshold-field {
+  width: 200px !important;
+}
