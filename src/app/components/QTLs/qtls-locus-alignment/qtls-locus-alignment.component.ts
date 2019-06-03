@@ -838,7 +838,24 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           }
         } else { // if no GWAS data is disaplyed in Manhattan plot
           // console.log("No GWAS data displayed");
-          this.popoverData = this.locusAlignmentData[event.points[0].pointIndex];
+          var associationData = this.locusAlignmentData[event.points[0].pointIndex];
+          this.popoverData = {
+            chr: associationData["chr"], 
+            pos: associationData["pos"], 
+            variant_id: associationData["variant_id"], 
+            gene_id: associationData["gene_id"], 
+            gene_symbol: associationData["gene_symbol"],
+            ref: associationData["ref"], 
+            alt: associationData["alt"], 
+            rsnum: associationData["rsnum"], 
+            pvalue: associationData["pval_nominal"], 
+            zscore: associationData["zscore"], 
+            effect: associationData["effect"],  
+            slope: associationData["slope"], 
+            se: associationData["se"], 
+            R2: associationData["R2"], 
+            tss_distance: associationData["tss_distance"]
+          };
           // console.log("popoverData", this.popoverData);
         }
         $('.popover').show();
