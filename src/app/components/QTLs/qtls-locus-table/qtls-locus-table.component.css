@@ -24,5 +24,6 @@ table {
 }
 
 .mat-cell {
-  padding: 0 6px 0 6px !important;
+  /* padding: 0 6px 0 6px !important; */
+  padding-left: 6px;
 }
