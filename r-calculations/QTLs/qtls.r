@@ -265,13 +265,19 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     rownames(ld_info) <- ld_data$info$id
     qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
     write.table(qdata_region, file = paste0("../static/tmp/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
-    qdata_region_colnames <- colnames(qdata_region)
-    locus_alignment_data <- list(setNames(as.data.frame(qdata_region), qdata_region_colnames))
+    ## cast column types to string to prevent rounding of decimals
+    qdata_region_string <- qdata_region
+    qdata_region_string[10:13] <- lapply(qdata_region_string[10:13], as.character)
+    qdata_region_string_colnames <- colnames(qdata_region_string)
+    locus_alignment_data <- list(setNames(as.data.frame(qdata_region_string), qdata_region_string_colnames))
   } else {
     qdata_region$R2 <- NA
     write.table(qdata_region, file = paste0("../static/tmp/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
-    qdata_region_colnames <- colnames(qdata_region)
-    locus_alignment_data <- list(setNames(as.data.frame(qdata_region), qdata_region_colnames))
+    ## cast column types to string to prevent rounding of decimals
+    qdata_region_string <- qdata_region
+    qdata_region_string[10:13] <- lapply(qdata_region_string[10:13], as.character)
+    qdata_region_string_colnames <- colnames(qdata_region_string)
+    locus_alignment_data <- list(setNames(as.data.frame(qdata_region_string), qdata_region_string_colnames))
   }
   # initialize scatter data as empty until data file detected
   gwas_example_scatter_data_title <- list(c(), c())
