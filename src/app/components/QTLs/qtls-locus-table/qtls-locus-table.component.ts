@@ -12,8 +12,8 @@ export interface Variant {
   pos: string;
   ref: string;
   alt: string;
-  tss_distance: number;
-  pval_nominal: number;
+  tss_distance: string;
+  pval_nominal: string;
   slope: string;
   slope_se: string;
   R2: string;
@@ -75,11 +75,16 @@ export class QTLsLocusTableComponent implements OnInit {
       variant['pval_nominal'] = geneData[i]['pval_nominal'];
       variant['slope'] = geneData[i]['slope'];
       variant['slope_se'] = geneData[i]['slope_se'];
-      variant['R2'] = geneData[i]['R2'] ? geneData[i]['R2'] : "NA";
+      // variant['R2'] = geneData[i]['R2'] ? geneData[i]['R2'] : "NA";
+      variant['R2'] = geneData[i]['R2'];
       variant['LDpop'] = "Go to";
       variant['GWAS'] = "Go to";
       variant['gnomAD'] = "Go to";
       data.push(variant);
+
+      if (geneData[i]['pval_nominal'] <= .000000000000048646) {
+        console.log(geneData[i]);
+      }
     }
     // console.log(data);
     return data;
