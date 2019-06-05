@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, MatPaginator, MatTableDataSource } from '@angular/material';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
 import { environment } from '../../../../environments/environment' 
+import { DataSource } from '@angular/cdk/table';
 
 export interface Variant {
   gene_id: string;
@@ -81,10 +82,6 @@ export class QTLsLocusTableComponent implements OnInit {
       variant['GWAS'] = "Go to";
       variant['gnomAD'] = "Go to";
       data.push(variant);
-
-      if (geneData[i]['pval_nominal'] <= .000000000000048646) {
-        console.log(geneData[i]);
-      }
     }
     // console.log(data);
     return data;
@@ -93,6 +90,10 @@ export class QTLsLocusTableComponent implements OnInit {
   applyFilter(filterValue: string) {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+
+  // applyFilter(filterValue: string) {
+  //   this.dataSource.filterPredicate = (data, filterValue) => (data.rsnum.trim().toLowerCase().indexOf(filterValue.trim().toLowerCase()) !== -1);  
+  // }
 
   linkGTExGeneID(gene_id) {
     var url = "https://gtexportal.org/home/gene/" + gene_id
