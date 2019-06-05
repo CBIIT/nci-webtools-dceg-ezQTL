@@ -874,7 +874,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
 
   clickPoint(event) {    
     if (event.points) {
-      // console.log("pointIndex", event.points[0].pointIndex);
+      console.log("curveNumber", event.points[0].curveNumber);
       if (event.points[0].hasOwnProperty("marker.color")) {
         // only show popovers for scatter points not recomb line (points w/ markers)
         var top = event.event.pointerY;
@@ -886,9 +886,64 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           if (event.points[0].curveNumber == 3) { // if GWAS data is clicked
             // console.log("GWAS data clicked.");
             this.popoverData = this.GWASData[event.points[0].pointIndex];
+            $('.popover').show();
+            if (this.collapseInput) { // input panel collapsed
+              $('.popover').show().css({
+                position: "absolute",
+                top: top - 125, 
+                left: left + 245
+              });
+            } else { // input panel shown
+              $('.popover').show().css({
+                position: "absolute",
+                top: top - 125, 
+                left: left + 25
+              });
+            }
+            this.showPopover = true;
             // console.log("popoverData", this.popoverData);
           } else { // if Association data is clicked
-            // console.log("Association data clicked.");
+            if (event.points[0].curveNumber == 5) {
+              // console.log("Association data clicked.");
+              var associationData = this.locusAlignmentData[event.points[0].pointIndex];
+              this.popoverData = {
+                chr: associationData["chr"], 
+                pos: associationData["pos"], 
+                variant_id: associationData["variant_id"], 
+                gene_id: associationData["gene_id"], 
+                gene_symbol: associationData["gene_symbol"],
+                ref: associationData["ref"], 
+                alt: associationData["alt"], 
+                rsnum: associationData["rsnum"], 
+                pvalue: associationData["pval_nominal"], 
+                zscore: associationData["zscore"], 
+                effect: associationData["effect"],  
+                slope: associationData["slope"], 
+                se: associationData["se"], 
+                R2: associationData["R2"], 
+                tss_distance: associationData["tss_distance"]
+              };
+              $('.popover').show();
+              if (this.collapseInput) { // input panel collapsed
+                $('.popover').show().css({
+                  position: "absolute",
+                  top: top - 125, 
+                  left: left + 245
+                });
+              } else { // input panel shown
+                $('.popover').show().css({
+                  position: "absolute",
+                  top: top - 125, 
+                  left: left + 25
+                });
+              }
+              this.showPopover = true;
+              // console.log("popoverData", this.popoverData);
+            }
+          }
+        } else { // if no GWAS data is disaplyed in Manhattan plot
+          // console.log("No GWAS data displayed");
+          if (event.points[0].curveNumber == 2) {
             var associationData = this.locusAlignmentData[event.points[0].pointIndex];
             this.popoverData = {
               chr: associationData["chr"], 
@@ -907,45 +962,39 @@ export class QTLsLocusAlignmentComponent implements OnInit {
               R2: associationData["R2"], 
               tss_distance: associationData["tss_distance"]
             };
-            // console.log("popoverData", this.popoverData);
+            $('.popover').show();
+            if (this.collapseInput) { // input panel collapsed
+              $('.popover').show().css({
+                position: "absolute",
+                top: top - 125, 
+                left: left + 245
+              });
+            } else { // input panel shown
+              $('.popover').show().css({
+                position: "absolute",
+                top: top - 125, 
+                left: left + 25
+              });
+            }
+            this.showPopover = true;
           }
-        } else { // if no GWAS data is disaplyed in Manhattan plot
-          // console.log("No GWAS data displayed");
-          var associationData = this.locusAlignmentData[event.points[0].pointIndex];
-          this.popoverData = {
-            chr: associationData["chr"], 
-            pos: associationData["pos"], 
-            variant_id: associationData["variant_id"], 
-            gene_id: associationData["gene_id"], 
-            gene_symbol: associationData["gene_symbol"],
-            ref: associationData["ref"], 
-            alt: associationData["alt"], 
-            rsnum: associationData["rsnum"], 
-            pvalue: associationData["pval_nominal"], 
-            zscore: associationData["zscore"], 
-            effect: associationData["effect"],  
-            slope: associationData["slope"], 
-            se: associationData["se"], 
-            R2: associationData["R2"], 
-            tss_distance: associationData["tss_distance"]
-          };
           // console.log("popoverData", this.popoverData);
         }
-        $('.popover').show();
-        if (this.collapseInput) { // input panel collapsed
-          $('.popover').show().css({
-            position: "absolute",
-            top: top - 125, 
-            left: left + 245
-          });
-        } else { // input panel shown
-          $('.popover').show().css({
-            position: "absolute",
-            top: top - 125, 
-            left: left + 25
-          });
-        }
-        this.showPopover = true;
+        // $('.popover').show();
+        // if (this.collapseInput) { // input panel collapsed
+        //   $('.popover').show().css({
+        //     position: "absolute",
+        //     top: top - 125, 
+        //     left: left + 245
+        //   });
+        // } else { // input panel shown
+        //   $('.popover').show().css({
+        //     position: "absolute",
+        //     top: top - 125, 
+        //     left: left + 25
+        //   });
+        // }
+        // this.showPopover = true;
       }
     } else {
       this.closePopover2(event);
