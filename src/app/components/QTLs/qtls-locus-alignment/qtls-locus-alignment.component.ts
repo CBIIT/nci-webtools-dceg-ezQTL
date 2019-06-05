@@ -874,7 +874,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
 
   clickPoint(event) {    
     if (event.points) {
-      console.log("curveNumber", event.points[0].curveNumber);
+      // console.log("curveNumber", event.points[0].curveNumber);
       if (event.points[0].hasOwnProperty("marker.color")) {
         // only show popovers for scatter points not recomb line (points w/ markers)
         var top = event.event.pointerY;
@@ -1189,6 +1189,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         b: 80,
       },
       showlegend: false,
+      clickmode: 'none',
+      hovermode: 'closest'
     };
     this.scatter = {
       data: pdata,
