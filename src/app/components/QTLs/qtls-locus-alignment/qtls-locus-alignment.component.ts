@@ -312,7 +312,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           width: 2
         },
       },
-      yaxis: 'y2'
+      yaxis: 'y3'
     };
     // mark GWAS point with most significant P-value
     // var topPvalMarkerGWAS = {
@@ -346,7 +346,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         size: 15,
         color: "red"
       },
-      yaxis: 'y2'
+      yaxis: 'y3'
     };
     // highlight top point GWAS
     var LDRefHighlightGWAS = {
@@ -358,8 +358,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       marker: {
         size: 15,
         color: "red"
-      }
-      // yaxis: 'y2'
+      },
+      yaxis: 'y2'
     };
     // graph GWAS scatter
     var trace1 = {
@@ -379,8 +379,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           width: 1
         },
       },
-      // xaxis: 'x',
-      yaxis: 'y'
+      yaxis: 'y2'
     };
     // graph recombination rate line
     var trace2 = {
@@ -388,8 +387,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       y: yDataRC,
       text: hoverDataRC,
       hoverinfo: 'text',
-      yaxis: 'y3',
+      yaxis: 'y4',
       type: 'scatter',
+      opacity: 0.7,
       line: {
         color: 'blue',
         width: 1
@@ -413,8 +413,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           width: 1
         },
       },
-      // xaxis: 'x',
-      yaxis: 'y2'
+      yaxis: 'y3'
     };
     // graph recombination rate line
     var trace4 = {
@@ -422,17 +421,32 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       y: yDataRC,
       text: hoverDataRC,
       hoverinfo: 'text',
-      yaxis: 'y4',
+      yaxis: 'y5',
       type: 'scatter',
+      opacity: 0.7,
       line: {
         color: 'blue',
         width: 1
       }
     };
-    var pdata = [topPvalMarker, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4];
+    // graph gene density
+    var trace5 = {
+      x: xData,
+      y: Array(xData.length).fill(0),
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        symbol: "line-ns-open",
+        size: 16,
+        color: colorData,
+        colorscale: 'Viridis',
+        reversescale: true
+      },
+      yaxis: 'y'
+    };
+    var pdata = [topPvalMarker, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4, trace5];
     // var pdata = [topPvalMarker, topPvalMarkerGWAS, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4];
-    // round most significant pval to next whole number
-    // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
       title: {
@@ -440,40 +454,40 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         xref: 'paper'
       },
       width: 1000,
-      height: 1100,
+      height: 1180,
       yaxis: {
-        // range: [0, maxY],
         autorange: true,
-        title: "GWAS -log10(P-value)",
-        domain: [0, 0.48],
-        zeroline: false
+        // overlaying: false,
+        // title: "Gene Density",
+        domain: [0, 0.025],
+        zeroline: false,
+        showgrid: false,
+        showticklabels: false,
+        linecolor: 'black',
+        linewidth: 1,
+        mirror: true
       },
       yaxis2: {
-        // range: [0, maxY],
         autorange: true,
-        title: "QTLs -log10(P-value)",
-        domain: [0.52, 1],
-        zeroline: false
+        automargin: true,
+        title: "GWAS -log10(P-value)",
+        domain: [0.03, 0.54],
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1
       },
       yaxis3: {
-        // range: [0, maxY * 10],
         autorange: true,
-        title: 'Recombination Rate (cM/Mb)',
-        titlefont: {
-          color: 'blue'
-        },
-        tickfont: {
-          color: 'blue'
-        },
-        overlaying: 'y',
-        side: 'right',
-        showgrid: false,
-        // dtick: 50,
-        zeroline: false
+        automargin: true,
+        title: "QTLs -log10(P-value)",
+        domain: [0.56, 1],
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1
       },
       yaxis4: {
-        // range: [0, maxY * 10],
         autorange: true,
+        automargin: true,
         title: 'Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
@@ -484,13 +498,34 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         overlaying: 'y2',
         side: 'right',
         showgrid: false,
-        // dtick: 50,
-        zeroline: false
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1
+      },
+      yaxis5: {
+        autorange: true,
+        automargin: true,
+        title: 'Recombination Rate (cM/Mb)',
+        titlefont: {
+          color: 'blue'
+        },
+        tickfont: {
+          color: 'blue'
+        },
+        overlaying: 'y3',
+        side: 'right',
+        showgrid: false,
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1
       },
       xaxis: {
         autorange: true,
         title: "Chromosome " + chromosome + " (Mb)",
-        zeroline: false
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1,
+        mirror: "allticks"
       },
       images: [
         {
@@ -514,12 +549,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       showlegend: false,
       clickmode: 'event',
       hovermode: 'closest',
-      // paper_bgcolor: "#D3D3D3"
     };
     this.graph = {
       data: pdata,
       layout: playout, 
-      // divId: "qtls-locus-alignment-plot",
       config: {
         displaylogo: false,
         modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
@@ -557,14 +590,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         size: 14,
         opacity: 1.0,
         color: "red",
-        // color: [colorData[topIdx]],
-        // colorscale: 'Viridis',
-        // reversescale: true,
         line: {
           color: 'red',
           width: 2
         },
-      }
+      },
+      yaxis: 'y2'
     };
     // highlight top point
     var LDRefHighlight = {
@@ -577,7 +608,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         opacity: 1.0, 
         size: 15,
         color: "red"
-      }
+      },
+      yaxis: 'y2'
     };
     // graph scatter
     var trace1 = {
@@ -597,7 +629,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           color: 'black',
           width: 1
         },
-      }
+      },
+      yaxis: 'y2'
     };
     // graph recombination rate line
     var trace2 = {
@@ -605,16 +638,33 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       y: yDataRC,
       text: hoverDataRC,
       hoverinfo: 'text',
-      yaxis: 'y2',
+      yaxis: 'y3',
       type: 'scatter',
+      opacity: 0.7,
       line: {
         color: 'blue',
         width: 1
       }
     };
-    var pdata = [topPvalMarker, LDRefHighlight, trace1, trace2];
+    // graph gene density
+    var trace3 = {
+      x: xData,
+      y: Array(xData.length).fill(0),
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        symbol: "line-ns-open",
+        size: 16,
+        color: colorData,
+        colorscale: 'Viridis',
+        reversescale: true
+      },
+      yaxis: 'y'
+
+    };
+    var pdata = [topPvalMarker, LDRefHighlight, trace1, trace2, trace3];
     // round most significant pval to next whole number
-    // var maxY = Math.ceil(Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
       title: {
@@ -622,14 +672,33 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         xref: 'paper'
       },
       width: 1000,
-      height: 700,
+      height: 780,
       yaxis: {
         autorange: true,
-        title: "QTLs -log10(P-value)",
-        zeroline: false
+        // overlaying: false,
+        // title: "Gene Density",
+        domain: [0, 0.04],
+        zeroline: false,
+        showgrid: false,
+        showticklabels: false,
+        linecolor: 'black',
+        linewidth: 1,
+        mirror: true
       },
       yaxis2: {
         autorange: true,
+        automargin: true,
+        // overlaying: 'y3',
+        title: "QTLs -log10(P-value)",
+        domain: [0.05, 1],
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1
+      },
+      yaxis3: {
+        autorange: true,
+        automargin: true,
+        overlaying: 'y2',
         title: 'QTLs Recombination Rate (cM/Mb)',
         titlefont: {
           color: 'blue'
@@ -637,16 +706,20 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         tickfont: {
           color: 'blue'
         },
-        overlaying: 'y',
         side: 'right',
         showgrid: false,
-        // dtick: 50,
-        zeroline: false
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1
       },
       xaxis: {
         autorange: true,
         title: "Chromosome " + chromosome + " (Mb)",
-        zeroline: false
+        // dtick: 0.1,
+        zeroline: false,
+        linecolor: 'black',
+        linewidth: 1,
+        mirror: "allticks"
       },
       images: [
         {
