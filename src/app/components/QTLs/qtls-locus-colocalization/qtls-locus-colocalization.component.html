@@ -1,3 +1,40 @@
-<p>
-  qtls-locus-colocalization works!
-</p>
+<div class="locus-colocalization-result-tab">
+
+  <!-- P-value threshold input for correlation scatter plot -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-colocalization-correlation-scatter-threshold"
+    *ngIf="correlationScatter">
+    <form [formGroup]="correlationScatterThreshold">
+      <mat-form-field class="correlation-pval-threshold-input-field">
+        <input 
+          #correlationPvalThreshold
+          matInput 
+          placeholder="P-value Threshold" 
+          (keyup)="changeCorrelationPvalThreshold($event)" 
+          [(ngModel)]="selectedCorrelationPvalThreshold" 
+          formControlName="correlationPvalThreshold">
+        <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearCorrelationPvalThreshold()">
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-error *ngIf="correlationScatterThreshold.invalid">{{ correlationPvalThresholdErrorMsg() }}</mat-error>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <!-- Show centered Plotly locus colocalization scatter plot if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-colocalization-correlation-scatter-plot">
+    <plotly-plot 
+      *ngIf="correlationScatter"
+      [data]="correlationScatter.data" 
+      [layout]="correlationScatter.layout" 
+      [config]="correlationScatter.config">
+    </plotly-plot>
+  </div>
+
+  <br>
+
+  <!-- <pre>{{ locusColocalizationData | json }}</pre> -->
+</div>
