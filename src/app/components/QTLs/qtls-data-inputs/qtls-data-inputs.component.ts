@@ -136,7 +136,9 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#expression-file").val("");
       $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(true);
-      this.loadGWASSampleDataFile(); // toggle load GWAS data file
+      if (this.selectLoadGWASSample == true) {
+        this.loadGWASSampleDataFile(); // toggle load GWAS data file
+      }
     } else { // if user loads sample QTLs data files
       this.selectLoadQTLsSamples = true;
       this.qtlsType = "assoc";
