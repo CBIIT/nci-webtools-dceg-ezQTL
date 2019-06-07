@@ -16,6 +16,13 @@ body, input[text], button {
   color: #888;
   font-family: Cambria, Georgia;
 }
+/* Angular Material Overrides */
+
+/* Override selected toggle buttons */
+/* .mat-button-toggle-checked {
+  background-color: #3F51B5 !important;
+  color: white !important;
+} */
 /* everywhere else */
 * {
   font-family: Arial, Helvetica, sans-serif;
