@@ -48,7 +48,7 @@
         *ngIf="qtlsType == 'assoc'">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
-            Association Data File<span style="color:red">*</span>
+            Association Data File <i class="fas fa-star-of-life" style="color:red;"></i>
           </div>
         </div>
         <div class="row mb-3">
@@ -70,12 +70,12 @@
             Choose File
           </button>
           <div>
-            <div *ngIf="!selectLoadQTLsSamples">
+            <!-- <div *ngIf="!selectLoadQTLsSamples">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.eQTL.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.eQTL.txt" download>Download Sample</a>
-            </div>
+            </div> -->
             <div 
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;" 
@@ -152,12 +152,12 @@
             Choose File
           </button>
           <div>
-            <div *ngIf="!selectLoadQTLsSamples">
+            <!-- <div *ngIf="!selectLoadQTLsSamples">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.quantification.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.quantification.txt" download>Download Sample</a>
-            </div>
+            </div> -->
             <div 
               *ngIf="!selectLoadQTLsSamples && qtlsForm.value.expressionFile" 
               class="text-secondary" 
@@ -213,12 +213,12 @@
               Choose File
             </button>
           <div>
-            <div *ngIf="!selectLoadQTLsSamples">
+            <!-- <div *ngIf="!selectLoadQTLsSamples">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.genotyping.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadQTLsSamples">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.genotyping.txt" download>Download Sample</a>
-            </div>
+            </div> -->
             <div 
               *ngIf="!selectLoadQTLsSamples && qtlsForm.value.genotypeFile" 
               class="text-secondary" 
@@ -243,7 +243,70 @@
           </div>
         </div>
       </div>
-
+      <!-- LD Data File -->
+      <div class="qtls-data-inputs" id="qtls-data-input-LD-file">
+        <div class="row mb-2">
+          <div class="ml-3 datafile-title">
+            LD Data File
+          </div>
+        </div>
+        <div class="row mb-3">
+          <input 
+            type="file" 
+            formControlName="LDFile" 
+            class="ng-hide" 
+            id="LD-file" 
+            name="input-files" 
+            accept=".txt" 
+            hidden 
+            #LDInput>
+          <button 
+            style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
+            (click)="LDInput.click()" 
+            [disabled]="resultStatus || selectLoadLDSample" 
+            class="ml-3 mr-3" 
+            mat-stroked-button>
+            Choose File
+          </button>
+          <div>
+            <!-- <div *ngIf="!selectLoadLDSample">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
+            </div>
+            <div class="disabled-overlay" *ngIf="selectLoadLDSample">
+              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
+            </div> -->
+            <div 
+              *ngIf="!selectLoadLDSample && qtlsForm.value.LDFile" 
+              class="text-secondary" 
+              style="overflow:hidden; text-overflow:ellipsis;">
+              {{ !qtlsForm.value.LDFile ? '' : (qtlsForm.value?.LDFile[0]?.name.length <= 21) ? (qtlsForm.value?.LDFile[0]?.name || '') : qtlsForm.value?.LDFile[0]?.name.substring(0,18) + '...' }} 
+              <button 
+                type="button" 
+                class="close" 
+                aria-label="Close" 
+                *ngIf="qtlsForm.value.LDFile && qtlsForm.value.LDFile.length > 0 && !resultStatus" 
+                (click)="clearLDFile()" 
+                [disabled]="resultStatus">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div 
+              class="text-secondary" 
+              style="overflow:hidden; text-overflow:ellipsis;" 
+              *ngIf="selectLoadLDSample">
+              MX2.LD.txt
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <i class="fas fa-download mr-1"></i><a (click)="downloadQTLsSamples()">Download Samples</a>
+        <!-- <a id="qtls-samples-download1" href="assets/files/MX2.eQTL.txt" download hidden>Download eQTL</a>
+        <a class="qtls-samples-download" href="assets/files/MX2.quantification.txt" download hidden>Download quantification</a>
+        <a class="qtls-samples-download" href="assets/files/MX2.genotyping.txt" download hidden>Download genotyping</a>
+        <a class="qtls-samples-download" href="assets/files/MX2.LD.txt" download hidden>Download LD</a> -->
+        <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.eQTL.txt" download>Download Samples</a> -->
+      </div>
     </div>
 
     <div class="w-100 mt-2 mb-2 border border-light"></div>
@@ -292,12 +355,12 @@
             Choose File
           </button>
           <div>
-            <div *ngIf="!selectLoadGWASSample">
+            <!-- <div *ngIf="!selectLoadGWASSample">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.GWAS.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadGWASSample">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.GWAS.txt" download>Download Sample</a>
-            </div>
+            </div> -->
             <div 
               *ngIf="!selectLoadGWASSample && qtlsForm.value.gwasFile" 
               class="text-secondary" 
@@ -322,30 +385,33 @@
           </div>
         </div>
       </div>
+      <div>
+        <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.GWAS.txt" download>Download Sample</a>
+      </div>
     </div> 
 
-    <div class="w-100 mt-2 mb-2 border border-light"></div>
+    <!-- <div class="w-100 mt-2 mb-2 border border-light"></div> -->
 
-    <div class="qtls-data-files mb-5">
+    <!-- <div class="qtls-data-files mb-5">
 
-        <div class="datafile-type">
-          <div class="d-flex justify-content-between">
-            <div>
-              <b>LD Data File</b>
-            </div>
-            <div class="disabled-post-calc" *ngIf="!selectLoadLDSample">
-              <i class="fas fa-file-export mr-1"></i><a (click)="loadLDSampleDataFile()">Load Sample</a>
-            </div>
-            <div class="disabled-post-calc" *ngIf="selectLoadLDSample">
-              <i class="fas fa-file-excel mr-1"></i><a (click)="loadLDSampleDataFile()">Unload Sample</a>
-            </div>
+      <div class="datafile-type">
+        <div class="d-flex justify-content-between">
+          <div>
+            <b>LD Data File</b>
+          </div>
+          <div class="disabled-post-calc" *ngIf="!selectLoadLDSample">
+            <i class="fas fa-file-export mr-1"></i><a (click)="loadLDSampleDataFile()">Load Sample</a>
+          </div>
+          <div class="disabled-post-calc" *ngIf="selectLoadLDSample">
+            <i class="fas fa-file-excel mr-1"></i><a (click)="loadLDSampleDataFile()">Unload Sample</a>
           </div>
         </div>
+      </div>
 
-        <div class="w-100 mt-2 mb-2 border border-light"></div>
+      <div class="w-100 mt-2 mb-2 border border-light"></div> -->
 
       <!-- LD Data File -->
-      <div class="qtls-data-inputs" id="qtls-data-input-LD-file">
+      <!-- <div class="qtls-data-inputs" id="qtls-data-input-LD-file">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
             LD Data File
@@ -369,14 +435,14 @@
             mat-stroked-button>
             Choose File
           </button>
-          <div>
-            <div *ngIf="!selectLoadLDSample">
+          <div> -->
+            <!-- <div *ngIf="!selectLoadLDSample">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
             </div>
             <div class="disabled-overlay" *ngIf="selectLoadLDSample">
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
-            </div>
-            <div 
+            </div> -->
+            <!-- <div 
               *ngIf="!selectLoadLDSample && qtlsForm.value.LDFile" 
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;">
@@ -401,7 +467,7 @@
         </div>
       </div>
 
-    </div>
+    </div> -->
 
   </div>
 

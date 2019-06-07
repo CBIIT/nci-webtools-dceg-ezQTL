@@ -54,8 +54,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   locusAlignmentData: Object;
   locusAlignmentDataRC: Object;
   locusAlignmentDataQTopAnnot: Object;
-  locusAlignmentScatterData: Object;
-  locusAlignmentScatterTitle: string;
+  locusAlignmentGWASScatterData: Object;
+  locusAlignmentGWASScatterTitle: string;
   GWASData: Object;
   selectedPop: string[];
   selectedGene: string;
@@ -94,7 +94,29 @@ export class QTLsLocusAlignmentComponent implements OnInit {
 
   ngOnInit() {
     this.data.currentBlurLoad.subscribe(blurLoad => this.blurLoad = blurLoad);
-    this.data.currentCollapseInput.subscribe(collapseInput => this.collapseInput = collapseInput);
+    this.data.currentCollapseInput.subscribe(collapseInput => {
+      this.collapseInput = collapseInput;
+      // ensure graphs are properly positioned when data input panel collapse is toggled
+      if (this.collapseInput) { // input panel collapsed
+        if ($("#qtls-locus-alignment-plot").hasClass("justify-content-start")) {
+          $("#qtls-locus-alignment-plot").addClass("justify-content-center");
+          $("#qtls-locus-alignment-plot").removeClass("justify-content-start");
+        }
+        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
+          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
+          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
+        }
+      } else { // input panel shown
+        if ($("#qtls-locus-alignment-plot").hasClass("justify-content-center")) {
+          $("#qtls-locus-alignment-plot").addClass("justify-content-start");
+          $("#qtls-locus-alignment-plot").removeClass("justify-content-center");
+        }
+        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
+          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
+          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
+        }
+      }
+    });
     this.disableInputs = false;
     this.showPopover = false;
 
@@ -121,49 +143,29 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.locusAlignmentData = mainData["locus_alignment"]["data"][0]; // locus alignment data
         this.locusAlignmentDataRC = mainData["locus_alignment"]["rc"][0]; // locus alignment RC data
         this.locusAlignmentDataQTopAnnot = mainData["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-        this.locusAlignmentScatterData = mainData["locus_alignment_scatter"]["data"][0]; // locus alignment scatter data
-        this.locusAlignmentScatterTitle = mainData["locus_alignment_scatter"]["title"][0]; // locus alignment scatter title
+        this.locusAlignmentGWASScatterData = mainData["locus_alignment_gwas_scatter"]["data"][0]; // locus alignment scatter data
+        this.locusAlignmentGWASScatterTitle = mainData["locus_alignment_gwas_scatter"]["title"][0]; // locus alignment scatter title
         this.GWASData = mainData["gwas"]["data"][0]; // gwas data
 
         var newSelectedPopList = this.newSelectedPop.split('+');
         this.selectedPop = newSelectedPopList; // recalculated new population selection
         this.selectedGene = this.newSelectedGene; // recalculated new gene selection
         this.selectedDist = this.newSelectedDist;
-      }
-      if (this.locusAlignmentData) {
-        // check if there is data in GWAS object
-        if (this.GWASData[0] && this.locusAlignmentScatterData[0]) {
-          // if there is, graph GWAS plot and scatter plot
-          this.locusAlignmentPlotGWAS(this.locusAlignmentData, this.GWASData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
-          this.selectedPvalThreshold = 1.0;
-          this.locusAlignmentScatterPlot(this.locusAlignmentScatterData, this.locusAlignmentScatterTitle, this.selectedPvalThreshold);
-        } else {
-          // if not, do not graph GWAS plot or scatter plot
-          this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot)
-          // this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
-        }
-      }
-      // ensure graphs are properly positioned when data input panel collapse is toggled
-      if (this.collapseInput) { // input panel collapsed
-        if ($("#qtls-locus-alignment-plot").hasClass("justify-content-start")) {
-          $("#qtls-locus-alignment-plot").addClass("justify-content-center");
-          $("#qtls-locus-alignment-plot").removeClass("justify-content-start");
-        }
-        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
-          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
-          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
-        }
-      } else { // input panel shown
-        if ($("#qtls-locus-alignment-plot").hasClass("justify-content-center")) {
-          $("#qtls-locus-alignment-plot").addClass("justify-content-start");
-          $("#qtls-locus-alignment-plot").removeClass("justify-content-center");
-        }
-        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
-          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
-          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
-        }
-      }
 
+        if (this.locusAlignmentData && this.locusAlignmentData[0]) {
+          // check if there is data in GWAS object
+          if ((this.GWASData && this.GWASData[0]) && (this.locusAlignmentGWASScatterData && this.locusAlignmentGWASScatterData[0])) {
+            // if there is, graph GWAS plot and scatter plot
+            this.locusAlignmentPlotGWAS(this.locusAlignmentData, this.GWASData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
+            this.selectedPvalThreshold = 1.0;
+            this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, this.selectedPvalThreshold);
+          } else {
+            // if not, do not graph GWAS plot or scatter plot
+            this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot)
+            // this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
+          }
+        }
+      }
     });
   }
 
@@ -301,14 +303,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       type: 'scatter', 
       marker: {
         symbol: "diamond",
-        size: 14,
+        size: 15,
         opacity: 1.0,
-        color: "red",
-        // color: [colorData[topIdx]],
-        // colorscale: 'Viridis',
-        // reversescale: true,
+        color: "#ff66cc",
         line: {
-          color: 'red',
+          color: '#ff66cc',
           width: 2
         },
       },
@@ -450,7 +449,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
       title: {
-        text: 'Locus Alignment Plot',
+        text: 'QTLs-GWAS Chromosome ' + chromosome + ' Variants',
         xref: 'paper'
       },
       width: 1000,
@@ -587,11 +586,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       type: 'scatter',
       marker: {
         symbol: "diamond",
-        size: 14,
+        size: 15,
         opacity: 1.0,
-        color: "red",
+        color: "#ff66cc",
         line: {
-          color: 'red',
+          color: '#ff66cc',
           width: 2
         },
       },
@@ -668,7 +667,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
       title: {
-        text: 'Locus Alignment Plot',
+        text: 'QTLs Chromosome ' + chromosome + ' Variants',
         xref: 'paper'
       },
       width: 1000,
@@ -874,7 +873,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
 
   clickPoint(event) {    
     if (event.points) {
-      console.log("curveNumber", event.points[0].curveNumber);
+      // console.log("curveNumber", event.points[0].curveNumber);
       if (event.points[0].hasOwnProperty("marker.color")) {
         // only show popovers for scatter points not recomb line (points w/ markers)
         var top = event.event.pointerY;
@@ -1147,6 +1146,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var b = linear_regression[1];
     // console.log("b", b);
     var xDataFinites = this.removeInfinities(xData);
+    // console.log(xDataFinites);
     var xMin = Math.min.apply(null, xDataFinites);
     // console.log("xMin", xMin);
     var xMax = Math.max.apply(null, xDataFinites);
@@ -1170,7 +1170,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var pdata = [trace1];
     var playout = {
       title: {
-        text: scatterTitle,
+        text: "QTLs-GWAS Gene Correlation: " + scatterTitle,
         xref: 'paper'
       },
       width: 1000,
@@ -1189,6 +1189,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         b: 80,
       },
       showlegend: false,
+      clickmode: 'none',
+      hovermode: 'closest'
     };
     this.scatter = {
       data: pdata,
@@ -1212,9 +1214,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     if (threshold >= 0.0 && threshold <= 1.0) {
       if (threshold.length > 0) {
         this.selectedPvalThreshold = threshold;
-        this.locusAlignmentScatterPlot(this.locusAlignmentScatterData, this.locusAlignmentScatterTitle, this.selectedPvalThreshold);
+        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
       } else {
-        this.locusAlignmentScatterPlot(this.locusAlignmentScatterData, this.locusAlignmentScatterTitle, 1.0);
+        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", 1.0);
       }
     }
   }
@@ -1222,7 +1224,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   clearPvalThreshold() {
     this.selectedPvalThreshold = 1.0;
     this.GWASScatterThreshold.value.pvalThreshold = '1.0';
-    this.locusAlignmentScatterPlot(this.locusAlignmentScatterData, this.locusAlignmentScatterTitle, this.selectedPvalThreshold);
+    this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
   }
 
   pvalThresholdErrorMsg() {
@@ -1232,7 +1234,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     } else if (this.GWASScatterThreshold.value.pvalThreshold < 0.0) {
       msg = "Threshold must be >= 0.0";
     } else {
-      msg = "Invalid cis-QTL Distance";
+      msg = "Invalid threshold";
     }
     return msg;
   }

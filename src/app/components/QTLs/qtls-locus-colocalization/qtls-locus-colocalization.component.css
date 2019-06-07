@@ -1,0 +1,14 @@
+.locus-colocalization-result-tab {
+    overflow-x: hidden !important;
+    overflow-y: hidden !important;
+}
+
+.correlation-pval-threshold-input-field {
+    width: 180px !important;
+}
+
+/* Override selected toggle buttons */
+.mat-button-toggle-checked {
+    background-color: #3F51B5 !important;
+    color: white !important;
+  }

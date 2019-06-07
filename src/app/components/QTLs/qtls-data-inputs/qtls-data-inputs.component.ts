@@ -89,6 +89,21 @@ export class QTLsDataInputsComponent implements OnInit {
     this.clearAssociationFile();
   }
 
+  downloadQTLsSamples() {
+    console.log("Download samples...");
+    var sampleFiles = [
+      "assets/files/MX2.eQTL.txt",
+      "assets/files/MX2.quantification.txt",
+      "assets/files/MX2.genotyping.txt"
+    ];
+    for (var i = 0; i < sampleFiles.length; i ++) {
+      var a = document.createElement("a");
+      a.href = sampleFiles[i];
+      a.download = sampleFiles[i].split('\/').pop();
+      a.click();
+    }
+  }
+
   clearAssociationFile() {
     this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.value.associationFile = false;
@@ -121,7 +136,6 @@ export class QTLsDataInputsComponent implements OnInit {
 
   loadQTLsSampleDataFiles() { // if user unloads sample QTLs data files
     if (this.selectLoadQTLsSamples == true) {
-      this.loadGWASSampleDataFile(); // toggle load GWAS data file
       this.selectLoadQTLsSamples = false;
       this.disableQTLsToggle = false;
       this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
@@ -137,8 +151,11 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#expression-file").val("");
       $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(true);
+      this.loadLDSampleDataFile();
+      if (this.selectLoadGWASSample == true) {
+        this.loadGWASSampleDataFile(); // toggle load GWAS data file
+      }
     } else { // if user loads sample QTLs data files
-      this.loadGWASSampleDataFile(); // toggle load GWAS data file
       this.selectLoadQTLsSamples = true;
       this.qtlsType = "assoc";
       this.disableQTLsToggle = true;
@@ -155,6 +172,10 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#expression-file").val("");
       $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(false);
+      this.loadLDSampleDataFile();
+      if (this.selectLoadGWASSample == false) {
+        this.loadGWASSampleDataFile(); // toggle load GWAS data file
+      }
     }
   }
 
