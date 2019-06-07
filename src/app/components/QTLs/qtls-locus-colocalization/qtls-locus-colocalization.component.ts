@@ -1,9 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
-import { MatDialog } from '@angular/material';
-import { QTLsLocusAlignmentBoxplotsComponent } from '../qtls-locus-alignment-boxplots/qtls-locus-alignment-boxplots.component';
-import { environment } from '../../../../environments/environment' 
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -18,7 +15,8 @@ declare let $: any;
 @Component({
   selector: 'app-qtls-locus-colocalization',
   templateUrl: './qtls-locus-colocalization.component.html',
-  styleUrls: ['./qtls-locus-colocalization.component.css']
+  styleUrls: ['./qtls-locus-colocalization.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class QtlsLocusColocalizationComponent implements OnInit {
 

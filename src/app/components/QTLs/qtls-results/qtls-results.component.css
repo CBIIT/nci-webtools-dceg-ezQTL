@@ -44,3 +44,7 @@
     height: 100%;
     z-index: 10;
 }
+
+.align-spinner {
+    margin-top: 150px;
+}

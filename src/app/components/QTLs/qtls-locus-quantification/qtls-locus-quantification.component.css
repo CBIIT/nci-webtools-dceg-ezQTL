@@ -11,3 +11,9 @@
 mat-button-toggle-group {
     margin-left: 12px;
 }
+
+/* Override selected toggle buttons */
+.mat-button-toggle-checked {
+    background-color: #3F51B5 !important;
+    color: white !important;
+  }
