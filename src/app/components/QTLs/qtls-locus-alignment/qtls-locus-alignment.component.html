@@ -61,18 +61,7 @@
     id="qtls-locus-alignment-plot">
   </div> -->
 
-  <!-- Show centered Plotly locus alignment scatter plot if graph is generated -->
-  <div 
-    class="d-flex justify-content-center" 
-    id="qtls-locus-alignment-scatter-plot">
-    <plotly-plot 
-      *ngIf="scatter"
-      [data]="scatter.data" 
-      [layout]="scatter.layout" 
-      [config]="scatter.config">
-    </plotly-plot>
-  </div>
-  
+  <!-- P-value threshold input for GWAS scatter plot -->
   <div 
     class="d-flex justify-content-center" 
     id="qtls-locus-alignment-scatter-threshold"
@@ -92,6 +81,18 @@
         <mat-error *ngIf="GWASScatterThreshold.invalid">{{ pvalThresholdErrorMsg() }}</mat-error>
       </mat-form-field>
     </form>
+  </div>
+
+  <!-- Show centered Plotly locus alignment scatter plot if graph is generated -->
+  <div 
+    class="d-flex justify-content-center" 
+    id="qtls-locus-alignment-scatter-plot">
+    <plotly-plot 
+      *ngIf="scatter"
+      [data]="scatter.data" 
+      [layout]="scatter.layout" 
+      [config]="scatter.config">
+    </plotly-plot>
   </div>
 
   <br>

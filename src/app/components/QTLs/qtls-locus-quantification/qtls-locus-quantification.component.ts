@@ -27,7 +27,8 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
   totalNumGenesArray: string[];
   selectNumGenes: string;
   selectedScale: string;
-  selectedMedianSort: string;
+  selectedSort: string;
+  selectedSortOrder: string;
   warningMessage: string;
   public graph = null;
   public heatmap = null;
@@ -58,9 +59,10 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
               }
             }
             this.selectedScale = "linear";
-            this.selectedMedianSort = "";
+            this.selectedSort = "pvalue";
+            this.selectedSortOrder = "asc";
             if (this.locusQuantificationData[0] && this.locusQuantificationHeatmapData[0]) {
-              this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, this.geneSymbols, this.selectedScale, this.selectedMedianSort);
+              this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, this.geneSymbols, this.selectedScale, this.selectedSort, this.selectedSortOrder);
               this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData, this.selectedScale);
             }
           }
@@ -126,20 +128,20 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     return a[0] - b[0];
   }
 
-  sortMedian(xData, yData, medianSort) {
+  sortMedian(xData, yData, sortOrder) {
     var dataSorted = [];
     for ( var i = 0; i < xData.length; i ++) {
       var geneData = [this.getMedian(yData[i])].concat([xData[i]].concat(yData[i]));
       dataSorted.push(geneData);
     }
     dataSorted = dataSorted.sort(this.compareMedian);
-    if (medianSort == "desc") {
+    if (sortOrder == "desc") {
       dataSorted = dataSorted.reverse();
     }
     return dataSorted;
   }
 
-  locusQuantificationViolinBoxPlot(geneData, xData, scale, medianSort) {
+  locusQuantificationViolinBoxPlot(geneData, xData, scale, sort, sortOrder) {
     // var yData = this.getGeneYDataLog(geneData, xData);
     if (scale == "log") {
       var yData = this.getGeneYDataLog(geneData, xData);
@@ -148,8 +150,9 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
     }
     // console.log(yData);
     var pdata = [];
-    if (medianSort == "asc" || medianSort == "desc") {
-      var dataSorted = this.sortMedian(xData, yData, medianSort);
+    // if (sortOrder == "asc" || sortOrder == "desc") {
+    if (sort == "median") {
+      var dataSorted = this.sortMedian(xData, yData, sortOrder);
       // console.log(dataSorted);
       for ( var i = 0; i < xData.length; i ++ ) {
         var resultSorted = {
@@ -173,11 +176,22 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         pdata.push(resultSorted);
       };
     } else {
+      if (sortOrder == "asc") {
+        var yDataSorted = yData;
+        var xDataSorted = xData;
+        // console.log("yData", yDataSorted);
+        // console.log("xData", xDataSorted);
+      } else {
+        var yDataSorted = yData.reverse();
+        var xDataSorted = xData.reverse();
+        // console.log("yData", yDataSorted);
+        // console.log("xData", xDataSorted);
+      }
       for ( var i = 0; i < xData.length; i ++ ) {
         var result = {
           type: 'violin',
-          y: yData[i],
-          name: xData[i],
+          y: yDataSorted[i],
+          name: xDataSorted[i],
           box: {
             visible: true
           }, 
@@ -359,19 +373,11 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
 
   triggerReplot() {
     // console.log("scale:", this.selectedScale);
-    // console.log("median sort:", this.selectedMedianSort);
+    // console.log("median sort:", this.selectedSort);
+    // console.log("sort order:", this.selectedSortOrder);
     var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
-    this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
+    this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedSort, this.selectedSortOrder);
     this.locusQuantificationHeatmap(this.locusQuantificationHeatmapData, this.selectedScale);
-  }
-
-  resetSort() {
-    // console.log("reset sort");
-    this.selectedMedianSort = "";
-    // console.log("scale:", this.selectedScale);
-    // console.log("median sort:", this.selectedMedianSort);
-    var limitedGeneSymbols = this.geneSymbols.slice(0,parseInt(this.selectNumGenes));
-    this.locusQuantificationViolinBoxPlot(this.locusQuantificationData, limitedGeneSymbols, this.selectedScale, this.selectedMedianSort);
   }
 
 }

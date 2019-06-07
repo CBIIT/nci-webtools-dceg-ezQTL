@@ -1,105 +1,3 @@
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
-  setwd(workDir)
-  library(tidyverse)
-  # library(forcats)
-  library(jsonlite)
-
-  ## parameters define ##
-  if (identical(select_pop, 'false')) {
-    ## set default population to EUR if none chosen
-    select_pop <- "CEU+TSI+FIN+GBR+IBS"
-  }
-  if (identical(select_gene, 'false')) {
-    ## set default gene to top gene if none chosen
-    gene <- NULL
-  } else {
-    gene <- select_gene
-  }
-  if (identical(select_ref, 'false')) {
-    ## set default rsnum to top gene's rsnum if none chosen
-    rsnum <- NULL
-  } else {
-    rsnum <- select_ref
-  }
-  if (identical(select_dist, 'false')) {
-    ## set default cisDistance to 100 Kb (100,000 bp) if none supplied
-    cedistance <- 100 * 1000
-  } else {
-    cedistance <- strtoi(select_dist, base = 0L) * 1000
-  }
-
-  ## load 1kg pop panel file ##
-  kgpanel <- read_delim('data/Population_Panel/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
-    select(sample:gender)
-  popinfo <- kgpanel %>% 
-    select(pop,super_pop) %>% 
-    unique()
-
-  ## read and parse association data file ###
-  if (identical(select_qtls_samples, 'true')) {
-    qdatafile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
-  } else {
-    qdatafile <- paste0('tmp/', assocFile)
-  }
-  qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
-  qdata <- qdata %>% 
-    arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% 
-    group_by(gene_id,variant_id,rsnum,ref,alt) %>% 
-    slice(1) %>% 
-    ungroup()
-
-  # return all gene variants
-  all_gene_variants <- qdata %>%
-    select(gene_id, rsnum)
-  all_gene_variants_colnames <- colnames(all_gene_variants)
-  all_gene_variants_data <- list(setNames(as.data.frame(all_gene_variants), all_gene_variants_colnames))
-
-  qdata_tmp <- qdata %>% 
-    group_by(gene_id,gene_symbol) %>% 
-    arrange(pval_nominal) %>% 
-    slice(1) %>% 
-    ungroup() %>% 
-    arrange(pval_nominal)
-
-  # return most significant variants for all genes
-  top_gene_variants <- qdata_tmp %>%
-    select(gene_id, gene_symbol, rsnum)
-  top_gene_variants_colnames <- colnames(top_gene_variants)
-  top_gene_variants_data <- list(setNames(as.data.frame(top_gene_variants), top_gene_variants_colnames))
-
-  # added code to isolate gene_symbols and put in variable
-  # gene_symbols <- list(qdata_tmp$gene_symbol)
-  gene_list <- qdata_tmp %>%
-    select(gene_id, gene_symbol)
-  gene_list_colnames <- colnames(gene_list)
-  gene_list_data <- list(setNames(as.data.frame(gene_list), gene_list_colnames))
-
-  ## call calculations for qtls modules: locus alignment and locus quantification ##
-  ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants)
-  locus_alignment_data <- locus_alignment[[1]]
-  rcdata_region_data <- locus_alignment[[2]]
-  qdata_top_annotation_data <- locus_alignment[[3]]
-  locus_alignment_scatter <- locus_alignment[[4]]
-  locus_alignment_scatter_data <- locus_alignment_scatter[[1]]
-  locus_alignment_scatter_title <- locus_alignment_scatter[[2]]
-  gwas_example_data <- locus_alignment[[5]]
-  ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile)
-  locus_quantification_data <- locus_quantification[[1]]
-  locus_quantification_heatmap_data <- locus_quantification[[2]]
-  # ## locus alignment gwas data ##
-  # gwas_example_data <- gwas_example(workDir, select_gwas_sample, gwasFile)
-  ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_scatter=list(data=locus_alignment_scatter_data, title=locus_alignment_scatter_title), gwas=list(data=gwas_example_data))))
-  ## remove all generated temporary files in the /tmp directory
-
-  # unlink(paste0('tmp/*',request,'*'))
-  
-  # return(dataSource)
-  return(dataSourceJSON)
-}
-
 locus_alignment_define_window <- function(recalculateAttempt, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos) {
   if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true')) {
     cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
@@ -123,7 +21,19 @@ locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalcula
   }
 }
 
-gwas_example_scatter <- function(gwasdata, qdata_region) {
+gwas_example <- function(gwasdata, qdata_region) {
+  gwasdata <- merge(x = qdata_region, y = gwasdata, by = c("pos", "rsnum"), all.x = TRUE) %>%
+    select(chr.y,pos,variant_id,gene_id,gene_symbol,ref.y,alt.y,rsnum,pvalue,zscore,effect,slope,se,R2,tss_distance)
+  names(gwasdata) <- c("chr", "pos", "variant_id", "gene_id", "gene_symbol", "ref", "alt", "rsnum", "pvalue", "zscore", "effect", "slope", "se", "R2", "tss_distance")
+  ## cast column types to string to prevent rounding of decimals
+  gwasdata_string <- gwasdata
+  gwasdata_string[9:14] <- lapply(gwasdata_string[9:14], as.character)
+  gwasdata_string_colnames <- colnames(gwasdata_string)
+  gwas_example_data <- list(setNames(as.data.frame(gwasdata_string), gwasdata_string_colnames))
+  return(gwas_example_data)
+}
+
+locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
   ## coloculization ####
   tmpdata <- qdata_region %>% 
     select(chr,pos,ref,alt,pval_nominal,R2) %>% 
@@ -132,11 +42,48 @@ gwas_example_scatter <- function(gwasdata, qdata_region) {
 
   tmptest <- cor.test(-log10(tmpdata$pvalue),-log10(tmpdata$pval_nominal),method = 'spearman')
   tmptitle <- paste0('rho=',round(tmptest$estimate,3),', p=',round(tmptest$p.value,3))
-
+  
   tmpdata_colnames <- colnames(tmpdata)
-  gwas_example_scatter_data <- list(setNames(as.data.frame(tmpdata), tmpdata_colnames))
+  locus_alignment_gwas_scatter_data <- list(setNames(as.data.frame(tmpdata), tmpdata_colnames))
 
-  return(list(gwas_example_scatter_data, tmptitle))
+  return(list(locus_alignment_gwas_scatter_data, tmptitle))
+}
+
+locus_colocalization <- function(gwasdata, qdata) {
+  #p_cutoff <- 0.01 ### kevin, a parameter for user to choose max pvalue cut-off for both eQTL and GWAS ##
+
+  tmpdata <- qdata %>% 
+    select(gene_symbol,gene_id,chr,pos,ref,alt,pval_nominal) %>% 
+    left_join(gwasdata) %>% 
+    filter(!is.na(pvalue),!is.na(pval_nominal)) 
+
+  # filter(!is.na(pvalue),!is.na(pval_nominal),pvalue<p_cutoff,pval_nominal<p_cutoff) 
+
+  #if (p_cutoff < 1) {
+  tmpgeneid <- tmpdata %>% 
+    count(gene_id,sort = T) %>% 
+    filter(n>10) %>% pull(gene_id)
+  tmpdata <- tmpdata %>% 
+    filter(gene_id %in% tmpgeneid)
+  #}
+
+  tmpdata <- left_join(
+    tmpdata %>% 
+      group_by(gene_id,gene_symbol) %>% 
+      do(tidy(cor.test(.$pvalue,.$pval_nominal,method = 'spearman'))) %>% 
+      ungroup() %>% 
+      select(gene_id,gene_symbol,spearman_r=estimate,spearman_p=p.value),
+    tmpdata %>% 
+      group_by(gene_id,gene_symbol) %>% 
+      do(tidy(cor.test(.$pvalue,.$pval_nominal,method = 'pearson'))) %>% 
+      ungroup() %>% select(gene_id,gene_symbol,pearson_r=estimate,pearson_p=p.value)
+  )
+  ## cast column types to string to prevent rounding of decimals
+  tmpdata_string <- tmpdata
+  tmpdata_string[3:6] <- lapply(tmpdata_string[3:6], as.character)
+  locus_colocalization_colnames <- colnames(tmpdata_string)
+  locus_colocalization_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_colnames))
+  return(locus_colocalization_data);
 }
 
 locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants) { 
@@ -279,9 +226,14 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     qdata_region_string_colnames <- colnames(qdata_region_string)
     locus_alignment_data <- list(setNames(as.data.frame(qdata_region_string), qdata_region_string_colnames))
   }
+
+  # initialize GWAS data as empty until data file detected
+  gwas_example_data <- list(c())
   # initialize scatter data as empty until data file detected
-  gwas_example_scatter_data_title <- list(c(), c())
-  # get GWAS scatter data
+  locus_alignment_gwas_scatter_data_title <- list(c(), c())
+  # initialize colocalization data as empty until data file detected
+  locus_colocalization_data <- list(c())
+  # if GWAS data file is loaded
   if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('tmp/', gwasFile)
@@ -289,11 +241,14 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
       gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
     }
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
-    gwas_example_scatter_data_title <- gwas_example_scatter(gwasdata, qdata_region)
+    ## return relevent gwas data ##
+    gwas_example_data <- gwas_example(gwasdata, qdata_region)
+    ## return locus alignment gwas scatter data
+    locus_alignment_gwas_scatter_data_title <- locus_alignment_gwas_scatter(gwasdata, qdata_region)
+    ## return locus colocalization data
+    locus_colocalization_data <- locus_colocalization(gwasdata, qdata)
   }
-  ## locus alignment gwas data ##
-  gwas_example_data <- gwas_example(workDir, select_gwas_sample, gwasFile, qdata_region)
-  return(list(locus_alignment_data, rcdata_region_data, qdata_top_annotation_data, gwas_example_scatter_data_title, gwas_example_data))
+  return(list(locus_alignment_data, rcdata_region_data, qdata_top_annotation_data, locus_alignment_gwas_scatter_data_title, gwas_example_data, locus_colocalization_data))
 }
 
 locus_quantification_heatmap <- function(edata_boxplot) {
@@ -344,26 +299,6 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
-gwas_example <- function(workDir, select_gwas_sample, gwasFile, qdata_region) {
-  # initialize GWAS data as empty until data file detected
-  gwas_example_data <- list(c())
-  # return outputs in list with GWAS data
-  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
-    if (identical(select_gwas_sample, 'false')) {
-      gwasdatafile <- paste0('tmp/', gwasFile)
-    } else {
-      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
-    }
-    gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
-    gwasdata <- merge(x = qdata_region, y = gwasdata, by = c("pos", "rsnum"), all.x = TRUE) %>%
-      select(chr.y,pos,variant_id,gene_id,gene_symbol,ref.y,alt.y,rsnum,pvalue,zscore,effect,slope,se,R2,tss_distance)
-    names(gwasdata) <- c("chr", "pos", "variant_id", "gene_id", "gene_symbol", "ref", "alt", "rsnum", "pvalue", "zscore", "effect", "slope", "se", "R2", "tss_distance")
-    gwasdata_colnames <- colnames(gwasdata)
-    gwas_example_data <- list(setNames(as.data.frame(gwasdata), gwasdata_colnames))
-  }
-  return(gwas_example_data)
-}
-
 locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info) {
   setwd(workDir)
   library(tidyverse)
@@ -404,3 +339,104 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
+  setwd(workDir)
+  library(tidyverse)
+  # library(forcats)
+  library(jsonlite)
+  library(broom)
+
+  ## parameters define ##
+  if (identical(select_pop, 'false')) {
+    ## set default population to EUR if none chosen
+    select_pop <- "CEU+TSI+FIN+GBR+IBS"
+  }
+  if (identical(select_gene, 'false')) {
+    ## set default gene to top gene if none chosen
+    gene <- NULL
+  } else {
+    gene <- select_gene
+  }
+  if (identical(select_ref, 'false')) {
+    ## set default rsnum to top gene's rsnum if none chosen
+    rsnum <- NULL
+  } else {
+    rsnum <- select_ref
+  }
+  if (identical(select_dist, 'false')) {
+    ## set default cisDistance to 100 Kb (100,000 bp) if none supplied
+    cedistance <- 100 * 1000
+  } else {
+    cedistance <- strtoi(select_dist, base = 0L) * 1000
+  }
+
+  ## load 1kg pop panel file ##
+  kgpanel <- read_delim('data/Population_Panel/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
+    select(sample:gender)
+  popinfo <- kgpanel %>% 
+    select(pop,super_pop) %>% 
+    unique()
+
+  ## read and parse association data file ###
+  if (identical(select_qtls_samples, 'true')) {
+    qdatafile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
+  } else {
+    qdatafile <- paste0('tmp/', assocFile)
+  }
+  qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
+  qdata <- qdata %>% 
+    arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% 
+    group_by(gene_id,variant_id,rsnum,ref,alt) %>% 
+    slice(1) %>% 
+    ungroup()
+
+  # return all gene variants
+  all_gene_variants <- qdata %>%
+    select(gene_id, rsnum)
+  all_gene_variants_colnames <- colnames(all_gene_variants)
+  all_gene_variants_data <- list(setNames(as.data.frame(all_gene_variants), all_gene_variants_colnames))
+
+  qdata_tmp <- qdata %>% 
+    group_by(gene_id,gene_symbol) %>% 
+    arrange(pval_nominal) %>% 
+    slice(1) %>% 
+    ungroup() %>% 
+    arrange(pval_nominal)
+
+  # return most significant variants for all genes
+  top_gene_variants <- qdata_tmp %>%
+    select(gene_id, gene_symbol, rsnum)
+  top_gene_variants_colnames <- colnames(top_gene_variants)
+  top_gene_variants_data <- list(setNames(as.data.frame(top_gene_variants), top_gene_variants_colnames))
+
+  # added code to isolate gene_symbols and put in variable
+  # gene_symbols <- list(qdata_tmp$gene_symbol)
+  gene_list <- qdata_tmp %>%
+    select(gene_id, gene_symbol)
+  gene_list_colnames <- colnames(gene_list)
+  gene_list_data <- list(setNames(as.data.frame(gene_list), gene_list_colnames))
+
+  ## call calculations for qtls modules: locus alignment and locus quantification ##
+  ## locus alignment calculations ##
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants)
+  locus_alignment_data <- locus_alignment[[1]]
+  rcdata_region_data <- locus_alignment[[2]]
+  qdata_top_annotation_data <- locus_alignment[[3]]
+  locus_alignment_gwas_scatter <- locus_alignment[[4]]
+  locus_alignment_gwas_scatter_data <- locus_alignment_gwas_scatter[[1]]
+  locus_alignment_gwas_scatter_title <- locus_alignment_gwas_scatter[[2]]
+  gwas_example_data <- locus_alignment[[5]]
+  locus_colocalization_data <- locus_alignment[[6]]
+  ## locus quantification calculations ##
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile)
+  locus_quantification_data <- locus_quantification[[1]]
+  locus_quantification_heatmap_data <- locus_quantification[[2]]
+  ## combine results from QTLs modules calculations and return ##
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization=list(data=locus_colocalization_data))))
+  ## remove all generated temporary files in the /tmp directory
+
+  # unlink(paste0('tmp/*',request,'*'))
+  
+  # return(dataSource)
+  return(dataSourceJSON)
+}
