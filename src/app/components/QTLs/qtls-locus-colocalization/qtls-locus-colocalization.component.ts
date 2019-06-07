@@ -25,10 +25,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   // GWASData: Object;
   locusColocalizationData: Object;
   public correlationScatter = null;
+  selectedCorrelation: string;
   selectedCorrelationPvalThreshold: number;
 
   correlationScatterThreshold = new FormGroup({
-    correlationPvalThreshold: new FormControl("1.0", [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
+    correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
   });
 
   constructor(private data: QTLsResultsService) { }
@@ -40,14 +41,39 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         this.locusColocalizationData = mainData["locus_colocalization"]["data"][0]; // locus alignment data
         if (this.locusColocalizationData && this.locusColocalizationData[0]) {
           // console.log(this.locusColocalizationData);
+          this.selectedCorrelation = "R";
           this.selectedCorrelationPvalThreshold = 1.0;
-          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelationPvalThreshold);
+          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
         }
       }
     });
   }
 
-  getCorrelationScatterX(correlationData, threshold) {
+  getCorrelationScatterXR(correlationData) {
+    var p_values = [];
+    for (var i = 0; i < correlationData.length; i++) {
+      p_values.push(correlationData[i]['pearson_r']);
+    }
+    return p_values;
+  }
+
+  getCorrelationScatterYR(correlationData) {
+    var pval_nominals = [];
+    for (var i = 0; i < correlationData.length; i++) {
+      pval_nominals.push(correlationData[i]['spearman_r']);
+    }
+    return pval_nominals;
+  }
+
+  getCorrelationScatterHoverDataR(correlationData) {
+    var hoverData = [];
+    for (var i = 0; i < correlationData.length; i++) {
+      hoverData.push(correlationData[i]['gene_symbol'] + '<br>' + 'Pearson: ' + correlationData[i]['pearson_r'] + '<br>' + "Spearman: " + correlationData[i]['spearman_r']);
+    }
+    return hoverData;
+  }
+
+  getCorrelationScatterXP(correlationData, threshold) {
     var p_values = [];
     for (var i = 0; i < correlationData.length; i++) {
       if (correlationData[i]['pearson_p'] <= threshold && correlationData[i]['spearman_p'] <= threshold) {
@@ -57,7 +83,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     return p_values;
   }
 
-  getCorrelationScatterY(correlationData, threshold) {
+  getCorrelationScatterYP(correlationData, threshold) {
     var pval_nominals = [];
     for (var i = 0; i < correlationData.length; i++) {
       if (correlationData[i]['pearson_p'] <= threshold && correlationData[i]['spearman_p'] <= threshold) {
@@ -67,7 +93,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     return pval_nominals;
   }
 
-  getCorrelationScatterHoverData(correlationData, threshold) {
+  getCorrelationScatterHoverDataP(correlationData, threshold) {
     var hoverData = [];
     for (var i = 0; i < correlationData.length; i++) {
       if (correlationData[i]['pearson_p'] <= threshold && correlationData[i]['spearman_p'] <= threshold) {
@@ -77,21 +103,29 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     return hoverData;
   }
 
-  locusColocalizationCorrelationScatterPlot(correlationData, threshold) {
-    var xData = this.getCorrelationScatterX(correlationData, threshold);
-    console.log("xData", xData);
-    var yData = this.getCorrelationScatterY(correlationData, threshold);
-    console.log("yData", yData);
-    var hoverData = this.getCorrelationScatterHoverData(correlationData, threshold);
+  locusColocalizationCorrelationScatterPlot(correlationData, correlation, threshold) {
+    if (correlation == "R") {
+      var xDataR = this.getCorrelationScatterXR(correlationData);
+      // console.log("xData", xData);
+      var yDataR = this.getCorrelationScatterYR(correlationData);
+      // console.log("yData", yData);
+      var hoverDataR = this.getCorrelationScatterHoverDataR(correlationData);
+    } else {
+      var xDataP = this.getCorrelationScatterXP(correlationData, threshold);
+      // console.log("xData", xData);
+      var yDataP = this.getCorrelationScatterYP(correlationData, threshold);
+      // console.log("yData", yData);
+      var hoverDataP = this.getCorrelationScatterHoverDataP(correlationData, threshold);
+    }
     var trace1 = {
-      x: xData,
-      y: yData,
-      text: hoverData,
+      x: (correlation == "R") ? xDataR : xDataP,
+      y: (correlation == "R") ? yDataR : yDataP,
+      text: (correlation == "R") ? hoverDataR : hoverDataP,
       hoverinfo: 'text',
       mode: 'markers',
       type: 'scatter',
       marker: {
-        size: 7,
+        size: 12,
         color: "#cccccc",
         // color: scatterColorData,
         // colorscale: 'Viridis',
@@ -103,23 +137,22 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       }
     };
     var pdata = [trace1];
-    // var pdata = [trace1];
     var playout = {
-      // title: {
-      //   text: scatterTitle,
-      //   xref: 'paper'
-      // },
+      title: {
+        text: "Gene Correlation",
+        xref: 'paper'
+      },
       width: 1000,
       height: 700,
       yaxis: {
         autorange: true,
         automargin: true,
-        title: "-log10(Spearman P-value)",
+        title: (correlation == "R") ? "Spearman R" : "-log10(Spearman P-value)",
       },
       xaxis: {
         autorange: true,
         automargin: true,
-        title: "-log10(Pearson P-value)",
+        title: (correlation == "R") ? "Pearson R" : "-log10(Pearson P-value)",
       },
       margin: {
         l: 40,
@@ -147,14 +180,23 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     };
   }
 
+  triggerCorrelationReplot() {
+    if (this.selectedCorrelation == "R") {
+      this.correlationScatterThreshold.controls['correlationPvalThreshold'].disable();
+    } else {
+      this.correlationScatterThreshold.controls['correlationPvalThreshold'].enable();
+    }
+    this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
+  }
+
   changeCorrelationPvalThreshold(event: any) {
     var threshold = event.target.value;
     if (threshold >= 0.0 && threshold <= 1.0) {
       if (threshold.length > 0) {
         this.selectedCorrelationPvalThreshold = threshold;
-        this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelationPvalThreshold);
+        this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
       } else {
-        this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, 1.0);
+        this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 1.0);
       }
     }
   }
@@ -162,7 +204,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   clearCorrelationPvalThreshold() {
     this.selectedCorrelationPvalThreshold = 1.0;
     this.correlationScatterThreshold.value.correlationPvalThreshold = '1.0';
-    this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelationPvalThreshold);
+    this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
   }
 
   correlationPvalThresholdErrorMsg() {

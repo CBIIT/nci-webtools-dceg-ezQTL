@@ -29,19 +29,39 @@
             <mat-button-toggle value="log">Log</mat-button-toggle>
           </mat-button-toggle-group>
         </div>
-        <div class="col-md-auto pl-3 pr-3">
-          Median Sort:
+        <div class="col-md-auto pl-3">
+          Sort:
           <mat-button-toggle-group 
             name="fontStyle" 
             aria-label="Font Style" 
-            [(ngModel)]="selectedMedianSort" 
+            [(ngModel)]="selectedSort" 
             (change)="triggerReplot()">
+            <mat-button-toggle value="pvalue">P-value</mat-button-toggle>
+            <mat-button-toggle value="median">Median</mat-button-toggle>
+          </mat-button-toggle-group>
+          <mat-button-toggle-group 
+            name="fontStyle" 
+            aria-label="Font Style" 
+            [(ngModel)]="selectedSortOrder" 
+            (change)="triggerReplot()">
+            <!-- [vertical]="true"> -->
             <mat-button-toggle value="asc"><i class="fas fa-caret-up"></i></mat-button-toggle>
             <mat-button-toggle value="desc"><i class="fas fa-caret-down"></i></mat-button-toggle>
           </mat-button-toggle-group>
-
-          <button mat-button (click)="resetSort()">Reset</button>
+          <!-- <button mat-button (click)="resetSort()">Reset</button> -->
         </div>
+        <!-- <div class="col-md-auto pr-3"> -->
+          <!-- <mat-button-toggle-group 
+            name="fontStyle" 
+            aria-label="Font Style" 
+            [(ngModel)]="selectedSortOrder" 
+            (change)="triggerReplot()" 
+            [vertical]="true">
+            <mat-button-toggle value="asc"><i class="fas fa-caret-up"></i></mat-button-toggle>
+            <mat-button-toggle value="desc"><i class="fas fa-caret-down"></i></mat-button-toggle>
+          </mat-button-toggle-group> -->
+          <!-- <button mat-button (click)="resetSort()">Reset</button> -->
+        <!-- </div> -->
       </div>
     </div>
 
