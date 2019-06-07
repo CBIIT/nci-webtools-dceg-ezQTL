@@ -1,25 +1,45 @@
 <div class="locus-colocalization-result-tab">
 
-  <!-- P-value threshold input for correlation scatter plot -->
-  <div 
-    class="d-flex justify-content-center" 
-    id="qtls-locus-colocalization-correlation-scatter-threshold"
-    *ngIf="correlationScatter">
-    <form [formGroup]="correlationScatterThreshold">
-      <mat-form-field class="correlation-pval-threshold-input-field">
-        <input 
-          #correlationPvalThreshold
-          matInput 
-          placeholder="P-value Threshold" 
-          (keyup)="changeCorrelationPvalThreshold($event)" 
-          [(ngModel)]="selectedCorrelationPvalThreshold" 
-          formControlName="correlationPvalThreshold">
-        <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearCorrelationPvalThreshold()">
-          <mat-icon>close</mat-icon>
-        </button>
-        <mat-error *ngIf="correlationScatterThreshold.invalid">{{ correlationPvalThresholdErrorMsg() }}</mat-error>
-      </mat-form-field>
-    </form>
+  <div class="row p-3 justify-content-center">
+
+    <!-- Toggle Spearman/Pearson correlation type -->
+    <div class="col-md-auto pl-3 pr-3">
+      Pearson/Spearman:
+      <mat-button-toggle-group 
+        name="fontStyle" 
+        aria-label="Font Style" 
+        [(ngModel)]="selectedCorrelation" 
+        (change)="triggerCorrelationReplot()">
+        <mat-button-toggle value="R">R</mat-button-toggle>
+        <mat-button-toggle value="P">P</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+    <!-- P-value threshold input for correlation scatter plot -->
+    <div 
+      class="col-md-auto pl-3 pr-3" 
+      id="qtls-locus-colocalization-correlation-scatter-threshold"
+      *ngIf="correlationScatter">
+      <form [formGroup]="correlationScatterThreshold">
+        <mat-form-field class="correlation-pval-threshold-input-field">
+          <input 
+            #correlationPvalThreshold
+            matInput 
+            placeholder="P-value Threshold" 
+            (keyup)="changeCorrelationPvalThreshold($event)" 
+            [(ngModel)]="selectedCorrelationPvalThreshold" 
+            formControlName="correlationPvalThreshold">
+          <button 
+            mat-button matSuffix mat-icon-button aria-label="Clear" 
+            (click)="clearCorrelationPvalThreshold()" 
+            [disabled]="selectedCorrelation == 'R'">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="correlationScatterThreshold.invalid">{{ correlationPvalThresholdErrorMsg() }}</mat-error>
+        </mat-form-field>
+      </form>
+    </div>
+    
   </div>
 
   <!-- Show centered Plotly locus colocalization scatter plot if graph is generated -->

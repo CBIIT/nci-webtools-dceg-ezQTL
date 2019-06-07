@@ -13,6 +13,12 @@
     overflow-y: hidden !important;
 }
 
+.mat-tab-label {
+    font-weight: bold;
+    font-size: 14pt;
+    padding: 25px !important;
+}
+
 .mat-tab-label.mat-tab-label-active {
     color: #3F51B5 !important;
 }

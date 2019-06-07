@@ -303,14 +303,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       type: 'scatter', 
       marker: {
         symbol: "diamond",
-        size: 14,
+        size: 15,
         opacity: 1.0,
-        color: "red",
-        // color: [colorData[topIdx]],
-        // colorscale: 'Viridis',
-        // reversescale: true,
+        color: "#ff66cc",
         line: {
-          color: 'red',
+          color: '#ff66cc',
           width: 2
         },
       },
@@ -452,7 +449,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
       title: {
-        text: 'Locus Alignment Plot',
+        text: 'QTLs-GWAS Chromosome ' + chromosome + ' Variants',
         xref: 'paper'
       },
       width: 1000,
@@ -589,11 +586,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       type: 'scatter',
       marker: {
         symbol: "diamond",
-        size: 14,
+        size: 15,
         opacity: 1.0,
-        color: "red",
+        color: "#ff66cc",
         line: {
-          color: 'red',
+          color: '#ff66cc',
           width: 2
         },
       },
@@ -670,7 +667,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
       title: {
-        text: 'Locus Alignment Plot',
+        text: 'QTLs Chromosome ' + chromosome + ' Variants',
         xref: 'paper'
       },
       width: 1000,
@@ -1149,6 +1146,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var b = linear_regression[1];
     // console.log("b", b);
     var xDataFinites = this.removeInfinities(xData);
+    // console.log(xDataFinites);
     var xMin = Math.min.apply(null, xDataFinites);
     // console.log("xMin", xMin);
     var xMax = Math.max.apply(null, xDataFinites);
@@ -1172,7 +1170,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var pdata = [trace1];
     var playout = {
       title: {
-        text: scatterTitle,
+        text: "QTLs-GWAS Gene Correlation: " + scatterTitle,
         xref: 'paper'
       },
       width: 1000,
@@ -1216,9 +1214,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     if (threshold >= 0.0 && threshold <= 1.0) {
       if (threshold.length > 0) {
         this.selectedPvalThreshold = threshold;
-        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, this.selectedPvalThreshold);
+        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
       } else {
-        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, 1.0);
+        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", 1.0);
       }
     }
   }
@@ -1226,7 +1224,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   clearPvalThreshold() {
     this.selectedPvalThreshold = 1.0;
     this.GWASScatterThreshold.value.pvalThreshold = '1.0';
-    this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, this.selectedPvalThreshold);
+    this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
   }
 
   pvalThresholdErrorMsg() {
