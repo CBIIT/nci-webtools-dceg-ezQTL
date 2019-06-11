@@ -830,7 +830,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           this.disableInputs = false;
           $(".blur-loading").removeClass("blur-overlay");
         }
-      )
+      );
   }
 
   linkLDpop() {
@@ -1113,6 +1113,39 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return [a, b];
   }
 
+  getSumDiffAbsSquared(arr1, arr2) {
+    var d = [];
+    for (var i = 0; i < arr1.length; i++) {
+      d.push(Math.pow(Math.abs(arr1[i] - arr2[i]), 2));
+    }
+    var sum = d.reduce((a, b) => a + b, 0);
+    return sum;
+  }
+
+  recalculateSpearmanPValue(r, n) {
+    var numer = n - 2.0;
+    var denom = 1 - (Math.pow(r, 2));
+    var pval = r * (Math.sqrt(numer / denom));
+    console.log("pval", pval);
+    return pval;
+  }
+
+  recalculateSpearmanCorrelationTitle(xData, yData) {
+    var sortedX = xData.slice().sort(function(a, b){ return b - a })
+    var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
+    var sortedY = yData.slice().sort(function(a, b){ return b - a })
+    var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
+    var sumSquaredDiffRanks = this.getSumDiffAbsSquared(xRank, yRank);
+    var numer = 6.0 * sumSquaredDiffRanks;
+    var denom = xData.length * (Math.pow(xData.length, 2) - 1)
+    var rho = 1 - (numer / denom);
+    console.log("rho", rho);
+    console.log("n", xData.length);
+    // var pval = this.recalculateSpearmanPValue(rho, xData.length);
+    // return "rho=" + rho.toFixed(3) + ", p=" + pval.toFixed(3);
+    return "rho=" + rho.toFixed(3);
+  }
+
   locusAlignmentScatterPlot(scatterData, scatterTitle, threshold) {
     var xData = this.getScatterX(scatterData, threshold);
     // console.log("xData", xData);
@@ -1170,7 +1203,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var pdata = [trace1];
     var playout = {
       title: {
-        text: "QTLs-GWAS Gene Correlation: " + scatterTitle,
+        text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) : scatterTitle),
         xref: 'paper'
       },
       width: 1000,
@@ -1224,7 +1257,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   clearPvalThreshold() {
     this.selectedPvalThreshold = 1.0;
     this.GWASScatterThreshold.value.pvalThreshold = '1.0';
-    this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
+    this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, this.selectedPvalThreshold);
   }
 
   pvalThresholdErrorMsg() {
