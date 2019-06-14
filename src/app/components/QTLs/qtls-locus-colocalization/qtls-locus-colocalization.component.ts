@@ -136,7 +136,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   }
 
   downloadECAVIARTable() {
-    var url = environment.endpoint + "tmp/" + this.requestID + ".eCAVIAR.txt";
+    var url = environment.endpoint + "output/" + this.requestID + ".eCAVIAR.txt";
     var win = window.open(url, '_blank');
     win.focus();
   } 
