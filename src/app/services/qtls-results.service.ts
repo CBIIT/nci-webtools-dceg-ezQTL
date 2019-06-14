@@ -103,7 +103,7 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusAlignmentBoxplotsParameters), {headers: headers});
   }
 
-  calculateLocusColocalizationECAVIAR(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, select_ref: string, select_dist: string, select_pop: string, request_id: number) {
+  calculateLocusColocalizationECAVIAR(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, select_ref: string, select_dist: string, request_id: number) {
     let locusColocalizationECAVIARParameters= {
       select_gwas_sample: select_gwas_sample,
       select_qtls_samples: select_qtls_samples,
@@ -111,7 +111,6 @@ export class QTLsResultsService {
       associationFile: associationFile,
       select_ref: select_ref, 
       select_dist: select_dist,
-      select_pop: select_pop, 
       request_id: request_id
     };
     let headers = new HttpHeaders();

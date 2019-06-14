@@ -16,12 +16,16 @@ console.log("Server started.");
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const tmp_dir = 'r-calculations/tmp/';
-    const static_tmp_dir = 'static/tmp/';
+    const input_dir = 'r-calculations/input/';
+    const static_output_dir = 'static/output/';
     if (!fs.existsSync(tmp_dir)) {
       fs.mkdirSync(tmp_dir);
     }
-    if (!fs.existsSync(static_tmp_dir)) {
-      fs.mkdirSync(static_tmp_dir);
+    if (!fs.existsSync(input_dir)) {
+      fs.mkdirSync(input_dir);
+    }
+    if (!fs.existsSync(static_output_dir)) {
+      fs.mkdirSync(static_output_dir);
     }
     // fs.mkdir(dir, err => cb(err, dir))
     cb(null, tmp_dir);
@@ -62,12 +66,16 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   console.log("Main calculation reached.");
   // create tmp directories if do not exist
   const tmp_dir = 'r-calculations/tmp/';
-  const static_tmp_dir = 'static/tmp/';
+  const input_dir = 'r-calculations/input/';
+  const static_output_dir = 'static/output/';
   if (!fs.existsSync(tmp_dir)) {
     fs.mkdirSync(tmp_dir);
   }
-  if (!fs.existsSync(static_tmp_dir)) {
-    fs.mkdirSync(static_tmp_dir);
+  if (!fs.existsSync(input_dir)) {
+    fs.mkdirSync(input_dir);
+  }
+  if (!fs.existsSync(static_output_dir)) {
+    fs.mkdirSync(static_output_dir);
   }
 
   var associationFile = 'false'; // required file
@@ -175,11 +183,10 @@ app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
   var associationFile = request.body.associationFile;
   var select_ref = request.body.select_ref;
   var select_dist = request.body.select_dist;
-  var select_pop = request.body.select_pop;
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, select_pop, request_id, 'vQTL.env');
+    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id, 'vQTL.env');
     response.json(data);
   } catch(err) {
     console.log(err);

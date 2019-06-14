@@ -124,7 +124,7 @@ function qtlsCalculateLocusAlignmentBoxplots(rfile, select_qtls_samples, express
     });
 }
 
-function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, select_pop, request, envFile) {
+function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request, envFile) {
     console.log("Execute qtls locus colocalization eCAVIAR calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -134,7 +134,6 @@ function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, sele
         associationFile = JSON.stringify(associationFile);
         select_ref = JSON.stringify(select_ref);
         select_dist = JSON.stringify(select_dist);
-        select_pop = JSON.stringify(select_pop);
         request = JSON.stringify(request);
         envFile = JSON.stringify(envFile);
         select_gwas_sample = JSON.stringify(select_gwas_sample);
@@ -146,13 +145,12 @@ function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, sele
         console.log("GWAS File:", gwasFile);
         console.log("Selected Ref:", select_ref);
         console.log("Selected Dist:", select_dist);
-        console.log("Selected Pop:", select_pop);
         console.log("Request:", request);
         console.log("Environment File:", envFile);
     
         var code = readFileSync(rfile).toString();
         // make sure the R statement below is not appended to a comment in R code file
-        code += `locus_colocalization_eCAVIAR(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${gwasFile}, ${associationFile}, ${select_ref}, ${select_dist}, ${select_pop}, ${request}, ${envFile})`;
+        code += `locus_colocalization_eCAVIAR(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${gwasFile}, ${associationFile}, ${select_ref}, ${select_dist}, ${request}, ${envFile})`;
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(
