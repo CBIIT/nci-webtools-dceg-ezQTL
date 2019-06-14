@@ -82,23 +82,8 @@ locus_colocalization_correlation <- function(gwasdata, qdata) {
   return(locus_colocalization_correlation_data);
 }
 
-# locus_colocalization_eCAVIAR <- function(gwasFile, assocFile, select_ref_eCAVIAR, select_dist_eCAVIAR, select_pop_eCAVIAR, request, envFile) {
-#   # setwd(workDir)
-#   cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh tmp/', gwasFile, ' tmp/', assocFile, ' ', select_ref_eCAVIAR, ' ', select_dist_eCAVIAR, ' ', select_pop_eCAVIAR, ' ', request, ' QTLs/', envFile) 
-#   system(cmd)
-# }
-
 locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) {
   locus_colocalization_correlation_data <- locus_colocalization_correlation(gwasdata, qdata)
-  
-  # select_ref_eCAVIAR <- "rs408825"
-  # select_dist_eCAVIAR <- "100000"
-  # select_pop_eCAVIAR <- "EUR"
-  # request_eCAVIAR <- "888888888"
-  # envFile <- "vQTL.env"
-  
-  # locus_colocalization_eCAVIAR(gwasFile, assocFile, select_ref_eCAVIAR, select_dist_eCAVIAR, select_pop_eCAVIAR, request_eCAVIAR, envFile)
-  
   return(list(locus_colocalization_correlation_data));
 }
 
@@ -252,7 +237,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   # if GWAS data file is loaded
   if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
     if (identical(select_gwas_sample, 'false')) {
-      gwasdatafile <- paste0('tmp/', gwasFile)
+      gwasdatafile <- paste0('input/', gwasFile)
     } else {
       gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
     }
@@ -285,8 +270,8 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   # check to see if boxplot data files are present
   if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
     if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('tmp/', genoFile)
-      edatafile <- paste0('tmp/', exprFile)
+      gdatafile <- paste0('input/', genoFile)
+      edatafile <- paste0('input/', exprFile)
     } else {
       gdatafile <- paste0('../static/assets/files/', 'MX2.genotyping.txt') 
       edatafile <- paste0('../static/assets/files/', 'MX2.quantification.txt') 
@@ -324,8 +309,8 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   locus_alignment_boxplots_data <- list(c())
   if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
     if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('tmp/', genoFile)
-      edatafile <- paste0('tmp/', exprFile)
+      gdatafile <- paste0('input/', genoFile)
+      edatafile <- paste0('input/', exprFile)
     } else {
       gdatafile <- paste0('../static/assets/files/', 'MX2.genotyping.txt') 
       edatafile <- paste0('../static/assets/files/', 'MX2.quantification.txt') 
@@ -397,7 +382,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   if (identical(select_qtls_samples, 'true')) {
     qdatafile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
   } else {
-    qdatafile <- paste0('tmp/', assocFile)
+    qdatafile <- paste0('input/', assocFile)
   }
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
   qdata <- qdata %>% 

@@ -6,12 +6,12 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
   } else {
-    gwasFile <- paste0('tmp/', gwasFile)
+    gwasFile <- paste0('input/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
     assocFile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
   } else {
-    assocFile <- paste0('tmp/', assocFile)
+    assocFile <- paste0('input/', assocFile)
   }
   envFile <- paste0('QTLs/', envFile)
   ## execute eCAVIAR calculation: shell script
