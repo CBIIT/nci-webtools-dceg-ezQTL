@@ -526,7 +526,6 @@ export class QTLsCalculationInputsComponent implements OnInit {
               var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
               var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
               var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-              var newSelectedPop = res["info"]["inputs"]["select_pop"][0]; // inputted populations
               var requestID = res["info"]["inputs"]["request"][0]; // request id
               if (newSelectedDist == "false") {
                 var ecaviar_dist = "100000"; // default cis-QTL distance (in Kb)
@@ -545,9 +544,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
               console.log(associationFileName);
               console.log(ecaviar_ref);
               console.log(ecaviar_dist);
-              console.log(newSelectedPop);
               console.log(requestID);
-              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ecaviar_ref, ecaviar_dist, newSelectedPop, requestID)
+              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ecaviar_ref, ecaviar_dist, requestID)
                 .subscribe(
                   res => {
                     console.log("RESPONSE ECAVIAR");

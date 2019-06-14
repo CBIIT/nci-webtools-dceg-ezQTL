@@ -1,4 +1,4 @@
-locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, select_ref, select_dist, select_pop, request, envFile) {
+locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, select_ref, select_dist, request, envFile) {
   library(jsonlite)
   library(tidyverse)
   setwd(workDir)
@@ -17,8 +17,12 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   }
   envFile <- paste0('QTLs/', envFile)
 
-  cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', select_pop, ' ', request, ' ', envFile) 
+  cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request, ' ', envFile) 
   system(cmd)
+
+  ## remove eCAVIAR temp files folder
+  unlink(paste0('tmp/',request,'.','ECAVIAR_TMP'), recursive = TRUE)
+
 
   ecaviarfile <- paste0('tmp/', request, '.eCAVIAR.txt')
   ecaviardata <- read_delim(ecaviarfile, delim = "\t", col_names = T)
@@ -29,4 +33,3 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   dataSourceJSON <- c(toJSON(list(ecaviar=list(data=locus_colocalization_ecaviar_data))))
   return(dataSourceJSON)
 }
-
