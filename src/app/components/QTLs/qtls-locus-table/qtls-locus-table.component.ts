@@ -140,7 +140,7 @@ export class QTLsLocusTableComponent implements OnInit {
   }
 
   downloadLocusTable() {
-    var url = environment.endpoint + "tmp/" + this.requestID + ".variant_details.txt";
+    var url = environment.endpoint + "output/" + this.requestID + ".variant_details.txt";
     var win = window.open(url, '_blank');
     win.focus();
   } 
