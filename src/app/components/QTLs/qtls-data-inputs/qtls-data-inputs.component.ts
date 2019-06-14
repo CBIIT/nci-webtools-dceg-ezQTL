@@ -223,6 +223,7 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   async submit() {
+    const request_id = Date.now().toString();
     const { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
     const formData = new FormData();
     // custom tooltip validation - if expression file is submitted, need genotype file and vice versa. All or none.
@@ -250,15 +251,16 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#genotype-file-tooltip").tooltip("hide");
       $("#genotype-file-tooltip").tooltip("disable");
       this.data.changeResultStatus(true);
-      this.data.changeBlurLoad(true);
-      $(".blur-loading").addClass("blur-overlay");
+      this.data.changeBlurLoadMain(true);
+      $(".blur-loading-main").addClass("blur-overlay");
       $(".disabled-post-calc").addClass("disabled-overlay");
       $("#qtls-data-input-association-file").addClass("disabled-overlay");
       $("#qtls-data-input-expression-file").addClass("disabled-overlay");
       $("#qtls-data-input-genotype-file").addClass("disabled-overlay");
       $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
       $("#qtls-data-input-LD-file").addClass("disabled-overlay");
-      formData.append('request_id', Date.now().toString()); // generate calculation request ID
+      formData.append('request_id', request_id); // generate calculation request ID
+      // formData.append('request_id', Date.now().toString()); // generate calculation request ID
       formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
       formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
       formData.append('select_dist', "false"); // set default dist to 'false' -> default initial calculation cis-QTL distance window is 100 Kb
@@ -270,13 +272,17 @@ export class QTLsDataInputsComponent implements OnInit {
       formData.append('recalculateRef', "false");
       if (this.selectLoadQTLsSamples) {
         formData.append('select_qtls_samples', "true");
+        // var select_qtls_samples = "true";
       } else {
         formData.append('select_qtls_samples', "false");
+        // var select_qtls_samples = "false";
       }
       if (this.selectLoadGWASSample) {
         formData.append('select_gwas_sample', "true");
+        // var select_gwas_sample = "true";
       } else {
         formData.append('select_gwas_sample', "false");
+        // var select_gwas_sample = "false";
       }
 
       if (associationFile != null && associationFile.length > 0) {
@@ -302,29 +308,78 @@ export class QTLsDataInputsComponent implements OnInit {
         this.data.changeDisableLocusColocalization(true);
       }
 
+      console.log("RUN MAIN CALCULATION");
       this.data.calculateMain(formData)
         .subscribe(
           res => {
+            console.log("RESPONSE MAIN");
             this.data.changeMainData(res);
-            this.data.changeBlurLoad(false);
-            $(".blur-loading").removeClass("blur-overlay");
+            this.data.changeBlurLoadMain(false);
+            $(".blur-loading-main").removeClass("blur-overlay");
             $("#qtls-data-input-association-file").removeClass("disabled-overlay");
             $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
             $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
             $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
             $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
+            // Run eCAVIAR calculation if GWAS and Association Files loaded
+            var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+            var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+            var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
+            var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
+            if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
+              // $(".blur-loading-ecaviar").addClass("blur-overlay");
+              this.data.changeBlurLoadECAVIAR(true);
+              var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+              var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
+              var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
+              var newSelectedPop = res["info"]["inputs"]["select_pop"][0]; // inputted populations
+              var requestID = res["info"]["inputs"]["request"][0]; // request id
+              if (newSelectedDist == "false") {
+                var ecaviar_dist = "100000"; // default cis-QTL distance (in Kb)
+              } else {
+                var ecaviar_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+              }
+              if (newSelectedRef == "false") {
+                var ecaviar_ref = locusAlignmentDataQTopAnnot["rsnum"].toString(); // default ref
+              } else {
+                var ecaviar_ref = newSelectedRef.toString(); // recalculated new gene selection
+              }
+              console.log("RUN ECAVIAR CALCULATION");
+              console.log("Use sample association file?", select_qtls_samples);
+              console.log("Use sample GWAS file?", select_gwas_sample);
+              console.log(gwasFileName);
+              console.log(associationFileName);
+              console.log(ecaviar_ref);
+              console.log(ecaviar_dist);
+              console.log(newSelectedPop);
+              console.log(requestID);
+              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ecaviar_ref, ecaviar_dist, newSelectedPop, requestID)
+                .subscribe(
+                  res => {
+                    console.log("RESPONSE ECAVIAR");
+                    this.data.changeECAVIARData(res);
+                    $(".blur-loading-ecaviar").removeClass("blur-overlay");
+                    this.data.changeBlurLoadECAVIAR(false);
+                  },
+                  error => {
+                    this.handleError(error);
+                    $(".blur-loading-ecaviar").removeClass("blur-overlay");
+                    this.data.changeBlurLoadECAVIAR(false);
+                  }
+                );
+            }
           },
           error => {
             this.handleError(error);
-            this.data.changeBlurLoad(false);
-            $(".blur-loading").removeClass("blur-overlay");
+            this.data.changeBlurLoadMain(false);
+            $(".blur-loading-main").removeClass("blur-overlay");
             $("#qtls-data-input-association-file").removeClass("disabled-overlay");
             $("#qtls-data-input-expression-file").removeClass("disabled-overlay");
             $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
             $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
             $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
           }
-        )
+        );
     }
   } 
 
@@ -338,11 +393,14 @@ export class QTLsDataInputsComponent implements OnInit {
     $("#genotype-file-tooltip").tooltip("disable");
     this.disableQTLsToggle = false;
     this.data.changeResultStatus(false);
-    this.data.changeBlurLoad(false);
-    $(".blur-loading").removeClass("blur-overlay");
+    this.data.changeBlurLoadMain(false);
+    this.data.changeBlurLoadECAVIAR(false);
+    $(".blur-loading-main").removeClass("blur-overlay");
     $(".disabled-post-calc").removeClass("disabled-overlay");
     // remove all calculated data
     this.data.changeMainData(null);
+    // remove all eCAVIAR calculated data
+    this.data.changeECAVIARData(null);
     // remove any error messages
     this.data.changeErrorMessage('');
     // choose default association data file toggle

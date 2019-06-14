@@ -52,7 +52,7 @@ export class QTLsLocusTableComponent implements OnInit {
       this.selectedPop = this.newSelectedPop.split('+');; // recalculated new population selection
       this.expandPopulationGroup();
       if (this.locusAlignmentData) {
-        this.VARIANT_DATA = this.populateVariantDataList(this.locusAlignmentData);
+        this.VARIANT_DATA = this.populateLocusTableDataList(this.locusAlignmentData);
       }
       this.dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
       this.dataSource.paginator = this.paginator;
@@ -60,7 +60,7 @@ export class QTLsLocusTableComponent implements OnInit {
     });
   }
 
-  populateVariantDataList(geneData) {
+  populateLocusTableDataList(geneData) {
     var data = [];
     for (var i = 0; i < geneData.length; i++) {
       var variant = {};
@@ -139,7 +139,7 @@ export class QTLsLocusTableComponent implements OnInit {
     win.focus();
   }
 
-  downloadTable() {
+  downloadLocusTable() {
     var url = environment.endpoint + "tmp/" + this.requestID + ".variant_details.txt";
     var win = window.open(url, '_blank');
     win.focus();

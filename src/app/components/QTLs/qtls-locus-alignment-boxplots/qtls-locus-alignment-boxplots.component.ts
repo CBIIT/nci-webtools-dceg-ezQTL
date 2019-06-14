@@ -51,15 +51,15 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
       this.locusAlignmentData = this.mainData["locus_alignment"]["data"][0]; // locus alignment data
       if ((this.expressionFile != 'false' && this.genotypeFile != 'false') || this.select_qtls_samples == 'true') {
         this.data.calculateLocusAlignmentBoxplots(this.select_qtls_samples, this.expressionFile, this.genotypeFile, this.boxplotData)
-        .subscribe(
-          res => { 
-            this.locusAlignmentBoxplotsData = res["locus_alignment_boxplots"]["data"][0];
-            if (this.locusAlignmentBoxplotsData) {
-              this.graph = this.locusAlignmentBoxplots(this.boxplotData, this.locusAlignmentBoxplotsData);
-            }
-          },
-          error => this.handleError(error)
-        );
+          .subscribe(
+            res => { 
+              this.locusAlignmentBoxplotsData = res["locus_alignment_boxplots"]["data"][0];
+              if (this.locusAlignmentBoxplotsData) {
+                this.graph = this.locusAlignmentBoxplots(this.boxplotData, this.locusAlignmentBoxplotsData);
+              }
+            },
+            error => this.handleError(error)
+          );
       }
     }
   }

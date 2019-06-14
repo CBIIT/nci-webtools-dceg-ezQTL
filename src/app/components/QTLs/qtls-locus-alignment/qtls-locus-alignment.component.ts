@@ -79,7 +79,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   newSelectedPop: string;
   newSelectedGene: string;
   newSelectedDist: string;
-  blurLoad: boolean;
+  blurLoadMain: boolean;
   disableInputs: boolean;
   selectedPvalThreshold: number;
 
@@ -93,7 +93,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   constructor(private data: QTLsResultsService, public dialog: MatDialog) { }
 
   ngOnInit() {
-    this.data.currentBlurLoad.subscribe(blurLoad => this.blurLoad = blurLoad);
+    this.data.currentBlurLoadMain.subscribe(blurLoadMain => this.blurLoadMain = blurLoadMain);
     this.data.currentCollapseInput.subscribe(collapseInput => {
       this.collapseInput = collapseInput;
       // ensure graphs are properly positioned when data input panel collapse is toggled
@@ -807,28 +807,76 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var recalculateRef = "true";
     // reset
     this.closePopover();
-    this.data.changeBlurLoad(true);
+    this.data.changeBlurLoadMain(true);
     this.disableInputs = true;
     $("#ldref-search-warning").hide();
-    $(".blur-loading").addClass("blur-overlay");
+    $(".blur-loading-main").addClass("blur-overlay");
+    $(".blur-loading-ecaviar").addClass("blur-overlay");
     // calculate
     this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
       .subscribe(
         res => {
           this.data.changeMainData(res);
-          this.data.changeBlurLoad(false);
+          this.data.changeBlurLoadMain(false);
           this.disableInputs = false;
-          $(".blur-loading").removeClass("blur-overlay");
+          $(".blur-loading-main").removeClass("blur-overlay");
           this.recalculatePopAttempt = "false";
           this.recalculateGeneAttempt = "false";
           this.recalculateDistAttempt = "false";
           this.recalculateRefAttempt = "false";
+          // Run eCAVIAR calculation if GWAS and Association Files loaded
+          var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+          var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+          var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
+          var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
+          if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
+            // $(".blur-loading-ecaviar").addClass("blur-overlay");
+            this.data.changeBlurLoadECAVIAR(true);
+            var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+            var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
+            var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
+            var newSelectedPop = res["info"]["inputs"]["select_pop"][0]; // inputted populations
+            var requestID = res["info"]["inputs"]["request"][0]; // request id
+            if (newSelectedDist == "false") {
+              var ecaviar_dist = "100000"; // default cis-QTL distance (in Kb)
+            } else {
+              var ecaviar_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+            }
+            if (newSelectedRef == "false") {
+              var ecaviar_ref = locusAlignmentDataQTopAnnot["rsnum"].toString(); // default ref
+            } else {
+              var ecaviar_ref = newSelectedRef.toString(); // recalculated new gene selection
+            }
+            console.log("RUN ECAVIAR CALCULATION");
+            console.log("Use sample association file?", select_qtls_samples);
+            console.log("Use sample GWAS file?", select_gwas_sample);
+            console.log(gwasFileName);
+            console.log(associationFileName);
+            console.log(ecaviar_ref);
+            console.log(ecaviar_dist);
+            console.log(newSelectedPop);
+            console.log(requestID);
+            this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ecaviar_ref, ecaviar_dist, newSelectedPop, requestID)
+              .subscribe(
+                res => {
+                  console.log("RESPONSE ECAVIAR");
+                  this.data.changeECAVIARData(res);
+                  $(".blur-loading-ecaviar").removeClass("blur-overlay");
+                  this.data.changeBlurLoadECAVIAR(false);
+                },
+                error => {
+                  this.handleError(error);
+                  $(".blur-loading-ecaviar").removeClass("blur-overlay");
+                  this.data.changeBlurLoadECAVIAR(false);
+                }
+              );
+          }
         },
         error => {
           this.handleError(error);
-          this.data.changeBlurLoad(false);
+          this.data.changeBlurLoadMain(false);
           this.disableInputs = false;
-          $(".blur-loading").removeClass("blur-overlay");
+          $(".blur-loading-main").removeClass("blur-overlay");
         }
       );
   }
@@ -1139,8 +1187,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var numer = 6.0 * sumSquaredDiffRanks;
     var denom = xData.length * (Math.pow(xData.length, 2) - 1)
     var rho = 1 - (numer / denom);
-    console.log("rho", rho);
-    console.log("n", xData.length);
+    // console.log("rho", rho);
+    // console.log("n", xData.length);
     // var pval = this.recalculateSpearmanPValue(rho, xData.length);
     // return "rho=" + rho.toFixed(3) + ", p=" + pval.toFixed(3);
     return "rho=" + rho.toFixed(3);
