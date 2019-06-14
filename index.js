@@ -28,7 +28,7 @@ var storage = multer.diskStorage({
       fs.mkdirSync(static_output_dir);
     }
     // fs.mkdir(dir, err => cb(err, dir))
-    cb(null, tmp_dir);
+    cb(null, input_dir);
   },
   filename: function (req, file, cb) {
     let ext = ''; // set default extension (if any)
@@ -155,16 +155,13 @@ app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
   console.log("Locus Alignment boxplot info received.");
   console.log("REQUEST BODY - locus alignment boxplot point info");
   console.log(request.body);
-  var associationFile = request.body.associationFile;
-  var gwasFile = request.body.gwasFile; 
-  var select_ref = request.body.select_ref;
-  var select_dist = request.body.select_dist;
-  var select_pop = request.body.select_pop;
-  var request_id = request.body.request_id;
-  var envFile = request.body.envFile;
+  var expressionFile = request.body.expressionFile;
+  var genotypeFile =request.body.genotypeFile;
+  var boxplotDataDetailed = request.body.boxplotDataDetailed;
+  var select_qtls_samples = request.body.select_qtls_samples;
 
   try {
-    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', associationFile, gwasFile, select_ref, select_dist, select_pop, request_id, envFile);
+    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', select_qtls_samples, expressionFile, genotypeFile, boxplotDataDetailed);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -184,9 +181,10 @@ app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
   var select_ref = request.body.select_ref;
   var select_dist = request.body.select_dist;
   var request_id = request.body.request_id;
+  var envFile = "vQTL.env";
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id, 'vQTL.env');
+    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id, envFile);
     response.json(data);
   } catch(err) {
     console.log(err);

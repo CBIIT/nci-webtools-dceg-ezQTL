@@ -832,6 +832,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
             // $(".blur-loading-ecaviar").addClass("blur-overlay");
             this.data.changeBlurLoadECAVIAR(true);
+            // reset eCAVIAR data
+            this.data.changeECAVIARData(null);
             var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
             var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
             var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance

@@ -93,11 +93,16 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
         if (this.ecaviarData && this.ecaviarData[0]) {
           console.log(this.ecaviarData);
+          $(".blur-loading-ecaviar").removeClass("blur-overlay");
           this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);
           this.dataSource = new MatTableDataSource<eCAVIARGeneVariant>(this.ECAVIAR_DATA);
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
+        } else {
+          $(".blur-loading-ecaviar").addClass("blur-overlay");
         }
+      } else {
+        $(".blur-loading-ecaviar").addClass("blur-overlay");
       }
     });
   }

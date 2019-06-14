@@ -44,18 +44,21 @@
 
       <!-- Locus Colocalization Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoadMain || disableLocusColocalization" id="locus-colocalization-results" label="Locus Colocalization"> 
-        <div class="col result-main" id="locus-colocalization-results-main">
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoadMain && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-colocalization-results-main">
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">
+              <app-qtls-locus-colocalization></app-qtls-locus-colocalization>
             </div>
           </div>
-          <div class="blur-loading-main" *ngIf="mainData">
-            <app-qtls-locus-colocalization></app-qtls-locus-colocalization>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
 
       <!-- Locus Quantification Result Tab -->
