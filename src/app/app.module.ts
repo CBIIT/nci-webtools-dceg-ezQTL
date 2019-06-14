@@ -44,7 +44,7 @@ import {
   MatAutocompleteModule, 
   MatRadioModule, 
   MatTooltipModule,
-  MatButtonToggleModule 
+  MatButtonToggleModule
 } from '@angular/material';
 import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-colocalization/qtls-locus-colocalization.component';
 

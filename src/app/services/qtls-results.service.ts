@@ -8,9 +8,13 @@ import { environment } from '../../environments/environment'
 })
 export class QTLsResultsService {
 
-  // object: data output from R calculation to plot
+  // object: data output from main R calculation to plot
   private mainDataSource = new BehaviorSubject<Object>(null);
   currentMainData = this.mainDataSource.asObservable();
+
+  // object: data output from eCAVIAR R/bash calculation to plot
+  private eCAVIARDataSource = new BehaviorSubject<Object>(null);
+  currentECAVIARData = this.eCAVIARDataSource.asObservable();
 
   // boolean: true=show results container
   private resultStatus = new BehaviorSubject(false);
@@ -40,9 +44,13 @@ export class QTLsResultsService {
   private collapseInput = new BehaviorSubject(false);
   currentCollapseInput = this.collapseInput.asObservable();
 
-  // boolean: whether or not to display the blur loading spinner
-  private blurLoad = new BehaviorSubject(false);
-  currentBlurLoad = this.blurLoad.asObservable();
+  // boolean: whether or not to display the blur loading spinner on main calculations
+  private blurLoadMain = new BehaviorSubject(false);
+  currentBlurLoadMain = this.blurLoadMain.asObservable();
+
+  // boolean: whether or not to display the blur loading spinner on eCAVIAR calculations
+  private blurLoadECAVIAR = new BehaviorSubject(false);
+  currentBlurLoadECAVIAR = this.blurLoadECAVIAR.asObservable();
 
   // string: error message output from R calculation
   private qtlsType = new BehaviorSubject('assoc');
@@ -95,8 +103,29 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusAlignmentBoxplotsParameters), {headers: headers});
   }
 
+  calculateLocusColocalizationECAVIAR(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, select_ref: string, select_dist: string, select_pop: string, request_id: number) {
+    let locusColocalizationECAVIARParameters= {
+      select_gwas_sample: select_gwas_sample,
+      select_qtls_samples: select_qtls_samples,
+      gwasFile: gwasFile,
+      associationFile: associationFile,
+      select_ref: select_ref, 
+      select_dist: select_dist,
+      select_pop: select_pop, 
+      request_id: request_id
+    };
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    const url = environment.endpoint + 'qtls-locus-colocalization-ecaviar';
+    return this.http.post(url, JSON.stringify(locusColocalizationECAVIARParameters), {headers: headers});
+  }
+
   changeMainData(mainData: Object) {
     this.mainDataSource.next(mainData);
+  }
+
+  changeECAVIARData(eCAVIARData: Object) {
+    this.eCAVIARDataSource.next(eCAVIARData);
   }
 
   changeResultStatus(resultStatus: boolean) {
@@ -127,8 +156,12 @@ export class QTLsResultsService {
     this.collapseInput.next(collapseInput);
   }
 
-  changeBlurLoad(blurLoad: boolean) {
-    this.blurLoad.next(blurLoad);
+  changeBlurLoadMain(blurLoadMain: boolean) {
+    this.blurLoadMain.next(blurLoadMain);
+  }
+
+  changeBlurLoadECAVIAR(blurLoadECAVIAR: boolean) {
+    this.blurLoadECAVIAR.next(blurLoadECAVIAR);
   }
 
   changeQtlsType(qtlsType: string) {

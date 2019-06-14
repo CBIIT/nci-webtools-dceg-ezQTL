@@ -49,16 +49,13 @@ locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
   return(list(locus_alignment_gwas_scatter_data, tmptitle))
 }
 
-locus_colocalization <- function(gwasdata, qdata) {
+locus_colocalization_correlation <- function(gwasdata, qdata) {
   #p_cutoff <- 0.01 ### kevin, a parameter for user to choose max pvalue cut-off for both eQTL and GWAS ##
-
   tmpdata <- qdata %>% 
     select(gene_symbol,gene_id,chr,pos,ref,alt,pval_nominal) %>% 
     left_join(gwasdata) %>% 
     filter(!is.na(pvalue),!is.na(pval_nominal)) 
-
   # filter(!is.na(pvalue),!is.na(pval_nominal),pvalue<p_cutoff,pval_nominal<p_cutoff) 
-
   #if (p_cutoff < 1) {
   tmpgeneid <- tmpdata %>% 
     count(gene_id,sort = T) %>% 
@@ -66,7 +63,6 @@ locus_colocalization <- function(gwasdata, qdata) {
   tmpdata <- tmpdata %>% 
     filter(gene_id %in% tmpgeneid)
   #}
-
   tmpdata <- left_join(
     tmpdata %>% 
       group_by(gene_id,gene_symbol) %>% 
@@ -81,12 +77,32 @@ locus_colocalization <- function(gwasdata, qdata) {
   ## cast column types to string to prevent rounding of decimals
   tmpdata_string <- tmpdata
   tmpdata_string[3:6] <- lapply(tmpdata_string[3:6], as.character)
-  locus_colocalization_colnames <- colnames(tmpdata_string)
-  locus_colocalization_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_colnames))
-  return(locus_colocalization_data);
+  locus_colocalization_correlation_colnames <- colnames(tmpdata_string)
+  locus_colocalization_correlation_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_correlation_colnames))
+  return(locus_colocalization_correlation_data);
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants) { 
+# locus_colocalization_eCAVIAR <- function(gwasFile, assocFile, select_ref_eCAVIAR, select_dist_eCAVIAR, select_pop_eCAVIAR, request, envFile) {
+#   # setwd(workDir)
+#   cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh tmp/', gwasFile, ' tmp/', assocFile, ' ', select_ref_eCAVIAR, ' ', select_dist_eCAVIAR, ' ', select_pop_eCAVIAR, ' ', request, ' QTLs/', envFile) 
+#   system(cmd)
+# }
+
+locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) {
+  locus_colocalization_correlation_data <- locus_colocalization_correlation(gwasdata, qdata)
+  
+  # select_ref_eCAVIAR <- "rs408825"
+  # select_dist_eCAVIAR <- "100000"
+  # select_pop_eCAVIAR <- "EUR"
+  # request_eCAVIAR <- "888888888"
+  # envFile <- "vQTL.env"
+  
+  # locus_colocalization_eCAVIAR(gwasFile, assocFile, select_ref_eCAVIAR, select_dist_eCAVIAR, select_pop_eCAVIAR, request_eCAVIAR, envFile)
+  
+  return(list(locus_colocalization_correlation_data));
+}
+
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, select_ref, cedistance, top_gene_variants) { 
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -246,7 +262,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     ## return locus alignment gwas scatter data
     locus_alignment_gwas_scatter_data_title <- locus_alignment_gwas_scatter(gwasdata, qdata_region)
     ## return locus colocalization data
-    locus_colocalization_data <- locus_colocalization(gwasdata, qdata)
+    locus_colocalization_data <- locus_colocalization(gwasdata, qdata, gwasFile, assocFile, request)
   }
   return(list(locus_alignment_data, rcdata_region_data, qdata_top_annotation_data, locus_alignment_gwas_scatter_data_title, gwas_example_data, locus_colocalization_data))
 }
@@ -418,7 +434,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, select_ref, cedistance, top_gene_variants)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, select_ref, cedistance, top_gene_variants)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
@@ -427,12 +443,20 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_alignment_gwas_scatter_title <- locus_alignment_gwas_scatter[[2]]
   gwas_example_data <- locus_alignment[[5]]
   locus_colocalization_data <- locus_alignment[[6]]
+  locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
   locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile)
   locus_quantification_data <- locus_quantification[[1]]
   locus_quantification_heatmap_data <- locus_quantification[[2]]
+
+  # select_ref_eCAVIAR <- "rs408825"
+  # select_dist_eCAVIAR <- "100000"
+  # select_pop_eCAVIAR <- "EUR"
+  # envFile <- "vQTL.env"
+  # locus_colocalization_eCAVIAR(gwasFile, assocFile, select_ref_eCAVIAR, select_dist_eCAVIAR, select_pop_eCAVIAR, request, envFile)
+  
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization=list(data=locus_colocalization_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization_correlation=list(data=locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
