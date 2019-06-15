@@ -56,30 +56,9 @@
 
   <br>
 
-  <!-- <div 
-    class="d-flex justify-content-center" 
-    *ngIf="!ecaviarData">
-    <mat-spinner></mat-spinner>
-  </div> -->
-  <!-- <div 
-    class="d-flex justify-content-center loading-overlay" 
-    *ngIf="blurLoadECAVIAR">
-    <div class="d-flex align-items-center flex-wrap">
-      <mat-spinner></mat-spinner>
-    </div>
-  </div> -->
-<!-- 
-  <div 
-    class="ecaviar-results blur-loading-ecaviar blur-overlay" 
-    *ngIf="showECAVIARTable"> -->
-
-  <!-- <div 
-    class="ecaviar-results" 
-    *ngIf="showECAVIARTable"> -->
-
-  <div   
-    class="ecaviar-results">
-
+  <!-- eCAVIAR results table -->
+  <div class="ecaviar-results">
+    <!-- table filter input field -->
     <div class="ml-2 mr-2">
       <mat-form-field>
         <input matInput 
@@ -88,17 +67,26 @@
           placeholder="Filter">
       </mat-form-field>
     </div>
+    <!-- loading spinner -->
     <div 
       class="d-flex justify-content-center" 
-      *ngIf="!showECAVIARTable">
+      *ngIf="!showECAVIARTable && !ecaviarWarningMessage">
       <mat-spinner></mat-spinner>
     </div>
+    <!-- show warning message if no eCAVIAR data is returned -->
+    <div 
+      id="ecaviar-warning"
+      class="ml-2 mr-2 alert alert-warning show text-center" 
+      role="alert"  
+      *ngIf="ecaviarWarningMessage">
+      No eCAVIAR calculation results. Please check input data files and calculation parameters.
+    </div>
+    <!-- x-scrollable table container -->
     <div class="ml-2 mr-2 ecaviar-details-table-container" *ngIf="showECAVIARTable">
-
       <table class="ecaviar-details-table" mat-table [dataSource]="dataSource" matSort matSortStart="desc">
         <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
-      
+
         <!-- gene_id Column -->
         <ng-container matColumnDef="gene_id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="gene_id"> Gene ID </th>

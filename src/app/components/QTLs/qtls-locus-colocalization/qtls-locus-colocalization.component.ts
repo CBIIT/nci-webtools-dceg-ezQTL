@@ -53,7 +53,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
 
   requestID: number;
   
-  ecaviarData: Object;
+  ecaviarData: Object[];
   
   ECAVIAR_DATA: eCAVIARGeneVariant[];
   // displayedColumns: string[] = ['gene_id', 'gene_symbol', 'variant_id', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'gwas_pvalue', 'gwas_z', 'Leadsnp', 'Prob_in_pCausalSet', 'CLPP', 'Prob_in_pCausalSet2', 'CLPP2', 'leadsnp_included'];
@@ -63,6 +63,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   blurLoadECAVIAR: boolean;
 
   showECAVIARTable: boolean;
+  ecaviarWarningMessage: boolean;
 
   correlationScatterThreshold = new FormGroup({
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
@@ -91,6 +92,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       this.ecaviarData = null;
       this.ECAVIAR_DATA = null;
       this.dataSource = null;
+      this.ecaviarWarningMessage = false;
       if(ecaviarData) {
         this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
         if (this.ecaviarData && this.ecaviarData[0]) {
@@ -101,13 +103,31 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           this.dataSource = new MatTableDataSource<eCAVIARGeneVariant>(this.ECAVIAR_DATA);
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
+          if (this.ecaviarData != null && this.ecaviarData.length == 0) {
+            this.ecaviarWarningMessage = true;
+            this.ecaviarData = null;
+            this.ECAVIAR_DATA = null;
+            this.dataSource = null;
+          }
         } else {
           // $(".blur-loading-ecaviar").addClass("blur-overlay");
           this.showECAVIARTable = false;
+          if (this.ecaviarData != null && this.ecaviarData.length == 0) {
+            this.ecaviarWarningMessage = true;
+            this.ecaviarData = null;
+            this.ECAVIAR_DATA = null;
+            this.dataSource = null;
+          }
         }
       } else {
         // $(".blur-loading-ecaviar").addClass("blur-overlay");
         this.showECAVIARTable = false;
+        if (this.ecaviarData != null && this.ecaviarData.length == 0) {
+          this.ecaviarWarningMessage = true;
+          this.ecaviarData = null;
+          this.ECAVIAR_DATA = null;
+          this.dataSource = null;
+        }
       }
     });
   }
