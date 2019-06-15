@@ -68,15 +68,32 @@
       <mat-spinner></mat-spinner>
     </div>
   </div> -->
+<!-- 
+  <div 
+    class="ecaviar-results blur-loading-ecaviar blur-overlay" 
+    *ngIf="showECAVIARTable"> -->
 
-  <div class="ecaviar-results blur-loading-ecaviar blur-overlay">
+  <!-- <div 
+    class="ecaviar-results" 
+    *ngIf="showECAVIARTable"> -->
+
+  <div   
+    class="ecaviar-results">
 
     <div class="ml-2 mr-2">
       <mat-form-field>
-        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        <input matInput 
+          [disabled]="!showECAVIARTable"
+          (keyup)="applyFilter($event.target.value)" 
+          placeholder="Filter">
       </mat-form-field>
     </div>
-    <div class="ml-2 mr-2 ecaviar-details-table-container">
+    <div 
+      class="d-flex justify-content-center" 
+      *ngIf="!showECAVIARTable">
+      <mat-spinner></mat-spinner>
+    </div>
+    <div class="ml-2 mr-2 ecaviar-details-table-container" *ngIf="showECAVIARTable">
 
       <table class="ecaviar-details-table" mat-table [dataSource]="dataSource" matSort matSortStart="desc">
         <!--- Note that these columns can be defined in any order.
@@ -209,9 +226,14 @@
     </div>
       
     <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+
+    <!-- <mat-paginator [disabled]="!showECAVIARTable" [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator> -->
     
     <div class="ml-4 mb-4 ecaviar-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
-      <a (click)="downloadECAVIARTable()">Download eCAVIAR Table</a>
+      <a (click)="downloadECAVIARTable()" 
+        *ngIf="showECAVIARTable">
+        Download eCAVIAR Table
+      </a>
     </div>
 
   </div>

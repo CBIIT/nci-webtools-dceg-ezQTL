@@ -62,6 +62,8 @@ export class QtlsLocusColocalizationComponent implements OnInit {
 
   blurLoadECAVIAR: boolean;
 
+  showECAVIARTable: boolean;
+
   correlationScatterThreshold = new FormGroup({
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
   });
@@ -72,7 +74,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
-    this.data.currentBlurLoadECAVIAR.subscribe(blurLoadECAVIAR => this.blurLoadECAVIAR = blurLoadECAVIAR);
+    // this.data.currentBlurLoadECAVIAR.subscribe(blurLoadECAVIAR => this.blurLoadECAVIAR = blurLoadECAVIAR);
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
         this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus alignment data
@@ -93,16 +95,19 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
         if (this.ecaviarData && this.ecaviarData[0]) {
           console.log(this.ecaviarData);
-          $(".blur-loading-ecaviar").removeClass("blur-overlay");
+          // $(".blur-loading-ecaviar").removeClass("blur-overlay");
+          this.showECAVIARTable = true;
           this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);
           this.dataSource = new MatTableDataSource<eCAVIARGeneVariant>(this.ECAVIAR_DATA);
           this.dataSource.paginator = this.paginator;
           this.dataSource.sort = this.sort;
         } else {
-          $(".blur-loading-ecaviar").addClass("blur-overlay");
+          // $(".blur-loading-ecaviar").addClass("blur-overlay");
+          this.showECAVIARTable = false;
         }
       } else {
-        $(".blur-loading-ecaviar").addClass("blur-overlay");
+        // $(".blur-loading-ecaviar").addClass("blur-overlay");
+        this.showECAVIARTable = false;
       }
     });
   }
