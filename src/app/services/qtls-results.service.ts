@@ -49,8 +49,8 @@ export class QTLsResultsService {
   currentBlurLoadMain = this.blurLoadMain.asObservable();
 
   // boolean: whether or not to display the blur loading spinner on eCAVIAR calculations
-  private blurLoadECAVIAR = new BehaviorSubject(false);
-  currentBlurLoadECAVIAR = this.blurLoadECAVIAR.asObservable();
+  // private blurLoadECAVIAR = new BehaviorSubject(false);
+  // currentBlurLoadECAVIAR = this.blurLoadECAVIAR.asObservable();
 
   // string: error message output from R calculation
   private qtlsType = new BehaviorSubject('assoc');
@@ -159,9 +159,9 @@ export class QTLsResultsService {
     this.blurLoadMain.next(blurLoadMain);
   }
 
-  changeBlurLoadECAVIAR(blurLoadECAVIAR: boolean) {
-    this.blurLoadECAVIAR.next(blurLoadECAVIAR);
-  }
+  // changeBlurLoadECAVIAR(blurLoadECAVIAR: boolean) {
+  //   this.blurLoadECAVIAR.next(blurLoadECAVIAR);
+  // }
 
   changeQtlsType(qtlsType: string) {
     this.qtlsType.next(qtlsType);

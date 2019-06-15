@@ -831,7 +831,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
           if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
             // $(".blur-loading-ecaviar").addClass("blur-overlay");
-            this.data.changeBlurLoadECAVIAR(true);
+            // this.data.changeBlurLoadECAVIAR(true);
             // reset eCAVIAR data
             this.data.changeECAVIARData(null);
             var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
@@ -861,13 +861,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
                 res => {
                   console.log("RESPONSE ECAVIAR");
                   this.data.changeECAVIARData(res);
-                  $(".blur-loading-ecaviar").removeClass("blur-overlay");
-                  this.data.changeBlurLoadECAVIAR(false);
+                  // $(".blur-loading-ecaviar").removeClass("blur-overlay");
+                  // this.data.changeBlurLoadECAVIAR(false);
                 },
                 error => {
                   this.handleError(error);
-                  $(".blur-loading-ecaviar").removeClass("blur-overlay");
-                  this.data.changeBlurLoadECAVIAR(false);
+                  // $(".blur-loading-ecaviar").removeClass("blur-overlay");
+                  // this.data.changeBlurLoadECAVIAR(false);
                 }
               );
           }
