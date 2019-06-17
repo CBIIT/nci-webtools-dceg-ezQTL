@@ -1,16 +1,31 @@
-#input-panel {
+/* #input-panel {
     padding-right: 0px !important;
     min-width: 320px !important;
 }
 #results-panel {
     padding-left: 0px !important;
+} */
+
+mat-sidenav-container {
+    min-height: 780px;
+    height: 100%;
+    background: white;
 }
-#toggle-view {
-    padding-right: 2px !important;
-    padding-left: 2px !important;
-    padding-top: 8px !important;
+
+mat-sidenav {
+    /* height: 100%; */
+    width: 320px;
 }
-#toggle-view-button {
+
+/* mat-sidenav-content {
+    background: white;
+} */
+
+/* .toggle-view {
+    float: left;
+} */
+
+/* #toggle-view-button {
     cursor: pointer;
     color: #3F51B5;
-}
+} */

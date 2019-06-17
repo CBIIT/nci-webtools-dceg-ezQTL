@@ -34,11 +34,12 @@ export interface GeneVariants {
 })
 export class QTLsCalculationInputsComponent implements OnInit {
 
-  qtlsCalculationFormRSNumber = new FormGroup({
-    rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
-  });
   qtlsCalculationFormCISDistance = new FormGroup({
     cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
+  });
+
+  qtlsCalculationFormRSNumber = new FormGroup({
+    rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
   });
 
   mainData: Object;
@@ -165,6 +166,39 @@ export class QTLsCalculationInputsComponent implements OnInit {
         }
       }
     });
+  }
+
+  collapseDataInputPanel() {
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
+    $("#toggle-view-button").toggleClass('fa-caret-left fa-caret-right');
+    // toggle position of locus alignment manhattan plot for popovers to fit
+    $("#qtls-locus-alignment-plot").toggleClass('justify-content-start justify-content-center');
+    $("#qtls-locus-alignment-scatter-plot").toggleClass('justify-content-start justify-content-center');
+    var direction = $("#toggle-view-button").attr("class");
+    if (direction.includes("left")) {
+      // show input panel
+      this.data.changeCollapseInput(false);
+      // shift popovers to the left if any are open
+      if ($(".popover").is(":visible")) {
+        $('.popover').css({
+          left: $(".popover").position().left - 220 + "px"
+        });
+      }
+    } else {
+      // hide input panel
+      this.data.changeCollapseInput(true);
+      // shift popovers to the right if any are open
+      if ($(".popover").is(":visible")) {
+        $('.popover').css({
+          left: $(".popover").position().left + 220 + "px"
+        });
+      }
+    }
   }
 
   populatePopulationDropdown() {

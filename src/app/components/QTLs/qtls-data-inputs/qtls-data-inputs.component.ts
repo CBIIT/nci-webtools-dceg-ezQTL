@@ -108,33 +108,69 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
     this.qtlsForm.value.associationFile = false;
     $("#association-file").val("");
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
   }
 
   clearExpressionFile() {
     this.qtlsForm.setControl('expressionFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.expressionFile = false;
     $("#expression-file").val("");
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
   }
 
   clearGenotypeFile() {
     this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.genotypeFile = false;
     $("#genotype-file").val("");
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
   }
 
   clearGWASFile() {
     this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.gwasFile = false;
     $("#gwas-file").val("");
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
   }
 
   clearLDFile() {
     this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.value.LDFile = false;
     $("#LD-file").val("");
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
   }
 
   loadQTLsSampleDataFiles() { // if user unloads sample QTLs data files
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
     if (this.selectLoadQTLsSamples == true) {
       this.selectLoadQTLsSamples = false;
       this.disableQTLsToggle = false;
@@ -180,6 +216,12 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   loadGWASSampleDataFile() { // if user unloads sample GWAS data file
+    $("#expression-file-tooltip").tooltip("enable");
+    $("#expression-file-tooltip").tooltip("hide");
+    $("#expression-file-tooltip").tooltip("disable");
+    $("#genotype-file-tooltip").tooltip("enable");
+    $("#genotype-file-tooltip").tooltip("hide");
+    $("#genotype-file-tooltip").tooltip("disable");
     if (this.selectLoadGWASSample == true) {
       this.selectLoadGWASSample = false;
       this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));

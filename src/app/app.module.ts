@@ -44,7 +44,8 @@ import {
   MatAutocompleteModule, 
   MatRadioModule, 
   MatTooltipModule,
-  MatButtonToggleModule
+  MatButtonToggleModule, 
+  MatSidenavModule
 } from '@angular/material';
 import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-colocalization/qtls-locus-colocalization.component';
 
@@ -95,7 +96,8 @@ import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-c
     MatAutocompleteModule, 
     MatRadioModule,
     MatTooltipModule, 
-    MatButtonToggleModule
+    MatButtonToggleModule, 
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent],
