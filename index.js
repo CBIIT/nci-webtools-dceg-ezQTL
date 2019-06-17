@@ -181,10 +181,9 @@ app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
   var select_ref = request.body.select_ref;
   var select_dist = request.body.select_dist;
   var request_id = request.body.request_id;
-  var envFile = "vQTL.env";
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id, envFile);
+    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id);
     response.json(data);
   } catch(err) {
     console.log(err);

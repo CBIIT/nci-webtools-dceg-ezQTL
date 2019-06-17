@@ -15,10 +15,13 @@ export class QTLsComponent implements OnInit {
 
   resultStatus: boolean;
   errorMessage: string;
+  opened: boolean;
+  collapseInput: boolean;
 
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
+    this.opened = true;
     // hide input panel once calculate button is hit
     this.data.currentResultStatus.subscribe(resultStatus => {
       this.resultStatus = resultStatus;
@@ -30,6 +33,14 @@ export class QTLsComponent implements OnInit {
       this.errorMessage = errorMessage;
       if (this.errorMessage) {
         this.toggleView();
+      }
+    });
+    this.data.currentCollapseInput.subscribe(collapseInput => {
+      this.collapseInput = collapseInput;
+      if (this.collapseInput) {
+        this.opened = false;
+      } else {
+        this.opened = true;
       }
     });
   }
@@ -44,8 +55,9 @@ export class QTLsComponent implements OnInit {
     var direction = $("#toggle-view-button").attr("class");
     if (direction.includes("left")) {
       // show input panel
-      $("#input-panel").show();
-      $("#results-panel").toggleClass('col-9 col');
+      this.opened = true;
+      // $("#input-panel").show();
+      // $("#results-panel").toggleClass('col-9 col');
       this.data.changeCollapseInput(false);
       // shift popovers to the left if any are open
       if ($(".popover").is(":visible")) {
@@ -55,8 +67,9 @@ export class QTLsComponent implements OnInit {
       }
     } else {
       // hide input panel
-      $("#input-panel").hide();
-      $("#results-panel").toggleClass('col-9 col');
+      this.opened = false;
+      // $("#input-panel").hide();
+      // $("#results-panel").toggleClass('col-9 col');
       this.data.changeCollapseInput(true);
       // shift popovers to the right if any are open
       if ($(".popover").is(":visible")) {

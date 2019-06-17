@@ -124,7 +124,7 @@ function qtlsCalculateLocusAlignmentBoxplots(rfile, select_qtls_samples, express
     });
 }
 
-function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request, envFile) {
+function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request) {
     console.log("Execute qtls locus colocalization eCAVIAR calculation.");
     return new Promise((resolve, reject) => {
         const workingDirectory = JSON.stringify(__dirname);
@@ -135,7 +135,6 @@ function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, sele
         select_ref = JSON.stringify(select_ref);
         select_dist = JSON.stringify(select_dist);
         request = JSON.stringify(request);
-        envFile = JSON.stringify(envFile);
         select_gwas_sample = JSON.stringify(select_gwas_sample);
         select_qtls_samples = JSON.stringify(select_qtls_samples);
 
@@ -146,11 +145,10 @@ function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, sele
         console.log("Selected Ref:", select_ref);
         console.log("Selected Dist:", select_dist);
         console.log("Request:", request);
-        console.log("Environment File:", envFile);
     
         var code = readFileSync(rfile).toString();
         // make sure the R statement below is not appended to a comment in R code file
-        code += `locus_colocalization_eCAVIAR(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${gwasFile}, ${associationFile}, ${select_ref}, ${select_dist}, ${request}, ${envFile})`;
+        code += `locus_colocalization_eCAVIAR(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${gwasFile}, ${associationFile}, ${select_ref}, ${select_dist}, ${request})`;
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(

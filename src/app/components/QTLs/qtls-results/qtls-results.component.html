@@ -4,26 +4,29 @@
 
       <!-- Locus Alignment Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoadMain" id="locus-alignment-results" label="Locus Alignment"> 
-        <div class="col result-main" id="locus-alignment-results-main">
-          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage"> -->
-          <div class="p-2 blur-loading-main" *ngIf="!mainData && !errorMessage">
-            Upload data files on the left panel and click Calculate to see results here.
-          </div>
-          <div class="p-2" *ngIf="errorMessage && !mainData">
-            Please check input files — reset form to try again.
-          </div>
-          <!-- *ngIf="resultStatus && !mainData && !errorMessage"  -->
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoadMain && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-alignment-results-main">
+            <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage"> -->
+            <div class="p-2 blur-loading-main" *ngIf="!mainData && !errorMessage">
+              Upload data files on the left panel and click Calculate to see results here.
+            </div>
+            <div class="p-2" *ngIf="errorMessage && !mainData">
+              Please check input files — reset form to try again.
+            </div>
+            <!-- *ngIf="resultStatus && !mainData && !errorMessage"  -->
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">             
+              <app-qtls-locus-alignment></app-qtls-locus-alignment>
             </div>
           </div>
-          <div class="blur-loading-main" *ngIf="mainData">             
-            <app-qtls-locus-alignment></app-qtls-locus-alignment>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
 
       <!-- Locus Table Result Tab -->

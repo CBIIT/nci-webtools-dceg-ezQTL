@@ -12,6 +12,7 @@ body {
 
 .container {
   min-width: 1500px;
+  /* padding-left: 0px; */
 }
 
 .bg-primary, .btn-primary {
