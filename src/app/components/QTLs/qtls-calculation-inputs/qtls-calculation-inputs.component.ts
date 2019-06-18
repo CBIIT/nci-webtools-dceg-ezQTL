@@ -77,6 +77,9 @@ export class QTLsCalculationInputsComponent implements OnInit {
   recalculateRefAttempt: string;
   inputChanged: boolean;
   disableInputs: boolean;
+  messages: string[];
+
+  errorMessage: string;
   warningMessage: string;
 
   select_qtls_samples: string;
@@ -90,11 +93,19 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.selectedPopFinal = [];
     this.populationSelectedAll = false;
     this.rsnumSearch = "";
+    this.errorMessage = "";
     this.warningMessage = "";
     this.selectedPop = [];
     this.selectedGene = "";
     this.selectedDist = "";
     this.selectedRef = "";
+
+    this.data.currentErrorMessage.subscribe(errorMessage => {
+      this.errorMessage = "";
+      if (errorMessage) {
+        this.errorMessage = errorMessage;
+      }
+    });
     
     this.data.currentMainData.subscribe(mainData => {
       this.warningMessage = "";
@@ -113,6 +124,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.recalculateGeneAttempt = mainData["info"]["recalculateGene"][0]; // recalculation attempt when gene changed ?
         this.recalculateDistAttempt = mainData["info"]["recalculateDist"][0]; // recalculation attempt when cis-QTL distance changed ? 
         this.recalculateRefAttempt = mainData["info"]["recalculateRef"][0]; // recalculation attempt when ref rsnum changed ?
+
+        this.messages = mainData["info"]["messages"]["warnings"][0]; // messages from QTLs calculation
 
         this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
         this.select_gwas_sample = mainData["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
@@ -164,6 +177,15 @@ export class QTLsCalculationInputsComponent implements OnInit {
         if (this.allGeneVariants && this.geneList) {
           this.populateAllGeneVariantLists(this.allGeneVariants, this.geneList); // organize all QTLs variants by gene
         }
+        if (this.messages) {
+          this.warningMessage = this.messages.join('\n');
+        }
+      } else {
+        // reset calculation parameters if mainData is null
+        this.selectedPop = [];
+        this.selectedPopFinal = [];
+        this.selectedGene = "";
+        this.qtlsCalculationFormRSNumber.reset();
       }
     });
   }
