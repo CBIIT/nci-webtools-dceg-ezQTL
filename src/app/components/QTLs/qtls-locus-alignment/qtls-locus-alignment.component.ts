@@ -808,6 +808,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // reset
     this.closePopover();
     this.data.changeBlurLoadMain(true);
+    this.data.changeECAVIARData(null);
     this.disableInputs = true;
     $("#ldref-search-warning").hide();
     $(".blur-loading-main").addClass("blur-overlay");
