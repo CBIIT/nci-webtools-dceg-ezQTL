@@ -34,9 +34,9 @@ export interface GeneVariants {
 })
 export class QTLsCalculationInputsComponent implements OnInit {
 
-  qtlsCalculationFormCISDistance = new FormGroup({
-    cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
-  });
+  // qtlsCalculationFormCISDistance = new FormGroup({
+  //   cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
+  // });
 
   qtlsCalculationFormRSNumber = new FormGroup({
     rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
@@ -455,37 +455,37 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.qtlsCalculationFormRSNumber.value.rsnumber = event.target.value;
   }
 
-  enableSearchCISDistance(event: any) {
-    this.inputChanged = true;
-    this.recalculateDistAttempt = "true";
-    this.selectedDist = event.target.value;
-    this.qtlsCalculationFormCISDistance.value.cisDistanceInput = event.target.value;
-  }
+  // enableSearchCISDistance(event: any) {
+  //   this.inputChanged = true;
+  //   this.recalculateDistAttempt = "true";
+  //   this.selectedDist = event.target.value;
+  //   this.qtlsCalculationFormCISDistance.value.cisDistanceInput = event.target.value;
+  // }
 
   clearLDRefField() {
     this.rsnumSearch = '';
     this.qtlsCalculationFormRSNumber.value.rsnumber = '';
   }
 
-  clearCISDistField() {
-    this.selectedDist = null;
-    this.qtlsCalculationFormCISDistance.value.cisDistanceInput = '';
-  }
+  // clearCISDistField() {
+  //   this.selectedDist = null;
+  //   this.qtlsCalculationFormCISDistance.value.cisDistanceInput = '';
+  // }
 
-  cisDistErrorMsg() {
-    var msg = "";
-    if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput > 2000) {
-      msg = "Distance must be <= 2000 Kb";
-    } else if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput < 1) {
-      msg = "Distance must be >= 1 Kb";
-    } else {
-      msg = "Invalid cis-QTL Distance";
-    }
-    if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput == null || this.qtlsCalculationFormCISDistance.value.cisDistanceInput == '') {
-      msg = "Input required";
-    }
-    return msg;
-  }
+  // cisDistErrorMsg() {
+  //   var msg = "";
+  //   if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput > 2000) {
+  //     msg = "Distance must be <= 2000 Kb";
+  //   } else if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput < 1) {
+  //     msg = "Distance must be >= 1 Kb";
+  //   } else {
+  //     msg = "Invalid cis-QTL Distance";
+  //   }
+  //   if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput == null || this.qtlsCalculationFormCISDistance.value.cisDistanceInput == '') {
+  //     msg = "Input required";
+  //   }
+  //   return msg;
+  // }
 
   handleError(error) {
     console.log(error);
@@ -507,14 +507,14 @@ export class QTLsCalculationInputsComponent implements OnInit {
 
   async recalculatePopGeneDistRef() {
     // get new parameters as string
-    var selectedPopString = this.selectedPop.join('+');
-    var selectedGeneString = this.selectedGene;
-    var selectedDistNumber = this.selectedDist;
+    const selectedPopString = this.selectedPop.join('+');
+    const selectedGeneString = this.selectedGene;
+    const selectedDistNumber = this.selectedDist;
     // retrieve recalculate statuses
-    var recalculateAttempt = "true";
-    var recalculatePop = this.recalculatePopAttempt;
-    var recalculateGene = this.recalculateGeneAttempt;
-    var recalculateDist = this.recalculateDistAttempt;
+    const recalculateAttempt = "true";
+    const recalculatePop = this.recalculatePopAttempt;
+    const recalculateGene = this.recalculateGeneAttempt;
+    const recalculateDist = this.recalculateDistAttempt;
     // change recalculate status to false to disable recalculate button after recalculation completes
     this.inputChanged = false;
     // check if rs number ld ref entered is listed as a variant for ref gene
@@ -551,19 +551,19 @@ export class QTLsCalculationInputsComponent implements OnInit {
               this.qtlsCalculationFormRSNumber.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
             }
             // Run eCAVIAR calculation if GWAS and Association Files loaded
-            var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
-            var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
-            var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
-            var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
+            const select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+            const select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+            const gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
+            const associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
             if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
               // $(".blur-loading-ecaviar").addClass("blur-overlay");
               // this.data.changeBlurLoadECAVIAR(true);
               // reset eCAVIAR data
               this.data.changeECAVIARData(null);
-              var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-              var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
-              var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-              var requestID = res["info"]["inputs"]["request"][0]; // request id
+              const locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+              const newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
+              const newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
+              const requestID = res["info"]["inputs"]["request"][0]; // request id
               if (newSelectedDist == "false") {
                 var ecaviar_dist = "100000"; // default cis-QTL distance (in Kb)
               } else {

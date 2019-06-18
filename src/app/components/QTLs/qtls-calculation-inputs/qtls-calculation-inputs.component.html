@@ -112,7 +112,7 @@
     </div>
 
     <!-- cis-QTL Distance input -->
-    <div class="col-md-auto mt-2 pl-3 pr-3">
+    <!-- <div class="col-md-auto mt-2 pl-3 pr-3">
       <form [formGroup]="qtlsCalculationFormCISDistance">
         <mat-form-field class="calculation-input-field">
           <input 
@@ -134,7 +134,7 @@
           <mat-error *ngIf="qtlsCalculationFormCISDistance.invalid">{{ cisDistErrorMsg() }}</mat-error>
         </mat-form-field>
       </form>
-    </div>
+    </div> -->
 
     <!-- LD Reference input -->
     <div class="col-md-auto mt-2 pl-3 pr-3">
@@ -167,11 +167,13 @@
         type="submit" 
         class="mt-2" 
         mat-raised-button color="primary" 
-        [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid)" 
+        [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid)" 
         (click)="recalculatePopGeneDistRef()">
         Recalculate
       </button>
     </div>
+
+    <!-- [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid)"  -->
 
   </div>
 
