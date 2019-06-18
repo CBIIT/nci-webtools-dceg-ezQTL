@@ -25,7 +25,8 @@ export class QTLsDataInputsComponent implements OnInit {
     expressionFile: new FormControl({value: '', disabled: false}), 
     genotypeFile: new FormControl({value: '', disabled: false}), 
     gwasFile: new FormControl({value: '', disabled: false}),
-    LDFile: new FormControl({value: '', disabled: false})
+    LDFile: new FormControl({value: '', disabled: false}),
+    cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
   });
 
   mainData: Object;
@@ -44,6 +45,8 @@ export class QTLsDataInputsComponent implements OnInit {
   selectLoadQTLsSamples: boolean;
   selectLoadGWASSample: boolean;
   selectLoadLDSample: boolean;
+
+  selectedDist: string;
 
   GTExDatasets: GTExDataset[] = [
     {value: 'ds-0', viewValue: 'Dataset 1'},
@@ -82,6 +85,7 @@ export class QTLsDataInputsComponent implements OnInit {
     this.selectLoadQTLsSamples = false;
     this.selectLoadGWASSample = false;
     this.selectLoadLDSample = false;
+    this.selectedDist = "100"; // default cis-QTL distance (in Kb)
   }
 
   toggleAssocGTEx() {
@@ -264,8 +268,36 @@ export class QTLsDataInputsComponent implements OnInit {
     this.data.changeErrorMessage(errorMessage);
   }
 
+  enableSearchCISDistance(event: any) {
+    // this.inputChanged = true;
+    // this.recalculateDistAttempt = "true";
+    this.selectedDist = event.target.value;
+    this.qtlsForm.value.cisDistanceInput = event.target.value;
+  }
+
+  clearCISDistField() {
+    this.selectedDist = null;
+    this.qtlsForm.value.cisDistanceInput = '';
+  }
+
+  cisDistErrorMsg() {
+    var msg = "";
+    if (this.qtlsForm.value.cisDistanceInput > 2000) {
+      msg = "Distance must be <= 2000 Kb";
+    } else if (this.qtlsForm.value.cisDistanceInput < 1) {
+      msg = "Distance must be >= 1 Kb";
+    } else {
+      msg = "Invalid cis-QTL Distance";
+    }
+    if (this.qtlsForm.value.cisDistanceInput == null || this.qtlsForm.value.cisDistanceInput == '') {
+      msg = "Input required";
+    }
+    return msg;
+  }
+
   async submit() {
     const request_id = Date.now().toString();
+    const selectedDistNumber = this.selectedDist;
     const { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
     const formData = new FormData();
     // custom tooltip validation - if expression file is submitted, need genotype file and vice versa. All or none.
@@ -305,7 +337,7 @@ export class QTLsDataInputsComponent implements OnInit {
       // formData.append('request_id', Date.now().toString()); // generate calculation request ID
       formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
       formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
-      formData.append('select_dist', "false"); // set default dist to 'false' -> default initial calculation cis-QTL distance window is 100 Kb
+      formData.append('select_dist', selectedDistNumber); // set default dist to 'false' -> default initial calculation cis-QTL distance window is 100 Kb
       formData.append('select_ref', "false"); // set default rsnum to 'false' -> QData top gene's rsnum in R
       formData.append('recalculateAttempt', "false");
       formData.append('recalculatePop', "false");

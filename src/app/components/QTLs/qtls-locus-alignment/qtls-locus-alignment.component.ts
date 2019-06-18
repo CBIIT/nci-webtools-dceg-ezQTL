@@ -796,15 +796,15 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   async makeLDRef() {
-    var selectedGeneString = this.selectedGene;
-    var selectedPopString = this.selectedPop.join('+');
-    var selectedDistNumber = this.selectedDist;
-    var selectedRefString = this.popoverData["rsnum"];
-    var recalculateAttempt = "true";
-    var recalculatePop = "false";
-    var recalculateGene = "false";
-    var recalculateDist = "false";
-    var recalculateRef = "true";
+    const selectedGeneString = this.selectedGene;
+    const selectedPopString = this.selectedPop.join('+');
+    const selectedDistNumber = this.selectedDist;
+    const selectedRefString = this.popoverData["rsnum"];
+    const recalculateAttempt = "true";
+    const recalculatePop = "false";
+    const recalculateGene = "false";
+    const recalculateDist = "false";
+    const recalculateRef = "true";
     // reset
     this.closePopover();
     this.data.changeBlurLoadMain(true);
@@ -826,19 +826,19 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           this.recalculateDistAttempt = "false";
           this.recalculateRefAttempt = "false";
           // Run eCAVIAR calculation if GWAS and Association Files loaded
-          var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
-          var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
-          var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
-          var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
+          const select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+          const select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+          const gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
+          const associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
           if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
             // $(".blur-loading-ecaviar").addClass("blur-overlay");
             // this.data.changeBlurLoadECAVIAR(true);
             // reset eCAVIAR data
             this.data.changeECAVIARData(null);
-            var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-            var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
-            var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-            var requestID = res["info"]["inputs"]["request"][0]; // request id
+            const locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+            const newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
+            const newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
+            const requestID = res["info"]["inputs"]["request"][0]; // request id
             if (newSelectedDist == "false") {
               var ecaviar_dist = "100000"; // default cis-QTL distance (in Kb)
             } else {

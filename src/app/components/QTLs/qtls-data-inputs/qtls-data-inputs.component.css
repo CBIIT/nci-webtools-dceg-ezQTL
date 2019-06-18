@@ -59,3 +59,7 @@
 .qtls-data-input-gtex-select {
     font-size: 11pt !important;
 }
+
+.data-input-field {
+    width: 200px !important;
+}
