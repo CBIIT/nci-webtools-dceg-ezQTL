@@ -26,7 +26,8 @@ export class QTLsDataInputsComponent implements OnInit {
     genotypeFile: new FormControl({value: '', disabled: false}), 
     gwasFile: new FormControl({value: '', disabled: false}),
     LDFile: new FormControl({value: '', disabled: false}),
-    cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
+    cisDistanceInput: new FormControl({value: "100", disabled: false}, [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required]),
+    rsnumber: new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")])
   });
 
   mainData: Object;
@@ -47,6 +48,7 @@ export class QTLsDataInputsComponent implements OnInit {
   selectLoadLDSample: boolean;
 
   selectedDist: string;
+  rsnumSearch: string;
 
   GTExDatasets: GTExDataset[] = [
     {value: 'ds-0', viewValue: 'Dataset 1'},
@@ -275,9 +277,21 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.value.cisDistanceInput = event.target.value;
   }
 
+  enableSearchLDRef(event: any) {
+    // this.inputChanged = true;
+    // this.recalculateRefAttempt = "true";
+    this.rsnumSearch = event.target.value;
+    this.qtlsForm.value.rsnumber = event.target.value;
+  }
+
   clearCISDistField() {
     this.selectedDist = null;
     this.qtlsForm.value.cisDistanceInput = '';
+  }
+
+  clearLDRefField() {
+    this.rsnumSearch = '';
+    this.qtlsForm.value.rsnumber = '';
   }
 
   cisDistErrorMsg() {
@@ -333,12 +347,22 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#qtls-data-input-genotype-file").addClass("disabled-overlay");
       $("#qtls-data-input-gwas-file").addClass("disabled-overlay");
       $("#qtls-data-input-LD-file").addClass("disabled-overlay");
+      this.qtlsForm.controls['cisDistanceInput'].disable();
+      this.qtlsForm.controls['rsnumber'].disable();
       formData.append('request_id', request_id); // generate calculation request ID
       // formData.append('request_id', Date.now().toString()); // generate calculation request ID
       formData.append('select_pop', "false"); // set default population to 'false' -> 'EUR' in R
       formData.append('select_gene', "false"); // set default gene to 'false' -> QData top gene in R
-      formData.append('select_dist', selectedDistNumber); // set default dist to 'false' -> default initial calculation cis-QTL distance window is 100 Kb
-      formData.append('select_ref', "false"); // set default rsnum to 'false' -> QData top gene's rsnum in R
+
+      formData.append('select_dist', selectedDistNumber); // required input field
+      if (this.rsnumSearch == null || this.rsnumSearch.length == 0) {
+        // optional input field
+        // if empty, set default rsnum to 'false' -> QData top gene's rsnum in R
+        formData.append('select_ref', "false");
+      } else {
+        formData.append('select_ref', this.rsnumSearch);
+      }
+      
       formData.append('recalculateAttempt', "false");
       formData.append('recalculatePop', "false");
       formData.append('recalculateGene', "false");
@@ -382,11 +406,11 @@ export class QTLsDataInputsComponent implements OnInit {
         this.data.changeDisableLocusColocalization(true);
       }
 
-      console.log("RUN MAIN CALCULATION");
+      // console.log("RUN MAIN CALCULATION");
       this.data.calculateMain(formData)
         .subscribe(
           res => {
-            console.log("RESPONSE MAIN");
+            // console.log("RESPONSE MAIN");
             this.data.changeMainData(res);
             this.data.changeBlurLoadMain(false);
             $(".blur-loading-main").removeClass("blur-overlay");
@@ -417,18 +441,18 @@ export class QTLsDataInputsComponent implements OnInit {
               } else {
                 var ecaviar_ref = newSelectedRef.toString(); // recalculated new gene selection
               }
-              console.log("RUN ECAVIAR CALCULATION");
-              console.log("Use sample association file?", select_qtls_samples);
-              console.log("Use sample GWAS file?", select_gwas_sample);
-              console.log(gwasFileName);
-              console.log(associationFileName);
-              console.log(ecaviar_ref);
-              console.log(ecaviar_dist);
-              console.log(requestID);
+              // console.log("RUN ECAVIAR CALCULATION");
+              // console.log("Use sample association file?", select_qtls_samples);
+              // console.log("Use sample GWAS file?", select_gwas_sample);
+              // console.log(gwasFileName);
+              // console.log(associationFileName);
+              // console.log(ecaviar_ref);
+              // console.log(ecaviar_dist);
+              // console.log(requestID);
               this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ecaviar_ref, ecaviar_dist, requestID)
                 .subscribe(
                   res => {
-                    console.log("RESPONSE ECAVIAR");
+                    // console.log("RESPONSE ECAVIAR");
                     this.data.changeECAVIARData(res);
                     // $(".blur-loading-ecaviar").removeClass("blur-overlay");
                     // this.data.changeBlurLoadECAVIAR(false);
@@ -486,6 +510,8 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
+    this.qtlsForm.setControl('cisDistanceInput', new FormControl({value: '', disabled: false}, [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])),
+    this.qtlsForm.setControl('rsnumber', new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")]));
     this.qtlsForm.value.associationFile = false;
     this.qtlsForm.value.expressionFile = false;
     this.qtlsForm.value.genotypeFile = false;

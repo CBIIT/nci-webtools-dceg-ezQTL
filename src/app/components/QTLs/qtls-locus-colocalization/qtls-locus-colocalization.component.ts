@@ -96,7 +96,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       if(ecaviarData) {
         this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
         if (this.ecaviarData && this.ecaviarData[0]) {
-          console.log(this.ecaviarData);
+          // console.log(this.ecaviarData);
           // $(".blur-loading-ecaviar").removeClass("blur-overlay");
           this.showECAVIARTable = true;
           this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);

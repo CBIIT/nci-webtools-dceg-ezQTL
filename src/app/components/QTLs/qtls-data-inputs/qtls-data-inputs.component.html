@@ -20,7 +20,7 @@
       <div class="w-100 mt-2 mb-2 border border-light"></div>
 
       <!-- Association/GTEx Data Toggle -->
-      <div class="qtls-data-inputs mt-3 mb-2" id="qtls-data-toggle">
+      <!-- <div class="qtls-data-inputs mt-3 mb-2" id="qtls-data-toggle">
         <mat-radio-group 
           [(ngModel)]="qtlsType" 
           [ngModelOptions]="{standalone: true}" 
@@ -39,7 +39,7 @@
             GTEx Data
           </mat-radio-button>
         </mat-radio-group>
-      </div>
+      </div> -->
     
       <!-- Association Data File -->
       <div 
@@ -392,7 +392,7 @@
 
     <div class="w-100 mt-2 mb-2 border border-light"></div>
 
-    <div class="qtls-data-files mb-4">
+    <div class="qtls-data-files mb-2">
 
       <div class="datafile-type">
         <div class="d-flex justify-content-between">
@@ -419,18 +419,37 @@
               matSuffix 
               mat-icon-button 
               aria-label="Clear" 
-              (click)="clearCISDistField()">
+              (click)="clearCISDistField()" 
+              [disabled]="qtlsForm.get('cisDistanceInput').disabled">
               <mat-icon>close</mat-icon>
             </button>
-            <mat-error *ngIf="qtlsForm.invalid">{{ cisDistErrorMsg() }}</mat-error>
+            <mat-error *ngIf="qtlsForm.get('cisDistanceInput').invalid">{{ cisDistErrorMsg() }}</mat-error>
           </mat-form-field>
         </div>
       </div>
       <!-- LD Reference Input Field -->
       <div class="qtls-data-inputs" id="qtls-data-input-ldref">
-
+        <div class="d-flex justify-content-center">
+          <mat-form-field class="data-input-field">
+            <input 
+              #rsnumSearchInput
+              matInput 
+              placeholder="LD Reference" 
+              (keyup)="enableSearchLDRef($event)" 
+              [(ngModel)]="rsnumSearch" 
+              formControlName="rsnumber">
+            <button mat-button 
+              matSuffix 
+              mat-icon-button 
+              aria-label="Clear" 
+              (click)="clearLDRefField()"
+              [disabled]="qtlsForm.get('rsnumber').disabled">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="qtlsForm.get('rsnumber').invalid">Invalid rs number</mat-error>
+          </mat-form-field>
+        </div>
       </div>
-
     </div>
 
   </div>

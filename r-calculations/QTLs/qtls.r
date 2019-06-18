@@ -347,6 +347,9 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   library(jsonlite)
   library(broom)
 
+  # initialize messages to empty
+  warningMessages <- list()
+
   ## parameters define ##
   if (identical(select_pop, 'false')) {
     ## set default population to EUR if none chosen
@@ -385,6 +388,16 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     qdatafile <- paste0('input/', assocFile)
   }
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
+
+  ## check if initial LD Reference rsnum input is in qdata
+  ## if not found, set value to null and throw warning message
+  if (!is.null(rsnum) && !(rsnum %in% qdata$rsnum)) {
+    message <- paste0(rsnum, " not found in Association data file. Using default variant with most significant P-value as LD Reference.")
+    warningMessages <- c(warningMessages, message)
+    rsnum <- NULL
+    select_ref <- "false"
+  }
+
   qdata <- qdata %>% 
     arrange(pval_nominal,desc(abs(slope)),abs(tss_distance)) %>% 
     group_by(gene_id,variant_id,rsnum,ref,alt) %>% 
@@ -441,7 +454,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   # locus_colocalization_eCAVIAR(gwasFile, assocFile, select_ref_eCAVIAR, select_dist_eCAVIAR, select_pop_eCAVIAR, request, envFile)
   
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization_correlation=list(data=locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, expression_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request), messages=list(warnings=warningMessages)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization_correlation=list(data=locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))

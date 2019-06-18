@@ -11,6 +11,10 @@
     font-weight: bold;
 }
 
+.data-input-field {
+    font-size: 12pt !important;
+}
+
 .datafile-title {
     color: #595959 !important;
     /* font-size: 1.2em; */

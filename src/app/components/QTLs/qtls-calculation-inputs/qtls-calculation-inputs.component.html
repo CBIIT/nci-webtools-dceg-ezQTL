@@ -1,3 +1,12 @@
+<!-- Show error message if issues occur during calculation -->
+<div 
+  id="qtls-calculation-error-message"
+  class="alert alert-danger" 
+  role="alert"  
+  *ngIf="errorMessage.length > 0">
+  Unable to calculate: {{ errorMessage }} — please check input files. Reset form to try again.
+</div>
+
 <div id="calculation-inputs"  
   class="border border-light rounded pl-3 pr-3 mb-3">
   <!-- *ngIf="mainData"> -->
@@ -177,13 +186,22 @@
 
   </div>
 
+  <!-- Show error message if issues occur during calculation -->
+  <!-- <div 
+    id="qtls-calculation-error-message"
+    class="ml-2 mr-2 alert alert-danger" 
+    role="alert"  
+    *ngIf="errorMessage.length > 0">
+    Unable to calculate: {{ errorMessage }} — please check input files. Reset form to try again.
+  </div> -->
+
   <!-- Show warning message if searched rs number is not found -->
-  <div 
+  <!-- <div 
     id="ldref-search-warning"
     class="ml-2 mr-2 alert alert-warning alert-dismissible fade show" 
     role="alert"  
-    *ngIf="warningMessage">
-    {{warningMessage}}
+    *ngIf="warningMessage.length > 0">
+    {{ warningMessage }}
     <button 
       type="button" 
       class="close" 
@@ -191,6 +209,22 @@
       aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
-  </div>
+  </div> -->
 
+</div>
+
+<!-- Show warning message if searched rs number is not found -->
+<div 
+  id="ldref-search-warning"
+  class="alert alert-warning alert-dismissible fade show" 
+  role="alert"  
+  *ngIf="warningMessage.length > 0">
+  {{ warningMessage }}
+  <button 
+    type="button" 
+    class="close" 
+    (click)="closeWarning()" 
+    aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>
