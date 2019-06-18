@@ -510,7 +510,7 @@ export class QTLsDataInputsComponent implements OnInit {
     this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
     this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
-    this.qtlsForm.setControl('cisDistanceInput', new FormControl({value: '', disabled: false}, [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])),
+    this.qtlsForm.setControl('cisDistanceInput', new FormControl({value: '100', disabled: false}, [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required]));
     this.qtlsForm.setControl('rsnumber', new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")]));
     this.qtlsForm.value.associationFile = false;
     this.qtlsForm.value.expressionFile = false;
@@ -534,6 +534,8 @@ export class QTLsDataInputsComponent implements OnInit {
     this.selectLoadQTLsSamples = false;
     this.selectLoadGWASSample = false;
     this.selectLoadLDSample = false;
+    this.selectedDist = "100";
+    this.rsnumSearch = "";
   }
 
 
