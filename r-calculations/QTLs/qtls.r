@@ -114,7 +114,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   ## subset gene variant with cis-QTL Distance window
   qdata <- subset(qdata, pos > minpos & pos < maxpos)
 
-  kgvcfpath <- paste0(workDir, '/data/1000G/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
+  kgvcfpath <- paste0(workDir, '/data/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
   
@@ -372,7 +372,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   }
 
   ## load 1kg pop panel file ##
-  kgpanel <- read_delim('data/Population_Panel/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
+  kgpanel <- read_delim('data/1kginfo/integrated_call_samples_v3.20130502.ALL.panel',delim = '\t',col_names = T) %>% 
     select(sample:gender)
   popinfo <- kgpanel %>% 
     select(pop,super_pop) %>% 

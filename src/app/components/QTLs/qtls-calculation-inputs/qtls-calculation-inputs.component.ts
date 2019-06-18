@@ -530,6 +530,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       // reset
       this.closePopover();
       this.data.changeBlurLoadMain(true);
+      this.data.changeECAVIARData(null);
       this.disableInputs = true;
       $(".blur-loading-main").addClass("blur-overlay");
       $(".blur-loading-ecaviar").addClass("blur-overlay");
