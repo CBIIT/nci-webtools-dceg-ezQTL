@@ -24,10 +24,6 @@ export class QTLsResultsService {
   private errorMessage = new BehaviorSubject('');
   currentErrorMessage = this.errorMessage.asObservable();
 
-  // string: warning message if uploaded data files has > 30 genes
-  // private warningMessage = new BehaviorSubject('');
-  // currentWarningMessage = this.warningMessage.asObservable();
-
   // boolean: disable/enable locus colocalizaion result tab
   private disableLocusColocalization = new BehaviorSubject(true);
   currentLocusColocalization = this.disableLocusColocalization.asObservable();
@@ -47,10 +43,6 @@ export class QTLsResultsService {
   // boolean: whether or not to display the blur loading spinner on main calculations
   private blurLoadMain = new BehaviorSubject(false);
   currentBlurLoadMain = this.blurLoadMain.asObservable();
-
-  // boolean: whether or not to display the blur loading spinner on eCAVIAR calculations
-  // private blurLoadECAVIAR = new BehaviorSubject(false);
-  // currentBlurLoadECAVIAR = this.blurLoadECAVIAR.asObservable();
 
   // string: error message output from R calculation
   private qtlsType = new BehaviorSubject('assoc');
@@ -118,6 +110,20 @@ export class QTLsResultsService {
     const url = environment.endpoint + 'qtls-locus-colocalization-ecaviar';
     return this.http.post(url, JSON.stringify(locusColocalizationECAVIARParameters), {headers: headers});
   }
+  
+  calculateLocusColocalizationHyprcolocLD(select_ref: string, select_chr: string, select_pos: string, select_dist: string, request_id: number) {
+    let locusColocalizationHyprcolocLDParameters= {
+      select_ref: select_ref, 
+      select_chr: select_chr,
+      select_pos: select_pos,
+      select_dist: select_dist,
+      request_id: request_id
+    };
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    const url = environment.endpoint + 'qtls-locus-colocalization-hyprcoloc-ld';
+    return this.http.post(url, JSON.stringify(locusColocalizationHyprcolocLDParameters), {headers: headers});
+  }
 
   changeMainData(mainData: Object) {
     this.mainDataSource.next(mainData);
@@ -134,10 +140,6 @@ export class QTLsResultsService {
   changeErrorMessage(errorMessage: string) {
     this.errorMessage.next(errorMessage);
   }
-
-  // changeWarningMessage(warningMessage: string) {
-  //   this.warningMessage.next(warningMessage);
-  // }
 
   changeDisableLocusColocalization(disableLocusColocalization: boolean) {
     this.disableLocusColocalization.next(disableLocusColocalization);
@@ -158,10 +160,6 @@ export class QTLsResultsService {
   changeBlurLoadMain(blurLoadMain: boolean) {
     this.blurLoadMain.next(blurLoadMain);
   }
-
-  // changeBlurLoadECAVIAR(blurLoadECAVIAR: boolean) {
-  //   this.blurLoadECAVIAR.next(blurLoadECAVIAR);
-  // }
 
   changeQtlsType(qtlsType: string) {
     this.qtlsType.next(qtlsType);

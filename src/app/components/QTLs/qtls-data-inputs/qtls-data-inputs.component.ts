@@ -419,48 +419,42 @@ export class QTLsDataInputsComponent implements OnInit {
             $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
             $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
             $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
-            // Run eCAVIAR calculation if GWAS and Association Files loaded
+            
+            // Run Locus Colocalization calculations if GWAS and Association Files loaded
             var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
             var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
             var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
             var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
             if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
-              // $(".blur-loading-ecaviar").addClass("blur-overlay");
-              // this.data.changeBlurLoadECAVIAR(true);
               var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-              var newSelectedRef = res["info"]["inputs"]["select_ref"][0]; // inputted ref
               var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
               var requestID = res["info"]["inputs"]["request"][0]; // request id
               if (newSelectedDist == "false") {
-                var ecaviar_dist = "100000"; // default cis-QTL distance (in Kb)
+                var select_dist = "100000"; // default cis-QTL distance (in Kb)
               } else {
-                var ecaviar_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+                var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
               }
-              if (newSelectedRef == "false") {
-                var ecaviar_ref = locusAlignmentDataQTopAnnot["rsnum"].toString(); // default ref
-              } else {
-                var ecaviar_ref = newSelectedRef.toString(); // recalculated new gene selection
-              }
-              // console.log("RUN ECAVIAR CALCULATION");
-              // console.log("Use sample association file?", select_qtls_samples);
-              // console.log("Use sample GWAS file?", select_gwas_sample);
-              // console.log(gwasFileName);
-              // console.log(associationFileName);
-              // console.log(ecaviar_ref);
-              // console.log(ecaviar_dist);
-              // console.log(requestID);
-              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ecaviar_ref, ecaviar_dist, requestID)
+              var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
+              var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
+              var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
+              // Run eCAVIAR calculation
+              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
                 .subscribe(
                   res => {
-                    // console.log("RESPONSE ECAVIAR");
                     this.data.changeECAVIARData(res);
-                    // $(".blur-loading-ecaviar").removeClass("blur-overlay");
-                    // this.data.changeBlurLoadECAVIAR(false);
                   },
                   error => {
                     this.handleError(error);
-                    // $(".blur-loading-ecaviar").removeClass("blur-overlay");
-                    // this.data.changeBlurLoadECAVIAR(false);
+                  }
+                );
+              // Run HyprColoc LD calculation
+              this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
+                .subscribe(
+                  res => {
+                    console.log(res);
+                  },
+                  error => {
+                    this.handleError(error);
                   }
                 );
             }
@@ -537,6 +531,5 @@ export class QTLsDataInputsComponent implements OnInit {
     this.selectedDist = "100";
     this.rsnumSearch = "";
   }
-
 
 }

@@ -172,7 +172,7 @@ app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
 
 app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
   console.log("Locus Colocalization eCAVIAR info received.");
-  console.log("REQUEST BODY - locus colocalization info");
+  console.log("REQUEST BODY - locus colocalization eCAVIAR info");
   console.log(request.body);
   var select_gwas_sample = request.body.select_gwas_sample;
   var select_qtls_samples = request.body.select_qtls_samples;
@@ -184,6 +184,27 @@ app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
 
   try {
     const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id);
+    response.json(data);
+  } catch(err) {
+    console.log(err);
+    response.status(500);
+    response.json(err.toString());
+  }
+});
+
+app.post('/qtls-locus-colocalization-hyprcoloc-ld', async (request, response) => {
+  console.log("Locus Colocalization Hyprcoloc LD info received.");
+  console.log("REQUEST BODY - locus colocalization Hyprcoloc LD info");
+  console.log(request.body);
+
+  var select_ref = request.body.select_ref;
+  var select_chr = request.body.select_chr;
+  var select_pos = request.body.select_pos;
+  var select_dist = request.body.select_dist;
+  var request_id = request.body.request_id;
+
+  try {
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcolocLD('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc-ld.r', select_ref, select_chr, select_pos, select_dist, request_id);
     response.json(data);
   } catch(err) {
     console.log(err);
