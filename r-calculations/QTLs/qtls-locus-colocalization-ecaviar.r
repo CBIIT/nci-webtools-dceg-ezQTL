@@ -17,7 +17,7 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   # envFile <- paste0('QTLs/', envFile)
   ## execute eCAVIAR calculation: shell script
   # cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request, ' ', envFile) 
-  cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request) 
+  cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request) 
   system(cmd)
   ## move eCAVIAR final output to static/output/ folder
   cmd <- paste0('mv tmp/', request, '.eCAVIAR.txt', ' ', '../static/output')
