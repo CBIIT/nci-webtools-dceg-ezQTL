@@ -16,10 +16,11 @@
 .mat-header-cell {
     /* font-size: 13px !important; */
     font-weight: bold !important;
+    padding-left: 6px !important;
 }
 
 .mat-cell {
-    padding-left: 6px;
+    padding-left: 6px !important;
 }
 
 .mat-form-field {
