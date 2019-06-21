@@ -85,19 +85,19 @@
     </div>
     <!-- x-scrollable table container -->
     <div class="ml-2 mr-2 ecaviar-details-table-container" *ngIf="showECAVIARTable">
-      <table class="ecaviar-details-table" mat-table [dataSource]="dataSourceECAVIAR" #ECAVIARSort="matSort" matSort matSortStart="desc">
+      <table class="ecaviar-details-table" mat-table [dataSource]="dataSourceECAVIAR">
         <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
 
         <!-- gene_id Column -->
         <ng-container matColumnDef="gene_id">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="gene_id"> Gene ID </th>
+          <th mat-header-cell *matHeaderCellDef> Gene ID </th>
           <td mat-cell *matCellDef="let ecaviar">{{ecaviar.gene_id}}</td>
         </ng-container>
       
         <!-- gene_symbol Column -->
         <ng-container matColumnDef="gene_symbol">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="gene_symbol"> Gene Symbol </th>
+          <th mat-header-cell *matHeaderCellDef> Gene Symbol </th>
           <td mat-cell *matCellDef="let ecaviar">{{ecaviar.gene_symbol}}</td>
         </ng-container>
       
@@ -109,103 +109,103 @@
       
         <!-- rsnum Column -->
         <ng-container matColumnDef="rsnum">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="rsnum"> RS Number </th>
+          <th mat-header-cell *matHeaderCellDef> RS Number </th>
           <td mat-cell *matCellDef="let ecaviar">{{ecaviar.rsnum}}</td>
         </ng-container>
       
         <!-- chr Column -->
         <ng-container matColumnDef="chr">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="chr"> Chromosome </th>
+          <th mat-header-cell *matHeaderCellDef> Chromosome </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.chr}} </td>
         </ng-container>
       
         <!-- pos Column -->
         <ng-container matColumnDef="pos">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="pos"> Position </th>
+          <th mat-header-cell *matHeaderCellDef> Position </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.pos}} </td>
         </ng-container>
       
         <!-- ref Column -->
         <ng-container matColumnDef="ref">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="ref"> Ref </th>
+          <th mat-header-cell *matHeaderCellDef> Ref </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.ref}} </td>
         </ng-container>
       
         <!-- alt Column -->
         <ng-container matColumnDef="alt">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="alt"> Alt </th>
+          <th mat-header-cell *matHeaderCellDef> Alt </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.alt}} </td>
         </ng-container>
       
         <!-- tss_distance Column -->
         <ng-container matColumnDef="tss_distance">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="tss_distance"> TSS Distance </th>
+          <th mat-header-cell *matHeaderCellDef> TSS Distance </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.tss_distance}} </td>
         </ng-container>
       
         <!-- pval_nominal Column -->
         <ng-container matColumnDef="pval_nominal">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="pval_nominal">Nomimal P-value</th>
+          <th mat-header-cell *matHeaderCellDef>Nomimal P-value</th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.pval_nominal}} </td>
         </ng-container>
       
         <!-- slope Column -->
         <ng-container matColumnDef="slope">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="slope"> Slope </th>
+          <th mat-header-cell *matHeaderCellDef> Slope </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.slope}} </td>
         </ng-container>
       
         <!-- slope_se Column -->
         <ng-container matColumnDef="slope_se">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="slope_se"> Slope SE </th>
+          <th mat-header-cell *matHeaderCellDef> Slope SE </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.slope_se}} </td>
         </ng-container>
         
         <!-- gwas_pvalue Column -->
         <ng-container matColumnDef="gwas_pvalue">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="gwas_pvalue"> GWAS P-value </th>
+          <th mat-header-cell *matHeaderCellDe> GWAS P-value </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.gwas_pvalue}} </td>
         </ng-container>
     
         <!-- gwas_z Column -->
         <ng-container matColumnDef="gwas_z">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="gwas_z"> GWAS Z </th>
+          <th mat-header-cell *matHeaderCellDef> GWAS Z </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.gwas_z}} </td>
         </ng-container>
     
         <!-- Leadsnp Column -->
         <ng-container matColumnDef="Leadsnp">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="Leadsnp"> Lead SNP </th>
+          <th mat-header-cell *matHeaderCellDef> Lead SNP </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.Leadsnp}} </td>
         </ng-container>
         
         <!-- Prob_in_pCausalSet Column -->
         <ng-container matColumnDef="Prob_in_pCausalSet">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="Prob_in_pCausalSet"> Prob_in_pCausalSet </th>
+          <th mat-header-cell *matHeaderCellDef> Prob_in_pCausalSet </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.Prob_in_pCausalSet}} </td>
         </ng-container>
     
         <!-- CLPP Column -->
         <ng-container matColumnDef="CLPP">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="CLPP"> CLPP </th>
+          <th mat-header-cell *matHeaderCellDef> CLPP </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.CLPP}} </td>
         </ng-container>
     
         <!-- Prob_in_pCausalSet2 Column -->
         <ng-container matColumnDef="Prob_in_pCausalSet2">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="Prob_in_pCausalSet2"> Prob_in_pCausalSet2 </th>
+          <th mat-header-cell *matHeaderCellDef> Prob_in_pCausalSet2 </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.Prob_in_pCausalSet2}} </td>
         </ng-container>
     
         <!-- CLPP2 Column -->
         <ng-container matColumnDef="CLPP2">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="CLPP2"> CLPP2 </th>
+          <th mat-header-cell *matHeaderCellDef> CLPP2 </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.CLPP2}} </td>
         </ng-container>
     
         <!-- leadsnp_included Column -->
         <ng-container matColumnDef="leadsnp_included">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header="leadsnp_included"> Lead SNP Included </th>
+          <th mat-header-cell *matHeaderCellDef> Lead SNP Included </th>
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.leadsnp_included}} </td>
         </ng-container>
       
@@ -259,7 +259,7 @@
     </div>
     <!-- x-scrollable table container -->
     <div class="ml-2 mr-2 hyprcoloc-details-table-container" *ngIf="showHyprcolocTable">
-      <table class="hyprcoloc-details-table" mat-table [dataSource]="dataSourceHyprcoloc" matSortStart="desc">
+      <table class="hyprcoloc-details-table" mat-table [dataSource]="dataSourceHyprcoloc">
         <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
 
@@ -365,7 +365,7 @@
     </div>
     <!-- x-scrollable table container -->
     <div class="ml-2 mr-2 hyprcoloc-snpscore-details-table-container" *ngIf="showHyprcolocSnpscoreTable">
-      <table class="hyprcoloc-snpscore-details-table" mat-table [dataSource]="dataSourceHyprcolocSnpscore" matSortStart="desc">
+      <table class="hyprcoloc-snpscore-details-table" mat-table [dataSource]="dataSourceHyprcolocSnpscore">
         <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
 
