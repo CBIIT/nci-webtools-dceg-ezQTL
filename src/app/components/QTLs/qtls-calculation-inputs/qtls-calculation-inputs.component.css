@@ -2,6 +2,21 @@
     width: 200px !important;
 }
 
-#calculation-inputs {
+/* #calculation-inputs {
     min-width: 1148px;
+    padding-right: auto;
+} */
+
+.vert-cent {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.toggle-view {
+    /* background: #3F51B5; */
+    cursor: pointer;
+}
+
+#toggle-view-button {
+    color: #2A71A5;
 }

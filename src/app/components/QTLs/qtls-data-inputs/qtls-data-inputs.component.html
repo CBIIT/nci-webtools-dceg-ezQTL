@@ -1,7 +1,7 @@
 <!-- Inputs -->
 <form [formGroup]="qtlsForm">
-  <div class="border border-light rounded p-3">
-    <div class="qtls-data-files mb-5">
+  <div class="border border-light rounded p-3 mr-3">
+    <div class="qtls-data-files mb-4">
 
       <div class="datafile-type">
         <div class="d-flex justify-content-between">
@@ -20,7 +20,7 @@
       <div class="w-100 mt-2 mb-2 border border-light"></div>
 
       <!-- Association/GTEx Data Toggle -->
-      <div class="qtls-data-inputs mt-3 mb-2" id="qtls-data-toggle">
+      <!-- <div class="qtls-data-inputs mt-3 mb-2" id="qtls-data-toggle">
         <mat-radio-group 
           [(ngModel)]="qtlsType" 
           [ngModelOptions]="{standalone: true}" 
@@ -39,7 +39,7 @@
             GTEx Data
           </mat-radio-button>
         </mat-radio-group>
-      </div>
+      </div> -->
     
       <!-- Association Data File -->
       <div 
@@ -48,7 +48,7 @@
         *ngIf="qtlsType == 'assoc'">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
-            Association Data File <i class="fas fa-star-of-life" style="color:red;"></i>
+            Association Data File <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
           </div>
         </div>
         <div class="row mb-3">
@@ -147,7 +147,7 @@
             mat-stroked-button 
             id="expression-file-tooltip" 
             data-toggle="tooltip" 
-            data-placement="right" 
+            data-placement="left" 
             title="Please input accompanying Expression Data File with Genotype Data File.">
             Choose File
           </button>
@@ -208,7 +208,7 @@
               mat-stroked-button 
               id="genotype-file-tooltip" 
               data-toggle="tooltip" 
-              data-placement="right" 
+              data-placement="left" 
               title="Please input accompanying Genotype Data File with Expression Data File.">
               Choose File
             </button>
@@ -311,7 +311,7 @@
 
     <div class="w-100 mt-2 mb-2 border border-light"></div>
 
-    <div class="qtls-data-files mb-5">
+    <div class="qtls-data-files mb-4">
 
       <div class="datafile-type">
         <div class="d-flex justify-content-between">
@@ -390,90 +390,83 @@
       </div>
     </div> 
 
-    <!-- <div class="w-100 mt-2 mb-2 border border-light"></div> -->
+    <div class="w-100 mt-2 mb-2 border border-light"></div>
 
-    <!-- <div class="qtls-data-files mb-5">
+    <div class="qtls-data-files mb-2">
 
       <div class="datafile-type">
         <div class="d-flex justify-content-between">
           <div>
-            <b>LD Data File</b>
-          </div>
-          <div class="disabled-post-calc" *ngIf="!selectLoadLDSample">
-            <i class="fas fa-file-export mr-1"></i><a (click)="loadLDSampleDataFile()">Load Sample</a>
-          </div>
-          <div class="disabled-post-calc" *ngIf="selectLoadLDSample">
-            <i class="fas fa-file-excel mr-1"></i><a (click)="loadLDSampleDataFile()">Unload Sample</a>
+            <b>Locus Information</b>
           </div>
         </div>
       </div>
 
-      <div class="w-100 mt-2 mb-2 border border-light"></div> -->
+      <div class="w-100 mt-2 mb-2 border border-light"></div>
 
-      <!-- LD Data File -->
-      <!-- <div class="qtls-data-inputs" id="qtls-data-input-LD-file">
-        <div class="row mb-2">
+      <!-- cis-QTL Distance Input Field -->
+      <div class="qtls-data-inputs" id="qtls-data-input-distance">
+        <div class="row">
           <div class="ml-3 datafile-title">
-            LD Data File
+            cis-QTL Distance (Kb) <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
           </div>
         </div>
-        <div class="row mb-3">
-          <input 
-            type="file" 
-            formControlName="LDFile" 
-            class="ng-hide" 
-            id="LD-file" 
-            name="input-files" 
-            accept=".txt" 
-            hidden 
-            #LDInput>
-          <button 
-            style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
-            (click)="LDInput.click()" 
-            [disabled]="resultStatus || selectLoadLDSample" 
-            class="ml-3 mr-3" 
-            mat-stroked-button>
-            Choose File
-          </button>
-          <div> -->
-            <!-- <div *ngIf="!selectLoadLDSample">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
-            </div>
-            <div class="disabled-overlay" *ngIf="selectLoadLDSample">
-              <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.LD.txt" download>Download Sample</a>
-            </div> -->
-            <!-- <div 
-              *ngIf="!selectLoadLDSample && qtlsForm.value.LDFile" 
-              class="text-secondary" 
-              style="overflow:hidden; text-overflow:ellipsis;">
-              {{ !qtlsForm.value.LDFile ? '' : (qtlsForm.value?.LDFile[0]?.name.length <= 21) ? (qtlsForm.value?.LDFile[0]?.name || '') : qtlsForm.value?.LDFile[0]?.name.substring(0,18) + '...' }} 
-              <button 
-                type="button" 
-                class="close" 
-                aria-label="Close" 
-                *ngIf="qtlsForm.value.LDFile && qtlsForm.value.LDFile.length > 0 && !resultStatus" 
-                (click)="clearLDFile()" 
-                [disabled]="resultStatus">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div 
-              class="text-secondary" 
-              style="overflow:hidden; text-overflow:ellipsis;" 
-              *ngIf="selectLoadLDSample">
-              MX2.LD.txt
-            </div>
-          </div>
+        <div class="row">
+          <mat-form-field class="data-input-field ml-3" [floatLabel]="'never'" appearance="outline">
+            <input 
+              #cisDistanceInput
+              matInput 
+              placeholder="cis-QTL Distance (Kb) *" 
+              (keyup)="enableSearchCISDistance($event)" 
+              [(ngModel)]="selectedDist" 
+              formControlName="cisDistanceInput">
+            <button mat-button 
+              matSuffix 
+              mat-icon-button 
+              aria-label="Clear" 
+              (click)="clearCISDistField()" 
+              [disabled]="qtlsForm.get('cisDistanceInput').disabled">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="qtlsForm.get('cisDistanceInput').invalid">{{ cisDistErrorMsg() }}</mat-error>
+          </mat-form-field>
         </div>
       </div>
-
-    </div> -->
+      <!-- LD Reference Input Field -->
+      <div class="qtls-data-inputs" id="qtls-data-input-ldref">
+        <div class="row">
+          <div class="ml-3 datafile-title">
+            LD Reference
+          </div>
+        </div>
+        <div class="row">
+          <mat-form-field class="data-input-field ml-3" [floatLabel]="'never'" appearance="outline">
+            <input 
+              #rsnumSearchInput
+              matInput 
+              placeholder="LD Reference" 
+              (keyup)="enableSearchLDRef($event)" 
+              [(ngModel)]="rsnumSearch" 
+              formControlName="rsnumber">
+            <button mat-button 
+              matSuffix 
+              mat-icon-button 
+              aria-label="Clear" 
+              (click)="clearLDRefField()"
+              [disabled]="qtlsForm.get('rsnumber').disabled">
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="qtlsForm.get('rsnumber').invalid">Invalid rs number</mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
 
   </div>
 
   <!-- Submit and Reset Button   -->
   <div class="qtls-data-inputs" id="qtls-data-input-submit-reset">
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-end mr-3">
       <div>
         <button 
           type="submit" 
@@ -486,7 +479,6 @@
       </div>
       <div>
         <button 
-          type="reset" 
           class="mt-3" 
           mat-raised-button 
           (click)="reset()" 

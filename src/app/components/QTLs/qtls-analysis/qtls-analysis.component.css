@@ -1,16 +1,39 @@
-#input-panel {
+/* #input-panel {
     padding-right: 0px !important;
     min-width: 320px !important;
 }
 #results-panel {
     padding-left: 0px !important;
+} */
+
+mat-sidenav-container {
+    /* min-height: 840px; */
+    height: 100%;
+    background: white;
+    /* overflow: hidden; */
 }
-#toggle-view {
-    padding-right: 2px !important;
-    padding-left: 2px !important;
-    padding-top: 8px !important;
+
+mat-sidenav {
+    height: 100%;
+    width: 320px;
+    /* overflow: auto; */
 }
-#toggle-view-button {
+
+.qtls-panels {
+    overflow: visible;
+    height: 100%;
+}
+
+mat-sidenav-content {
+    height: 100%;
+    overflow: hidden;
+}
+
+/* .toggle-view {
+    float: left;
+} */
+
+/* #toggle-view-button {
     cursor: pointer;
     color: #3F51B5;
-}
+} */

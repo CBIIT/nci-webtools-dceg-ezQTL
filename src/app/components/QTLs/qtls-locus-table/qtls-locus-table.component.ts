@@ -34,10 +34,10 @@ export class QTLsLocusTableComponent implements OnInit {
   newSelectedPop: string;
   requestID: number;
   displayedColumns: string[] = ['gene_id', 'gene_symbol', 'variant_id', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'R2', 'LDpop', 'GWAS', 'gnomAD'];
-  dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
+  dataSource = new MatTableDataSource(this.VARIANT_DATA);
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('LocusTablePaginator') LocusTablePaginator: MatPaginator;
+  @ViewChild('LocusTableSort') LocusTableSort: MatSort;
 
   constructor(private data: QTLsResultsService) { }
 
@@ -52,15 +52,15 @@ export class QTLsLocusTableComponent implements OnInit {
       this.selectedPop = this.newSelectedPop.split('+');; // recalculated new population selection
       this.expandPopulationGroup();
       if (this.locusAlignmentData) {
-        this.VARIANT_DATA = this.populateVariantDataList(this.locusAlignmentData);
+        this.VARIANT_DATA = this.populateLocusTableDataList(this.locusAlignmentData);
       }
-      this.dataSource = new MatTableDataSource<Variant>(this.VARIANT_DATA);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.sort;
+      this.dataSource = new MatTableDataSource(this.VARIANT_DATA);
+      this.dataSource.paginator = this.LocusTablePaginator;
+      this.dataSource.sort = this.LocusTableSort;
     });
   }
 
-  populateVariantDataList(geneData) {
+  populateLocusTableDataList(geneData) {
     var data = [];
     for (var i = 0; i < geneData.length; i++) {
       var variant = {};
@@ -139,8 +139,8 @@ export class QTLsLocusTableComponent implements OnInit {
     win.focus();
   }
 
-  downloadTable() {
-    var url = environment.endpoint + "tmp/" + this.requestID + ".variant_details.txt";
+  downloadLocusTable() {
+    var url = environment.endpoint + "output/" + this.requestID + ".variant_details.txt";
     var win = window.open(url, '_blank');
     win.focus();
   } 

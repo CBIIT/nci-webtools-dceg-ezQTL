@@ -11,4 +11,35 @@
 .mat-button-toggle-checked {
     background-color: #3F51B5 !important;
     color: white !important;
-  }
+}
+
+.mat-header-cell {
+    font-weight: bold !important;
+    padding-left: 13px !important;
+    color: black !important;
+}
+
+.mat-cell {
+    padding-left: 6px !important;
+}
+
+.mat-form-field {
+    /* font-size: 14px; */
+    width: 100%;
+}
+
+table {
+    width: 100%;
+}
+
+.ecaviar-details-table-container {
+    overflow-x: auto !important;
+}
+
+.hyprcoloc-details-table-container {
+    overflow-x: auto !important;
+}
+
+.hyprcoloc-snpscore-details-table-container {
+    overflow-x: auto !important;
+}

@@ -14,7 +14,6 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { HomeComponent } from './components/home/home.component';
 import { QTLsDataInputsComponent } from './components/QTLs/qtls-data-inputs/qtls-data-inputs.component';
-import { QTLsErrorMessagesComponent } from './components/QTLs/qtls-error-messages/qtls-error-messages.component';
 import { QTLsResultsComponent } from './components/QTLs/qtls-results/qtls-results.component';
 import { QTLsLocusQuanitificationComponent } from './components/QTLs/qtls-locus-quantification/qtls-locus-quantification.component';
 import { QTLsLocusAlignmentComponent } from './components/QTLs/qtls-locus-alignment/qtls-locus-alignment.component';
@@ -44,7 +43,8 @@ import {
   MatAutocompleteModule, 
   MatRadioModule, 
   MatTooltipModule,
-  MatButtonToggleModule 
+  MatButtonToggleModule, 
+  MatSidenavModule
 } from '@angular/material';
 import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-colocalization/qtls-locus-colocalization.component';
 
@@ -67,7 +67,6 @@ import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-c
     QTLsLocusAlignmentComponent,
     QTLsLocusTableComponent,
     QTLsLocusAlignmentBoxplotsComponent,
-    QTLsErrorMessagesComponent,
     QTLsCalculationInputsComponent,
     QtlsLocusColocalizationComponent
   ],
@@ -95,7 +94,8 @@ import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-c
     MatAutocompleteModule, 
     MatRadioModule,
     MatTooltipModule, 
-    MatButtonToggleModule
+    MatButtonToggleModule, 
+    MatSidenavModule
   ],
   providers: [],
   bootstrap: [AppComponent],
