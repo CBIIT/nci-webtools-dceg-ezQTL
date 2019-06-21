@@ -796,15 +796,15 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   async makeLDRef() {
-    const selectedGeneString = this.selectedGene;
-    const selectedPopString = this.selectedPop.join('+');
-    const selectedDistNumber = this.selectedDist;
-    const selectedRefString = this.popoverData["rsnum"];
-    const recalculateAttempt = "true";
-    const recalculatePop = "false";
-    const recalculateGene = "false";
-    const recalculateDist = "false";
-    const recalculateRef = "true";
+    var selectedGeneString = this.selectedGene;
+    var selectedPopString = this.selectedPop.join('+');
+    var selectedDistNumber = this.selectedDist;
+    var selectedRefString = this.popoverData["rsnum"];
+    var recalculateAttempt = "true";
+    var recalculatePop = "false";
+    var recalculateGene = "false";
+    var recalculateDist = "false";
+    var recalculateRef = "true";
     // reset
     this.closePopover();
     this.data.changeBlurLoadMain(true);
@@ -848,11 +848,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
               .subscribe(
                 res => {
                   var requestIDECAVIAR = res["ecaviar"]["request"][0];
-                  if (requestID == requestIDECAVIAR) {
-                    // console.log("MATCHES", request_id, requestID, requestIDECAVIAR);
+                  if (requestID == requestIDECAVIAR && requestID == requestIDECAVIAR) {
+                    console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
                     this.data.changeECAVIARData(res);
                   } else {
-                    // console.log("DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+                    console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
                   }
                 },
                 error => {
@@ -864,22 +864,28 @@ export class QTLsLocusAlignmentComponent implements OnInit {
               .subscribe(
                 res => {
                   var ldFileName = res["hyprcoloc_ld"]["filename"][0];
-                  // console.log(select_gwas_sample);
-                  // console.log(select_qtls_samples);
-                  // console.log(gwasFileName);
-                  // console.log(associationFileName);
-                  // console.log(ldFileName);
-                  // console.log(requestID);
+                  var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                   // Run HyprColoc calculation after LD file is generated
-                  this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
-                    .subscribe(
-                      res => {
-                        this.data.changeHyprcolocData(res);
-                      },
-                      error => {
-                        this.handleError(error);
-                      }
-                    )
+                  if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
+                    console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
+                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                      .subscribe(
+                        res => {
+                          var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
+                          if (requestID == requestIDHypercoloc && requestID == requestIDHypercoloc) {
+                            console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
+                            this.data.changeHyprcolocData(res);
+                          } else {
+                            console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
+                          }
+                        },
+                        error => {
+                          this.handleError(error);
+                        }
+                      );
+                  } else {
+                    console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
+                  }
                 },
                 error => {
                   this.handleError(error);

@@ -529,14 +529,14 @@ export class QTLsCalculationInputsComponent implements OnInit {
 
   async recalculatePopGeneDistRef() {
     // get new parameters as string
-    const selectedPopString = this.selectedPop.join('+');
-    const selectedGeneString = this.selectedGene;
-    const selectedDistNumber = this.selectedDist;
+    var selectedPopString = this.selectedPop.join('+');
+    var selectedGeneString = this.selectedGene;
+    var selectedDistNumber = this.selectedDist;
     // retrieve recalculate statuses
-    const recalculateAttempt = "true";
-    const recalculatePop = this.recalculatePopAttempt;
-    const recalculateGene = this.recalculateGeneAttempt;
-    const recalculateDist = this.recalculateDistAttempt;
+    var recalculateAttempt = "true";
+    var recalculatePop = this.recalculatePopAttempt;
+    var recalculateGene = this.recalculateGeneAttempt;
+    var recalculateDist = this.recalculateDistAttempt;
     // change recalculate status to false to disable recalculate button after recalculation completes
     this.inputChanged = false;
     // check if rs number ld ref entered is listed as a variant for ref gene
@@ -595,11 +595,11 @@ export class QTLsCalculationInputsComponent implements OnInit {
                 .subscribe(
                   res => {
                     var requestIDECAVIAR = res["ecaviar"]["request"][0];
-                    if (requestID == requestIDECAVIAR) {
-                      // console.log("MATCHES", request_id, requestID, requestIDECAVIAR);
+                    if (requestID == requestIDECAVIAR && requestID == requestIDECAVIAR) {
+                      console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
                       this.data.changeECAVIARData(res);
                     } else {
-                      // console.log("DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+                      console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
                     }
                   },
                   error => {
@@ -611,22 +611,28 @@ export class QTLsCalculationInputsComponent implements OnInit {
                 .subscribe(
                   res => {
                     var ldFileName = res["hyprcoloc_ld"]["filename"][0];
-                    // console.log(select_gwas_sample);
-                    // console.log(select_qtls_samples);
-                    // console.log(gwasFileName);
-                    // console.log(associationFileName);
-                    // console.log(ldFileName);
-                    // console.log(requestID);
+                    var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                     // Run HyprColoc calculation after LD file is generated
-                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
-                      .subscribe(
-                        res => {
-                          this.data.changeHyprcolocData(res);
-                        },
-                        error => {
-                          this.handleError(error);
-                        }
-                      )
+                    if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
+                      console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
+                      this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                        .subscribe(
+                          res => {
+                            var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
+                            if (requestID == requestIDHypercoloc && requestID == requestIDHypercoloc) {
+                              console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
+                              this.data.changeHyprcolocData(res);
+                            } else {
+                              console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
+                            }
+                          },
+                          error => {
+                            this.handleError(error);
+                          }
+                        );
+                    } else {
+                      console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
+                    }
                   },
                   error => {
                     this.handleError(error);

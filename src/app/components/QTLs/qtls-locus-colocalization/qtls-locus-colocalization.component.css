@@ -14,9 +14,9 @@
 }
 
 .mat-header-cell {
-    /* font-size: 13px !important; */
     font-weight: bold !important;
-    padding-left: 6px !important;
+    padding-left: 13px !important;
+    color: black !important;
 }
 
 .mat-cell {

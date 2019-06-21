@@ -59,7 +59,7 @@
   <h3 class="mr-3">eCAVIAR</h3>
 
   <!-- eCAVIAR results table -->
-  <div class="ecaviar-results border border-light rounded">
+  <div class="ecaviar-results border border-light rounded" style="background: #E8E8E8 !important;">
     <!-- table filter input field -->
     <div class="ml-2 mr-2">
       <mat-form-field>
@@ -209,13 +209,13 @@
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.leadsnp_included}} </td>
         </ng-container>
       
-        <tr mat-header-row *matHeaderRowDef="displayedColumnsECAVIAR"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsECAVIAR" style="background: #8C97D4 !important;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumnsECAVIAR;"></tr>
       </table>
 
     </div>
       
-    <mat-paginator #ECAVIARPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+    <mat-paginator #ECAVIARPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
 
     <!-- <mat-paginator [disabled]="!showECAVIARTable" [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator> -->
     
@@ -233,7 +233,7 @@
   <h3 class="mr-3">HyprColoc</h3>
 
   <!-- Hyprcoloc results table -->
-  <div class="hyprcoloc-results border border-light rounded">
+  <div class="hyprcoloc-results border border-light rounded" style="background: #E8E8E8 !important;">
     <!-- table filter input field -->
     <div class="ml-2 mr-2">
       <mat-form-field>
@@ -317,13 +317,13 @@
           <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.gene_symbol}} </td>
         </ng-container>
       
-        <tr mat-header-row *matHeaderRowDef="displayedColumnsHyprcoloc"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsHyprcoloc" style="background: #8C97D4 !important;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumnsHyprcoloc;"></tr>
       </table>
 
     </div>
       
-    <mat-paginator #HyprcolocPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+    <mat-paginator #HyprcolocPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
     
     <div class="ml-4 mb-4 hyprcoloc-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
       <a (click)="downloadHyprcolocTable()" 
@@ -339,7 +339,7 @@
   <h3 class="mr-3">HyprColoc SNP Scores</h3>
 
   <!-- Hyprcoloc snpscore results table -->
-  <div class="hyprcoloc-snpscore-results border border-light rounded">
+  <div class="hyprcoloc-snpscore-results border border-light rounded" style="background: #E8E8E8 !important;">
     <!-- table filter input field -->
     <div class="ml-2 mr-2">
       <mat-form-field>
@@ -393,13 +393,13 @@
           <td mat-cell *matCellDef="let hyprcolocSnpscore"> {{hyprcolocSnpscore.gene_symbol}} </td>
         </ng-container>
       
-        <tr mat-header-row *matHeaderRowDef="displayedColumnsHyprcolocSnpscore"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsHyprcolocSnpscore" style="background: #8C97D4 !important;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumnsHyprcolocSnpscore;"></tr>
       </table>
 
     </div>
       
-    <mat-paginator #HyprcolocSnpscorePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+    <mat-paginator #HyprcolocSnpscorePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
     
     <div class="ml-4 mb-4 hyprcoloc-snpscore-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
       <a (click)="downloadHyprcolocSnpscoreTable()" 
