@@ -1,4 +1,4 @@
-locus_colocalization_hyprcoloc <- function(workDir, gwasfile, qtlfile, ldfile, prefix) {
+locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, gwasfile, qtlfile, ldfile, request) {
   setwd(workDir)
   .libPaths(c(.libPaths(),"~/R"))
   library(hyprcoloc)
@@ -9,9 +9,18 @@ locus_colocalization_hyprcoloc <- function(workDir, gwasfile, qtlfile, ldfile, p
 ##  qtlfile <- args[2]
 ##  ldfile <- args[3]
 ##  prefix <- args[4]
+
+  if (identical(select_gwas_sample, 'true')) {
+    gwasfile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
+  } else {
+    gwasfile <- paste0('input/', gwasfile)
+  }
+  if (identical(select_qtls_samples, 'true')) {
+    qtlfile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
+  } else {
+    qtlfile <- paste0('input/', qtlfile)
+  }
   
-  gwasfile <- paste0("tmp/", gwasfile)
-  qtlfile <- paste0("tmp/", qtlfile)
   ldfile <- paste0("tmp/", ldfile)
 
 
@@ -92,8 +101,8 @@ locus_colocalization_hyprcoloc <- function(workDir, gwasfile, qtlfile, ldfile, p
   result_snpscore_colnames <- colnames(result_snpscore)
   result_snpscore_data <- list(setNames(as.data.frame(result_snpscore), result_snpscore_colnames))
   
-  result_hyprcoloc_filename <- paste0(prefix,".hyprcoloc.txt")
-  result_snpscore_filename <- paste0(prefix,".hyprcoloc_snpscore.txt")
+  result_hyprcoloc_filename <- paste0(request,".hyprcoloc.txt")
+  result_snpscore_filename <- paste0(request,".hyprcoloc_snpscore.txt")
   result_hyprcoloc %>% write_delim(paste0('../static/output/',result_hyprcoloc_filename),delim = '\t',col_names = T)  
   result_snpscore %>% write_delim(paste0('../static/output/',result_snpscore_filename),delim = '\t',col_names = T)
   

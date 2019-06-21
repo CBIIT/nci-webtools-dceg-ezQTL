@@ -18,9 +18,9 @@
     font-weight: bold !important;
 }
 
-/* .mat-cell {
+.mat-cell {
     padding-left: 6px;
-} */
+}
 
 .mat-form-field {
     /* font-size: 14px; */
@@ -31,15 +31,14 @@ table {
     width: 100%;
 }
 
-/* .ecaviar-details-table {
-    overflow: auto !important;
-} */
-
-/* .ecaviar-results {
-    width: 90%;
-    overflow-x: hidden !important;
-} */
-
 .ecaviar-details-table-container {
+    overflow-x: auto !important;
+}
+
+.hyprcoloc-details-table-container {
+    overflow-x: auto !important;
+}
+
+.hyprcoloc-snpscore-details-table-container {
     overflow-x: auto !important;
 }

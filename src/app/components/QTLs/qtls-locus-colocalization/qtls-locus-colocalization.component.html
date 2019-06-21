@@ -56,14 +56,16 @@
 
   <br>
 
+  <h3 class="mr-3">eCAVIAR</h3>
+
   <!-- eCAVIAR results table -->
-  <div class="ecaviar-results">
+  <div class="ecaviar-results border border-light rounded">
     <!-- table filter input field -->
     <div class="ml-2 mr-2">
       <mat-form-field>
         <input matInput 
           [disabled]="!showECAVIARTable"
-          (keyup)="applyFilter($event.target.value)" 
+          (keyup)="applyFilterECAVIAR($event.target.value)" 
           placeholder="Filter">
       </mat-form-field>
     </div>
@@ -83,7 +85,7 @@
     </div>
     <!-- x-scrollable table container -->
     <div class="ml-2 mr-2 ecaviar-details-table-container" *ngIf="showECAVIARTable">
-      <table class="ecaviar-details-table" mat-table [dataSource]="dataSource" matSort matSortStart="desc">
+      <table class="ecaviar-details-table" mat-table [dataSource]="dataSourceECAVIAR" #ECAVIARSort="matSort" matSort matSortStart="desc">
         <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
 
@@ -207,13 +209,13 @@
           <td mat-cell *matCellDef="let ecaviar"> {{ecaviar.leadsnp_included}} </td>
         </ng-container>
       
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsECAVIAR"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsECAVIAR;"></tr>
       </table>
 
     </div>
       
-    <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+    <mat-paginator #ECAVIARPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
 
     <!-- <mat-paginator [disabled]="!showECAVIARTable" [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator> -->
     
@@ -221,6 +223,188 @@
       <a (click)="downloadECAVIARTable()" 
         *ngIf="showECAVIARTable">
         Download eCAVIAR Table
+      </a>
+    </div>
+
+  </div>
+
+  <br>
+
+  <h3 class="mr-3">HyprColoc</h3>
+
+  <!-- Hyprcoloc results table -->
+  <div class="hyprcoloc-results border border-light rounded">
+    <!-- table filter input field -->
+    <div class="ml-2 mr-2">
+      <mat-form-field>
+        <input matInput 
+          [disabled]="!showHyprcolocTable"
+          (keyup)="applyFilterHyprcoloc($event.target.value)" 
+          placeholder="Filter">
+      </mat-form-field>
+    </div>
+    <!-- loading spinner -->
+    <div 
+      class="d-flex justify-content-center" 
+      *ngIf="!showHyprcolocTable && !hyprcolocWarningMessage">
+      <mat-spinner></mat-spinner>
+    </div>
+    <!-- show warning message if no Hyprcoloc data is returned -->
+    <div 
+      id="hyprcoloc-warning"
+      class="ml-2 mr-2 alert alert-warning show text-center" 
+      role="alert"  
+      *ngIf="hyprcolocWarningMessage">
+      No Hyprcoloc calculation results. Please check input data files and calculation parameters.
+    </div>
+    <!-- x-scrollable table container -->
+    <div class="ml-2 mr-2 hyprcoloc-details-table-container" *ngIf="showHyprcolocTable">
+      <table class="hyprcoloc-details-table" mat-table [dataSource]="dataSourceHyprcoloc" matSortStart="desc">
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+
+        <!-- iteration Column -->
+        <ng-container matColumnDef="iteration">
+          <th mat-header-cell *matHeaderCellDef> Iterations </th>
+          <td mat-cell *matCellDef="let hyprcoloc">{{hyprcoloc.iteration}}</td>
+        </ng-container>
+      
+        <!-- traits Column -->
+        <ng-container matColumnDef="traits">
+          <th mat-header-cell *matHeaderCellDef> Traits </th>
+          <td mat-cell *matCellDef="let hyprcoloc">{{hyprcoloc.traits}}</td>
+        </ng-container>
+      
+        <!-- posterior_prob Column -->
+        <ng-container matColumnDef="posterior_prob">
+          <th mat-header-cell *matHeaderCellDef> Posterior Probability </th>
+          <td mat-cell *matCellDef="let hyprcoloc">{{hyprcoloc.posterior_prob}}</td>
+        </ng-container>
+      
+        <!-- regional_prob Column -->
+        <ng-container matColumnDef="regional_prob">
+          <th mat-header-cell *matHeaderCellDef> Regional Probability </th>
+          <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.regional_prob}} </td>
+        </ng-container>
+      
+        <!-- candidate_snp Column -->
+        <ng-container matColumnDef="candidate_snp">
+          <th mat-header-cell *matHeaderCellDef> Candidate SNP </th>
+          <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.candidate_snp}} </td>
+        </ng-container>
+      
+        <!-- posterior_explained_by_snp Column -->
+        <ng-container matColumnDef="posterior_explained_by_snp">
+          <th mat-header-cell *matHeaderCellDef> Posterior Explained By SNP </th>
+          <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.posterior_explained_by_snp}} </td>
+        </ng-container>
+      
+        <!-- dropped_trait Column -->
+        <ng-container matColumnDef="dropped_trait">
+          <th mat-header-cell *matHeaderCellDef> Dropped Trait </th>
+          <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.dropped_trait}} </td>
+        </ng-container>
+      
+        <!-- gene_id Column -->
+        <ng-container matColumnDef="gene_id">
+          <th mat-header-cell *matHeaderCellDef> Gene ID </th>
+          <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.gene_id}} </td>
+        </ng-container>
+      
+        <!-- gene_symbol Column -->
+        <ng-container matColumnDef="gene_symbol">
+          <th mat-header-cell *matHeaderCellDef>Gene Symbol</th>
+          <td mat-cell *matCellDef="let hyprcoloc"> {{hyprcoloc.gene_symbol}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsHyprcoloc"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsHyprcoloc;"></tr>
+      </table>
+
+    </div>
+      
+    <mat-paginator #HyprcolocPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+    
+    <div class="ml-4 mb-4 hyprcoloc-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
+      <a (click)="downloadHyprcolocTable()" 
+        *ngIf="showHyprcolocTable">
+        Download Hyprcoloc Table
+      </a>
+    </div>
+
+  </div>
+
+  <br>
+
+  <h3 class="mr-3">HyprColoc SNP Scores</h3>
+
+  <!-- Hyprcoloc snpscore results table -->
+  <div class="hyprcoloc-snpscore-results border border-light rounded">
+    <!-- table filter input field -->
+    <div class="ml-2 mr-2">
+      <mat-form-field>
+        <input matInput 
+          [disabled]="!showHyprcolocSnpscoreTable"
+          (keyup)="applyFilterHyprcolocSnpscore($event.target.value)" 
+          placeholder="Filter">
+      </mat-form-field>
+    </div>
+    <!-- loading spinner -->
+    <div 
+      class="d-flex justify-content-center" 
+      *ngIf="!showHyprcolocSnpscoreTable && !hyprcolocSnpscoreWarningMessage">
+      <mat-spinner></mat-spinner>
+    </div>
+    <!-- show warning message if no Hyprcoloc snpscore data is returned -->
+    <div 
+      id="hyprcoloc-snpscore-warning"
+      class="ml-2 mr-2 alert alert-warning show text-center" 
+      role="alert"  
+      *ngIf="hyprcolocSnpscoreWarningMessage">
+      No Hyprcoloc snpscore calculation results. Please check input data files and calculation parameters.
+    </div>
+    <!-- x-scrollable table container -->
+    <div class="ml-2 mr-2 hyprcoloc-snpscore-details-table-container" *ngIf="showHyprcolocSnpscoreTable">
+      <table class="hyprcoloc-snpscore-details-table" mat-table [dataSource]="dataSourceHyprcolocSnpscore" matSortStart="desc">
+        <!--- Note that these columns can be defined in any order.
+              The actual rendered columns are set as a property on the row definition" -->
+
+        <!-- rsnum Column -->
+        <ng-container matColumnDef="rsnum">
+          <th mat-header-cell *matHeaderCellDef> RS Number </th>
+          <td mat-cell *matCellDef="let hyprcolocSnpscore">{{hyprcolocSnpscore.rsnum}}</td>
+        </ng-container>
+      
+        <!-- snpscore Column -->
+        <ng-container matColumnDef="snpscore">
+          <th mat-header-cell *matHeaderCellDef> SNP Score </th>
+          <td mat-cell *matCellDef="let hyprcolocSnpscore">{{hyprcolocSnpscore.snpscore}}</td>
+        </ng-container>
+      
+        <!-- gene_id Column -->
+        <ng-container matColumnDef="gene_id">
+          <th mat-header-cell *matHeaderCellDef> Gene ID </th>
+          <td mat-cell *matCellDef="let hyprcolocSnpscore">{{hyprcolocSnpscore.gene_id}}</td>
+        </ng-container>
+      
+        <!-- gene_symbol Column -->
+        <ng-container matColumnDef="gene_symbol">
+          <th mat-header-cell *matHeaderCellDef> Gene Symbol </th>
+          <td mat-cell *matCellDef="let hyprcolocSnpscore"> {{hyprcolocSnpscore.gene_symbol}} </td>
+        </ng-container>
+      
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsHyprcolocSnpscore"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsHyprcolocSnpscore;"></tr>
+      </table>
+
+    </div>
+      
+    <mat-paginator #HyprcolocSnpscorePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+    
+    <div class="ml-4 mb-4 hyprcoloc-snpscore-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
+      <a (click)="downloadHyprcolocSnpscoreTable()" 
+        *ngIf="showHyprcolocSnpscoreTable">
+        Download Hyprcoloc SNP Scores Table
       </a>
     </div>
 

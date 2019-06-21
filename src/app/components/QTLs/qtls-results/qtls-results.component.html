@@ -31,18 +31,21 @@
 
       <!-- Locus Table Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoadMain" id="table-results" label="Locus Table"> 
-        <div class="col result-main" id="locus-table-results-main">
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoadMain && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-table-results-main">
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">
+              <app-qtls-locus-table></app-qtls-locus-table>
             </div>
           </div>
-          <div class="blur-loading-main" *ngIf="mainData">
-            <app-qtls-locus-table></app-qtls-locus-table>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
 
       <!-- Locus Colocalization Result Tab -->
@@ -66,20 +69,22 @@
 
       <!-- Locus Quantification Result Tab -->
       <mat-tab [disabled]="!mainData || blurLoadMain || disableLocusQuantification" id="locus-quantification-results" label="Locus Quantification"> 
-        <div class="col result-main" id="locus-quantification-results-main">
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoadMain && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-quantification-results-main">
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">  
+              <app-qtls-locus-quantification></app-qtls-locus-quantification>
             </div>
           </div>
-          <div class="blur-loading-main" *ngIf="mainData">  
-            <app-qtls-locus-quantification></app-qtls-locus-quantification>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
-      
     </div>
   </mat-tab-group>
 </div>

@@ -30,6 +30,6 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   ecaviardata_colnames <- colnames(ecaviardata)
   ## parse outputfile to JSON and return to frontend
   locus_colocalization_ecaviar_data <- list(setNames(as.data.frame(ecaviardata), ecaviardata_colnames))
-  dataSourceJSON <- c(toJSON(list(ecaviar=list(data=locus_colocalization_ecaviar_data))))
+  dataSourceJSON <- c(toJSON(list(ecaviar=list(request=request, data=locus_colocalization_ecaviar_data))))
   return(dataSourceJSON)
 }

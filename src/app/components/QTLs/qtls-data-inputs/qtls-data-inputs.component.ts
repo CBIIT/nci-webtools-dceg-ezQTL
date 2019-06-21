@@ -441,17 +441,39 @@ export class QTLsDataInputsComponent implements OnInit {
               this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
                 .subscribe(
                   res => {
-                    this.data.changeECAVIARData(res);
+                    var requestIDECAVIAR = res["ecaviar"]["request"][0];
+                    if (request_id == requestIDECAVIAR && requestID == requestIDECAVIAR) {
+                      // console.log("MATCHES", request_id, requestID, requestIDECAVIAR);
+                      this.data.changeECAVIARData(res);
+                    } else {
+                      // console.log("DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+                    }
                   },
                   error => {
                     this.handleError(error);
                   }
                 );
-              // Run HyprColoc LD calculation
+              // Run HyprColoc LD calculation then HyprColoc calculation
               this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
                 .subscribe(
                   res => {
-                    console.log(res);
+                    var ldFileName = res["hyprcoloc_ld"]["filename"][0];
+                    // console.log(select_gwas_sample);
+                    // console.log(select_qtls_samples);
+                    // console.log(gwasFileName);
+                    // console.log(associationFileName);
+                    // console.log(ldFileName);
+                    // console.log(requestID);
+                    // Run HyprColoc calculation after LD file is generated
+                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                      .subscribe(
+                        res => {
+                          this.data.changeHyprcolocData(res);
+                        },
+                        error => {
+                          this.handleError(error);
+                        }
+                      )
                   },
                   error => {
                     this.handleError(error);
@@ -491,6 +513,8 @@ export class QTLsDataInputsComponent implements OnInit {
     this.data.changeMainData(null);
     // remove all eCAVIAR calculated data
     this.data.changeECAVIARData(null);
+    // remove all Hyprcoloc calculate data
+    this.data.changeHyprcolocData(null);
     // remove any error messages
     this.data.changeErrorMessage('');
     // choose default association data file toggle

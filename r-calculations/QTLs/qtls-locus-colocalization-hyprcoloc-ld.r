@@ -6,6 +6,6 @@ locus_colocalization_hyprcoloc_ld <- function(workDir, select_ref, chr, pos, sel
   system(cmd)
   filename <- paste0(request,".LD.gz")
   ## return completion message
-  dataSourceJSON <- c(toJSON(list(hyprcoloc_ld=list(filename=filename))))
+  dataSourceJSON <- c(toJSON(list(hyprcoloc_ld=list(request=request, filename=filename))))
   return(dataSourceJSON)
 }
