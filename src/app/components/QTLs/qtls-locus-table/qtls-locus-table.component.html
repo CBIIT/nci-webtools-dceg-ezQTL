@@ -1,4 +1,4 @@
-<div class="locus-table-result-tab">
+<div class="locus-table-result-tab" style="background: #E8E8E8 !important;">
 
   <div class="ml-2 mr-2">
     <mat-form-field>
@@ -123,11 +123,11 @@
           </td>
         </ng-container>
     
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" style="background: #8C97D4 !important;"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
     </div>
-  <mat-paginator #LocusTablePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+  <mat-paginator #LocusTablePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
   <div class="ml-4 mb-4 variant-details-table">
     <a (click)="downloadLocusTable()">Download Locus Table</a>
   </div>

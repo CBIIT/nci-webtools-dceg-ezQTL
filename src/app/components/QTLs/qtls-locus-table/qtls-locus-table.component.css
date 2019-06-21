@@ -30,6 +30,7 @@ table {
 .mat-header-cell {
   font-size: 13px !important;
   font-weight: bold !important;
+  color: black !important;
 }
 
 .mat-cell {

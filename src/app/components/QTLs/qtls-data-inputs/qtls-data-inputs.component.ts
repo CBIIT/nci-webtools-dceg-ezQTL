@@ -58,18 +58,16 @@ export class QTLsDataInputsComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef, private data: QTLsResultsService) { }
 
-  // ngAfterViewChecked(){
-  //     this.data.currentWarningMessage.subscribe(warningMessage => {
-  //       this.warningMessage = warningMessage;
-  //     });
-  //     this.cdr.detectChanges();
-  // }
-
   ngOnInit() {
-    // this.qtlsForm.valueChanges.subscribe(formValue => {
-    //   // console.log(formValue);
-    // });
-    this.data.currentMainData.subscribe(mainData => this.mainData = mainData);
+    this.data.currentMainData.subscribe(mainData => {
+      this.mainData = mainData
+      // populate LD Reference field with default variant after initial calculation if blank
+      if (mainData && (this.rsnumSearch == null || this.rsnumSearch.length == 0)) {
+        var locusAlignmentDataQTopAnnot = mainData["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+        this.rsnumSearch = locusAlignmentDataQTopAnnot["rsnum"];
+        this.qtlsForm.value.rsnumber = locusAlignmentDataQTopAnnot["rsnum"];
+      }
+    });
     this.data.currentResultStatus.subscribe(resultStatus => this.resultStatus = resultStatus);
     this.data.currentSelectedTab.subscribe(selectedTab => this.selectedTab = selectedTab);
     this.data.currentQtlsType.subscribe(qtlsType => {
@@ -194,9 +192,9 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(true);
       this.loadLDSampleDataFile();
-      if (this.selectLoadGWASSample == true) {
-        this.loadGWASSampleDataFile(); // toggle load GWAS data file
-      }
+      // if (this.selectLoadGWASSample == true) {
+      //   this.loadGWASSampleDataFile(); // toggle load GWAS data file
+      // }
     } else { // if user loads sample QTLs data files
       this.selectLoadQTLsSamples = true;
       this.qtlsType = "assoc";
@@ -215,9 +213,9 @@ export class QTLsDataInputsComponent implements OnInit {
       $("#genotype-file").val("");
       this.data.changeDisableLocusQuantification(false);
       this.loadLDSampleDataFile();
-      if (this.selectLoadGWASSample == false) {
-        this.loadGWASSampleDataFile(); // toggle load GWAS data file
-      }
+      // if (this.selectLoadGWASSample == false) {
+      //   this.loadGWASSampleDataFile(); // toggle load GWAS data file
+      // }
     }
   }
 
@@ -310,10 +308,10 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   async submit() {
-    const request_id = Date.now().toString();
-    const selectedDistNumber = this.selectedDist;
-    const { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
-    const formData = new FormData();
+    var request_id = Date.now().toString();
+    var selectedDistNumber = this.selectedDist;
+    var { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
+    var formData = new FormData();
     // custom tooltip validation - if expression file is submitted, need genotype file and vice versa. All or none.
     if ((expressionFile == null || expressionFile == false || expressionFile.length == 0) && (genotypeFile != null && genotypeFile.length > 0)) {
       // show tooltip on expression file if user tries to calculate with genotype file but no expression file
@@ -443,10 +441,10 @@ export class QTLsDataInputsComponent implements OnInit {
                   res => {
                     var requestIDECAVIAR = res["ecaviar"]["request"][0];
                     if (request_id == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-                      // console.log("MATCHES", request_id, requestID, requestIDECAVIAR);
+                      console.log("ECAVIAR REQUEST MATCHES", request_id, requestID, requestIDECAVIAR);
                       this.data.changeECAVIARData(res);
                     } else {
-                      // console.log("DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+                      console.log("ECAVIAR REQUEST DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
                     }
                   },
                   error => {
@@ -458,22 +456,28 @@ export class QTLsDataInputsComponent implements OnInit {
                 .subscribe(
                   res => {
                     var ldFileName = res["hyprcoloc_ld"]["filename"][0];
-                    // console.log(select_gwas_sample);
-                    // console.log(select_qtls_samples);
-                    // console.log(gwasFileName);
-                    // console.log(associationFileName);
-                    // console.log(ldFileName);
-                    // console.log(requestID);
+                    var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                     // Run HyprColoc calculation after LD file is generated
-                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
-                      .subscribe(
-                        res => {
-                          this.data.changeHyprcolocData(res);
-                        },
-                        error => {
-                          this.handleError(error);
-                        }
-                      )
+                    if (request_id == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
+                      console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
+                      this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                        .subscribe(
+                          res => {
+                            var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
+                            if (request_id == requestIDHypercoloc && requestID == requestIDHypercoloc) {
+                              console.log("HYPRCOLOC REQUEST MATCHES", request_id, requestID, requestIDHypercoloc);
+                              this.data.changeHyprcolocData(res);
+                            } else {
+                              console.log("HYPRCOLOC REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercoloc);
+                            }
+                          },
+                          error => {
+                            this.handleError(error);
+                          }
+                        );
+                    } else {
+                      console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercolocLD);
+                    }
                   },
                   error => {
                     this.handleError(error);

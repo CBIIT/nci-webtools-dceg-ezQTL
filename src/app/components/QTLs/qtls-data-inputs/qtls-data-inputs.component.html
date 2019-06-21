@@ -48,7 +48,7 @@
         *ngIf="qtlsType == 'assoc'">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
-            Association Data File <i class="fas fa-star-of-life" style="color:red;"></i>
+            Association Data File <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
           </div>
         </div>
         <div class="row mb-3">
@@ -406,8 +406,13 @@
 
       <!-- cis-QTL Distance Input Field -->
       <div class="qtls-data-inputs" id="qtls-data-input-distance">
-        <div class="d-flex justify-content-center">
-          <mat-form-field class="data-input-field">
+        <div class="row">
+          <div class="ml-3 datafile-title">
+            cis-QTL Distance (Kb) <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
+          </div>
+        </div>
+        <div class="row">
+          <mat-form-field class="data-input-field ml-3" [floatLabel]="'never'" appearance="outline">
             <input 
               #cisDistanceInput
               matInput 
@@ -429,8 +434,13 @@
       </div>
       <!-- LD Reference Input Field -->
       <div class="qtls-data-inputs" id="qtls-data-input-ldref">
-        <div class="d-flex justify-content-center">
-          <mat-form-field class="data-input-field">
+        <div class="row">
+          <div class="ml-3 datafile-title">
+            LD Reference
+          </div>
+        </div>
+        <div class="row">
+          <mat-form-field class="data-input-field ml-3" [floatLabel]="'never'" appearance="outline">
             <input 
               #rsnumSearchInput
               matInput 

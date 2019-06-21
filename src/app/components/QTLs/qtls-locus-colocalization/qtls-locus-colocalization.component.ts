@@ -172,8 +172,8 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       if(hyprcolocData) {
         this.hyprcolocData = hyprcolocData["hyprcoloc"]["result_hyprcoloc"]["data"][0];
         this.hyprcolocSNPScoreData = hyprcolocData["hyprcoloc"]["result_snpscore"]["data"][0];
-        console.log(this.hyprcolocData);
-        console.log(this.hyprcolocSNPScoreData);
+        // console.log(this.hyprcolocData);
+        // console.log(this.hyprcolocSNPScoreData);
         if (this.hyprcolocData && this.hyprcolocData[0]) {
           // Populate Hyprcoloc table
           this.showHyprcolocTable = true;

@@ -13,10 +13,10 @@
 }
 
 .toggle-view {
-    background: #3F51B5;
+    /* background: #3F51B5; */
     cursor: pointer;
 }
 
 #toggle-view-button {
-    color: white;
+    color: #2A71A5;
 }
