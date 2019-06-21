@@ -3,110 +3,88 @@
     <div class="row">
 
       <!-- Locus Alignment Result Tab -->
-      <mat-tab [disabled]="!mainData || blurLoad" id="locus-alignment-results" label="Locus Alignment"> 
-        <div class="col result-main" id="locus-alignment-results-main">
-          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage"> -->
-          <div class="p-2 blur-loading" *ngIf="!mainData && !errorMessage">
-            Upload data files on the left panel and click Calculate to see results here.
-          </div>
-          <div class="p-2" *ngIf="errorMessage && !mainData">
-            Please check input files — reset form to try again.
-          </div>
-          <!-- *ngIf="resultStatus && !mainData && !errorMessage"  -->
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoad && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+      <mat-tab [disabled]="!mainData || blurLoadMain" id="locus-alignment-results" label="Locus Alignment"> 
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-alignment-results-main">
+            <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage"> -->
+            <div class="p-2 blur-loading-main" *ngIf="!mainData && !errorMessage">
+              Upload data files on the left panel and click Calculate to see results here.
+            </div>
+            <div class="p-2" *ngIf="errorMessage && !mainData">
+              Please check input files — reset form to try again.
+            </div>
+            <!-- *ngIf="resultStatus && !mainData && !errorMessage"  -->
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">             
+              <app-qtls-locus-alignment></app-qtls-locus-alignment>
             </div>
           </div>
-          <div class="blur-loading" *ngIf="mainData">             
-            <app-qtls-locus-alignment></app-qtls-locus-alignment>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
 
       <!-- Locus Table Result Tab -->
-      <mat-tab [disabled]="!mainData || blurLoad" id="table-results" label="Locus Table"> 
-        <div class="col result-main" id="locus-table-results-main">
-          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
-            Upload data files on the left panel and click Calculate to see results here.
-          </div>
-          <div class="p-2" *ngIf="errorMessage && !mainData">
-            Please check input files — reset form to try again.
-          </div>
-          <div 
-            class="mt-5 d-flex justify-content-center" 
-            *ngIf="resultStatus && !mainData && !errorMessage">
-            <mat-spinner></mat-spinner>
-          </div> -->
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoad && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+      <mat-tab [disabled]="!mainData || blurLoadMain" id="table-results" label="Locus Table"> 
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-table-results-main" style="background: #E8E8E8 !important;">
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">
+              <app-qtls-locus-table></app-qtls-locus-table>
             </div>
           </div>
-          <div class="blur-loading" *ngIf="mainData">
-            <app-qtls-locus-table></app-qtls-locus-table>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
 
       <!-- Locus Colocalization Result Tab -->
-      <mat-tab [disabled]="!mainData || blurLoad || disableLocusColocalization" id="locus-colocalization-results" label="Locus Colocalization"> 
-        <div class="col result-main" id="locus-colocalization-results-main">
-          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
-            Upload data files on the left panel and click Calculate to see results here.
-          </div>
-          <div class="p-2" *ngIf="errorMessage && !mainData">
-            Please check input files — reset form to try again.
-          </div>
-          <div 
-            class="mt-5 d-flex justify-content-center" 
-            *ngIf="resultStatus && !mainData && !errorMessage">
-            <mat-spinner></mat-spinner>
-          </div> -->
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoad && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+      <mat-tab [disabled]="!mainData || blurLoadMain || disableLocusColocalization" id="locus-colocalization-results" label="Locus Colocalization"> 
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-colocalization-results-main">
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">
+              <app-qtls-locus-colocalization></app-qtls-locus-colocalization>
             </div>
           </div>
-          <div class="blur-loading" *ngIf="mainData">
-            <app-qtls-locus-colocalization></app-qtls-locus-colocalization>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
 
       <!-- Locus Quantification Result Tab -->
-      <mat-tab [disabled]="!mainData || blurLoad || disableLocusQuantification" id="locus-quantification-results" label="Locus Quantification"> 
-        <div class="col result-main" id="locus-quantification-results-main">
-          <!-- <div class="p-2" *ngIf="!resultStatus && !mainData && !errorMessage">
-            Upload data files on the left panel and click Calculate to see results here.
-          </div>
-          <div class="p-2" *ngIf="errorMessage && !mainData">
-            Please check input files — reset form to try again.
-          </div>
-          <div 
-            class="mt-5 d-flex justify-content-center" 
-            *ngIf="resultStatus && !mainData && !errorMessage">
-            <mat-spinner></mat-spinner>
-          </div> -->
-          <div 
-            class="d-flex justify-content-center loading-overlay" 
-            *ngIf="blurLoad && !errorMessage">
-            <div class="d-flex align-spinner flex-wrap">
-              <mat-spinner></mat-spinner>
+      <mat-tab [disabled]="!mainData || blurLoadMain || disableLocusQuantification" id="locus-quantification-results" label="Locus Quantification"> 
+        <!-- Lazy load this analysis results tab -->
+        <ng-template matTabContent>
+          <div class="col result-main" id="locus-quantification-results-main">
+            <div 
+              class="d-flex justify-content-center loading-overlay" 
+              *ngIf="blurLoadMain && !errorMessage">
+              <div class="d-flex align-spinner flex-wrap">
+                <mat-spinner></mat-spinner>
+              </div>
+            </div>
+            <div class="blur-loading-main" *ngIf="mainData">  
+              <app-qtls-locus-quantification></app-qtls-locus-quantification>
             </div>
           </div>
-          <div class="blur-loading" *ngIf="mainData">  
-            <app-qtls-locus-quantification></app-qtls-locus-quantification>
-          </div>
-        </div>
+        </ng-template>
       </mat-tab>
-      
     </div>
   </mat-tab-group>
 </div>

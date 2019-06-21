@@ -47,4 +47,8 @@ Thumbs.db
 .Rhistory
 
 r-calculations/data/1000G/
-static/tmp/
+r-calculations/data/1kginfo
+
+# Input/Output save directories
+static/output/
+/r-calculations/input/

@@ -1,8 +1,32 @@
-<div *ngIf="mainData" class="border border-light rounded pt-3 pl-3 pr-3 mb-3" id="calculation-inputs">
+<!-- Show error message if issues occur during calculation -->
+<div 
+  id="qtls-calculation-error-message"
+  class="alert alert-danger" 
+  role="alert"  
+  *ngIf="errorMessage.length > 0">
+  Unable to calculate: {{ errorMessage }} — please check input files. Reset form to try again.
+</div>
+
+<div id="calculation-inputs"  
+  class="border border-light rounded pl-3 pr-3 mb-3">
+  <!-- *ngIf="mainData"> -->
+  
 <!-- <div class="border border-light rounded pt-3 pl-3 pr-3 mb-3"> -->
-  <div class="row blur-loading">
+  <div class="row blur-loading-main">
+
+    <!-- Toggle Data Input Side Panel Collapse -->
+    <div class="toggle-view d-flex col-md-auto pl-1 pr-1"
+      (click)="collapseDataInputPanel()" 
+      (keyup.enter)="collapseDataInputPanel()" 
+      (keyup.space)="collapseDataInputPanel()" 
+      tabindex="10">
+      <div class="d-flex align-items-center justify-content-center">
+        <i id="toggle-view-button" class="fas fa-caret-left fa-2x"></i>
+      </div>
+    </div>
+
     <!-- Choose Population -->
-    <div class="col-md-auto pl-3 pr-3">
+    <div class="col-md-auto pt-2 pl-3 pr-3 ml-3">
       <mat-form-field>
         <mat-label>Population</mat-label>
         <mat-select 
@@ -11,6 +35,7 @@
           (selectionChange)="changePop()" 
           multiple 
           required 
+          [disabled]=!mainData
           #population>
           <!-- Edit dropdown placeholder -->
           <mat-select-trigger>
@@ -62,13 +87,14 @@
     </div>
 
     <!-- Choose Reference Gene -->
-    <div class="col-md-auto pl-3 pr-3">
+    <div class="col-md-auto mt-2 pl-3 pr-3">
       <mat-form-field>
         <mat-label>Reference Gene</mat-label>
         <mat-select 
           [(value)]="selectedGene" 
           (selectionChange)="refGeneChange()" 
           required 
+          [disabled]=!mainData 
           #refGene>
           <mat-option 
             *ngFor="let gene of geneList" 
@@ -95,7 +121,7 @@
     </div>
 
     <!-- cis-QTL Distance input -->
-    <div class="col-md-auto pl-3 pr-3">
+    <!-- <div class="col-md-auto mt-2 pl-3 pr-3">
       <form [formGroup]="qtlsCalculationFormCISDistance">
         <mat-form-field class="calculation-input-field">
           <input 
@@ -104,17 +130,23 @@
             placeholder="cis-QTL Distance (Kb) *" 
             (keyup)="enableSearchCISDistance($event)" 
             [(ngModel)]="selectedDist" 
+            [readonly]=!mainData
             formControlName="cisDistanceInput">
-          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearCISDistField()">
+          <button mat-button 
+            matSuffix 
+            mat-icon-button 
+            aria-label="Clear" 
+            (click)="clearCISDistField()" 
+            [disabled]=!mainData>
             <mat-icon>close</mat-icon>
           </button>
           <mat-error *ngIf="qtlsCalculationFormCISDistance.invalid">{{ cisDistErrorMsg() }}</mat-error>
         </mat-form-field>
       </form>
-    </div>
+    </div> -->
 
     <!-- LD Reference input -->
-    <div class="col-md-auto pl-3 pr-3">
+    <div class="col-md-auto mt-2 pl-3 pr-3">
       <form [formGroup]="qtlsCalculationFormRSNumber">
         <mat-form-field class="calculation-input-field">
           <input 
@@ -123,8 +155,14 @@
             placeholder="LD Reference" 
             (keyup)="enableSearchLDRef($event)" 
             [(ngModel)]="rsnumSearch" 
+            [readonly]=!mainData
             formControlName="rsnumber">
-          <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearLDRefField()">
+          <button mat-button 
+            matSuffix 
+            mat-icon-button 
+            aria-label="Clear" 
+            (click)="clearLDRefField()" 
+            [disabled]=!mainData>
             <mat-icon>close</mat-icon>
           </button>
           <mat-error *ngIf="qtlsCalculationFormRSNumber.invalid">Invalid rs number</mat-error>
@@ -133,26 +171,37 @@
     </div>
 
     <!-- Re-calculate Button -->
-    <div class="col-md-auto pl-3 pr-3">
+    <div class="col-md-auto vert-cent pl-3 pr-3">
       <button 
         type="submit" 
         class="mt-2" 
         mat-raised-button color="primary" 
-        [disabled]="!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid" 
+        [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid)" 
         (click)="recalculatePopGeneDistRef()">
         Recalculate
       </button>
     </div>
 
+    <!-- [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid)"  -->
+
   </div>
 
+  <!-- Show error message if issues occur during calculation -->
+  <!-- <div 
+    id="qtls-calculation-error-message"
+    class="ml-2 mr-2 alert alert-danger" 
+    role="alert"  
+    *ngIf="errorMessage.length > 0">
+    Unable to calculate: {{ errorMessage }} — please check input files. Reset form to try again.
+  </div> -->
+
   <!-- Show warning message if searched rs number is not found -->
-  <div 
+  <!-- <div 
     id="ldref-search-warning"
     class="ml-2 mr-2 alert alert-warning alert-dismissible fade show" 
     role="alert"  
-    *ngIf="warningMessage">
-    {{warningMessage}}
+    *ngIf="warningMessage.length > 0">
+    {{ warningMessage }}
     <button 
       type="button" 
       class="close" 
@@ -160,6 +209,22 @@
       aria-label="Close">
       <span aria-hidden="true">&times;</span>
     </button>
-  </div>
+  </div> -->
 
+</div>
+
+<!-- Show warning message if searched rs number is not found -->
+<div 
+  id="ldref-search-warning"
+  class="alert alert-warning alert-dismissible fade show" 
+  role="alert"  
+  *ngIf="warningMessage.length > 0">
+  {{ warningMessage }}
+  <button 
+    type="button" 
+    class="close" 
+    (click)="closeWarning()" 
+    aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
 </div>

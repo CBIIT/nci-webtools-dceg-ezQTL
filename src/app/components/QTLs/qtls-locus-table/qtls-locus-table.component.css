@@ -1,3 +1,8 @@
+.locus-table-result-tab {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
 table {
   width: 100%;
 }
@@ -5,6 +10,10 @@ table {
 .mat-form-field {
   font-size: 14px;
   width: 100%;
+}
+
+.variant-details-table-container {
+  overflow-x: auto !important;
 }
 
 .variant-details-table a {
@@ -21,6 +30,7 @@ table {
 .mat-header-cell {
   font-size: 13px !important;
   font-weight: bold !important;
+  color: black !important;
 }
 
 .mat-cell {

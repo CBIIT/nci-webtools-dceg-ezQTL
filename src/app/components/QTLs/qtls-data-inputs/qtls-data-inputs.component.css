@@ -11,6 +11,10 @@
     font-weight: bold;
 }
 
+.data-input-field {
+    font-size: 12pt !important;
+}
+
 .datafile-title {
     color: #595959 !important;
     /* font-size: 1.2em; */
@@ -58,4 +62,8 @@
 
 .qtls-data-input-gtex-select {
     font-size: 11pt !important;
+}
+
+.data-input-field {
+    width: 230px !important;
 }

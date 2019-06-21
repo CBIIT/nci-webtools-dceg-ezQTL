@@ -17,7 +17,7 @@ export class QTLsResultsComponent implements OnInit {
   disableLocusColocalization: boolean;
   disableLocusQuantification: boolean;
   selectedTab: number;
-  blurLoad: boolean;
+  blurLoadMain: boolean;
 
   constructor(private data: QTLsResultsService) { }
 
@@ -28,7 +28,7 @@ export class QTLsResultsComponent implements OnInit {
     this.data.currentLocusColocalization.subscribe(disableLocusColocalization => this.disableLocusColocalization = disableLocusColocalization);
     this.data.currentLocusQuantification.subscribe(disableLocusQuantification => this.disableLocusQuantification = disableLocusQuantification);
     this.data.currentSelectedTab.subscribe(selectedTab => this.selectedTab = selectedTab);
-    this.data.currentBlurLoad.subscribe(blurLoad => this.blurLoad = blurLoad);
+    this.data.currentBlurLoadMain.subscribe(blurLoadMain => this.blurLoadMain = blurLoadMain);
   }
 
 }

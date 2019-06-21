@@ -1,5 +1,6 @@
 #results {
-    min-width: 1148px;
+    /* min-width: 1148px; */
+    height: 100%;
 }
 
 .result-main {
