@@ -99,7 +99,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   });
 
   @ViewChild('ECAVIARPaginator') ECAVIARPaginator: MatPaginator;
-  @ViewChild('ECAVIARSort') ECAVIARSort: MatSort;
+  // @ViewChild('ECAVIARSort') ECAVIARSort: MatSort;
   @ViewChild('HyprcolocPaginator') HyprcolocPaginator: MatPaginator;
   // @ViewChild('HyprcolocSort') HyprcolocSort: MatSort;
   @ViewChild('HyprcolocSnpscorePaginator') HyprcolocSnpscorePaginator: MatPaginator;
@@ -133,7 +133,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);
           this.dataSourceECAVIAR = new MatTableDataSource(this.ECAVIAR_DATA);
           this.dataSourceECAVIAR.paginator = this.ECAVIARPaginator;
-          this.dataSourceECAVIAR.sort = this.ECAVIARSort;
+          // this.dataSourceECAVIAR.sort = this.ECAVIARSort;
           if (this.ecaviarData != null && this.ecaviarData.length == 0) {
             this.ecaviarWarningMessage = true;
             this.ecaviarData = null;
