@@ -553,6 +553,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       this.closePopover();
       this.data.changeBlurLoadMain(true);
       this.data.changeECAVIARData(null);
+      this.data.changeHyprcolocData(null);
       this.disableInputs = true;
       $(".blur-loading-main").addClass("blur-overlay");
       $(".blur-loading-ecaviar").addClass("blur-overlay");
@@ -593,17 +594,39 @@ export class QTLsCalculationInputsComponent implements OnInit {
               this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
                 .subscribe(
                   res => {
-                    this.data.changeECAVIARData(res);
+                    var requestIDECAVIAR = res["ecaviar"]["request"][0];
+                    if (requestID == requestIDECAVIAR) {
+                      // console.log("MATCHES", request_id, requestID, requestIDECAVIAR);
+                      this.data.changeECAVIARData(res);
+                    } else {
+                      // console.log("DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+                    }
                   },
                   error => {
                     this.handleError(error);
                   }
                 );
-              // Run HyprColoc LD calculation
+              // Run HyprColoc LD calculation then HyprColoc calculation
               this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
                 .subscribe(
                   res => {
-                    console.log(res);
+                    var ldFileName = res["hyprcoloc_ld"]["filename"][0];
+                    // console.log(select_gwas_sample);
+                    // console.log(select_qtls_samples);
+                    // console.log(gwasFileName);
+                    // console.log(associationFileName);
+                    // console.log(ldFileName);
+                    // console.log(requestID);
+                    // Run HyprColoc calculation after LD file is generated
+                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                      .subscribe(
+                        res => {
+                          this.data.changeHyprcolocData(res);
+                        },
+                        error => {
+                          this.handleError(error);
+                        }
+                      )
                   },
                   error => {
                     this.handleError(error);

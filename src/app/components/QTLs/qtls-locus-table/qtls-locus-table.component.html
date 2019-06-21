@@ -6,7 +6,7 @@
     </mat-form-field>
   </div>
   <div class="variant-details-table-container">
-    <table class="variant-details-table" mat-table [dataSource]="dataSource" matSort matSortActive="R2" matSortDirection="desc" matSortStart="desc">
+    <table class="variant-details-table" mat-table [dataSource]="dataSource" matSort #LocusTableSort="matSort" matSortActive="R2" matSortDirection="desc" matSortStart="desc">
       <!-- <table class="variant-details-table" mat-table [dataSource]="dataSource" matSort matSortStart="desc"> -->
         <!--- Note that these columns can be defined in any order.
               The actual rendered columns are set as a property on the row definition" -->
@@ -127,7 +127,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
     </div>
-  <mat-paginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
+  <mat-paginator #LocusTablePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator>
   <div class="ml-4 mb-4 variant-details-table">
     <a (click)="downloadLocusTable()">Download Locus Table</a>
   </div>

@@ -140,8 +140,8 @@ function qtlsCalculateLocusColocalizationECAVIAR(rfile, select_gwas_sample, sele
 
         console.log("Selected GWAS Sample File:", select_gwas_sample);
         console.log("Selected QTLs Sample Files:", select_qtls_samples);
-        console.log("Association File:", associationFile);
         console.log("GWAS File:", gwasFile);
+        console.log("Association File:", associationFile);
         console.log("Selected Ref:", select_ref);
         console.log("Selected Dist:", select_dist);
         console.log("Request:", request);
@@ -232,9 +232,64 @@ function qtlsCalculateLocusColocalizationHyprcolocLD(rfile, select_ref, select_c
     });
 }
 
+function qtlsCalculateLocusColocalizationHyprcoloc(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldfile, request) {
+    console.log("Execute qtls locus colocalization Hyprcoloc calculation.");
+    return new Promise((resolve, reject) => {
+        const workingDirectory = JSON.stringify(__dirname);
+        console.log("R Working directory:", workingDirectory);
+
+        select_gwas_sample = JSON.stringify(select_gwas_sample);
+        select_qtls_samples = JSON.stringify(select_qtls_samples);
+        gwasFile = JSON.stringify(gwasFile);
+        associationFile = JSON.stringify(associationFile);
+        ldfile = JSON.stringify(ldfile);
+        request = JSON.stringify(request);
+
+        console.log("Selected GWAS Sample File:", select_gwas_sample);
+        console.log("Selected QTLs Sample Files:", select_qtls_samples);
+        console.log("GWAS File:", gwasFile);
+        console.log("Association File:", associationFile);
+        console.log("LD File:", ldfile);
+        console.log("Request:", request);
+    
+        var code = readFileSync(rfile).toString();
+        // make sure the R statement below is not appended to a comment in R code file
+        code += `locus_colocalization_hyprcoloc(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${gwasFile}, ${associationFile}, ${ldfile}, ${request})`;
+
+        const rcode = `
+            suppressWarnings(suppressMessages(suppressPackageStartupMessages(
+                jsonlite::toJSON({${code}}, auto_unbox=T)
+            )))
+        `;
+
+        const tmpFile = fileSync();
+        writeFileSync(tmpFile.name, rcode);
+
+        const process = exec(
+            `Rscript --vanilla "${tmpFile.name}"`, 
+            { maxBuffer: 100 * 1024 * 1024 }, // increase default maxBuffer from ~4kb to 100mb
+            (error, stdout, stderr) => {
+                try {
+                    if (stdout) {
+                        var parsed = JSON.parse(JSON.parse(stdout));
+                        console.log(parsed);
+                        resolve(parsed);
+                    } else {
+                        if (error) reject(error);
+                        if (stderr) reject(stderr);
+                    }
+                } catch(error) {
+                    reject(error.toString());
+                }
+            }
+        );
+    });
+}
+
 module.exports = {
     qtlsCalculateMain,
     qtlsCalculateLocusAlignmentBoxplots,
     qtlsCalculateLocusColocalizationECAVIAR,
-    qtlsCalculateLocusColocalizationHyprcolocLD
+    qtlsCalculateLocusColocalizationHyprcolocLD,
+    qtlsCalculateLocusColocalizationHyprcoloc
 };

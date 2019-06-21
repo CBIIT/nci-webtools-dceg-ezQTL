@@ -213,6 +213,28 @@ app.post('/qtls-locus-colocalization-hyprcoloc-ld', async (request, response) =>
   }
 });
 
+app.post('/qtls-locus-colocalization-hyprcoloc', async (request, response) => {
+  console.log("Locus Colocalization Hyprcoloc info received.");
+  console.log("REQUEST BODY - locus colocalization Hyprcoloc info");
+  console.log(request.body);
+
+  var select_gwas_sample = request.body.select_gwas_sample;
+  var select_qtls_samples = request.body.select_qtls_samples;
+  var gwasFile = request.body.gwasFile;
+  var associationFile = request.body.associationFile;
+  var ldFile = request.body.ldFile;
+  var request_id = request.body.request_id;
+
+  try {
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, request_id);
+    response.json(data);
+  } catch(err) {
+    console.log(err);
+    response.status(500);
+    response.json(err.toString());
+  }
+});
+
 app.get('/ping', async (request, response) => {
   console.log("pong");
   response.send(true);

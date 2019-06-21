@@ -37,6 +37,25 @@ export interface eCAVIARGeneVariant {
   leadsnp_included: string;
 }
 
+export interface HyprcolocRow {
+  candidate_snp: string;
+  traits: string;
+  regional_prob: string;
+  dropped_trait: string;
+  gene_id: string;
+  gene_symbol: string;
+  iteration: string;
+  posterior_explained_by_snp: string;
+  posterior_prob: string;
+}
+
+export interface HyprcolocSnpscoreRow {
+  gene_id: string;
+  gene_symbol: string;
+  rsnum: string;
+  snpscore: string;
+}
+
 @Component({
   selector: 'app-qtls-locus-colocalization',
   templateUrl: './qtls-locus-colocalization.component.html',
@@ -54,28 +73,41 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   requestID: number;
   
   ecaviarData: Object[];
+  hyprcolocData: Object[];
+  hyprcolocSNPScoreData: Object[];
   
   ECAVIAR_DATA: eCAVIARGeneVariant[];
+  HYPRCOLOC_DATA: HyprcolocRow[];
+  HYPRCOLOC_SNPSCORE_DATA: HyprcolocSnpscoreRow[];
   // displayedColumns: string[] = ['gene_id', 'gene_symbol', 'variant_id', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'gwas_pvalue', 'gwas_z', 'Leadsnp', 'Prob_in_pCausalSet', 'CLPP', 'Prob_in_pCausalSet2', 'CLPP2', 'leadsnp_included'];
-  displayedColumns: string[] = ['gene_id', 'gene_symbol', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'gwas_pvalue', 'gwas_z', 'Leadsnp', 'Prob_in_pCausalSet', 'CLPP', 'Prob_in_pCausalSet2', 'CLPP2', 'leadsnp_included'];
-  dataSource = new MatTableDataSource<eCAVIARGeneVariant>(this.ECAVIAR_DATA);
-
-  blurLoadECAVIAR: boolean;
+  displayedColumnsECAVIAR: string[] = ['gene_id', 'gene_symbol', 'rsnum', 'chr', 'pos', 'ref', 'alt', 'tss_distance', 'pval_nominal', 'slope', 'slope_se', 'gwas_pvalue', 'gwas_z', 'Leadsnp', 'Prob_in_pCausalSet', 'CLPP', 'Prob_in_pCausalSet2', 'CLPP2', 'leadsnp_included'];
+  displayedColumnsHyprcoloc: string[] = ['iteration', 'traits', 'posterior_prob', 'regional_prob', 'candidate_snp', 'posterior_explained_by_snp', 'dropped_trait', 'gene_id', 'gene_symbol'];
+  displayedColumnsHyprcolocSnpscore: string[] = ['rsnum', 'snpscore', 'gene_id', 'gene_symbol'];
+  dataSourceECAVIAR = new MatTableDataSource(this.ECAVIAR_DATA);
+  dataSourceHyprcoloc = new MatTableDataSource(this.HYPRCOLOC_DATA);
+  dataSourceHyprcolocSnpscore = new MatTableDataSource(this.HYPRCOLOC_SNPSCORE_DATA);
 
   showECAVIARTable: boolean;
+  showHyprcolocTable: boolean;
+  showHyprcolocSnpscoreTable: boolean;
   ecaviarWarningMessage: boolean;
+  hyprcolocWarningMessage: boolean;
+  hyprcolocSnpscoreWarningMessage: boolean;
 
   correlationScatterThreshold = new FormGroup({
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
   });
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild('ECAVIARPaginator') ECAVIARPaginator: MatPaginator;
+  @ViewChild('ECAVIARSort') ECAVIARSort: MatSort;
+  @ViewChild('HyprcolocPaginator') HyprcolocPaginator: MatPaginator;
+  // @ViewChild('HyprcolocSort') HyprcolocSort: MatSort;
+  @ViewChild('HyprcolocSnpscorePaginator') HyprcolocSnpscorePaginator: MatPaginator;
+  // @ViewChild('HyprcolocSnpscoreSort') HyprcolocSnpscoreSort: MatSort;
 
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
-    // this.data.currentBlurLoadECAVIAR.subscribe(blurLoadECAVIAR => this.blurLoadECAVIAR = blurLoadECAVIAR);
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
         this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus alignment data
@@ -91,42 +123,114 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     this.data.currentECAVIARData.subscribe(ecaviarData => {
       this.ecaviarData = null;
       this.ECAVIAR_DATA = null;
-      this.dataSource = null;
+      this.dataSourceECAVIAR = null;
       this.ecaviarWarningMessage = false;
       if(ecaviarData) {
         this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
+        // Populate eCAVIAR table
         if (this.ecaviarData && this.ecaviarData[0]) {
-          // console.log(this.ecaviarData);
-          // $(".blur-loading-ecaviar").removeClass("blur-overlay");
           this.showECAVIARTable = true;
           this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);
-          this.dataSource = new MatTableDataSource<eCAVIARGeneVariant>(this.ECAVIAR_DATA);
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
+          this.dataSourceECAVIAR = new MatTableDataSource(this.ECAVIAR_DATA);
+          this.dataSourceECAVIAR.paginator = this.ECAVIARPaginator;
+          this.dataSourceECAVIAR.sort = this.ECAVIARSort;
           if (this.ecaviarData != null && this.ecaviarData.length == 0) {
             this.ecaviarWarningMessage = true;
             this.ecaviarData = null;
             this.ECAVIAR_DATA = null;
-            this.dataSource = null;
+            this.dataSourceECAVIAR = null;
           }
         } else {
-          // $(".blur-loading-ecaviar").addClass("blur-overlay");
           this.showECAVIARTable = false;
           if (this.ecaviarData != null && this.ecaviarData.length == 0) {
             this.ecaviarWarningMessage = true;
             this.ecaviarData = null;
             this.ECAVIAR_DATA = null;
-            this.dataSource = null;
+            this.dataSourceECAVIAR = null;
           }
         }
       } else {
-        // $(".blur-loading-ecaviar").addClass("blur-overlay");
         this.showECAVIARTable = false;
         if (this.ecaviarData != null && this.ecaviarData.length == 0) {
           this.ecaviarWarningMessage = true;
           this.ecaviarData = null;
           this.ECAVIAR_DATA = null;
-          this.dataSource = null;
+          this.dataSourceECAVIAR = null;
+        }
+      }
+    });
+
+    this.data.currentHyprcolocData.subscribe(hyprcolocData => {
+      this.hyprcolocData = null;
+      this.HYPRCOLOC_DATA = null;
+      this.dataSourceHyprcoloc = null;
+      this.hyprcolocWarningMessage = false;
+      this.hyprcolocSNPScoreData = null;
+      this.HYPRCOLOC_SNPSCORE_DATA = null;
+      this.dataSourceHyprcolocSnpscore = null;
+      this.hyprcolocSnpscoreWarningMessage = false;
+      if(hyprcolocData) {
+        this.hyprcolocData = hyprcolocData["hyprcoloc"]["result_hyprcoloc"]["data"][0];
+        this.hyprcolocSNPScoreData = hyprcolocData["hyprcoloc"]["result_snpscore"]["data"][0];
+        console.log(this.hyprcolocData);
+        console.log(this.hyprcolocSNPScoreData);
+        if (this.hyprcolocData && this.hyprcolocData[0]) {
+          // Populate Hyprcoloc table
+          this.showHyprcolocTable = true;
+          this.HYPRCOLOC_DATA = this.populateHyprcolocDataList(this.hyprcolocData);
+          this.dataSourceHyprcoloc = new MatTableDataSource(this.HYPRCOLOC_DATA);
+          this.dataSourceHyprcoloc.paginator = this.HyprcolocPaginator;
+          // this.dataSourceHyprcoloc.sort = this.HyprcolocSort;
+          if (this.hyprcolocData != null && this.hyprcolocData.length == 0) {
+            this.showHyprcolocTable = false;
+            this.hyprcolocWarningMessage = true;
+            this.hyprcolocData = null;
+            this.HYPRCOLOC_DATA = null;
+            this.dataSourceHyprcoloc = null;
+          }
+          // Populate Hyprcoloc snpscore table
+          this.showHyprcolocSnpscoreTable = true;
+          this.HYPRCOLOC_SNPSCORE_DATA = this.populateHyprcolocSnpscoreDataList(this.hyprcolocSNPScoreData);
+          this.dataSourceHyprcolocSnpscore = new MatTableDataSource(this.HYPRCOLOC_SNPSCORE_DATA);
+          this.dataSourceHyprcolocSnpscore.paginator = this.HyprcolocSnpscorePaginator;
+          // this.dataSourceHyprcolocSnpscore.sort = this.HyprcolocSnpscoreSort;
+          if (this.hyprcolocSNPScoreData != null && this.hyprcolocSNPScoreData.length == 0) {
+            this.showHyprcolocSnpscoreTable = false;
+            this.hyprcolocSnpscoreWarningMessage = true;
+            this.hyprcolocSNPScoreData = null;
+            this.HYPRCOLOC_SNPSCORE_DATA = null;
+            this.dataSourceHyprcolocSnpscore = null;
+          }
+        } else {
+          this.showHyprcolocTable = false;
+          this.showHyprcolocSnpscoreTable = false;
+          if (this.hyprcolocData != null && this.hyprcolocData.length == 0) {
+            this.hyprcolocWarningMessage = true;
+            this.hyprcolocData = null;
+            this.HYPRCOLOC_DATA = null;
+            this.dataSourceHyprcoloc = null;
+          }
+          if (this.hyprcolocSNPScoreData != null && this.hyprcolocSNPScoreData.length == 0) {
+            this.hyprcolocSnpscoreWarningMessage = true;
+            this.hyprcolocSNPScoreData = null;
+            this.HYPRCOLOC_SNPSCORE_DATA = null;
+            this.dataSourceHyprcolocSnpscore = null;
+          }
+        }
+      } else {
+        this.showHyprcolocTable = false;
+        this.showHyprcolocSnpscoreTable = false;
+        if (this.hyprcolocData != null && this.hyprcolocData.length == 0) {
+          this.hyprcolocWarningMessage = true;
+          this.hyprcolocData = null;
+          this.HYPRCOLOC_DATA = null;
+          this.dataSourceHyprcoloc = null;
+        }
+        if (this.hyprcolocSNPScoreData != null && this.hyprcolocSNPScoreData.length == 0) {
+          this.hyprcolocSnpscoreWarningMessage = true;
+          this.hyprcolocSNPScoreData = null;
+          this.HYPRCOLOC_SNPSCORE_DATA = null;
+          this.dataSourceHyprcolocSnpscore = null;
         }
       }
     });
@@ -161,12 +265,63 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     return data;
   }
 
-  applyFilter(filterValue: string) {
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+  populateHyprcolocDataList(hyprcolocData) {
+    var data = [];
+    for (var i = 0; i < hyprcolocData.length; i++) {
+      var hyprcoloc = {};
+      hyprcoloc['candidate_snp'] = hyprcolocData[i]['candidate_snp'];
+      hyprcoloc['traits'] = hyprcolocData[i]['traits'];
+      hyprcoloc['regional_prob'] = hyprcolocData[i]['regional_prob'];
+      hyprcoloc['dropped_trait'] = hyprcolocData[i]['dropped_trait'];
+      hyprcoloc['gene_id'] = hyprcolocData[i]['gene_id'];
+      hyprcoloc['gene_symbol'] = hyprcolocData[i]['gene_symbol'];
+      hyprcoloc['iteration'] = hyprcolocData[i]['iteration'];
+      hyprcoloc['posterior_explained_by_snp'] = hyprcolocData[i]['posterior_explained_by_snp'];
+      hyprcoloc['posterior_prob'] = hyprcolocData[i]['posterior_prob'];
+      data.push(hyprcoloc);
+    }
+    return data;
+  }
+
+  populateHyprcolocSnpscoreDataList(hyprcolocSNPScoreData) {
+    var data = [];
+    for (var i = 0; i < hyprcolocSNPScoreData.length; i++) {
+      var hyprcolocSNPScore = {};
+      hyprcolocSNPScore['gene_id'] = hyprcolocSNPScoreData[i]['gene_id'];
+      hyprcolocSNPScore['gene_symbol'] = hyprcolocSNPScoreData[i]['gene_symbol'];
+      hyprcolocSNPScore['rsnum'] = hyprcolocSNPScoreData[i]['rsnum'];
+      hyprcolocSNPScore['snpscore'] = hyprcolocSNPScoreData[i]['snpscore'];
+      data.push(hyprcolocSNPScore);
+    }
+    return data;
+  }
+
+  applyFilterECAVIAR(filterValue: string) {
+    this.dataSourceECAVIAR.filter = filterValue.trim().toLowerCase();
+  }
+
+  applyFilterHyprcoloc(filterValue: string) {
+    this.dataSourceHyprcoloc.filter = filterValue.trim().toLowerCase();
+  }
+
+  applyFilterHyprcolocSnpscore(filterValue: string) {
+    this.dataSourceHyprcolocSnpscore.filter = filterValue.trim().toLowerCase();
   }
 
   downloadECAVIARTable() {
     var url = environment.endpoint + "output/" + this.requestID + ".eCAVIAR.txt";
+    var win = window.open(url, '_blank');
+    win.focus();
+  } 
+
+  downloadHyprcolocTable() {
+    var url = environment.endpoint + "output/" + this.requestID + ".hyprcoloc.txt";
+    var win = window.open(url, '_blank');
+    win.focus();
+  } 
+
+  downloadHyprcolocSnpscoreTable() {
+    var url = environment.endpoint + "output/" + this.requestID + ".hyprcoloc_snpscore.txt";
     var win = window.open(url, '_blank');
     win.focus();
   } 

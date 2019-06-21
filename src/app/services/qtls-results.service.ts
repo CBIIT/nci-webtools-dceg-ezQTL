@@ -16,6 +16,10 @@ export class QTLsResultsService {
   private eCAVIARDataSource = new BehaviorSubject<Object>(null);
   currentECAVIARData = this.eCAVIARDataSource.asObservable();
 
+  // object: data output from HyprColoc R/bash calculation to plot
+  private hyprcolocDataSource = new BehaviorSubject<Object>(null);
+  currentHyprcolocData = this.hyprcolocDataSource.asObservable();
+
   // boolean: true=show results container
   private resultStatus = new BehaviorSubject(false);
   currentResultStatus = this.resultStatus.asObservable();
@@ -125,12 +129,31 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusColocalizationHyprcolocLDParameters), {headers: headers});
   }
 
+  calculateLocusColocalizationHyprcoloc(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, ldFile: string, request_id: number) {
+    let locusColocalizationHyprcolocParameters= {
+      select_gwas_sample: select_gwas_sample,
+      select_qtls_samples: select_qtls_samples,
+      gwasFile: gwasFile,
+      associationFile: associationFile,
+      ldFile: ldFile,
+      request_id: request_id
+    };
+    let headers = new HttpHeaders();
+    headers = headers.set('Content-Type', 'application/json; charset=utf-8');
+    const url = environment.endpoint + 'qtls-locus-colocalization-hyprcoloc';
+    return this.http.post(url, JSON.stringify(locusColocalizationHyprcolocParameters), {headers: headers});
+  }
+
   changeMainData(mainData: Object) {
     this.mainDataSource.next(mainData);
   }
 
   changeECAVIARData(eCAVIARData: Object) {
     this.eCAVIARDataSource.next(eCAVIARData);
+  }
+
+  changeHyprcolocData(hyprcolocData: object) {
+    this.hyprcolocDataSource.next(hyprcolocData);
   }
 
   changeResultStatus(resultStatus: boolean) {
