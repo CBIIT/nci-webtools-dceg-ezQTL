@@ -1,15 +1,7 @@
-/* #input-panel {
-    padding-right: 0px !important;
-    min-width: 320px !important;
-}
-#results-panel {
-    padding-left: 0px !important;
-} */
-
 mat-sidenav-container {
-    /* min-height: 840px; */
+    min-height: 960px;
     height: 100%;
-    background: white;
+    background: white !important;
     /* overflow: hidden; */
 }
 
@@ -26,14 +18,5 @@ mat-sidenav {
 
 mat-sidenav-content {
     height: 100%;
-    overflow: hidden;
+    overflow: hidden !important;
 }
-
-/* .toggle-view {
-    float: left;
-} */
-
-/* #toggle-view-button {
-    cursor: pointer;
-    color: #3F51B5;
-} */

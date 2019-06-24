@@ -51,12 +51,16 @@ export interface GeneVariants {
 })
 export class QTLsLocusAlignmentComponent implements OnInit {
 
-  locusAlignmentData: Object;
-  locusAlignmentDataRC: Object;
+  locusAlignmentData: Object[];
+  locusAlignmentDataR2: Object[];
+  locusAlignmentDataR2NA: Object[]; 
+  locusAlignmentDataRC: Object[];
   locusAlignmentDataQTopAnnot: Object;
-  locusAlignmentGWASScatterData: Object;
+  locusAlignmentGWASScatterData: Object[];
   locusAlignmentGWASScatterTitle: string;
-  GWASData: Object;
+  GWASData: Object[];
+  GWASDataR2: Object[];
+  GWASDataR2NA: Object[];
   selectedPop: string[];
   selectedGene: string;
   selectedDist: string;
@@ -153,20 +157,65 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.selectedDist = this.newSelectedDist;
 
         if (this.locusAlignmentData && this.locusAlignmentData[0]) {
+          // differentiate variants with/without R2 data for popovers
+          this.locusAlignmentDataR2 = this.getPopoverData(this.locusAlignmentData);
+          this.locusAlignmentDataR2NA = this.getPopoverDataR2NA(this.locusAlignmentData);
+          this.GWASDataR2 = this.getPopoverDataGWAS(this.GWASData);
+          this.GWASDataR2NA = this.getPopoverDataGWASR2NA(this.GWASData);
           // check if there is data in GWAS object
           if ((this.GWASData && this.GWASData[0]) && (this.locusAlignmentGWASScatterData && this.locusAlignmentGWASScatterData[0])) {
             // if there is, graph GWAS plot and scatter plot
-            this.locusAlignmentPlotGWAS(this.locusAlignmentData, this.GWASData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
+            this.locusAlignmentPlotGWAS(this.locusAlignmentDataR2, this.locusAlignmentDataR2NA, this.GWASDataR2, this.GWASDataR2NA, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
             this.selectedPvalThreshold = 1.0;
             this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, this.selectedPvalThreshold);
           } else {
             // if not, do not graph GWAS plot or scatter plot
-            this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot)
+            this.locusAlignmentPlot(this.locusAlignmentDataR2, this.locusAlignmentDataR2NA, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot)
             // this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
           }
         }
       }
     });
+  }
+
+  getPopoverData(geneData) {
+    var dataR2 = [];
+    for (var i = 0; i < geneData.length; i++) {
+      if ("R2" in geneData[i] && geneData[i]["R2"] != "NA") {
+        dataR2.push(geneData[i]);
+      }
+    }
+    return dataR2;
+  }
+
+  getPopoverDataR2NA(geneData) {
+    var dataR2NA = [];
+    for (var i = 0; i < geneData.length; i++) {
+      if (!("R2" in geneData[i]) || geneData[i]["R2"] == "NA") {
+        dataR2NA.push(geneData[i]);
+      }
+    }
+    return dataR2NA;
+  }
+
+  getPopoverDataGWAS(geneData) {
+    var dataGWASR2 = [];
+    for (var i = 0; i < geneData.length; i++) {
+      if ("R2" in geneData[i] && geneData[i]["R2"] != "NA") {
+        dataGWASR2.push(geneData[i]);
+      }
+    }
+    return dataGWASR2;
+  }
+
+  getPopoverDataGWASR2NA(geneData) {
+    var dataGWASR2NA = [];
+    for (var i = 0; i < geneData.length; i++) {
+      if (!("R2" in geneData[i]) || geneData[i]["R2"] == "NA") {
+        dataGWASR2NA.push(geneData[i]);
+      }
+    }
+    return dataGWASR2NA;
   }
 
   getXData(geneData) {
@@ -235,11 +284,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   getColorData(geneData) {
     var colorData = [];
     for (var i = 0; i < geneData.length; i++) {
-      if (geneData[i]['R2']) {
-        colorData.push(geneData[i]['R2']);
-      } else {
-        colorData.push(0.0);
-      }
+      colorData.push(geneData[i]['R2']);
     }
     // normalize R2 color data between 0 and 1 for color spectrum
     for (var i = 0; i < colorData.length; i++) {
@@ -276,15 +321,20 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return max;
   }
 
-  locusAlignmentPlotGWAS(geneData, geneGWASData, geneDataRC, qDataTopAnnot) {
-    var xData = this.getXData(geneData);
-    var yData = this.getYData(geneData);
-    var yGWASData = this.getYGWASData(geneGWASData);
-    var colorData = this.getColorData(geneData);
+  locusAlignmentPlotGWAS(geneDataR2, geneDataR2NA, geneGWASDataR2, geneGWASDataR2NA, geneDataRC, qDataTopAnnot) {
+    var xData = this.getXData(geneDataR2);
+    var yData = this.getYData(geneDataR2);
+    var xDataR2NA = this.getXData(geneDataR2NA);
+    var yDataR2NA = this.getYData(geneDataR2NA);
+    var yGWASData = this.getYGWASData(geneGWASDataR2);
+    var yGWASDataR2NA = this.getYGWASData(geneGWASDataR2NA);
+    var colorData = this.getColorData(geneDataR2);
     var xDataRC = this.getXDataRC(geneDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
-    var hoverData = this.getHoverData(geneData);
-    var hoverDataGWAS = this.getHoverDataGWAS(geneGWASData);
+    var hoverData = this.getHoverData(geneDataR2);
+    var hoverDataR2NA = this.getHoverData(geneDataR2NA);
+    var hoverDataGWAS = this.getHoverDataGWAS(geneGWASDataR2);
+    var hoverDataGWASR2NA = this.getHoverDataGWAS(geneGWASDataR2NA);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
     var xLDRef = qDataTopAnnot['pos'] / 1000000.0;
     var yLDRef = Math.log10(qDataTopAnnot['pval_nominal']) * -1.0;
@@ -360,7 +410,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
-    // graph GWAS scatter
+    // graph GWAS scatter where R2 != NA
     var trace1 = {
       x: xData,
       y: yGWASData,
@@ -373,6 +423,24 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      },
+      yaxis: 'y2'
+    };
+    // graph GWAS scatter where R2 == NA
+    var trace1R2NA = {
+      x: xDataR2NA,
+      y: yGWASDataR2NA,
+      text: hoverDataGWASR2NA,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        color: '#cccccc',
         line: {
           color: 'black',
           width: 1
@@ -394,7 +462,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         width: 1
       }
     };
-    // graph scatter
+    // graph scatter where R2 != NA
     var trace3 = {
       x: xData,
       y: yData,
@@ -407,6 +475,24 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      },
+      yaxis: 'y3'
+    };
+    // graph scatter where R2 == NA
+    var trace3R2NA = {
+      x: xDataR2NA,
+      y: yDataR2NA,
+      text: hoverDataR2NA,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        color: '#cccccc',
         line: {
           color: 'black',
           width: 1
@@ -428,7 +514,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         width: 1
       }
     };
-    // graph gene density
+    // graph gene density where R2 != NA
     var trace5 = {
       x: xData,
       y: Array(xData.length).fill(0),
@@ -444,7 +530,21 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y'
     };
-    var pdata = [topPvalMarker, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4, trace5];
+    // graph gene density where R2 == NA
+    var trace5R2NA = {
+      x: xDataR2NA,
+      y: Array(xDataR2NA.length).fill(0),
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        symbol: "line-ns-open",
+        size: 16,
+        color: '#cccccc',
+      },
+      yaxis: 'y'
+    };
+    var pdata = [topPvalMarker, LDRefHighlight, LDRefHighlightGWAS, trace1, trace1R2NA, trace2, trace3, trace3R2NA, trace4, trace5, trace5R2NA];
     // var pdata = [topPvalMarker, topPvalMarkerGWAS, LDRefHighlight, LDRefHighlightGWAS, trace1, trace2, trace3, trace4];
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
@@ -566,13 +666,16 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     };
   }
 
-  locusAlignmentPlot(geneData, geneDataRC, qDataTopAnnot) {
-    var xData = this.getXData(geneData);
-    var yData = this.getYData(geneData);
-    var colorData = this.getColorData(geneData);
+  locusAlignmentPlot(geneDataR2, geneDataR2NA, geneDataRC, qDataTopAnnot) {
+    var xData = this.getXData(geneDataR2);
+    var yData = this.getYData(geneDataR2);
+    var xDataR2NA = this.getXData(geneDataR2NA);
+    var yDataR2NA = this.getYData(geneDataR2NA);
+    var colorData = this.getColorData(geneDataR2);
     var xDataRC = this.getXDataRC(geneDataRC);
     var yDataRC = this.getYDataRC(geneDataRC);
-    var hoverData = this.getHoverData(geneData);
+    var hoverData = this.getHoverData(geneDataR2);
+    var hoverDataR2NA = this.getHoverData(geneDataR2NA);
     var hoverDataRC = this.getHoverDataRC(geneDataRC);
     var yDataFinites = this.removeInfinities(yData);
     var topPvalY = Math.max.apply(null, yDataFinites);
@@ -610,7 +713,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
-    // graph scatter
+    // graph scatter where R2 != NA
     var trace1 = {
       x: xData,
       y: yData,
@@ -624,6 +727,25 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: colorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      },
+      yaxis: 'y2'
+    };
+    // graph scatter where R2 == NA
+    var trace1R2NA = {
+      x: xDataR2NA,
+      y: yDataR2NA,
+      text: hoverDataR2NA,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        opacity: 1.0,
+        color: '#cccccc',
         line: {
           color: 'black',
           width: 1
@@ -645,7 +767,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         width: 1
       }
     };
-    // graph gene density
+    // graph gene density where R2 != NA
     var trace3 = {
       x: xData,
       y: Array(xData.length).fill(0),
@@ -662,7 +784,22 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis: 'y'
 
     };
-    var pdata = [topPvalMarker, LDRefHighlight, trace1, trace2, trace3];
+    // graph gene density where R2 == NA
+    var trace3R2NA = {
+      x: xDataR2NA,
+      y: Array(xDataR2NA.length).fill(0),
+      hoverinfo: 'none',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        symbol: "line-ns-open",
+        size: 16,
+        color: '#cccccc',
+      },
+      yaxis: 'y'
+
+    };
+    var pdata = [topPvalMarker, LDRefHighlight, trace1, trace1R2NA, trace2, trace3, trace3R2NA];
     // round most significant pval to next whole number
     var chromosome = qDataTopAnnot['chr'];
     var playout = {
@@ -849,10 +986,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
                 res => {
                   var requestIDECAVIAR = res["ecaviar"]["request"][0];
                   if (requestID == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-                    console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
+                    // console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
                     this.data.changeECAVIARData(res);
                   } else {
-                    console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
+                    // console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
                   }
                 },
                 error => {
@@ -867,16 +1004,16 @@ export class QTLsLocusAlignmentComponent implements OnInit {
                   var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                   // Run HyprColoc calculation after LD file is generated
                   if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
-                    console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
+                    // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
                     this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
                       .subscribe(
                         res => {
                           var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
                           if (requestID == requestIDHypercoloc && requestID == requestIDHypercoloc) {
-                            console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
+                            // console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
                             this.data.changeHyprcolocData(res);
                           } else {
-                            console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
+                            // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
                           }
                         },
                         error => {
@@ -884,7 +1021,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
                         }
                       );
                   } else {
-                    console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
+                    // console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
                   }
                 },
                 error => {
@@ -943,7 +1080,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   clickPoint(event) {    
     if (event.points) {
       // console.log("curveNumber", event.points[0].curveNumber);
-      if (event.points[0].hasOwnProperty("marker.color")) {
+      // console.log("pointIndex", event.points[0].pointIndex);
+      // console.log(event.points[0]);
+      // if (event.points[0].hasOwnProperty("marker.color")) {
         // only show popovers for scatter points not recomb line (points w/ markers)
         var top = event.event.pointerY;
         var left = event.event.pointerX;
@@ -951,9 +1090,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         // console.log("popoverData", this.popoverData);
         if (this.GWASData[0]) { // if GWAS data is displayed in Manhattan plot
           // console.log("GWAS data displayed");
-          if (event.points[0].curveNumber == 3) { // if GWAS data is clicked
+          if (event.points[0].curveNumber == 3 || event.points[0].curveNumber == 4) { // if GWAS data is clicked
             // console.log("GWAS data clicked.");
-            this.popoverData = this.GWASData[event.points[0].pointIndex];
+            if (event.points[0].curveNumber == 3) {
+              this.popoverData = this.GWASDataR2[event.points[0].pointIndex];
+            } else {
+              this.popoverData = this.GWASDataR2NA[event.points[0].pointIndex];
+            }
             $('.popover').show();
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
@@ -971,9 +1114,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             this.showPopover = true;
             // console.log("popoverData", this.popoverData);
           } else { // if Association data is clicked
-            if (event.points[0].curveNumber == 5) {
+            if (event.points[0].curveNumber == 6 || event.points[0].curveNumber == 7) {
               // console.log("Association data clicked.");
-              var associationData = this.locusAlignmentData[event.points[0].pointIndex];
+              if (event.points[0].curveNumber == 6) {
+                var associationData = this.locusAlignmentDataR2[event.points[0].pointIndex];
+              } else {
+                var associationData = this.locusAlignmentDataR2NA[event.points[0].pointIndex];
+              }
               this.popoverData = {
                 chr: associationData["chr"], 
                 pos: associationData["pos"], 
@@ -1011,8 +1158,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           }
         } else { // if no GWAS data is disaplyed in Manhattan plot
           // console.log("No GWAS data displayed");
-          if (event.points[0].curveNumber == 2) {
-            var associationData = this.locusAlignmentData[event.points[0].pointIndex];
+          if (event.points[0].curveNumber == 2 || event.points[0].curveNumber == 3) {
+            if (event.points[0].curveNumber == 2) {
+              var associationData = this.locusAlignmentDataR2[event.points[0].pointIndex];
+            } else {
+              var associationData = this.locusAlignmentDataR2NA[event.points[0].pointIndex];
+            }
             this.popoverData = {
               chr: associationData["chr"], 
               pos: associationData["pos"], 
@@ -1063,7 +1214,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         //   });
         // }
         // this.showPopover = true;
-      }
+      // }
     } else {
       this.closePopover2(event);
     }
@@ -1082,8 +1233,22 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   getScatterX(scatterData, threshold) {
     var p_values = [];
     for (var i = 0; i < scatterData.length; i++) {
-      if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
-        p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
+      if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+          p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
+        }
+      }
+    }
+    return p_values;
+  }
+
+  getScatterXR2NA(scatterData, threshold) {
+    var p_values = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+          p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
+        }
       }
     }
     return p_values;
@@ -1092,8 +1257,22 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   getScatterY(scatterData, threshold) {
     var pval_nominals = [];
     for (var i = 0; i < scatterData.length; i++) {
-      if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
-        pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
+      if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+          pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
+        }
+      }
+    }
+    return pval_nominals;
+  }
+
+  getScatterYR2NA(scatterData, threshold) {
+    var pval_nominals = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+          pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
+        }
       }
     }
     return pval_nominals;
@@ -1102,11 +1281,29 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   getScatterHoverData(scatterData, threshold) {
     var hoverData = [];
     for (var i = 0; i < scatterData.length; i++) {
-      if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
-        if ('rs' in scatterData[i]) {
-          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
-        } else {
-          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+      if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+          if ('rs' in scatterData[i]) {
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          } else {
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          }
+        }
+      }
+    }
+    return hoverData;
+  }
+
+  getScatterHoverDataR2NA(scatterData, threshold) {
+    var hoverData = [];
+    for (var i = 0; i < scatterData.length; i++) {
+      if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+          if ('rs' in scatterData[i]) {
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          } else {
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          }
         }
       }
     }
@@ -1116,11 +1313,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   getScatterColorData(scatterData, threshold) {
     var colorData = [];
     for (var i = 0; i < scatterData.length; i++) {
-      if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
-        if (scatterData[i]['R2']) {
+      if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
+        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
           colorData.push(scatterData[i]['R2']);
-        } else {
-          colorData.push(0.0);
         }
       }
     }
@@ -1216,13 +1411,21 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   locusAlignmentScatterPlot(scatterData, scatterTitle, threshold) {
+    // console.log("scatterData", scatterData);
     var xData = this.getScatterX(scatterData, threshold);
     // console.log("xData", xData);
     var yData = this.getScatterY(scatterData, threshold);
     // console.log("yData", yData);
-    // console.log(scatterData);
+    var xDataR2NA = this.getScatterXR2NA(scatterData, threshold);
+    // console.log("xDataR2NA", xDataR2NA);
+    var yDataR2NA = this.getScatterYR2NA(scatterData, threshold);
+    // console.log("yDataR2NA", yDataR2NA);
     var scatterColorData = this.getScatterColorData(scatterData, threshold);
+    // console.log("scatterColorData", scatterColorData);
     var hoverData = this.getScatterHoverData(scatterData, threshold);
+    // console.log("hoverData", hoverData);
+    var hoverDataR2NA = this.getScatterHoverDataR2NA(scatterData, threshold);
+    // console.log("hoverDataR2NA", hoverDataR2NA);
     var trace1 = {
       x: xData,
       y: yData,
@@ -1235,6 +1438,22 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: scatterColorData,
         colorscale: 'Viridis',
         reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      }
+    };
+    var trace1R2NA = {
+      x: xDataR2NA,
+      y: yDataR2NA,
+      text: hoverDataR2NA,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        color: '#cccccc',
         line: {
           color: 'black',
           width: 1
@@ -1268,7 +1487,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: "blue",
       }
     };
-    var pdata = [trace1, trace2];
+    var pdata = [trace1, trace1R2NA, trace2];
     // var pdata = [trace1];
     var playout = {
       title: {
