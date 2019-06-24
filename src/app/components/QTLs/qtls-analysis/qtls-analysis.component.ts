@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
 
 // declare var $; // declare jquery $
@@ -8,7 +8,8 @@ declare let $: any;
 @Component({
   selector: 'app-qtls-analysis',
   templateUrl: './qtls-analysis.component.html',
-  styleUrls: ['./qtls-analysis.component.css']
+  styleUrls: ['./qtls-analysis.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 
 export class QTLsComponent implements OnInit {
