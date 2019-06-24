@@ -441,10 +441,10 @@ export class QTLsDataInputsComponent implements OnInit {
                   res => {
                     var requestIDECAVIAR = res["ecaviar"]["request"][0];
                     if (request_id == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-                      console.log("ECAVIAR REQUEST MATCHES", request_id, requestID, requestIDECAVIAR);
+                      // console.log("ECAVIAR REQUEST MATCHES", request_id, requestID, requestIDECAVIAR);
                       this.data.changeECAVIARData(res);
                     } else {
-                      console.log("ECAVIAR REQUEST DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+                      // console.log("ECAVIAR REQUEST DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
                     }
                   },
                   error => {
@@ -459,16 +459,16 @@ export class QTLsDataInputsComponent implements OnInit {
                     var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                     // Run HyprColoc calculation after LD file is generated
                     if (request_id == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
-                      console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
+                      // console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
                       this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
                         .subscribe(
                           res => {
                             var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
                             if (request_id == requestIDHypercoloc && requestID == requestIDHypercoloc) {
-                              console.log("HYPRCOLOC REQUEST MATCHES", request_id, requestID, requestIDHypercoloc);
+                              // console.log("HYPRCOLOC REQUEST MATCHES", request_id, requestID, requestIDHypercoloc);
                               this.data.changeHyprcolocData(res);
                             } else {
-                              console.log("HYPRCOLOC REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercoloc);
+                              // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercoloc);
                             }
                           },
                           error => {
@@ -476,7 +476,7 @@ export class QTLsDataInputsComponent implements OnInit {
                           }
                         );
                     } else {
-                      console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercolocLD);
+                      // console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercolocLD);
                     }
                   },
                   error => {
