@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { map, startWith } from 'rxjs/operators';
+
 
 declare let $: any;
 
@@ -34,12 +37,9 @@ export interface GeneVariants {
 })
 export class QTLsCalculationInputsComponent implements OnInit {
 
-  // qtlsCalculationFormCISDistance = new FormGroup({
-  //   cisDistanceInput: new FormControl("100", [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required])
-  // });
-
-  qtlsCalculationFormRSNumber = new FormGroup({
-    rsnumber: new FormControl('', [Validators.pattern("^(rs[0-9]+)?$")])
+  qtlsCalculationForm = new FormGroup({
+    referenceGene: new FormControl({value: '', disabled: false}, [Validators.required]),
+    rsnumber: new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")])
   });
 
   mainData: Object;
@@ -60,6 +60,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   geneList: ReferenceGene[];
   selectedGene: string;
   newSelectedGene: string;
+  selectedGeneSymbol: string;
 
   selectedDist: string;
   newSelectedDist: string;
@@ -86,6 +87,8 @@ export class QTLsCalculationInputsComponent implements OnInit {
   select_qtls_samples: string;
   select_gwas_sample: string;
 
+  geneSymbolsList: string[];
+  filteredOptions: Observable<string[]>;
 
   constructor(private data: QTLsResultsService) { }
 
@@ -98,8 +101,15 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.warningMessage = "";
     this.selectedPop = [];
     this.selectedGene = "";
+    this.selectedGeneSymbol = "";
     this.selectedDist = "";
     this.selectedRef = "";
+    this.geneSymbolsList = [];
+
+    this.filteredOptions = this.qtlsCalculationForm.get('referenceGene').valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
 
     this.data.currentErrorMessage.subscribe(errorMessage => {
       this.errorMessage = "";
@@ -154,11 +164,16 @@ export class QTLsCalculationInputsComponent implements OnInit {
           this.recalculatePopAttempt = "false";
           this.returnPopulationGroupFinal();
         }
-        if(this.newSelectedGene == "false") {
-          this.selectedGene = this.locusAlignmentDataQTopAnnot["gene_id"]; // default reference gene
-        } else {
-          this.selectedGene = this.newSelectedGene; // recalculated new gene selection
-          this.recalculateGeneAttempt = "false";
+        if (this.geneList) {
+          this.geneSymbolsList = this.getGeneSymbols(this.geneList);
+          if(this.newSelectedGene == "false") {
+            this.selectedGene = this.locusAlignmentDataQTopAnnot["gene_id"]; // default reference gene
+            this.selectedGeneSymbol = this.locusAlignmentDataQTopAnnot["gene_symbol"]; // default reference gene symbol
+          } else {
+            this.selectedGene = this.newSelectedGene; // recalculated new gene selection
+            this.selectedGeneSymbol = this.getGeneSymbol(this.geneList, this.newSelectedGene);
+            this.recalculateGeneAttempt = "false";
+          }
         }
         if (this.newSelectedDist == "false") {
           this.selectedDist = "100"; // default cis-QTL distance (in Kb)
@@ -169,12 +184,12 @@ export class QTLsCalculationInputsComponent implements OnInit {
         if (this.newSelectedRef == "false") {
           this.selectedRef = "false"; // default ref rsnum
           this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
-          this.qtlsCalculationFormRSNumber.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
+          this.qtlsCalculationForm.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
         } else {
           this.selectedRef = this.newSelectedRef; // recalculated new gene selection
           this.recalculateRefAttempt = "false";
           this.rsnumSearch = this.selectedRef;
-          this.qtlsCalculationFormRSNumber.value.rsnumber = this.selectedRef;
+          this.qtlsCalculationForm.value.rsnumber = this.selectedRef;
         }
         if (this.allGeneVariants && this.geneList) {
           this.populateAllGeneVariantLists(this.allGeneVariants, this.geneList); // organize all QTLs variants by gene
@@ -187,9 +202,18 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.selectedPop = [];
         this.selectedPopFinal = [];
         this.selectedGene = "";
-        this.qtlsCalculationFormRSNumber.reset();
+        this.selectedGeneSymbol = "";
+        this.qtlsCalculationForm.reset();
       }
     });
+  }
+
+  private _filter(value: string): string[] {
+    var filterValue = "";
+    if (value && value.length > 0) {
+      filterValue = value.toLowerCase();
+    }
+    return this.geneSymbolsList.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
   }
 
   collapseDataInputPanel() {
@@ -448,6 +472,34 @@ export class QTLsCalculationInputsComponent implements OnInit {
     return geneIDs;
   }
 
+  getGeneSymbols(geneList) {
+    var geneSymbols = [];
+    for (var i = 0; i < geneList.length; i++) {
+      geneSymbols.push(geneList[i]['gene_symbol']);
+    }
+    return geneSymbols;
+  }
+
+  getGeneID(geneList, geneSymbol) {
+    var geneID = null;
+    for (var i = 0; i < geneList.length; i++) {
+      if (geneList[i]['gene_symbol'] == geneSymbol) {
+        geneID = geneList[i]['gene_id'];
+      }
+    }
+    return geneID;
+  }
+
+  getGeneSymbol(geneList, geneID) {
+    var geneSymbol = null;
+    for (var i = 0; i < geneList.length; i++) {
+      if (geneList[i]['gene_id'] == geneID) {
+        geneSymbol = geneList[i]['gene_symbol'];
+      }
+    }
+    return geneSymbol;
+  }
+
   populateAllGeneVariantLists(geneData, geneList) {
     var geneVariants = {};
     var geneIDList = this.getGeneIDs(geneList);
@@ -465,51 +517,41 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.inputChanged = true;
     this.recalculateGeneAttempt = "true";
     for(var i = 0; i < this.topGeneVariants.length; i++) {
-      if (this.topGeneVariants[i]['gene_id'] == this.selectedGene) {
+      if (this.topGeneVariants[i]['gene_symbol'] == this.selectedGeneSymbol) {
         this.rsnumSearch = this.topGeneVariants[i]['rsnum'];
-        this.qtlsCalculationFormRSNumber.value.rsnumber = this.topGeneVariants[i]['rsnum'];
+        this.qtlsCalculationForm.value.rsnumber = this.topGeneVariants[i]['rsnum'];
+        break;
+      } else {
+        this.rsnumSearch = "";
+        this.qtlsCalculationForm.value.rsnumber = "";
       }
     }
+  }
+
+  enableSearchGeneRef(event: any) {
+    this.inputChanged = true;
+    this.recalculateAttempt = "true";
+    this.selectedGeneSymbol = event.target.value;
+    this.qtlsCalculationForm.value.referenceGene = event.target.value;
   }
 
   enableSearchLDRef(event: any) {
     this.inputChanged = true;
     this.recalculateRefAttempt = "true";
     this.rsnumSearch = event.target.value;
-    this.qtlsCalculationFormRSNumber.value.rsnumber = event.target.value;
+    this.qtlsCalculationForm.value.rsnumber = event.target.value;
   }
-
-  // enableSearchCISDistance(event: any) {
-  //   this.inputChanged = true;
-  //   this.recalculateDistAttempt = "true";
-  //   this.selectedDist = event.target.value;
-  //   this.qtlsCalculationFormCISDistance.value.cisDistanceInput = event.target.value;
-  // }
 
   clearLDRefField() {
     this.rsnumSearch = '';
-    this.qtlsCalculationFormRSNumber.value.rsnumber = '';
+    this.qtlsCalculationForm.value.rsnumber = '';
   }
 
-  // clearCISDistField() {
-  //   this.selectedDist = null;
-  //   this.qtlsCalculationFormCISDistance.value.cisDistanceInput = '';
-  // }
-
-  // cisDistErrorMsg() {
-  //   var msg = "";
-  //   if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput > 2000) {
-  //     msg = "Distance must be <= 2000 Kb";
-  //   } else if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput < 1) {
-  //     msg = "Distance must be >= 1 Kb";
-  //   } else {
-  //     msg = "Invalid cis-QTL Distance";
-  //   }
-  //   if (this.qtlsCalculationFormCISDistance.value.cisDistanceInput == null || this.qtlsCalculationFormCISDistance.value.cisDistanceInput == '') {
-  //     msg = "Input required";
-  //   }
-  //   return msg;
-  // }
+  clearRefGeneField() {
+    this.selectedGene = '';
+    this.selectedGeneSymbol = '';
+    this.qtlsCalculationForm.value.referenceGene = '';
+  }
 
   handleError(error) {
     console.log(error);
@@ -532,7 +574,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   async recalculatePopGeneDistRef() {
     // get new parameters as string
     var selectedPopString = this.selectedPop.join('+');
-    var selectedGeneString = this.selectedGene;
+    var selectedGeneString = this.getGeneID(this.geneList, this.selectedGeneSymbol);
     var selectedDistNumber = this.selectedDist;
     // retrieve recalculate statuses
     var recalculateAttempt = "true";
@@ -543,115 +585,120 @@ export class QTLsCalculationInputsComponent implements OnInit {
     this.inputChanged = false;
     // check if rs number ld ref entered is listed as a variant for ref gene
     // if not, prevent calculation and throw warning
-    if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
-      this.closeWarning();
-      var selectedRefString = this.rsnumSearch;
-      var recalculateRef = this.recalculateRefAttempt;
-      if (this.rsnumSearch.length == 0) {
-        selectedRefString = "false";
-        recalculateRef = "false";
-      }
-      // reset
-      this.closePopover();
-      this.data.changeBlurLoadMain(true);
-      this.data.changeECAVIARData(null);
-      this.data.changeHyprcolocData(null);
-      this.disableInputs = true;
-      $(".blur-loading-main").addClass("blur-overlay");
-      $(".blur-loading-ecaviar").addClass("blur-overlay");
-      // calculate
-      this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
-        .subscribe(
-          res => {
-            this.data.changeMainData(res);
-            this.data.changeBlurLoadMain(false);
-            this.disableInputs = false;
-            $(".blur-loading-main").removeClass("blur-overlay");
-            this.recalculatePopAttempt = "false";
-            this.recalculateGeneAttempt = "false";
-            this.recalculateDistAttempt = "false";
-            this.recalculateRefAttempt = "false";
-            if (this.rsnumSearch.length == 0) {
-              this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
-              this.qtlsCalculationFormRSNumber.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
-            }
-            // Run Locus Colocalization calculations if GWAS and Association Files loaded
-            var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
-            var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
-            var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
-            var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
-            if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
-              var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-              var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-              var requestID = res["info"]["inputs"]["request"][0]; // request id
-              if (newSelectedDist == "false") {
-                var select_dist = "100000"; // default cis-QTL distance (in Kb)
-              } else {
-                var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+    if (this.geneSymbolsList.includes(this.selectedGeneSymbol)) {
+      if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
+        this.closeWarning();
+        var selectedRefString = this.rsnumSearch;
+        var recalculateRef = this.recalculateRefAttempt;
+        if (this.rsnumSearch.length == 0) {
+          selectedRefString = "false";
+          recalculateRef = "false";
+        }
+        // reset
+        this.closePopover();
+        this.data.changeBlurLoadMain(true);
+        this.data.changeECAVIARData(null);
+        this.data.changeHyprcolocData(null);
+        this.disableInputs = true;
+        $(".blur-loading-main").addClass("blur-overlay");
+        $(".blur-loading-ecaviar").addClass("blur-overlay");
+        // calculate
+        this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
+          .subscribe(
+            res => {
+              this.data.changeMainData(res);
+              this.data.changeBlurLoadMain(false);
+              this.disableInputs = false;
+              $(".blur-loading-main").removeClass("blur-overlay");
+              this.recalculatePopAttempt = "false";
+              this.recalculateGeneAttempt = "false";
+              this.recalculateDistAttempt = "false";
+              this.recalculateRefAttempt = "false";
+              if (this.rsnumSearch.length == 0) {
+                this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
+                this.qtlsCalculationForm.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
               }
-              var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
-              var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
-              var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
-              // Run eCAVIAR calculation
-              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
-                .subscribe(
-                  res => {
-                    var requestIDECAVIAR = res["ecaviar"]["request"][0];
-                    if (requestID == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-                      // console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
-                      this.data.changeECAVIARData(res);
-                    } else {
-                      // console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
+              // Run Locus Colocalization calculations if GWAS and Association Files loaded
+              var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+              var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+              var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
+              var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
+              if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
+                var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+                var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
+                var requestID = res["info"]["inputs"]["request"][0]; // request id
+                if (newSelectedDist == "false") {
+                  var select_dist = "100000"; // default cis-QTL distance (in Kb)
+                } else {
+                  var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+                }
+                var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
+                var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
+                var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
+                // Run eCAVIAR calculation
+                this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
+                  .subscribe(
+                    res => {
+                      var requestIDECAVIAR = res["ecaviar"]["request"][0];
+                      if (requestID == requestIDECAVIAR && requestID == requestIDECAVIAR) {
+                        // console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
+                        this.data.changeECAVIARData(res);
+                      } else {
+                        // console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
+                      }
+                    },
+                    error => {
+                      this.handleError(error);
                     }
-                  },
-                  error => {
-                    this.handleError(error);
-                  }
-                );
-              // Run HyprColoc LD calculation then HyprColoc calculation
-              this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
-                .subscribe(
-                  res => {
-                    var ldFileName = res["hyprcoloc_ld"]["filename"][0];
-                    var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
-                    // Run HyprColoc calculation after LD file is generated
-                    if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
-                      // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
-                      this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
-                        .subscribe(
-                          res => {
-                            var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
-                            if (requestID == requestIDHypercoloc && requestID == requestIDHypercoloc) {
-                              // console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
-                              this.data.changeHyprcolocData(res);
-                            } else {
-                              // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
+                  );
+                // Run HyprColoc LD calculation then HyprColoc calculation
+                this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
+                  .subscribe(
+                    res => {
+                      var ldFileName = res["hyprcoloc_ld"]["filename"][0];
+                      var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
+                      // Run HyprColoc calculation after LD file is generated
+                      if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
+                        // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
+                        this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                          .subscribe(
+                            res => {
+                              var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
+                              if (requestID == requestIDHypercoloc && requestID == requestIDHypercoloc) {
+                                // console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
+                                this.data.changeHyprcolocData(res);
+                              } else {
+                                // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
+                              }
+                            },
+                            error => {
+                              this.handleError(error);
                             }
-                          },
-                          error => {
-                            this.handleError(error);
-                          }
-                        );
-                    } else {
-                      console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
+                          );
+                      } else {
+                        console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
+                      }
+                    },
+                    error => {
+                      this.handleError(error);
                     }
-                  },
-                  error => {
-                    this.handleError(error);
-                  }
-                );
+                  );
+              }
+            },
+            error => {
+              this.handleError(error);
+              this.data.changeBlurLoadMain(false);
+              this.disableInputs = false;
+              $(".blur-loading-main").removeClass("blur-overlay");
             }
-          },
-          error => {
-            this.handleError(error);
-            this.data.changeBlurLoadMain(false);
-            this.disableInputs = false;
-            $(".blur-loading-main").removeClass("blur-overlay");
-          }
-        );
+          );
+      } else {
+        // if rs number ld ref entered is not listed as a variant for ref gene, throw warning alert
+        this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
+      }
     } else {
-      // if rs number ld ref entered is not listed as a variant for ref gene, throw warning alert
-      this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
+      // if ref gene entered is not in in association data, throw warning alert
+      this.warningMessage = this.selectedGeneSymbol + " not found in the association data file. Please enter another gene symbol name."
     }
   }
 
