@@ -78,10 +78,11 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
     fs.mkdirSync(static_output_dir);
   }
 
-  var associationFile = 'false'; // required file
+  var associationFile = 'false'; // required data file
   var expressionFile = 'false'; // optional data file
   var genotypeFile = 'false'; // optional data file
-  var gwasFile = 'false'; // optional data file
+  var gwasFile = 'false'; // optional data file 
+  var LDFile = 'false'; //optional data file
   var request_id = request.body.request_id;
   var select_pop = request.body.select_pop;
   var select_gene = request.body.select_gene;
@@ -109,10 +110,13 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
     if (request.files[i]['fieldname'] == 'gwas-file') {
       gwasFile = request.files[i].filename;
     }
+    if (request.files[i]['fieldname'] == 'LD-file') {
+      LDFile = request.files[i].filename;
+    }
   }
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -128,6 +132,7 @@ app.post('/qtls-recalculate-main', async (request, response) => {
   var expressionFile = request.body.expressionFile;
   var genotypeFile = request.body.genotypeFile;
   var gwasFile = request.body.gwasFile;
+  var LDFile = request.body.LDFile;
   var request_id = request.body.request_id;
   var select_pop = request.body.select_pop;
   var select_gene = request.body.select_gene;
@@ -142,7 +147,7 @@ app.post('/qtls-recalculate-main', async (request, response) => {
   var select_gwas_sample = request.body.select_gwas_sample;
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
     response.json(data);
   } catch(err) {
     console.log(err);

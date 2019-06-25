@@ -49,6 +49,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
   expressionFile: string;
   genotypeFile: string;
   gwasFile: string;
+  LDFile: string;
 
   populationGroups: PopulationGroup[];
   selectedPop: string[];
@@ -117,6 +118,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
+        this.LDFile = mainData["info"]["inputs"]["ld_file"][0] // LD filename
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
 
         this.recalculateAttempt = mainData["info"]["recalculateAttempt"][0]; // recalculation attempt ?
@@ -558,7 +560,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       $(".blur-loading-main").addClass("blur-overlay");
       $(".blur-loading-ecaviar").addClass("blur-overlay");
       // calculate
-      this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
+      this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
         .subscribe(
           res => {
             this.data.changeMainData(res);
