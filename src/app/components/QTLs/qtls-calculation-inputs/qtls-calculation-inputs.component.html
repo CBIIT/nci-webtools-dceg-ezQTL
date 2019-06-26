@@ -8,7 +8,8 @@
 </div>
 
 <div id="calculation-inputs"  
-  class="border border-light rounded pl-3 pr-3 mb-3">
+  class="border border-light rounded pl-3 pr-3 mb-3" 
+  [formGroup]="qtlsCalculationForm">
   <!-- *ngIf="mainData"> -->
   
 <!-- <div class="border border-light rounded pt-3 pl-3 pr-3 mb-3"> -->
@@ -89,7 +90,7 @@
     <!-- Choose Reference Gene -->
     <div class="col-md-auto mt-2 pl-3 pr-3">
       <mat-form-field>
-        <mat-label>Reference Gene</mat-label>
+        <!-- <mat-label>Reference Gene</mat-label>
         <mat-select 
           [(value)]="selectedGene" 
           (selectionChange)="refGeneChange()" 
@@ -101,22 +102,32 @@
             [value]="gene.gene_id">
             {{ gene.gene_symbol }}
           </mat-option>
-        </mat-select>
-        <!-- <input type="text" 
-          placeholder="Reference Gene" 
+        </mat-select> -->
+        <input type="text" 
+          placeholder="Reference Gene *" 
           aria-label="Gene Symbol" 
-          (change)="refGeneChange()" 
           matInput 
-          [(value)]="selectedGene" 
-          [formControl]="myControl" 
-          [matAutocomplete]="auto" 
-          required 
+          (keyup)="enableSearchGeneRef($event)" 
+          [(ngModel)]="selectedGeneSymbol" 
+          [readonly]=!mainData
+          formControlName="referenceGene" 
+          [matAutocomplete]="auto"  
           #refGene>
-        <mat-autocomplete #auto="matAutocomplete">
+        <button mat-button 
+          matSuffix 
+          mat-icon-button 
+          aria-label="Clear" 
+          (click)="clearRefGeneField()" 
+          [disabled]=!mainData>
+          <mat-icon>close</mat-icon>
+        </button>
+        <mat-autocomplete autoActiveFirstOption 
+          #auto="matAutocomplete"
+          (optionSelected)="refGeneChange()">
           <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
             {{ option }}
           </mat-option>
-        </mat-autocomplete> -->
+        </mat-autocomplete>
       </mat-form-field>
     </div>
 
@@ -147,7 +158,7 @@
 
     <!-- LD Reference input -->
     <div class="col-md-auto mt-2 pl-3 pr-3">
-      <form [formGroup]="qtlsCalculationFormRSNumber">
+      <!-- <form [formGroup]="qtlsCalculationForm"> -->
         <mat-form-field class="calculation-input-field">
           <input 
             #rsnumSearchInput
@@ -165,9 +176,9 @@
             [disabled]=!mainData>
             <mat-icon>close</mat-icon>
           </button>
-          <mat-error *ngIf="qtlsCalculationFormRSNumber.invalid">Invalid rs number</mat-error>
+          <mat-error *ngIf="qtlsCalculationForm.get('rsnumber').invalid">Invalid rs number</mat-error>
         </mat-form-field>
-      </form>
+      <!-- </form> -->
     </div>
 
     <!-- Re-calculate Button -->
@@ -176,13 +187,13 @@
         type="submit" 
         class="mt-2" 
         mat-raised-button color="primary" 
-        [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid)" 
+        [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationForm.get('rsnumber').invalid || qtlsCalculationForm.get('referenceGene').invalid)" 
         (click)="recalculatePopGeneDistRef()">
         Recalculate
       </button>
     </div>
 
-    <!-- [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationFormRSNumber.invalid || qtlsCalculationFormCISDistance.invalid)"  -->
+    <!-- [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationForm.invalid || qtlsCalculationFormCISDistance.invalid)"  -->
 
   </div>
 

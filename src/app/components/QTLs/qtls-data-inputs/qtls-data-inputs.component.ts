@@ -98,7 +98,8 @@ export class QTLsDataInputsComponent implements OnInit {
     var sampleFiles = [
       "assets/files/MX2.eQTL.txt",
       "assets/files/MX2.quantification.txt",
-      "assets/files/MX2.genotyping.txt"
+      "assets/files/MX2.genotyping.txt",
+      "assets/files/MX2.LD.gz"
     ];
     for (var i = 0; i < sampleFiles.length; i ++) {
       var a = document.createElement("a");
@@ -310,7 +311,7 @@ export class QTLsDataInputsComponent implements OnInit {
   async submit() {
     var request_id = Date.now().toString();
     var selectedDistNumber = this.selectedDist;
-    var { associationFile, expressionFile, genotypeFile, gwasFile } = this.qtlsForm.value;
+    var { associationFile, expressionFile, genotypeFile, gwasFile, LDFile } = this.qtlsForm.value;
     var formData = new FormData();
     // custom tooltip validation - if expression file is submitted, need genotype file and vice versa. All or none.
     if ((expressionFile == null || expressionFile == false || expressionFile.length == 0) && (genotypeFile != null && genotypeFile.length > 0)) {
@@ -402,6 +403,10 @@ export class QTLsDataInputsComponent implements OnInit {
         this.data.changeDisableLocusColocalization(false);
       } else {
         this.data.changeDisableLocusColocalization(true);
+      }
+
+      if (LDFile != null && LDFile.length > 0) {
+        formData.append('LD-file', LDFile[0]);
       }
 
       // console.log("RUN MAIN CALCULATION");
