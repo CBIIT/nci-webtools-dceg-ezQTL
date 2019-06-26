@@ -75,6 +75,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   expressionFile: string;
   genotypeFile: string;
   gwasFile: string;
+  LDFile: string;
   recalculateAttempt: string;
   recalculatePopAttempt: string;
   recalculateGeneAttempt: string;
@@ -140,6 +141,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
+        this.LDFile = mainData["info"]["inputs"]["gwas_file"][0] // LD filename
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
         this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
@@ -952,7 +954,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     $(".blur-loading-main").addClass("blur-overlay");
     $(".blur-loading-ecaviar").addClass("blur-overlay");
     // calculate
-    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
+    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
       .subscribe(
         res => {
           this.data.changeMainData(res);
