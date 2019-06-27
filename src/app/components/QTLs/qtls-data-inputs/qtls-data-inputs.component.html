@@ -298,14 +298,9 @@
           </div>
         </div>
       </div>
-      <div>
+      <!-- <div>
         <i class="fas fa-download mr-1"></i><a (click)="downloadQTLsSamples()">Download Samples</a>
-        <!-- <a id="qtls-samples-download1" href="assets/files/MX2.eQTL.txt" download hidden>Download eQTL</a>
-        <a class="qtls-samples-download" href="assets/files/MX2.quantification.txt" download hidden>Download quantification</a>
-        <a class="qtls-samples-download" href="assets/files/MX2.genotyping.txt" download hidden>Download genotyping</a>
-        <a class="qtls-samples-download" href="assets/files/MX2.LD.txt" download hidden>Download LD</a> -->
-        <!-- <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.eQTL.txt" download>Download Samples</a> -->
-      </div>
+      </div> -->
     </div>
 
     <div class="w-100 mt-2 mb-2 border border-light"></div>
@@ -384,9 +379,9 @@
           </div>
         </div>
       </div>
-      <div>
+      <!-- <div>
         <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.GWAS.txt" download>Download Sample</a>
-      </div>
+      </div> -->
     </div> 
 
     <div class="w-100 mt-2 mb-2 border border-light"></div>
@@ -458,6 +453,15 @@
             <mat-error *ngIf="qtlsForm.get('rsnumber').invalid">Invalid rs number</mat-error>
           </mat-form-field>
         </div>
+      </div>
+
+    </div>
+
+    <div class="w-100 mt-2 mb-2 border border-light"></div>
+
+    <div class="qtls-data-files mb-3">
+      <div>
+        <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.examples.gz" download>Download Example Data</a>
       </div>
     </div>
 
