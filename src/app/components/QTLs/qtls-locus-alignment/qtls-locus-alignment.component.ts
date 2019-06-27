@@ -450,7 +450,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
-    // graph recombination rate line
+    // graph recombination rate line GWAS
     var trace2 = {
       x: xDataRC,
       y: yDataRC,
@@ -458,7 +458,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hoverinfo: 'text',
       yaxis: 'y4',
       type: 'scatter',
-      opacity: 0.7,
+      opacity: 0.35,
       line: {
         color: 'blue',
         width: 1
@@ -510,7 +510,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hoverinfo: 'text',
       yaxis: 'y5',
       type: 'scatter',
-      opacity: 0.7,
+      opacity: 0.35,
       line: {
         color: 'blue',
         width: 1
@@ -763,7 +763,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hoverinfo: 'text',
       yaxis: 'y3',
       type: 'scatter',
-      opacity: 0.7,
+      opacity: 0.35,
       line: {
         color: 'blue',
         width: 1
@@ -1397,15 +1397,19 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   recalculateSpearmanCorrelationTitle(xData, yData) {
-    var sortedX = xData.slice().sort(function(a, b){ return b - a })
-    var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
-    var sortedY = yData.slice().sort(function(a, b){ return b - a })
-    var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
-    var sumSquaredDiffRanks = this.getSumDiffAbsSquared(xRank, yRank);
-    var numer = 6.0 * sumSquaredDiffRanks;
-    var denom = xData.length * (Math.pow(xData.length, 2) - 1)
-    var rho = 1 - (numer / denom);
-    return "rho=" + rho.toFixed(3);
+    if (xData.length > 0 && yData.length > 0) {
+      var sortedX = xData.slice().sort(function(a, b){ return b - a })
+      var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
+      var sortedY = yData.slice().sort(function(a, b){ return b - a })
+      var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
+      var sumSquaredDiffRanks = this.getSumDiffAbsSquared(xRank, yRank);
+      var numer = 6.0 * sumSquaredDiffRanks;
+      var denom = xData.length * (Math.pow(xData.length, 2) - 1)
+      var rho = 1 - (numer / denom);
+      return "rho=" + rho.toFixed(3);
+    } else {
+      return "NA"
+    }
   }
 
   recalculatePearsonCorrelationTitle(xData, yData) {
@@ -1426,9 +1430,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       var r = numer / denom;
       return "r=" + r.toFixed(3);
     } else {
-      return "NaN";
+      return "NA";
     }
-    
   }
 
   locusAlignmentScatterPlot(scatterData, scatterTitle, threshold) {
