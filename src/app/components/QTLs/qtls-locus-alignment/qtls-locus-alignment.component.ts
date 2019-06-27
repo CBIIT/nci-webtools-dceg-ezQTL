@@ -1384,16 +1384,16 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     for (var i = 0; i < arr1.length; i++) {
       d.push(Math.pow(Math.abs(arr1[i] - arr2[i]), 2));
     }
-    var sum = d.reduce((a, b) => a + b, 0);
+    var sum = this.getSum(d);
     return sum;
   }
 
-  recalculateSpearmanPValue(r, n) {
-    var numer = n - 2.0;
-    var denom = 1 - (Math.pow(r, 2));
-    var pval = r * (Math.sqrt(numer / denom));
-    console.log("pval", pval);
-    return pval;
+  multiplyArrays(x, y) {
+    var xy = [];
+    for (var i = 0; i < x.length; i++) {
+      xy.push(x[i] * y[i]);
+    }
+    return xy;
   }
 
   recalculateSpearmanCorrelationTitle(xData, yData) {
@@ -1405,11 +1405,30 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var numer = 6.0 * sumSquaredDiffRanks;
     var denom = xData.length * (Math.pow(xData.length, 2) - 1)
     var rho = 1 - (numer / denom);
-    // console.log("rho", rho);
-    // console.log("n", xData.length);
-    // var pval = this.recalculateSpearmanPValue(rho, xData.length);
-    // return "rho=" + rho.toFixed(3) + ", p=" + pval.toFixed(3);
     return "rho=" + rho.toFixed(3);
+  }
+
+  recalculatePearsonCorrelationTitle(xData, yData) {
+    if (xData.length > 0 && yData.length > 0) {
+      var xDataFinites = this.removeInfinities(xData);
+      var yDataFinites = this.removeInfinities(yData);
+      var xMean = xDataFinites.reduce(function(a, b){ return a + b }) / xDataFinites.length;
+      var yMean = yDataFinites.reduce(function(a, b){ return a + b }) / yDataFinites.length;
+      var xDataMinusMean = xData.map(function(i){ return i - xMean });
+      var yDataMinusMean = yData.map(function(i){ return i - yMean });
+      var xy = this.multiplyArrays(xDataMinusMean, yDataMinusMean);
+      var xDataMinusMeanSquared = xDataMinusMean.map(function(i){ return Math.pow(i, 2) })
+      var yDataMinusMeanSquared = yDataMinusMean.map(function(i){ return Math.pow(i, 2) })
+      var numer = this.getSum(xy);
+      var xSumDataMinusMeanSquared = this.getSum(xDataMinusMeanSquared);
+      var ySumDataMinusMeanSquared = this.getSum(yDataMinusMeanSquared);
+      var denom = Math.sqrt(xSumDataMinusMeanSquared * ySumDataMinusMeanSquared);
+      var r = numer / denom;
+      return "r=" + r.toFixed(3);
+    } else {
+      return "NaN";
+    }
+    
   }
 
   locusAlignmentScatterPlot(scatterData, scatterTitle, threshold) {
@@ -1493,7 +1512,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var pdata = [trace1];
     var playout = {
       title: {
-        text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) : scatterTitle),
+        text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? (this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData)) : scatterTitle),
         xref: 'paper'
       },
       width: 1000,
