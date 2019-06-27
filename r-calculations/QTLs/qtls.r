@@ -40,8 +40,12 @@ locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
     left_join(gwasdata) %>% 
     filter(!is.na(pvalue),!is.na(pval_nominal)) 
   
-  tmptest <- cor.test(-log10(tmpdata$pvalue),-log10(tmpdata$pval_nominal),method = 'spearman')
-  tmptitle <- paste0('rho=',round(tmptest$estimate,3),', p=',round(tmptest$p.value,3))
+  # tmptest <- cor.test(-log10(tmpdata$pvalue),-log10(tmpdata$pval_nominal),method = 'spearman')
+  # tmptitle <- paste0('rho=',round(tmptest$estimate,3),', p=',round(tmptest$p.value,3))
+
+  tmptest_spearman <- cor.test(-log10(tmpdata$pvalue),-log10(tmpdata$pval_nominal),method = 'spearman')
+  tmptest_pearson <- cor.test(-log10(tmpdata$pvalue), -log10(tmpdata$pval_nominal),method = 'pearson')
+  tmptitle <- paste0('rho=',round(tmptest_spearman$estimate,3),', r=',round(tmptest_pearson$estimate,3))
   
   tmpdata_colnames <- colnames(tmpdata)
   locus_alignment_gwas_scatter_data <- list(setNames(as.data.frame(tmpdata), tmpdata_colnames))
