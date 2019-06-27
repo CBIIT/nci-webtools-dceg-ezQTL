@@ -119,13 +119,13 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
     }
 
     var playout = {
-        width: 1000,
+        width: 660,
         height: 600,
         xaxis: {
           title: info['rsnum'] + " genotype: " + info['ref'] + "->" + info['alt']
         },
         yaxis: {
-          title: info['gene_symbol'] + " mRNA expression (log2)",
+          title: info['gene_symbol'] + " Quantification (log2)",
           autorange: true,
           showgrid: true,
           zeroline: true,
@@ -151,7 +151,7 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
         toImageButtonOptions: {
           format: 'svg', // one of png, svg, jpeg, webp
           filename: 'locus_alignment_boxplots',
-          width: 1000,
+          width: 660,
           height: 600,
           scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
         }
