@@ -183,12 +183,13 @@ app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
   var select_qtls_samples = request.body.select_qtls_samples;
   var gwasFile = request.body.gwasFile;
   var associationFile = request.body.associationFile;
+  var LDFile = request.body.LDFile;
   var select_ref = request.body.select_ref;
   var select_dist = request.body.select_dist;
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, select_ref, select_dist, request_id);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -202,6 +203,7 @@ app.post('/qtls-locus-colocalization-hyprcoloc-ld', async (request, response) =>
   console.log("REQUEST BODY - locus colocalization Hyprcoloc LD info");
   console.log(request.body);
 
+  var LDFile = request.body.LDFile;
   var select_ref = request.body.select_ref;
   var select_chr = request.body.select_chr;
   var select_pos = request.body.select_pos;
@@ -209,7 +211,7 @@ app.post('/qtls-locus-colocalization-hyprcoloc-ld', async (request, response) =>
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationHyprcolocLD('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc-ld.r', select_ref, select_chr, select_pos, select_dist, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcolocLD('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc-ld.r', LDFile, select_ref, select_chr, select_pos, select_dist, request_id);
     response.json(data);
   } catch(err) {
     console.log(err);
@@ -227,11 +229,11 @@ app.post('/qtls-locus-colocalization-hyprcoloc', async (request, response) => {
   var select_qtls_samples = request.body.select_qtls_samples;
   var gwasFile = request.body.gwasFile;
   var associationFile = request.body.associationFile;
-  var ldFile = request.body.ldFile;
+  var LDFile = request.body.LDFile;
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, request_id);
     response.json(data);
   } catch(err) {
     console.log(err);
