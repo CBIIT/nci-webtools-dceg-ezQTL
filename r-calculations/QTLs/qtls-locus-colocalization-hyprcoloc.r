@@ -17,11 +17,12 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   }
   if (identical(select_qtls_samples, 'true')) {
     qtlfile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
+    ldfile <- paste0('../static/assets/files/', 'MX2.LD.gz')
   } else {
     qtlfile <- paste0('input/', qtlfile)
   }
   
-  ldfile <- paste0("tmp/", ldfile)
+  # ldfile <- paste0("tmp/", ldfile)
 
 
   ## for jiyeon ##
