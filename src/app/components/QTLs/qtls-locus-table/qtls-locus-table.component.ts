@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSort, MatPaginator, MatTableDataSource } from '@angular/material';
 import { QTLsResultsService } from '../../../services/qtls-results.service';
 import { environment } from '../../../../environments/environment' 
-import { DataSource } from '@angular/cdk/table';
 
 export interface Variant {
   gene_id: string;
