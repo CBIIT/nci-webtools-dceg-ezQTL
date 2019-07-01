@@ -4,7 +4,6 @@ const { fileSync } = require('tmp');
 
 var logger = require('../logger');
 
-
 function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
     // console.log("Execute main qtls calculation.");
     logger.info("Execute main qtls calculation.");

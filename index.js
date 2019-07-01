@@ -1,30 +1,25 @@
 var express = require('express');
 var multer = require('multer');
-
 var fs = require('fs');
-
 const rscript = require('./r-calculations/r-wrapper.js');
-
 var logger = require('./logger');
-
 var app = express();
 
+// read config json file
+var config = require('./config');
+
 // ensure tmp, input, output, log directories exist
-const tmp_dir = 'r-calculations/tmp/';
-const input_dir = 'r-calculations/input/';
-const static_output_dir = 'static/output/';
-const log_dir = '../logs/';
-if (!fs.existsSync(tmp_dir)) {
-  fs.mkdirSync(tmp_dir);
+if (!fs.existsSync(config.tmp_dir)) {
+  fs.mkdirSync(config.tmp_dir);
 }
-if (!fs.existsSync(input_dir)) {
-  fs.mkdirSync(input_dir);
+if (!fs.existsSync(config.input_dir)) {
+  fs.mkdirSync(config.input_dir);
 }
-if (!fs.existsSync(static_output_dir)) {
-  fs.mkdirSync(static_output_dir);
+if (!fs.existsSync(config.static_output_dir)) {
+  fs.mkdirSync(config.static_output_dir);
 }
-if (!fs.existsSync(log_dir)) {
-  fs.mkdirSync(log_dir);
+if (!fs.existsSync(config.log_dir)) {
+  fs.mkdirSync(config.log_dir);
 }
 
 app.use(express.json());
@@ -37,23 +32,19 @@ logger.info("Server started.");
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     // ensure tmp, input, output, log directories exist
-    const tmp_dir = 'r-calculations/tmp/';
-    const input_dir = 'r-calculations/input/';
-    const static_output_dir = 'static/output/';
-    const log_dir = '../logs/';
-    if (!fs.existsSync(tmp_dir)) {
-      fs.mkdirSync(tmp_dir);
+    if (!fs.existsSync(config.tmp_dir)) {
+      fs.mkdirSync(config.tmp_dir);
     }
-    if (!fs.existsSync(input_dir)) {
-      fs.mkdirSync(input_dir);
+    if (!fs.existsSync(config.input_dir)) {
+      fs.mkdirSync(config.input_dir);
     }
-    if (!fs.existsSync(static_output_dir)) {
-      fs.mkdirSync(static_output_dir);
+    if (!fs.existsSync(config.static_output_dir)) {
+      fs.mkdirSync(config.static_output_dir);
     }
-    if (!fs.existsSync(log_dir)) {
-      fs.mkdirSync(log_dir);
+    if (!fs.existsSync(config.log_dir)) {
+      fs.mkdirSync(config.log_dir);
     }
-    cb(null, input_dir);
+    cb(null, config.input_dir);
   },
   filename: function (req, file, cb) {
     let ext = ''; // set default extension (if any)
@@ -78,21 +69,17 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   // console.log("Main calculation reached.");
   logger.info("Main calculation reached.");
   // ensure tmp, input, output, log directories exist
-  const tmp_dir = 'r-calculations/tmp/';
-  const input_dir = 'r-calculations/input/';
-  const static_output_dir = 'static/output/';
-  const log_dir = '../logs/';
-  if (!fs.existsSync(tmp_dir)) {
-    fs.mkdirSync(tmp_dir);
+  if (!fs.existsSync(config.tmp_dir)) {
+    fs.mkdirSync(config.tmp_dir);
   }
-  if (!fs.existsSync(input_dir)) {
-    fs.mkdirSync(input_dir);
+  if (!fs.existsSync(config.input_dir)) {
+    fs.mkdirSync(config.input_dir);
   }
-  if (!fs.existsSync(static_output_dir)) {
-    fs.mkdirSync(static_output_dir);
+  if (!fs.existsSync(config.static_output_dir)) {
+    fs.mkdirSync(config.static_output_dir);
   }
-  if (!fs.existsSync(log_dir)) {
-    fs.mkdirSync(log_dir);
+  if (!fs.existsSync(config.log_dir)) {
+    fs.mkdirSync(config.log_dir);
   }
 
   var associationFile = 'false'; // required data file
