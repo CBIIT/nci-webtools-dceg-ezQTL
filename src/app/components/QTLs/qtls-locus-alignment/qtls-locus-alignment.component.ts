@@ -971,7 +971,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
           var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
           var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
-          if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
+          if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
             var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
             var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
             var requestID = res["info"]["inputs"]["request"][0]; // request id

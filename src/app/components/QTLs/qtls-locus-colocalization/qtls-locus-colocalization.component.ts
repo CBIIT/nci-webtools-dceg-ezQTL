@@ -98,12 +98,12 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
   });
 
-  @ViewChild('ECAVIARPaginator') ECAVIARPaginator: MatPaginator;
-  @ViewChild('ECAVIARSort') ECAVIARSort: MatSort;
   @ViewChild('HyprcolocPaginator') HyprcolocPaginator: MatPaginator;
-  // @ViewChild('HyprcolocSort') HyprcolocSort: MatSort;
+  @ViewChild('HyprcolocTableSort') HyprcolocTableSort: MatSort;
   @ViewChild('HyprcolocSnpscorePaginator') HyprcolocSnpscorePaginator: MatPaginator;
-  // @ViewChild('HyprcolocSnpscoreSort') HyprcolocSnpscoreSort: MatSort;
+  @ViewChild('HyprcolocSnpscoreTableSort') HyprcolocSnpscoreTableSort: MatSort;
+  @ViewChild('ECAVIARPaginator') ECAVIARPaginator: MatPaginator;
+  @ViewChild('ECAVIARTableSort') ECAVIARTableSort: MatSort;
 
   constructor(private data: QTLsResultsService) { }
 
@@ -119,47 +119,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         }
       }
     });
-
-    this.data.currentECAVIARData.subscribe(ecaviarData => {
-      this.ecaviarData = null;
-      this.ECAVIAR_DATA = null;
-      this.dataSourceECAVIAR = null;
-      this.ecaviarWarningMessage = false;
-      if(ecaviarData) {
-        this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
-        // Populate eCAVIAR table
-        if (this.ecaviarData && this.ecaviarData[0]) {
-          this.showECAVIARTable = true;
-          this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);
-          this.dataSourceECAVIAR = new MatTableDataSource(this.ECAVIAR_DATA);
-          this.dataSourceECAVIAR.paginator = this.ECAVIARPaginator;
-          this.dataSourceECAVIAR.sort = this.ECAVIARSort;
-          if (this.ecaviarData != null && this.ecaviarData.length == 0) {
-            this.ecaviarWarningMessage = true;
-            this.ecaviarData = null;
-            this.ECAVIAR_DATA = null;
-            this.dataSourceECAVIAR = null;
-          }
-        } else {
-          this.showECAVIARTable = false;
-          if (this.ecaviarData != null && this.ecaviarData.length == 0) {
-            this.ecaviarWarningMessage = true;
-            this.ecaviarData = null;
-            this.ECAVIAR_DATA = null;
-            this.dataSourceECAVIAR = null;
-          }
-        }
-      } else {
-        this.showECAVIARTable = false;
-        if (this.ecaviarData != null && this.ecaviarData.length == 0) {
-          this.ecaviarWarningMessage = true;
-          this.ecaviarData = null;
-          this.ECAVIAR_DATA = null;
-          this.dataSourceECAVIAR = null;
-        }
-      }
-    });
-
+    // Populate Hyprcoloc & Hyprcoiloc SNP Scores tables
     this.data.currentHyprcolocData.subscribe(hyprcolocData => {
       this.hyprcolocData = null;
       this.HYPRCOLOC_DATA = null;
@@ -179,8 +139,10 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           this.showHyprcolocTable = true;
           this.HYPRCOLOC_DATA = this.populateHyprcolocDataList(this.hyprcolocData);
           this.dataSourceHyprcoloc = new MatTableDataSource(this.HYPRCOLOC_DATA);
-          this.dataSourceHyprcoloc.paginator = this.HyprcolocPaginator;
-          // this.dataSourceHyprcoloc.sort = this.HyprcolocSort;
+          setTimeout(() => {
+            this.dataSourceHyprcoloc.paginator = this.HyprcolocPaginator;
+            this.dataSourceHyprcoloc.sort = this.HyprcolocTableSort;
+          });
           if (this.hyprcolocData != null && this.hyprcolocData.length == 0) {
             this.showHyprcolocTable = false;
             this.hyprcolocWarningMessage = true;
@@ -192,8 +154,10 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           this.showHyprcolocSnpscoreTable = true;
           this.HYPRCOLOC_SNPSCORE_DATA = this.populateHyprcolocSnpscoreDataList(this.hyprcolocSNPScoreData);
           this.dataSourceHyprcolocSnpscore = new MatTableDataSource(this.HYPRCOLOC_SNPSCORE_DATA);
-          this.dataSourceHyprcolocSnpscore.paginator = this.HyprcolocSnpscorePaginator;
-          // this.dataSourceHyprcolocSnpscore.sort = this.HyprcolocSnpscoreSort;
+          setTimeout(() => {
+            this.dataSourceHyprcolocSnpscore.paginator = this.HyprcolocSnpscorePaginator;
+            this.dataSourceHyprcolocSnpscore.sort = this.HyprcolocSnpscoreTableSort;
+          });
           if (this.hyprcolocSNPScoreData != null && this.hyprcolocSNPScoreData.length == 0) {
             this.showHyprcolocSnpscoreTable = false;
             this.hyprcolocSnpscoreWarningMessage = true;
@@ -231,6 +195,48 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           this.hyprcolocSNPScoreData = null;
           this.HYPRCOLOC_SNPSCORE_DATA = null;
           this.dataSourceHyprcolocSnpscore = null;
+        }
+      }
+    });
+    // Populate eCAVIAR tables
+    this.data.currentECAVIARData.subscribe(ecaviarData => {
+      this.ecaviarData = null;
+      this.ECAVIAR_DATA = null;
+      this.dataSourceECAVIAR = null;
+      this.ecaviarWarningMessage = false;
+      if(ecaviarData) {
+        this.ecaviarData = ecaviarData["ecaviar"]["data"][0];
+        // Populate eCAVIAR table
+        if (this.ecaviarData && this.ecaviarData[0]) {
+          this.showECAVIARTable = true;
+          this.ECAVIAR_DATA = this.populateECAVIARDataList(this.ecaviarData);
+          this.dataSourceECAVIAR = new MatTableDataSource(this.ECAVIAR_DATA);
+          setTimeout(() => {
+            this.dataSourceECAVIAR.paginator = this.ECAVIARPaginator;
+            this.dataSourceECAVIAR.sort = this.ECAVIARTableSort;
+          });
+          if (this.ecaviarData != null && this.ecaviarData.length == 0) {
+            this.ecaviarWarningMessage = true;
+            this.ecaviarData = null;
+            this.ECAVIAR_DATA = null;
+            this.dataSourceECAVIAR = null;
+          }
+        } else {
+          this.showECAVIARTable = false;
+          if (this.ecaviarData != null && this.ecaviarData.length == 0) {
+            this.ecaviarWarningMessage = true;
+            this.ecaviarData = null;
+            this.ECAVIAR_DATA = null;
+            this.dataSourceECAVIAR = null;
+          }
+        }
+      } else {
+        this.showECAVIARTable = false;
+        if (this.ecaviarData != null && this.ecaviarData.length == 0) {
+          this.ecaviarWarningMessage = true;
+          this.ecaviarData = null;
+          this.ECAVIAR_DATA = null;
+          this.dataSourceECAVIAR = null;
         }
       }
     });
