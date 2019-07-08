@@ -13,7 +13,7 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
     LDFile <- paste0('../static/assets/files/', 'MX2.LD.gz')
   } else {
     assocFile <- paste0('input/', assocFile)
-    if (!identical(LDFile, 'false')) {
+    if (!identical(LDFile, 'false') && !startsWith(LDFile, "input/")) {
       LDFile <- paste0('input/', LDFile)
     }
   }
