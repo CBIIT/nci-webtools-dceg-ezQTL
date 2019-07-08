@@ -141,7 +141,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
-        this.LDFile = mainData["info"]["inputs"]["gwas_file"][0] // LD filename
+        this.LDFile = mainData["info"]["inputs"]["ld_file"][0] // LD filename
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
         this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
@@ -984,7 +984,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
             var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
             // Run eCAVIAR calculation
-            this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, LDFileName, associationFileName, select_ref, select_dist, requestID)
+            this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
               .subscribe(
                 res => {
                   var requestIDECAVIAR = res["ecaviar"]["request"][0];

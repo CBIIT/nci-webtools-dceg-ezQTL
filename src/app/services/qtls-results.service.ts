@@ -79,7 +79,6 @@ export class QTLsResultsService {
       select_qtls_samples: select_qtls_samples,
       select_gwas_sample: select_gwas_sample
     };
-    // console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     const url = environment.endpoint + 'qtls-recalculate-main';

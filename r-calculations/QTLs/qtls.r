@@ -404,7 +404,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     LDFile <- paste0('../static/assets/files/', 'MX2.LD.gz') 
   } else {
     qdatafile <- paste0('input/', assocFile)
-    if (!identical(LDFile, 'false')) {
+    if (!identical(LDFile, 'false') && !startsWith(LDFile, "input/")) {
       LDFile <- paste0('input/', LDFile)
     }
   }
