@@ -79,7 +79,6 @@ export class QTLsResultsService {
       select_qtls_samples: select_qtls_samples,
       select_gwas_sample: select_gwas_sample
     };
-    // console.log("recalculateParameters", recalculateParameters);
     let headers = new HttpHeaders();
     headers = headers.set('Content-Type', 'application/json; charset=utf-8');
     const url = environment.endpoint + 'qtls-recalculate-main';
@@ -100,12 +99,13 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusAlignmentBoxplotsParameters), {headers: headers});
   }
 
-  calculateLocusColocalizationECAVIAR(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, select_ref: string, select_dist: string, request_id: number) {
+  calculateLocusColocalizationECAVIAR(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, LDFile: string, select_ref: string, select_dist: string, request_id: number) {
     let locusColocalizationECAVIARParameters= {
       select_gwas_sample: select_gwas_sample,
       select_qtls_samples: select_qtls_samples,
       gwasFile: gwasFile,
       associationFile: associationFile,
+      LDFile: LDFile,
       select_ref: select_ref, 
       select_dist: select_dist,
       request_id: request_id
@@ -116,8 +116,9 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusColocalizationECAVIARParameters), {headers: headers});
   }
   
-  calculateLocusColocalizationHyprcolocLD(select_ref: string, select_chr: string, select_pos: string, select_dist: string, request_id: number) {
+  calculateLocusColocalizationHyprcolocLD(LDFile: string, select_ref: string, select_chr: string, select_pos: string, select_dist: string, request_id: number) {
     let locusColocalizationHyprcolocLDParameters= {
+      LDFile: LDFile,
       select_ref: select_ref, 
       select_chr: select_chr,
       select_pos: select_pos,
@@ -130,13 +131,13 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusColocalizationHyprcolocLDParameters), {headers: headers});
   }
 
-  calculateLocusColocalizationHyprcoloc(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, ldFile: string, request_id: number) {
+  calculateLocusColocalizationHyprcoloc(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, LDFile: string, request_id: number) {
     let locusColocalizationHyprcolocParameters= {
       select_gwas_sample: select_gwas_sample,
       select_qtls_samples: select_qtls_samples,
       gwasFile: gwasFile,
       associationFile: associationFile,
-      ldFile: ldFile,
+      LDFile: LDFile,
       request_id: request_id
     };
     let headers = new HttpHeaders();

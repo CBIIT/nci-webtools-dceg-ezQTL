@@ -428,7 +428,8 @@ export class QTLsDataInputsComponent implements OnInit {
             var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
             var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
             var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
-            if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
+            var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
+            if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
               var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
               var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
               var requestID = res["info"]["inputs"]["request"][0]; // request id
@@ -441,7 +442,7 @@ export class QTLsDataInputsComponent implements OnInit {
               var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
               var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
               // Run eCAVIAR calculation
-              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
+              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
                 .subscribe(
                   res => {
                     var requestIDECAVIAR = res["ecaviar"]["request"][0];
@@ -457,15 +458,15 @@ export class QTLsDataInputsComponent implements OnInit {
                   }
                 );
               // Run HyprColoc LD calculation then HyprColoc calculation
-              this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
+              this.data.calculateLocusColocalizationHyprcolocLD(LDFileName, select_ref, select_chr, select_pos, select_dist, requestID)
                 .subscribe(
                   res => {
-                    var ldFileName = res["hyprcoloc_ld"]["filename"][0];
+                    var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
                     var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                     // Run HyprColoc calculation after LD file is generated
                     if (request_id == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
                       // console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
-                      this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                      this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, hyprcolocLDFileName, requestID)
                         .subscribe(
                           res => {
                             var requestIDHypercoloc = res["hyprcoloc"]["request"][0];

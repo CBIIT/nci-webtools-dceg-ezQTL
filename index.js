@@ -1,34 +1,50 @@
 var express = require('express');
 var multer = require('multer');
-
 var fs = require('fs');
-
 const rscript = require('./r-calculations/r-wrapper.js');
-
+var logger = require('./logger');
 var app = express();
+
+// read config json file
+var config = require('./config');
+
+// ensure tmp, input, output, log directories exist
+if (!fs.existsSync(config.tmp_dir)) {
+  fs.mkdirSync(config.tmp_dir);
+}
+if (!fs.existsSync(config.input_dir)) {
+  fs.mkdirSync(config.input_dir);
+}
+if (!fs.existsSync(config.static_output_dir)) {
+  fs.mkdirSync(config.static_output_dir);
+}
+if (!fs.existsSync(config.log_dir)) {
+  fs.mkdirSync(config.log_dir);
+}
 
 app.use(express.json());
 
-console.log("Server started.");
+// console.log("Server started.");
+logger.info("Server started.");
 
 
 // Upload files with file extension and original name
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const tmp_dir = 'r-calculations/tmp/';
-    const input_dir = 'r-calculations/input/';
-    const static_output_dir = 'static/output/';
-    if (!fs.existsSync(tmp_dir)) {
-      fs.mkdirSync(tmp_dir);
+    // ensure tmp, input, output, log directories exist
+    if (!fs.existsSync(config.tmp_dir)) {
+      fs.mkdirSync(config.tmp_dir);
     }
-    if (!fs.existsSync(input_dir)) {
-      fs.mkdirSync(input_dir);
+    if (!fs.existsSync(config.input_dir)) {
+      fs.mkdirSync(config.input_dir);
     }
-    if (!fs.existsSync(static_output_dir)) {
-      fs.mkdirSync(static_output_dir);
+    if (!fs.existsSync(config.static_output_dir)) {
+      fs.mkdirSync(config.static_output_dir);
     }
-    // fs.mkdir(dir, err => cb(err, dir))
-    cb(null, input_dir);
+    if (!fs.existsSync(config.log_dir)) {
+      fs.mkdirSync(config.log_dir);
+    }
+    cb(null, config.input_dir);
   },
   filename: function (req, file, cb) {
     let ext = ''; // set default extension (if any)
@@ -49,33 +65,21 @@ app.use(function(req, res, next) {
   next();
 });
 
-// app.get('/', function(request, response) {
-//   // response.send("Hi");
-//   console.log("Client connected.");
-
-//   request.on("close", function() {
-//     console.log("request closed unexpectedly");
-//   });
-  
-//   request.on("end", function() {
-//     console.log("request ended normally");
-//   });
-// });
-
 app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
-  console.log("Main calculation reached.");
-  // create tmp directories if do not exist
-  const tmp_dir = 'r-calculations/tmp/';
-  const input_dir = 'r-calculations/input/';
-  const static_output_dir = 'static/output/';
-  if (!fs.existsSync(tmp_dir)) {
-    fs.mkdirSync(tmp_dir);
+  // console.log("Main calculation reached.");
+  logger.info("Main calculation reached.");
+  // ensure tmp, input, output, log directories exist
+  if (!fs.existsSync(config.tmp_dir)) {
+    fs.mkdirSync(config.tmp_dir);
   }
-  if (!fs.existsSync(input_dir)) {
-    fs.mkdirSync(input_dir);
+  if (!fs.existsSync(config.input_dir)) {
+    fs.mkdirSync(config.input_dir);
   }
-  if (!fs.existsSync(static_output_dir)) {
-    fs.mkdirSync(static_output_dir);
+  if (!fs.existsSync(config.static_output_dir)) {
+    fs.mkdirSync(config.static_output_dir);
+  }
+  if (!fs.existsSync(config.log_dir)) {
+    fs.mkdirSync(config.log_dir);
   }
 
   var associationFile = 'false'; // required data file
@@ -97,7 +101,8 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   var select_gwas_sample = request.body.select_gwas_sample;
 
   for (var i = 0; i < request.files.length; i++) {
-    console.log(request.files[i]);
+    // console.log(request.files[i]);
+    logger.info(request.files[i]);
     if (request.files[i]['fieldname'] == 'association-file') {
       associationFile = request.files[i].filename;
     }
@@ -119,14 +124,16 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
     const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
     response.json(data);
   } catch(err) {
-    console.log(err);
+    // console.log(err);
+    logger.info(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.post('/qtls-recalculate-main', async (request, response) => {
-  console.log("Recalculation info received.");
+  // console.log("Recalculation info received.");
+  logger.info("Recalculation info received.");
 
   var associationFile = request.body.associationFile;
   var expressionFile = request.body.expressionFile;
@@ -150,16 +157,20 @@ app.post('/qtls-recalculate-main', async (request, response) => {
     const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
     response.json(data);
   } catch(err) {
-    console.log(err);
+    // console.log(err);
+    logger.info(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
-  console.log("Locus Alignment boxplot info received.");
-  console.log("REQUEST BODY - locus alignment boxplot point info");
-  console.log(request.body);
+  // console.log("Locus Alignment boxplot info received.");
+  // console.log("REQUEST BODY - locus alignment boxplot point info");
+  // console.log(request.body);
+  logger.info("Locus Alignment boxplot info received.");
+  logger.info("REQUEST BODY - locus alignment boxplot point info");
+  logger.info(request.body);
   var expressionFile = request.body.expressionFile;
   var genotypeFile =request.body.genotypeFile;
   var boxplotDataDetailed = request.body.boxplotDataDetailed;
@@ -169,39 +180,48 @@ app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
     const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', select_qtls_samples, expressionFile, genotypeFile, boxplotDataDetailed);
     response.json(data);
   } catch(err) {
-    console.log(err);
+    // console.log(err);
+    logger.info(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.post('/qtls-locus-colocalization-ecaviar', async (request, response) => {
-  console.log("Locus Colocalization eCAVIAR info received.");
-  console.log("REQUEST BODY - locus colocalization eCAVIAR info");
-  console.log(request.body);
+  // console.log("Locus Colocalization eCAVIAR info received.");
+  // console.log("REQUEST BODY - locus colocalization eCAVIAR info");
+  // console.log(request.body);
+  logger.info("Locus Colocalization eCAVIAR info received.");
+  logger.info("REQUEST BODY - locus colocalization eCAVIAR info");
+  logger.info(request.body);
   var select_gwas_sample = request.body.select_gwas_sample;
   var select_qtls_samples = request.body.select_qtls_samples;
   var gwasFile = request.body.gwasFile;
   var associationFile = request.body.associationFile;
+  var LDFile = request.body.LDFile;
   var select_ref = request.body.select_ref;
   var select_dist = request.body.select_dist;
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, select_ref, select_dist, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationECAVIAR('./r-calculations/QTLs/qtls-locus-colocalization-ecaviar.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, select_ref, select_dist, request_id);
     response.json(data);
   } catch(err) {
-    console.log(err);
+    // console.log(err);
+    logger.info(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.post('/qtls-locus-colocalization-hyprcoloc-ld', async (request, response) => {
-  console.log("Locus Colocalization Hyprcoloc LD info received.");
-  console.log("REQUEST BODY - locus colocalization Hyprcoloc LD info");
-  console.log(request.body);
-
+  // console.log("Locus Colocalization Hyprcoloc LD info received.");
+  // console.log("REQUEST BODY - locus colocalization Hyprcoloc LD info");
+  // console.log(request.body);
+  logger.info("Locus Colocalization Hyprcoloc LD info received.");
+  logger.info("REQUEST BODY - locus colocalization Hyprcoloc LD info");
+  logger.info(request.body);
+  var LDFile = request.body.LDFile;
   var select_ref = request.body.select_ref;
   var select_chr = request.body.select_chr;
   var select_pos = request.body.select_pos;
@@ -209,39 +229,44 @@ app.post('/qtls-locus-colocalization-hyprcoloc-ld', async (request, response) =>
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationHyprcolocLD('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc-ld.r', select_ref, select_chr, select_pos, select_dist, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcolocLD('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc-ld.r', LDFile, select_ref, select_chr, select_pos, select_dist, request_id);
     response.json(data);
   } catch(err) {
-    console.log(err);
+    // console.log(err);
+    logger.info(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.post('/qtls-locus-colocalization-hyprcoloc', async (request, response) => {
-  console.log("Locus Colocalization Hyprcoloc info received.");
-  console.log("REQUEST BODY - locus colocalization Hyprcoloc info");
-  console.log(request.body);
-
+  // console.log("Locus Colocalization Hyprcoloc info received.");
+  // console.log("REQUEST BODY - locus colocalization Hyprcoloc info");
+  // console.log(request.body);
+  logger.info("Locus Colocalization Hyprcoloc info received.");
+  logger.info("REQUEST BODY - locus colocalization Hyprcoloc info");
+  logger.info(request.body);
   var select_gwas_sample = request.body.select_gwas_sample;
   var select_qtls_samples = request.body.select_qtls_samples;
   var gwasFile = request.body.gwasFile;
   var associationFile = request.body.associationFile;
-  var ldFile = request.body.ldFile;
+  var LDFile = request.body.LDFile;
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, request_id);
     response.json(data);
   } catch(err) {
-    console.log(err);
+    // console.log(err);
+    logger.info(err);
     response.status(500);
     response.json(err.toString());
   }
 });
 
 app.get('/ping', async (request, response) => {
-  console.log("pong");
+  // console.log("pong");
+  logger.info("pong");
   response.send(true);
 });
 

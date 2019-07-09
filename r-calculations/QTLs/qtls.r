@@ -1,5 +1,5 @@
-locus_alignment_define_window <- function(recalculateAttempt, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos) {
-  if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true')) {
+locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos) {
+  if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || identical(recalculatePop, 'true')) {
     cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath,' ', chromosome, ":", minpos, '-',maxpos)
     system(cmd)
     cmd <- paste0('bcftools index ', in_path)
@@ -122,7 +122,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
   
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
-    locus_alignment_define_window(recalculateAttempt, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos)
+    locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos)
   }
   
   popshort <- "CEU"  ### need to find the superpop recomendation data 
@@ -404,7 +404,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     LDFile <- paste0('../static/assets/files/', 'MX2.LD.gz') 
   } else {
     qdatafile <- paste0('input/', assocFile)
-    if (!identical(LDFile, 'false')) {
+    if (!identical(LDFile, 'false') && !startsWith(LDFile, "input/")) {
       LDFile <- paste0('input/', LDFile)
     }
   }

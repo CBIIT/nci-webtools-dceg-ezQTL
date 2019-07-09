@@ -141,7 +141,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
-        this.LDFile = mainData["info"]["inputs"]["gwas_file"][0] // LD filename
+        this.LDFile = mainData["info"]["inputs"]["ld_file"][0] // LD filename
         this.newSelectedPop = mainData["info"]["inputs"]["select_pop"][0]; // inputted populations
         this.newSelectedGene = mainData["info"]["inputs"]["select_gene"][0]; // inputted gene
         this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
@@ -450,7 +450,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
-    // graph recombination rate line
+    // graph recombination rate line GWAS
     var trace2 = {
       x: xDataRC,
       y: yDataRC,
@@ -458,7 +458,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hoverinfo: 'text',
       yaxis: 'y4',
       type: 'scatter',
-      opacity: 0.7,
+      opacity: 0.35,
       line: {
         color: 'blue',
         width: 1
@@ -510,7 +510,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hoverinfo: 'text',
       yaxis: 'y5',
       type: 'scatter',
-      opacity: 0.7,
+      opacity: 0.35,
       line: {
         color: 'blue',
         width: 1
@@ -634,7 +634,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           y: 1,
           sizex: 1.0,
           sizey: 1.0,
-          source: environment.endpoint + "assets/images/qtls_locus_alignment_r2_legend.png",
+          source: environment.endpoint + "assets/images/qtls_locus_alignment_r2_legend_transparent.png",
           xanchor: "left",
           xref: "paper",
           yanchor: "bottom",
@@ -763,7 +763,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       hoverinfo: 'text',
       yaxis: 'y3',
       type: 'scatter',
-      opacity: 0.7,
+      opacity: 0.35,
       line: {
         color: 'blue',
         width: 1
@@ -865,7 +865,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           y: 1,
           sizex: 1.0,
           sizey: 1.0,
-          source: environment.endpoint + "assets/images/qtls_locus_alignment_r2_legend.png",
+          source: environment.endpoint + "assets/images/qtls_locus_alignment_r2_legend_transparent.png",
           xanchor: "left",
           xref: "paper",
           yanchor: "bottom",
@@ -970,7 +970,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
           var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
           var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
-          if ((gwasFileName && gwasFileName != "false") || (select_gwas_sample == "true" && select_qtls_samples == "true")) {
+          var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
+          if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
             var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
             var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
             var requestID = res["info"]["inputs"]["request"][0]; // request id
@@ -983,7 +984,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
             var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
             // Run eCAVIAR calculation
-            this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, select_ref, select_dist, requestID)
+            this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
               .subscribe(
                 res => {
                   var requestIDECAVIAR = res["ecaviar"]["request"][0];
@@ -999,15 +1000,15 @@ export class QTLsLocusAlignmentComponent implements OnInit {
                 }
               );
             // Run HyprColoc LD calculation then HyprColoc calculation
-            this.data.calculateLocusColocalizationHyprcolocLD(select_ref, select_chr, select_pos, select_dist, requestID)
+            this.data.calculateLocusColocalizationHyprcolocLD(LDFileName, select_ref, select_chr, select_pos, select_dist, requestID)
               .subscribe(
                 res => {
-                  var ldFileName = res["hyprcoloc_ld"]["filename"][0];
+                  var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
                   var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
                   // Run HyprColoc calculation after LD file is generated
                   if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
                     // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
-                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, ldFileName, requestID)
+                    this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, hyprcolocLDFileName, requestID)
                       .subscribe(
                         res => {
                           var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
@@ -1397,15 +1398,19 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   recalculateSpearmanCorrelationTitle(xData, yData) {
-    var sortedX = xData.slice().sort(function(a, b){ return b - a })
-    var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
-    var sortedY = yData.slice().sort(function(a, b){ return b - a })
-    var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
-    var sumSquaredDiffRanks = this.getSumDiffAbsSquared(xRank, yRank);
-    var numer = 6.0 * sumSquaredDiffRanks;
-    var denom = xData.length * (Math.pow(xData.length, 2) - 1)
-    var rho = 1 - (numer / denom);
-    return "rho=" + rho.toFixed(3);
+    if (xData.length > 0 && yData.length > 0) {
+      var sortedX = xData.slice().sort(function(a, b){ return b - a })
+      var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
+      var sortedY = yData.slice().sort(function(a, b){ return b - a })
+      var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
+      var sumSquaredDiffRanks = this.getSumDiffAbsSquared(xRank, yRank);
+      var numer = 6.0 * sumSquaredDiffRanks;
+      var denom = xData.length * (Math.pow(xData.length, 2) - 1)
+      var rho = 1 - (numer / denom);
+      return "rho=" + rho.toFixed(3);
+    } else {
+      return "NA"
+    }
   }
 
   recalculatePearsonCorrelationTitle(xData, yData) {
@@ -1426,9 +1431,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       var r = numer / denom;
       return "r=" + r.toFixed(3);
     } else {
-      return "NaN";
+      return "NA";
     }
-    
   }
 
   locusAlignmentScatterPlot(scatterData, scatterTitle, threshold) {

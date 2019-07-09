@@ -101,7 +101,7 @@
     
         <!-- LDpop Column -->
         <ng-container matColumnDef="LDpop">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> LDpop </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="LDpop"> LDpop </th>
           <td mat-cell *matCellDef="let variant"> 
             <a (click)="linkLDpop(variant.rsnum)">{{variant.LDpop}}</a>
           </td>
@@ -109,7 +109,7 @@
     
         <!-- GWAS Column -->
         <ng-container matColumnDef="GWAS">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> NHGRI GWAS </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="GWAS"> NHGRI GWAS </th>
           <td mat-cell *matCellDef="let variant"> 
             <a (click)="linkGWAS(variant.rsnum)">{{variant.GWAS}}</a>
           </td>
@@ -117,7 +117,7 @@
     
         <!-- gnomAD Column -->
         <ng-container matColumnDef="gnomAD">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> gnomAD </th>
+          <th mat-header-cell *matHeaderCellDef mat-sort-header="gnomAD"> gnomAD </th>
           <td mat-cell *matCellDef="let variant"> 
             <a (click)="linkGnomADBrowser(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.gnomAD}}</a>
           </td>
