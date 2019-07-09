@@ -1409,7 +1409,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       var rho = 1 - (numer / denom);
       return "rho=" + rho.toFixed(3);
     } else {
-      return "NA"
+      return "rho=NA"
     }
   }
 
@@ -1431,7 +1431,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       var r = numer / denom;
       return "r=" + r.toFixed(3);
     } else {
-      return "NA";
+      return "r=NA";
     }
   }
 

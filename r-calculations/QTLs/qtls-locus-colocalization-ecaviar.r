@@ -17,19 +17,24 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
       LDFile <- paste0('input/', LDFile)
     }
   }
+
   ## execute eCAVIAR calculation: shell script
   if (identical(LDFile, 'false')) {
-    cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request) 
+    cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', 'false', ' ', request) 
     system(cmd)
   } else {
-    cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar-with-ld.sh ', gwasFile, ' ', assocFile, ' ', LDFile, ' ', select_ref, ' ', select_dist, ' ', request) 
+    cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', LDFile, ' ', request) 
     system(cmd)
   }
+
+
   ## move eCAVIAR final output to static/output/ folder
   cmd <- paste0('mv tmp/', request, '.eCAVIAR.txt', ' ', '../static/output')
   system(cmd)
+
   ## remove eCAVIAR temp files folder
   unlink(paste0('tmp/',request,'.','ECAVIAR_TMP'), recursive = TRUE)
+  
   ## read output file
   ecaviarfile <- paste0('../static/output/', request, '.eCAVIAR.txt')
   ecaviardata <- read_delim(ecaviarfile, delim = "\t", col_names = T)
@@ -39,3 +44,19 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   dataSourceJSON <- c(toJSON(list(ecaviar=list(request=request, data=locus_colocalization_ecaviar_data))))
   return(dataSourceJSON)
 }
+### LEAVE EMPTY LINE BELOW ###
+
+
+workingDirectory <- "/Users/jiangk3/Desktop/dev/nci-webtools-dceg-vQTL/r-calculations"
+select_gwas_sample <- "false"
+select_qtls_samples <- "false"
+gwasFile <- "1562699926201.MX2.GWAS.txt"
+assocFile <- "1562699926201.MX2.eQTL.txt"
+##LDFile <- "888888888.MX2.LD.gz"
+LDFile <- "false"
+request <- "1562699926201"
+select_ref_eCAVIAR <- "rs408825"
+select_dist_eCAVIAR <- "50000"
+
+##locus_colocalization_eCAVIAR(workingDirectory, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, LDFile, select_ref_eCAVIAR, select_dist_eCAVIAR, request)
+

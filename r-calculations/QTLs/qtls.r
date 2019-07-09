@@ -477,3 +477,4 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   # return(dataSource)
   return(dataSourceJSON)
 }
+### LEAVE EMPTY LINE BELOW ###
