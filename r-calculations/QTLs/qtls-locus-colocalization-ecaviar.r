@@ -1,5 +1,4 @@
-# locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, select_ref, select_dist, request, envFile) {
-locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, select_ref, select_dist, request) {
+locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, LDFile, select_ref, select_dist, request) {
   library(jsonlite)
   library(tidyverse)
   setwd(workDir)
@@ -11,14 +10,21 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   }
   if (identical(select_qtls_samples, 'true')) {
     assocFile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
+    LDFile <- paste0('../static/assets/files/', 'MX2.LD.gz')
   } else {
     assocFile <- paste0('input/', assocFile)
+    if (!identical(LDFile, 'false') && !startsWith(LDFile, "input/")) {
+      LDFile <- paste0('input/', LDFile)
+    }
   }
-  # envFile <- paste0('QTLs/', envFile)
   ## execute eCAVIAR calculation: shell script
-  # cmd <- paste0('sh QTLs/eCAVIAR_vQTL.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request, ' ', envFile) 
-  cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request) 
-  system(cmd)
+  if (identical(LDFile, 'false')) {
+    cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar.sh ', gwasFile, ' ', assocFile, ' ', select_ref, ' ', select_dist, ' ', request) 
+    system(cmd)
+  } else {
+    cmd <- paste0('sh QTLs/qtls-locus-colocalization-ecaviar-with-ld.sh ', gwasFile, ' ', assocFile, ' ', LDFile, ' ', select_ref, ' ', select_dist, ' ', request) 
+    system(cmd)
+  }
   ## move eCAVIAR final output to static/output/ folder
   cmd <- paste0('mv tmp/', request, '.eCAVIAR.txt', ' ', '../static/output')
   system(cmd)
