@@ -14,3 +14,4 @@ locus_colocalization_hyprcoloc_ld <- function(workDir, ldfile, select_ref, chr, 
   dataSourceJSON <- c(toJSON(list(hyprcoloc_ld=list(request=request, filename=filename))))
   return(dataSourceJSON)
 }
+### LEAVE EMPTY LINE BELOW ###
