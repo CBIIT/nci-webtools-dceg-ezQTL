@@ -1523,10 +1523,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       height: 700,
       yaxis: {
         autorange: true,
+        automargin: true,
         title: "-log10(QTLs P-value)",
       },
       xaxis: {
         autorange: true,
+        automargin: true,
         title: "-log10(GWAS P-value)",
       },
       margin: {
