@@ -111,3 +111,4 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   dataSourceJSON <- c(toJSON(list(hyprcoloc=list(request=request, result_hyprcoloc=list(data=result_hyprcoloc_data), result_snpscore=list(data=result_snpscore_data), output=list(filenames=list(result_hyprcoloc_filename=result_hyprcoloc_filename, result_snpscore_filename=result_snpscore_filename))))))
   return(dataSourceJSON)
 }
+### LEAVE EMPTY LINE BELOW ###
