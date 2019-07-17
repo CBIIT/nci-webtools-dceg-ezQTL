@@ -1237,7 +1237,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var p_values = [];
     for (var i = 0; i < scatterData.length; i++) {
       if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
         }
       }
@@ -1249,7 +1249,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var p_values = [];
     for (var i = 0; i < scatterData.length; i++) {
       if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
         }
       }
@@ -1261,7 +1261,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var pval_nominals = [];
     for (var i = 0; i < scatterData.length; i++) {
       if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
         }
       }
@@ -1273,7 +1273,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var pval_nominals = [];
     for (var i = 0; i < scatterData.length; i++) {
       if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
         }
       }
@@ -1285,7 +1285,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < scatterData.length; i++) {
       if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           if ('rs' in scatterData[i]) {
             hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
           } else {
@@ -1301,7 +1301,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < scatterData.length; i++) {
       if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           if ('rs' in scatterData[i]) {
             hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
           } else {
@@ -1317,7 +1317,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var colorData = [];
     for (var i = 0; i < scatterData.length; i++) {
       if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
-        if (scatterData[i]['pvalue'] <= threshold && scatterData[i]['pval_nominal'] <= threshold) {
+        if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           colorData.push(scatterData[i]['R2']);
         }
       }
@@ -1559,13 +1559,17 @@ export class QTLsLocusAlignmentComponent implements OnInit {
 
   changePvalThreshold(event: any) {
     var threshold = event.target.value;
-    if (threshold >= 0.0 && threshold <= 1.0) {
-      if (threshold.length > 0) {
-        this.selectedPvalThreshold = threshold;
-        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
-      } else {
-        this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", 1.0);
-      }
+    if (threshold == 1.0) { 
+      this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, this.locusAlignmentGWASScatterTitle, this.selectedPvalThreshold);
+    } else {
+      if (threshold >= 0.0 && threshold <= 1.0) {
+        if (threshold.length > 0) {
+          this.selectedPvalThreshold = threshold;
+          this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", this.selectedPvalThreshold);
+        } else {
+          this.locusAlignmentScatterPlot(this.locusAlignmentGWASScatterData, "RECALCULATE", 0.0);
+        }
+      } 
     }
   }
 

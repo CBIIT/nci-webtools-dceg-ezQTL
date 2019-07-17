@@ -73,9 +73,15 @@
           matInput 
           placeholder="P-value Threshold" 
           (keyup)="changePvalThreshold($event)" 
+          (keydown.enter)="$event.preventDefault()" 
           [(ngModel)]="selectedPvalThreshold" 
           formControlName="pvalThreshold">
-        <button mat-button matSuffix mat-icon-button aria-label="Clear" (click)="clearPvalThreshold()">
+        <button 
+          mat-button 
+          matSuffix 
+          mat-icon-button 
+          aria-label="Clear" 
+          (click)="clearPvalThreshold()" >
           <mat-icon>close</mat-icon>
         </button>
         <mat-error *ngIf="GWASScatterThreshold.invalid">{{ pvalThresholdErrorMsg() }}</mat-error>
