@@ -367,7 +367,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   getCorrelationScatterXP(correlationData, threshold) {
     var p_values = [];
     for (var i = 0; i < correlationData.length; i++) {
-      if (correlationData[i]['pearson_p'] <= threshold && correlationData[i]['spearman_p'] <= threshold) {
+      if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
         p_values.push(Math.log10(correlationData[i]['pearson_p']) * -1.0);
       }
     }
@@ -377,7 +377,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   getCorrelationScatterYP(correlationData, threshold) {
     var pval_nominals = [];
     for (var i = 0; i < correlationData.length; i++) {
-      if (correlationData[i]['pearson_p'] <= threshold && correlationData[i]['spearman_p'] <= threshold) {
+      if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
         pval_nominals.push(Math.log10(correlationData[i]['spearman_p']) * -1.0);
       }
     }
@@ -387,7 +387,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   getCorrelationScatterHoverDataP(correlationData, threshold) {
     var hoverData = [];
     for (var i = 0; i < correlationData.length; i++) {
-      if (correlationData[i]['pearson_p'] <= threshold && correlationData[i]['spearman_p'] <= threshold) {
+      if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
         hoverData.push(correlationData[i]['gene_symbol'] + '<br>' + 'Pearson: ' + correlationData[i]['pearson_p'] + '<br>' + "Spearman: " + correlationData[i]['spearman_p']);
       }
     }
@@ -482,12 +482,16 @@ export class QtlsLocusColocalizationComponent implements OnInit {
 
   changeCorrelationPvalThreshold(event: any) {
     var threshold = event.target.value;
-    if (threshold >= 0.0 && threshold <= 1.0) {
-      if (threshold.length > 0) {
-        this.selectedCorrelationPvalThreshold = threshold;
-        this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
-      } else {
-        this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 1.0);
+    if (threshold == 1.0) {
+      this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 1.0);
+    } else {
+      if (threshold >= 0.0 && threshold <= 1.0) {
+        if (threshold.length > 0) {
+          this.selectedCorrelationPvalThreshold = threshold;
+          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
+        } else {
+          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 0.0);
+        }
       }
     }
   }

@@ -27,6 +27,7 @@
             matInput 
             placeholder="P-value Threshold" 
             (keyup)="changeCorrelationPvalThreshold($event)" 
+            (keydown.enter)="$event.preventDefault()" 
             [(ngModel)]="selectedCorrelationPvalThreshold" 
             formControlName="correlationPvalThreshold">
           <button 
