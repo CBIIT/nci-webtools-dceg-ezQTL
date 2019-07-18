@@ -125,7 +125,26 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos)
   }
   
-  popshort <- "CEU"  ### need to find the superpop recomendation data 
+  # popshort <- "CEU"  ### need to find the superpop recomendation data 
+  select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
+
+  if (length(select_pop_list) == 1) {
+    popshort <- select_pop_list
+  } else {
+    if (select_pop == "YRI+LWK+GWD+MSL+ESN+ASW+ACB") {
+      popshort <- "YRI"
+    } else if (select_pop == "MXL+PUR+CLM+PEL") {
+      popshort <- "MXL"
+    } else if (select_pop == "CHB+JPT+CHS+CDX+KHV") {
+      popshort <- "CHB"
+    } else if (select_pop == "CEU+TSI+FIN+GBR+IBS") {
+      popshort <- "CEU"
+    } else if (select_pop == "GIH+PJL+BEB+STU+ITU") {
+      popshort <- "GIH"
+    } else {
+      popshort <- "CEU"
+    }
+  }
   
   cmd = paste0("tabix data/Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/",request,'.',"rc_temp",".txt")
   system(cmd)
@@ -189,7 +208,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   ## remove any previous extracted panel if exists
   unlink(paste0('tmp/',request,'.','extracted','.panel'))
   ## read multiple population selections
-  select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
+  # select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
   for(pop_i in select_pop_list){
     if (pop_i %in% kgpanel$super_pop) {
       kgpanel %>% 
