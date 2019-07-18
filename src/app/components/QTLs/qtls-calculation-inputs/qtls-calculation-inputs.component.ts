@@ -119,6 +119,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     });
     
     this.data.currentMainData.subscribe(mainData => {
+      this.populationSelectedAll = false;
       this.warningMessage = "";
       $("#ldref-search-warning").show();
       this.mainData = mainData;
@@ -154,13 +155,22 @@ export class QTLsCalculationInputsComponent implements OnInit {
 
         if (this.recalculateAttempt == "false" && this.newSelectedPop == "EUR") {
           this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+          if (this.selectedPop.length == 26) {
+            this.populationSelectedAll = true;
+          } 
           this.returnPopulationGroupFinal();
         } else if (this.recalculateAttempt == "true" && this.newSelectedPop == "EUR") {
           this.selectedPop = ["CEU", "TSI", "FIN", "GBR", "IBS"]; // default population EUR
+          if (this.selectedPop.length == 26) {
+            this.populationSelectedAll = true;
+          } 
           this.returnPopulationGroupFinal();
         } else {
           var newSelectedPopList = this.newSelectedPop.split('+');
           this.selectedPop = newSelectedPopList; // recalculated new population selection
+          if (this.selectedPop.length == 26) {
+            this.populationSelectedAll = true;
+          } 
           this.recalculatePopAttempt = "false";
           this.returnPopulationGroupFinal();
         }
@@ -201,6 +211,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
         // reset calculation parameters if mainData is null
         this.selectedPop = [];
         this.selectedPopFinal = [];
+        this.populationSelectedAll = false;
         this.selectedGene = "";
         this.selectedGeneSymbol = "";
         this.qtlsCalculationForm.reset();
