@@ -129,7 +129,11 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
 
   if (length(select_pop_list) == 1) {
-    popshort <- select_pop_list
+    if (select_pop_list == "GWD" || select_pop_list == "PJL" || select_pop_list == "BEB" || select_pop_list == "STU" || select_pop_list == "ITU" || select_pop_list == "MSL" || select_pop_list == "ESN") {
+      popshort <- "CEU"
+    } else {
+      popshort <- select_pop_list
+    }
   } else {
     if (select_pop == "YRI+LWK+GWD+MSL+ESN+ASW+ACB") {
       popshort <- "YRI"
