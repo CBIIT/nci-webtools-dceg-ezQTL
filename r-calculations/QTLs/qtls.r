@@ -251,7 +251,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     #use the chr:pos as index instead of rsnum
     rownames(ld_info) <- paste0(ld_data$info$chr,":",ld_data$info$pos)
     qdata_region$R2 <- (ld_info[paste0(qdata_region$chr,":",qdata_region$pos),"R2"])^2
-    write.table(qdata_region, file = paste0("../static/output/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
+    # write.table(qdata_region, file = paste0("../static/output/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
     ## cast column types to string to prevent rounding of decimals
     qdata_region_string <- qdata_region
     qdata_region_string[10:13] <- lapply(qdata_region_string[10:13], as.character)
@@ -259,7 +259,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
     locus_alignment_data <- list(setNames(as.data.frame(qdata_region_string), qdata_region_string_colnames))
   } else {
     qdata_region$R2 <- NA
-    write.table(qdata_region, file = paste0("../static/output/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
+    # write.table(qdata_region, file = paste0("../static/output/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
     ## cast column types to string to prevent rounding of decimals
     qdata_region_string <- qdata_region
     qdata_region_string[10:13] <- lapply(qdata_region_string[10:13], as.character)

@@ -242,6 +242,37 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     });
   }
 
+  populateHyprcolocDataList(hyprcolocData) {
+    var data = [];
+    for (var i = 0; i < hyprcolocData.length; i++) {
+      var hyprcoloc = {};
+      hyprcoloc['candidate_snp'] = hyprcolocData[i]['candidate_snp'];
+      hyprcoloc['traits'] = hyprcolocData[i]['traits'].replace(/\,/g, "\/");
+      hyprcoloc['regional_prob'] = hyprcolocData[i]['regional_prob'];
+      hyprcoloc['dropped_trait'] = hyprcolocData[i]['dropped_trait'];
+      hyprcoloc['gene_id'] = hyprcolocData[i]['gene_id'];
+      hyprcoloc['gene_symbol'] = hyprcolocData[i]['gene_symbol'];
+      hyprcoloc['iteration'] = hyprcolocData[i]['iteration'];
+      hyprcoloc['posterior_explained_by_snp'] = hyprcolocData[i]['posterior_explained_by_snp'];
+      hyprcoloc['posterior_prob'] = hyprcolocData[i]['posterior_prob'];
+      data.push(hyprcoloc);
+    }
+    return data;
+  }
+
+  populateHyprcolocSnpscoreDataList(hyprcolocSNPScoreData) {
+    var data = [];
+    for (var i = 0; i < hyprcolocSNPScoreData.length; i++) {
+      var hyprcolocSNPScore = {};
+      hyprcolocSNPScore['gene_id'] = hyprcolocSNPScoreData[i]['gene_id'];
+      hyprcolocSNPScore['gene_symbol'] = hyprcolocSNPScoreData[i]['gene_symbol'];
+      hyprcolocSNPScore['rsnum'] = hyprcolocSNPScoreData[i]['rsnum'];
+      hyprcolocSNPScore['snpscore'] = hyprcolocSNPScoreData[i]['snpscore'];
+      data.push(hyprcolocSNPScore);
+    }
+    return data;
+  }
+
   populateECAVIARDataList(ecaviarData) {
     var data = [];
     for (var i = 0; i < ecaviarData.length; i++) {
@@ -271,37 +302,6 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     return data;
   }
 
-  populateHyprcolocDataList(hyprcolocData) {
-    var data = [];
-    for (var i = 0; i < hyprcolocData.length; i++) {
-      var hyprcoloc = {};
-      hyprcoloc['candidate_snp'] = hyprcolocData[i]['candidate_snp'];
-      hyprcoloc['traits'] = hyprcolocData[i]['traits'];
-      hyprcoloc['regional_prob'] = hyprcolocData[i]['regional_prob'];
-      hyprcoloc['dropped_trait'] = hyprcolocData[i]['dropped_trait'];
-      hyprcoloc['gene_id'] = hyprcolocData[i]['gene_id'];
-      hyprcoloc['gene_symbol'] = hyprcolocData[i]['gene_symbol'];
-      hyprcoloc['iteration'] = hyprcolocData[i]['iteration'];
-      hyprcoloc['posterior_explained_by_snp'] = hyprcolocData[i]['posterior_explained_by_snp'];
-      hyprcoloc['posterior_prob'] = hyprcolocData[i]['posterior_prob'];
-      data.push(hyprcoloc);
-    }
-    return data;
-  }
-
-  populateHyprcolocSnpscoreDataList(hyprcolocSNPScoreData) {
-    var data = [];
-    for (var i = 0; i < hyprcolocSNPScoreData.length; i++) {
-      var hyprcolocSNPScore = {};
-      hyprcolocSNPScore['gene_id'] = hyprcolocSNPScoreData[i]['gene_id'];
-      hyprcolocSNPScore['gene_symbol'] = hyprcolocSNPScoreData[i]['gene_symbol'];
-      hyprcolocSNPScore['rsnum'] = hyprcolocSNPScoreData[i]['rsnum'];
-      hyprcolocSNPScore['snpscore'] = hyprcolocSNPScoreData[i]['snpscore'];
-      data.push(hyprcolocSNPScore);
-    }
-    return data;
-  }
-
   applyFilterECAVIAR(filterValue: string) {
     this.dataSourceECAVIAR.filter = filterValue.trim().toLowerCase();
   }
@@ -314,22 +314,125 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     this.dataSourceHyprcolocSnpscore.filter = filterValue.trim().toLowerCase();
   }
 
-  downloadECAVIARTable() {
-    var url = environment.endpoint + "output/" + this.requestID + ".eCAVIAR.txt";
-    var win = window.open(url, '_blank');
-    win.focus();
+  exportHyprcolocTable() {
+    var exportLines = [];
+    var headers = [
+      "iteration", 
+      "traits", 
+      "posterior_prob",
+      "regional_prob", 
+      "candidate_snp", 
+      "posterior_explained_by_snp", 
+      "dropped_trait", 
+      "gene_id", 
+      "gene_symbol"
+    ];
+    var headersString = headers.join(",");
+    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    this.HYPRCOLOC_DATA.forEach(function (dataRow, index) {
+      let line = [];
+      line.push(dataRow['iteration']);
+      line.push(dataRow['traits']);
+      line.push(dataRow['posterior_prob']);
+      line.push(dataRow['regional_prob']);
+      line.push(dataRow['candidate_snp']);
+      line.push(dataRow['posterior_explained_by_snp']);
+      line.push(dataRow['droppped_trait']);
+      line.push(dataRow['gene_id']);
+      line.push(dataRow['gene_symbol']);
+      let lineString = line.join(",");
+      exportLines.push(lineString);
+    });
+    var csvContent = exportLines.join("\n");
+    var encodedUri = encodeURI(csvContent);
+		var a = document.createElement("a");
+    a.href = encodedUri;
+    a.download = "hyprcoloc_table.csv";
+    a.click();
   } 
 
-  downloadHyprcolocTable() {
-    var url = environment.endpoint + "output/" + this.requestID + ".hyprcoloc.txt";
-    var win = window.open(url, '_blank');
-    win.focus();
+  exportHyprcolocSnpscoreTable() {
+    var exportLines = [];
+    var headers = [
+      "rsnum", 
+      "snpscore",
+      "gene_id", 
+      "gene_symbol"
+    ];
+    var headersString = headers.join(",");
+    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    this.HYPRCOLOC_SNPSCORE_DATA.forEach(function (dataRow, index) {
+      let line = [];
+      line.push(dataRow['rsnum']);
+      line.push(dataRow['snpscore']);
+      line.push(dataRow['gene_id']);
+      line.push(dataRow['gene_symbol']);
+      let lineString = line.join(",");
+      exportLines.push(lineString);
+    });
+    var csvContent = exportLines.join("\n");
+    var encodedUri = encodeURI(csvContent);
+		var a = document.createElement("a");
+    a.href = encodedUri;
+    a.download = "hyprcoloc_snpscores_table.csv";
+    a.click();
   } 
 
-  downloadHyprcolocSnpscoreTable() {
-    var url = environment.endpoint + "output/" + this.requestID + ".hyprcoloc_snpscore.txt";
-    var win = window.open(url, '_blank');
-    win.focus();
+  exportECAVIARTable() {
+    var exportLines = [];
+    var headers = [
+      "gene_id", 
+      "gene_symbol", 
+      "rsnum", 
+      "chr", 
+      "pos", 
+      "ref", 
+      "alt", 
+      "tss_distance", 
+      "pval_nominal",
+      "slope",
+      "slope_se",
+      "gwas_pvalue",
+      "gwas_z",
+      "Leadsnp",
+      "Prob_in_pCausalSet",
+      "CLPP",
+      "Prob_in_pCausalSet2",
+      "CLPP2",
+      "leadsnp_included"
+    ];
+    var headersString = headers.join(",");
+    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    this.ECAVIAR_DATA.forEach(function (dataRow, index) {
+      let line = [];
+      line.push(dataRow['gene_id']);
+      line.push(dataRow['gene_symbol']);
+      line.push(dataRow['rsnum']);
+      line.push(dataRow['chr']);
+      line.push(dataRow['pos']);
+      line.push(dataRow['ref']);
+      line.push(dataRow['alt']);
+      line.push(dataRow['tss_distance']);
+      line.push(dataRow['pval_nominal']);
+      line.push(dataRow['slope']);
+      line.push(dataRow['slope_se']);
+      line.push(dataRow['gwas_pvalue']);
+      line.push(dataRow['gwas_z']);
+      line.push(dataRow['Leadsnp']);
+      line.push(dataRow['Prob_in_pCausalSet']);
+      line.push(dataRow['CLPP']);
+      line.push(dataRow['Prob_in_pCausalSet2']);
+      line.push(dataRow['CLPP2']);
+      line.push(dataRow['leadsnp_included']);
+      let lineString = line.join(",");
+      exportLines.push(lineString);
+    });
+    var csvContent = exportLines.join("\n");
+    var encodedUri = encodeURI(csvContent);
+		var a = document.createElement("a");
+    a.href = encodedUri;
+    a.download = "ecaviar_table.csv";
+    a.click();
   } 
 
   handleError(error) {
