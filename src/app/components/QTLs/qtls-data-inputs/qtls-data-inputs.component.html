@@ -59,6 +59,7 @@
             id="association-file" 
             name="input-files" 
             accept=".txt" 
+            aria-label="Association data file input"
             hidden  
             #associationInput>
           <button 
@@ -136,7 +137,8 @@
             class="ng-hide" 
             id="expression-file" 
             name="input-files" 
-            accept=".txt"  
+            accept=".txt" 
+            aria-label="Expression data file input" 
             hidden 
             #expressionInput>
           <button 
@@ -198,6 +200,7 @@
             id="genotype-file" 
             name="input-files" 
             accept=".txt" 
+            aria-label="Genotype data file input" 
             hidden 
             #genotypeInput>
             <button 
@@ -257,6 +260,7 @@
             class="ng-hide" 
             id="LD-file" 
             name="input-files" 
+            aria-label="LD data file input"
             hidden 
             #LDInput>
           <button 
@@ -338,6 +342,7 @@
             id="gwas-file" 
             name="input-files" 
             accept=".txt" 
+            aria-label="GWAS data file input"
             hidden 
             #gwasInput>
           <button 
@@ -413,7 +418,8 @@
               placeholder="cis-QTL Distance (Kb) *" 
               (keyup)="enableSearchCISDistance($event)" 
               [(ngModel)]="selectedDist" 
-              formControlName="cisDistanceInput">
+              formControlName="cisDistanceInput" 
+              aria-label="cis-QTL Distance (Kb) input field">
             <button mat-button 
               matSuffix 
               mat-icon-button 
@@ -441,7 +447,8 @@
               placeholder="LD Reference" 
               (keyup)="enableSearchLDRef($event)" 
               [(ngModel)]="rsnumSearch" 
-              formControlName="rsnumber">
+              formControlName="rsnumber" 
+              aria-label="LD Reference (rs numeber) input field">
             <button mat-button 
               matSuffix 
               mat-icon-button 
