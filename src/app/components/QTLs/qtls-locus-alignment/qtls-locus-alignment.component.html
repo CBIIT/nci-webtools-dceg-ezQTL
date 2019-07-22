@@ -75,7 +75,8 @@
           (keyup)="changePvalThreshold($event)" 
           (keydown.enter)="$event.preventDefault()" 
           [(ngModel)]="selectedPvalThreshold" 
-          formControlName="pvalThreshold">
+          formControlName="pvalThreshold" 
+          aria-label="P-value threshold input field">
         <button 
           mat-button 
           matSuffix 

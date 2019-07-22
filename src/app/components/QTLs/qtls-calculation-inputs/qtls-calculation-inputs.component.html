@@ -37,7 +37,8 @@
           multiple 
           required 
           [disabled]=!mainData
-          #population>
+          #population 
+          role="menu">
           <!-- Edit dropdown placeholder -->
           <mat-select-trigger>
             <span *ngIf="selectedPop.length < 26">
@@ -79,7 +80,8 @@
             <mat-option 
               class="pl-5" 
               *ngFor="let subPopulation of group.subPopulations" 
-              [value]="subPopulation.value">
+              [value]="subPopulation.value" 
+              role="option">
               ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
             </mat-option>
           </div>
@@ -124,7 +126,7 @@
         <mat-autocomplete autoActiveFirstOption 
           #auto="matAutocomplete"
           (optionSelected)="refGeneChange()">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option" role="option">
             {{ option }}
           </mat-option>
         </mat-autocomplete>
@@ -167,7 +169,8 @@
             (keyup)="enableSearchLDRef($event)" 
             [(ngModel)]="rsnumSearch" 
             [readonly]=!mainData
-            formControlName="rsnumber">
+            formControlName="rsnumber" 
+            aria-label="LD Refernce (rs number) input field">
           <button mat-button 
             matSuffix 
             mat-icon-button 
