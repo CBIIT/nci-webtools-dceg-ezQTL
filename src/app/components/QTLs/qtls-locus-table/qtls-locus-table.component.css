@@ -20,7 +20,18 @@ table {
   color: #0000EE;
   text-decoration: underline;
   cursor: pointer;
-  /* font-weight: bold; */
+}
+
+.export-variant-details-table {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.export-variant-details-table a {
+  color: #0000EE;
+  text-decoration: underline;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* .variant-details-headers {
