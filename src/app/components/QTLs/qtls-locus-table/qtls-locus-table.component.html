@@ -3,7 +3,11 @@
   <div class="row ml-2 mr-2">
     <div class="col-10">
       <mat-form-field>
-        <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Filter">
+        <input 
+          matInput 
+          (keyup)="applyFilter($event.target.value)" 
+          placeholder="Filter" 
+          aria-label="Variant details data table filter input field">
       </mat-form-field>
     </div>
     <div class="col-2 pt-3 export-variant-details-table">
