@@ -138,10 +138,48 @@ export class QTLsLocusTableComponent implements OnInit {
     win.focus();
   }
 
-  downloadLocusTable() {
-    var url = environment.endpoint + "output/" + this.requestID + ".variant_details.txt";
-    var win = window.open(url, '_blank');
-    win.focus();
+  exportLocusTable() {
+    var exportLines = [];
+    var headers = [
+      "gene_id", 
+      "gene_symbol", 
+      "variant_id", 
+      "rsnum", 
+      "chr", 
+      "pos", 
+      "ref", 
+      "alt", 
+      "tss_distance", 
+      "pval_nominal",
+      "slope",
+      "slope_se",
+      "R2"
+    ];
+    var headersString = headers.join(",");
+    this.VARIANT_DATA.forEach(function (dataRow, index) {
+      let line = [];
+      line.push(dataRow['gene_id']);
+      line.push(dataRow['gene_symbol']);
+      line.push(dataRow['variant_id']);
+      line.push(dataRow['rsnum']);
+      line.push(dataRow['chr']);
+      line.push(dataRow['pos']);
+      line.push(dataRow['ref']);
+      line.push(dataRow['alt']);
+      line.push(dataRow['tss_distance']);
+      line.push(dataRow['pval_nominal']);
+      line.push(dataRow['slope']);
+      line.push(dataRow['slope_se']);
+      line.push(dataRow['R2']);
+      let lineString = line.join(",");
+      exportLines.push(index == 0 ? "data:text/csv;charset=utf-8," + headersString : lineString);
+    });
+    var csvContent = exportLines.join("\n");
+    var encodedUri = encodeURI(csvContent);
+		var a = document.createElement("a");
+    a.href = encodedUri;
+    a.download = "locus_variant_details_table.csv";
+    a.click();
   } 
 
   unique(value, index, self) {

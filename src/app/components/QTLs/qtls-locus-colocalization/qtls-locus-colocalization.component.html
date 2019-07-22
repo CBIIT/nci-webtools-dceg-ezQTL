@@ -62,13 +62,21 @@
   <!-- Hyprcoloc results table -->
   <div class="hyprcoloc-results pt-2 border border-light rounded" style="background: #E8E8E8 !important;">
     <!-- table filter input field -->
-    <div class="ml-2 mr-2">
-      <mat-form-field>
-        <input matInput 
-          [disabled]="!showHyprcolocTable"
-          (keyup)="applyFilterHyprcoloc($event.target.value)" 
-          placeholder="Filter">
-      </mat-form-field>
+    <div class="row ml-2 mr-2">
+      <div class="col-10">
+        <mat-form-field>
+            <input matInput 
+              [disabled]="!showHyprcolocTable"
+              (keyup)="applyFilterHyprcoloc($event.target.value)" 
+              placeholder="Filter">
+          </mat-form-field>
+      </div>
+      <div class="col-2 pt-4 export-hyprcoloc-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer; font-weight: bold; text-align: center; vertical-align: middle;">
+        <a (click)="exportHyprcolocTable()" 
+          *ngIf="showHyprcolocTable">
+          Export Table
+        </a>
+      </div>
     </div>
     <!-- loading spinner -->
     <div 
@@ -151,13 +159,6 @@
     </div>
       
     <mat-paginator #HyprcolocPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
-    
-    <div class="ml-4 mb-4 hyprcoloc-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
-      <a (click)="downloadHyprcolocTable()" 
-        *ngIf="showHyprcolocTable">
-        Download Hyprcoloc Table
-      </a>
-    </div>
 
   </div>
 
@@ -168,13 +169,21 @@
   <!-- Hyprcoloc snpscore results table -->
   <div class="hyprcoloc-snpscore-results pt-2 border border-light rounded" style="background: #E8E8E8 !important;">
     <!-- table filter input field -->
-    <div class="ml-2 mr-2">
-      <mat-form-field>
-        <input matInput 
-          [disabled]="!showHyprcolocSnpscoreTable"
-          (keyup)="applyFilterHyprcolocSnpscore($event.target.value)" 
-          placeholder="Filter">
-      </mat-form-field>
+    <div class="row ml-2 mr-2">
+      <div class="col-10">
+        <mat-form-field>
+          <input matInput 
+            [disabled]="!showHyprcolocSnpscoreTable"
+            (keyup)="applyFilterHyprcolocSnpscore($event.target.value)" 
+            placeholder="Filter">
+        </mat-form-field>
+      </div>
+      <div class="col-2 pt-4 export-hyprcoloc-snpscore-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer; font-weight: bold; text-align: center; vertical-align: middle;">
+        <a (click)="exportHyprcolocSnpscoreTable()" 
+          *ngIf="showHyprcolocSnpscoreTable">
+          Export Table
+        </a>
+      </div>
     </div>
     <!-- loading spinner -->
     <div 
@@ -227,13 +236,6 @@
     </div>
       
     <mat-paginator #HyprcolocSnpscorePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
-    
-    <div class="ml-4 mb-4 hyprcoloc-snpscore-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
-      <a (click)="downloadHyprcolocSnpscoreTable()" 
-        *ngIf="showHyprcolocSnpscoreTable">
-        Download Hyprcoloc SNP Scores Table
-      </a>
-    </div>
 
   </div>
 
@@ -246,13 +248,21 @@
   <!-- eCAVIAR results table -->
   <div class="ecaviar-results pt-2 border border-light rounded" style="background: #E8E8E8 !important;">
     <!-- table filter input field -->
-    <div class="ml-2 mr-2">
-      <mat-form-field>
-        <input matInput 
-          [disabled]="!showECAVIARTable"
-          (keyup)="applyFilterECAVIAR($event.target.value)" 
-          placeholder="Filter">
-      </mat-form-field>
+    <div class="row ml-2 mr-2">
+      <div class="col-10">
+        <mat-form-field>
+          <input matInput 
+            [disabled]="!showECAVIARTable"
+            (keyup)="applyFilterECAVIAR($event.target.value)" 
+            placeholder="Filter">
+        </mat-form-field>
+      </div>
+      <div class="col-2 pt-4 ecaviar-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer; font-weight: bold; text-align: center; vertical-align: middle;">
+        <a (click)="exportECAVIARTable()" 
+          *ngIf="showECAVIARTable">
+          Export Table
+        </a>
+      </div>
     </div>
     <!-- loading spinner -->
     <div 
@@ -401,15 +411,6 @@
     </div>
       
     <mat-paginator #ECAVIARPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
-
-    <!-- <mat-paginator [disabled]="!showECAVIARTable" [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons></mat-paginator> -->
-    
-    <div class="ml-4 mb-4 ecaviar-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer;">
-      <a (click)="downloadECAVIARTable()" 
-        *ngIf="showECAVIARTable">
-        Download eCAVIAR Table
-      </a>
-    </div>
 
   </div>
 
