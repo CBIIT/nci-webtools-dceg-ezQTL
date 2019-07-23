@@ -31,7 +31,7 @@ table {
   color: #0000EE;
   text-decoration: underline;
   cursor: pointer;
-  font-weight: bold;
+  /* font-weight: bold; */
 }
 
 /* .variant-details-headers {
