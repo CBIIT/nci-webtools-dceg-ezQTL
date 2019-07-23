@@ -631,7 +631,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       images: [
         {
           x: 0,
-          y: 1,
+          y: 1.01,
           sizex: 1.0,
           sizey: 1.0,
           source: environment.endpoint + "assets/images/qtls_locus_alignment_r2_legend_transparent.png",
@@ -645,7 +645,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         l: 40,
         r: 40,
         b: 80,
-        t: 140
+        t: 120
       },
       showlegend: false,
       clickmode: 'event',
@@ -862,7 +862,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       images: [
         {
           x: 0,
-          y: 1,
+          y: 1.02,
           sizex: 1.0,
           sizey: 1.0,
           source: environment.endpoint + "assets/images/qtls_locus_alignment_r2_legend_transparent.png",
@@ -876,7 +876,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         l: 40,
         r: 40,
         b: 80,
-        t: 140
+        t: 120
       },
       showlegend: false,
       clickmode: 'event',
