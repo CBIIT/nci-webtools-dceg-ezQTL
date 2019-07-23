@@ -346,9 +346,13 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     var csvContent = exportLines.join("\n");
     var encodedUri = encodeURI(csvContent);
 		var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', 'display: none');
     a.href = encodedUri;
     a.download = "hyprcoloc_table.csv";
     a.click();
+    window.URL.revokeObjectURL(encodedUri);
+    a.remove();
   } 
 
   exportHyprcolocSnpscoreTable() {
@@ -373,9 +377,13 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     var csvContent = exportLines.join("\n");
     var encodedUri = encodeURI(csvContent);
 		var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', 'display: none');
     a.href = encodedUri;
     a.download = "hyprcoloc_snpscores_table.csv";
     a.click();
+    window.URL.revokeObjectURL(encodedUri);
+    a.remove();
   } 
 
   exportECAVIARTable() {
@@ -430,9 +438,13 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     var csvContent = exportLines.join("\n");
     var encodedUri = encodeURI(csvContent);
 		var a = document.createElement("a");
+    document.body.appendChild(a);
+    a.setAttribute('style', 'display: none');
     a.href = encodedUri;
     a.download = "ecaviar_table.csv";
     a.click();
+    window.URL.revokeObjectURL(encodedUri);
+    a.remove();
   } 
 
   handleError(error) {
