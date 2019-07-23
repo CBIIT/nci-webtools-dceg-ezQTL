@@ -156,6 +156,7 @@ export class QTLsLocusTableComponent implements OnInit {
       "R2"
     ];
     var headersString = headers.join(",");
+    exportLines.push("data:text/csv;charset=utf-8," + headersString);
     this.VARIANT_DATA.forEach(function (dataRow, index) {
       let line = [];
       line.push(dataRow['gene_id']);
@@ -172,7 +173,7 @@ export class QTLsLocusTableComponent implements OnInit {
       line.push(dataRow['slope_se']);
       line.push(dataRow['R2']);
       let lineString = line.join(",");
-      exportLines.push(index == 0 ? "data:text/csv;charset=utf-8," + headersString : lineString);
+      exportLines.push(lineString);
     });
     var csvContent = exportLines.join("\n");
     var encodedUri = encodeURI(csvContent);
