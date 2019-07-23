@@ -93,21 +93,21 @@ export class QTLsDataInputsComponent implements OnInit {
     this.clearAssociationFile();
   }
 
-  downloadQTLsSamples() {
-    console.log("Download samples...");
-    var sampleFiles = [
-      "assets/files/MX2.eQTL.txt",
-      "assets/files/MX2.quantification.txt",
-      "assets/files/MX2.genotyping.txt",
-      "assets/files/MX2.LD.gz"
-    ];
-    for (var i = 0; i < sampleFiles.length; i ++) {
-      var a = document.createElement("a");
-      a.href = sampleFiles[i];
-      a.download = sampleFiles[i].split('\/').pop();
-      a.click();
-    }
-  }
+  // downloadQTLsSamples() {
+  //   console.log("Download samples...");
+  //   var sampleFiles = [
+  //     "assets/files/MX2.eQTL.txt",
+  //     "assets/files/MX2.quantification.txt",
+  //     "assets/files/MX2.genotyping.txt",
+  //     "assets/files/MX2.LD.gz"
+  //   ];
+  //   for (var i = 0; i < sampleFiles.length; i ++) {
+  //     var a = document.createElement("a");
+  //     a.href = sampleFiles[i];
+  //     a.download = sampleFiles[i].split('\/').pop();
+  //     a.click();
+  //   }
+  // }
 
   clearAssociationFile() {
     this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
