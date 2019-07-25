@@ -216,14 +216,19 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
           // title: (scale == "log") ? "Gene Expressions (log2)" : "Gene Expressions",
           title: "Trait Quantification",
           autorange: true,
+          automargin: true,
           showgrid: true,
           zeroline: true,
           // dtick: 4,
-          gridwidth: 1
+          gridwidth: 1,
+        },
+        xaxis: {
+          showticklabels: true,
+          tickangle: 45
         },
         margin: {
           l: 40,
-          r: 10,
+          r: 25,
           b: 80,
           t: 40
         },

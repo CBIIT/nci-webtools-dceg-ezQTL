@@ -1,7 +1,7 @@
 .locus-alignment-result-tab {
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
   overflow-y: hidden !important;
-  min-height: 750px;
+  /* min-height: 750px; */
 }
 
 .example-additional-selection {
