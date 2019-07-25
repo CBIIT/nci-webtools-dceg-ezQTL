@@ -1,5 +1,6 @@
 .locus-quantification-result-tab {
-    overflow: hidden !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
 }
 
 #display-number-genes {
