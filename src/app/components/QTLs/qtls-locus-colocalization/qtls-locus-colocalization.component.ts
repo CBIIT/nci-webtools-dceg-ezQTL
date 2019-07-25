@@ -94,6 +94,8 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   hyprcolocWarningMessage: boolean;
   hyprcolocSnpscoreWarningMessage: boolean;
 
+  selectedResultsDisplay: string;
+
   correlationScatterThreshold = new FormGroup({
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
   });
@@ -108,6 +110,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
+    this.selectedResultsDisplay = "gene_correlation";
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
         this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus alignment data
@@ -240,6 +243,10 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         }
       }
     });
+  }
+
+  changeResultsDisplay() {
+    console.log(this.selectedResultsDisplay);
   }
 
   populateHyprcolocDataList(hyprcolocData) {
