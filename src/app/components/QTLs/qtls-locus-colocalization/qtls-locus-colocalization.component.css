@@ -1,5 +1,5 @@
 .locus-colocalization-result-tab {
-    overflow-x: hidden !important;
+    overflow-x: auto !important;
     overflow-y: hidden !important;
 }
 
