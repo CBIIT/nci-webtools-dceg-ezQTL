@@ -423,73 +423,73 @@ export class QTLsDataInputsComponent implements OnInit {
             $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
             $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
             
-            // Run Locus Colocalization calculations if GWAS and Association Files loaded
-            var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
-            var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
-            var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
-            var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
-            var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
-            if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
-              var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-              var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-              var requestID = res["info"]["inputs"]["request"][0]; // request id
-              if (newSelectedDist == "false") {
-                var select_dist = "100000"; // default cis-QTL distance (in Kb)
-              } else {
-                var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
-              }
-              var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
-              var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
-              var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
-              // Run eCAVIAR calculation
-              this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
-                .subscribe(
-                  res => {
-                    var requestIDECAVIAR = res["ecaviar"]["request"][0];
-                    if (request_id == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-                      // console.log("ECAVIAR REQUEST MATCHES", request_id, requestID, requestIDECAVIAR);
-                      this.data.changeECAVIARData(res);
-                    } else {
-                      // console.log("ECAVIAR REQUEST DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
-                    }
-                  },
-                  error => {
-                    this.handleError(error);
-                  }
-                );
-              // Run HyprColoc LD calculation then HyprColoc calculation
-              this.data.calculateLocusColocalizationHyprcolocLD(LDFileName, select_ref, select_chr, select_pos, select_dist, requestID)
-                .subscribe(
-                  res => {
-                    var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
-                    var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
-                    // Run HyprColoc calculation after LD file is generated
-                    if (request_id == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
-                      // console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
-                      this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, hyprcolocLDFileName, requestID)
-                        .subscribe(
-                          res => {
-                            var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
-                            if (request_id == requestIDHypercoloc && requestID == requestIDHypercoloc) {
-                              // console.log("HYPRCOLOC REQUEST MATCHES", request_id, requestID, requestIDHypercoloc);
-                              this.data.changeHyprcolocData(res);
-                            } else {
-                              // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercoloc);
-                            }
-                          },
-                          error => {
-                            this.handleError(error);
-                          }
-                        );
-                    } else {
-                      // console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercolocLD);
-                    }
-                  },
-                  error => {
-                    this.handleError(error);
-                  }
-                );
-            }
+            // // Run Locus Colocalization calculations if GWAS and Association Files loaded
+            // var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+            // var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+            // var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
+            // var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
+            // var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
+            // if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
+            //   var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
+            //   var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
+            //   var requestID = res["info"]["inputs"]["request"][0]; // request id
+            //   if (newSelectedDist == "false") {
+            //     var select_dist = "100000"; // default cis-QTL distance (in Kb)
+            //   } else {
+            //     var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+            //   }
+            //   var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
+            //   var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
+            //   var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
+            //   // Run eCAVIAR calculation
+            //   this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
+            //     .subscribe(
+            //       res => {
+            //         var requestIDECAVIAR = res["ecaviar"]["request"][0];
+            //         if (request_id == requestIDECAVIAR && requestID == requestIDECAVIAR) {
+            //           // console.log("ECAVIAR REQUEST MATCHES", request_id, requestID, requestIDECAVIAR);
+            //           this.data.changeECAVIARData(res);
+            //         } else {
+            //           // console.log("ECAVIAR REQUEST DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
+            //         }
+            //       },
+            //       error => {
+            //         this.handleError(error);
+            //       }
+            //     );
+            //   // Run HyprColoc LD calculation then HyprColoc calculation
+            //   this.data.calculateLocusColocalizationHyprcolocLD(LDFileName, select_ref, select_chr, select_pos, select_dist, requestID)
+            //     .subscribe(
+            //       res => {
+            //         var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
+            //         var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
+            //         // Run HyprColoc calculation after LD file is generated
+            //         if (request_id == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
+            //           // console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
+            //           this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, hyprcolocLDFileName, requestID)
+            //             .subscribe(
+            //               res => {
+            //                 var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
+            //                 if (request_id == requestIDHypercoloc && requestID == requestIDHypercoloc) {
+            //                   // console.log("HYPRCOLOC REQUEST MATCHES", request_id, requestID, requestIDHypercoloc);
+            //                   this.data.changeHyprcolocData(res);
+            //                 } else {
+            //                   // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercoloc);
+            //                 }
+            //               },
+            //               error => {
+            //                 this.handleError(error);
+            //               }
+            //             );
+            //         } else {
+            //           // console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercolocLD);
+            //         }
+            //       },
+            //       error => {
+            //         this.handleError(error);
+            //       }
+            //     );
+            // }
           },
           error => {
             this.handleError(error);
