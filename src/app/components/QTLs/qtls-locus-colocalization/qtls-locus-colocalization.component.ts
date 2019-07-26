@@ -65,12 +65,19 @@ export interface HyprcolocSnpscoreRow {
 export class QtlsLocusColocalizationComponent implements OnInit {
 
   locusColocalizationData: Object;
+  locusAlignmentDataQTopAnnot: Object;
 
   public correlationScatter = null;
   selectedCorrelation: string;
   selectedCorrelationPvalThreshold: number;
 
   requestID: number;
+  select_qtls_samples: string;
+  select_gwas_sample: string;
+  associationFile: string;
+  LDFile: string;
+  gwasFile: string;
+  newSelectedDist: string;
   
   ecaviarData: Object[];
   hyprcolocData: Object[];
@@ -95,6 +102,8 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   hyprcolocSnpscoreWarningMessage: boolean;
 
   selectedResultsDisplay: string;
+  hyprcolocInitial: boolean;
+  ecaviarInitial: boolean;
 
   correlationScatterThreshold = new FormGroup({
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
@@ -111,10 +120,22 @@ export class QtlsLocusColocalizationComponent implements OnInit {
 
   ngOnInit() {
     this.selectedResultsDisplay = "gene_correlation";
+    this.hyprcolocInitial = true;
+    this.ecaviarInitial = true;
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
-        this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus alignment data
+        this.selectedResultsDisplay = "gene_correlation";
+        this.hyprcolocInitial = true;
+        this.ecaviarInitial = true;
+        this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus
+        this.locusAlignmentDataQTopAnnot = mainData["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data 
+        this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
+        this.select_gwas_sample = mainData["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
+        this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename 
+        this.LDFile = mainData["info"]["inputs"]["ld_file"][0] // LD filename
+        this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
+        this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
         if (this.locusColocalizationData && this.locusColocalizationData[0]) {
           this.selectedCorrelation = "R";
           this.selectedCorrelationPvalThreshold = 1.0;
@@ -246,7 +267,87 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   }
 
   changeResultsDisplay() {
-    console.log(this.selectedResultsDisplay);
+    // console.log(this.selectedResultsDisplay);
+    if (this.selectedResultsDisplay == "hyprcoloc") {
+      // console.log("hyprcolocInitial", this.hyprcolocInitial);
+      if (this.hyprcolocInitial) {
+        
+        if (this.newSelectedDist == "false") {
+          var select_dist = "100000"; // default cis-QTL distance (in Kb)
+        } else {
+          var select_dist = (parseInt(this.newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+        }
+        var select_ref = this.locusAlignmentDataQTopAnnot["rsnum"].toString();
+        var select_chr = this.locusAlignmentDataQTopAnnot["chr"].toString();
+        var select_pos = this.locusAlignmentDataQTopAnnot["pos"].toString();
+        
+        // Run HyprColoc LD calculation then HyprColoc calculation
+        this.data.calculateLocusColocalizationHyprcolocLD(this.LDFile, select_ref, select_chr, select_pos, select_dist, this.requestID)
+          .subscribe(
+            res => {
+              var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
+              var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
+              // Run HyprColoc calculation after LD file is generated
+              if (this.requestID == requestIDHypercolocLD && this.requestID == requestIDHypercolocLD) {
+                // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
+                this.data.calculateLocusColocalizationHyprcoloc(this.select_gwas_sample, this.select_qtls_samples, this.gwasFile, this.associationFile, hyprcolocLDFileName, this.requestID)
+                  .subscribe(
+                    res => {
+                      var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
+                      if (this.requestID == requestIDHypercoloc && this.requestID == requestIDHypercoloc) {
+                        // console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
+                        this.data.changeHyprcolocData(res);
+                      } else {
+                        // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
+                      }
+                    },
+                    error => {
+                      this.handleError(error);
+                    }
+                  );
+              } else {
+                // console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
+              }
+            },
+            error => {
+              this.handleError(error);
+            }
+          );
+
+        this.hyprcolocInitial = false; 
+      }
+    }
+    if (this.selectedResultsDisplay == "ecaviar") {
+      // console.log("ecaviarInitial", this.ecaviarInitial);
+      if (this.ecaviarInitial) {
+
+        if (this.newSelectedDist == "false") {
+          var select_dist = "100000"; // default cis-QTL distance (in Kb)
+        } else {
+          var select_dist = (parseInt(this.newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
+        }
+        var select_ref = this.locusAlignmentDataQTopAnnot["rsnum"].toString();
+
+        // Run eCAVIAR calculation
+        this.data.calculateLocusColocalizationECAVIAR(this.select_gwas_sample, this.select_qtls_samples, this.gwasFile, this.associationFile, this.LDFile, select_ref, select_dist, this.requestID)
+        .subscribe(
+          res => {
+            var requestIDECAVIAR = res["ecaviar"]["request"][0];
+            if (this.requestID == requestIDECAVIAR && this.requestID == requestIDECAVIAR) {
+              // console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
+              this.data.changeECAVIARData(res);
+            } else {
+              // console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
+            }
+          },
+          error => {
+            this.handleError(error);
+          }
+        );
+
+        this.ecaviarInitial = false; 
+      }
+    }
   }
 
   populateHyprcolocDataList(hyprcolocData) {
