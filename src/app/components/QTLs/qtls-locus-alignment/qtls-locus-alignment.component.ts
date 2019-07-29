@@ -1105,13 +1105,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
                 position: "absolute",
-                top: top - 125, 
+                top: top + 50, 
                 left: left + 245
               });
             } else { // input panel shown
               $('.popover').show().css({
                 position: "absolute",
-                top: top - 125, 
+                top: top + 50, 
                 left: left + 25
               });
             }
@@ -1146,13 +1146,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
               if (this.collapseInput) { // input panel collapsed
                 $('.popover').show().css({
                   position: "absolute",
-                  top: top - 125, 
+                  top: top + 50, 
                   left: left + 245
                 });
               } else { // input panel shown
                 $('.popover').show().css({
                   position: "absolute",
-                  top: top - 125, 
+                  top: top + 50, 
                   left: left + 25
                 });
               }
@@ -1189,13 +1189,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
                 position: "absolute",
-                top: top - 125, 
+                top: top + 50, 
                 left: left + 245
               });
             } else { // input panel shown
               $('.popover').show().css({
                 position: "absolute",
-                top: top - 125, 
+                top: top + 50, 
                 left: left + 25
               });
             }
