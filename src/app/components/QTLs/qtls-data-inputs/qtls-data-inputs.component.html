@@ -123,34 +123,34 @@
         </mat-form-field>
       </div>
 
-      <!-- Expression Data File -->
-      <div class="qtls-data-inputs" id="qtls-data-input-expression-file">
+      <!-- Quantification Data File -->
+      <div class="qtls-data-inputs" id="qtls-data-input-quantification-file">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
-            Expression Data File
+            Quantification Data File
           </div>
         </div>
         <div class="row mb-3">
           <input 
             type="file" 
-            formControlName="expressionFile"  
+            formControlName="quantificationFile"  
             class="ng-hide" 
-            id="expression-file" 
+            id="quantification-file" 
             name="input-files" 
             accept=".txt" 
-            aria-label="Expression data file input" 
+            aria-label="Quantification data file input" 
             hidden 
-            #expressionInput>
+            #quantificationInput>
           <button 
             style="width:120px; overflow:hidden; text-overflow:ellipsis;" 
-            (click)="expressionInput.click()" 
+            (click)="quantificationInput.click()" 
             [disabled]="resultStatus || selectLoadQTLsSamples" 
             class="ml-3 mr-3" 
             mat-stroked-button 
-            id="expression-file-tooltip" 
+            id="quantification-file-tooltip" 
             data-toggle="tooltip" 
             data-placement="left" 
-            title="Please input accompanying Expression Data File with Genotype Data File.">
+            title="Please input accompanying Quantification Data File with Genotype Data File.">
             Choose File
           </button>
           <div>
@@ -161,16 +161,16 @@
               <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.quantification.txt" download>Download Sample</a>
             </div> -->
             <div 
-              *ngIf="!selectLoadQTLsSamples && qtlsForm.value.expressionFile" 
+              *ngIf="!selectLoadQTLsSamples && qtlsForm.value.quantificationFile" 
               class="text-secondary" 
               style="overflow:hidden; text-overflow:ellipsis;">
-              {{ !qtlsForm.value.expressionFile ? '' : (qtlsForm.value?.expressionFile[0]?.name.length <= 21) ? (qtlsForm.value?.expressionFile[0]?.name || '') : qtlsForm.value?.expressionFile[0]?.name.substring(0,18) + '...' }} 
+              {{ !qtlsForm.value.quantificationFile ? '' : (qtlsForm.value?.quantificationFile[0]?.name.length <= 21) ? (qtlsForm.value?.quantificationFile[0]?.name || '') : qtlsForm.value?.quantificationFile[0]?.name.substring(0,18) + '...' }} 
               <button 
                 type="button" 
                 class="close" 
                 aria-label="Close" 
-                *ngIf="qtlsForm.value.expressionFile && qtlsForm.value.expressionFile.length > 0 && !resultStatus" 
-                (click)="clearExpressionFile()" 
+                *ngIf="qtlsForm.value.quantificationFile && qtlsForm.value.quantificationFile.length > 0 && !resultStatus" 
+                (click)="clearQuantificationFile()" 
                 [disabled]="resultStatus">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -212,7 +212,7 @@
               id="genotype-file-tooltip" 
               data-toggle="tooltip" 
               data-placement="left" 
-              title="Please input accompanying Genotype Data File with Expression Data File.">
+              title="Please input accompanying Genotype Data File with Quantification Data File.">
               Choose File
             </button>
           <div>

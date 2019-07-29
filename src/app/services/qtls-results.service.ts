@@ -59,10 +59,10 @@ export class QTLsResultsService {
     return this.http.post(url, formData);
   }
 
-  recalculateMain(select_qtls_samples: string, select_gwas_sample: string, associationFile: string, expressionFile: string, genotypeFile: string, gwasFile: string, LDFile: string, request_id: number, select_pop: string, select_gene: string, select_dist: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateDist: string, recalculateRef: string) {
+  recalculateMain(select_qtls_samples: string, select_gwas_sample: string, associationFile: string, quantificationFile: string, genotypeFile: string, gwasFile: string, LDFile: string, request_id: number, select_pop: string, select_gene: string, select_dist: string, select_ref: string, recalculateAttempt: string, recalculatePop: string, recalculateGene: string, recalculateDist: string, recalculateRef: string) {
     let recalculateParameters = {
       associationFile: associationFile, 
-      expressionFile: expressionFile, 
+      quantificationFile: quantificationFile, 
       genotypeFile: genotypeFile, 
       gwasFile: gwasFile, 
       LDFile: LDFile,
@@ -86,9 +86,9 @@ export class QTLsResultsService {
     // return this.http.post(url, formData);
   }
 
-  calculateLocusAlignmentBoxplots(select_qtls_samples: string, expressionFile: string, genotypeFile: string, boxplotDataDetailed: Object) {
+  calculateLocusAlignmentBoxplots(select_qtls_samples: string, quantificationFile: string, genotypeFile: string, boxplotDataDetailed: Object) {
     let locusAlignmentBoxplotsParameters= {
-      expressionFile: expressionFile,
+      quantificationFile: quantificationFile,
       genotypeFile: genotypeFile,
       boxplotDataDetailed: boxplotDataDetailed, 
       select_qtls_samples: select_qtls_samples
