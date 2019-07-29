@@ -40,6 +40,20 @@
     </div>
   </div>
 
+  <div class="locus-alignment-content mt-3 px-3">
+    <p>
+      Two locuszoom plots show the association p-value between GWAS and QTLs. If there is no GWAS data, 
+      only QTL locuszoom plot will show. Please select the population and LD reference to update the 
+      LD pattern. By default, the LD information (R2) will calculated based on the 1000 genome dataset 
+      (Phased 3 version 5) but will be replaced by the user’s input. 
+    </p>
+    <p>
+      Pink diamond in the locuszoom plot shows the best (most significant) QTLs based on the selected 
+      “Reference Gene”.  Red circle indicates the current LD reference variant, which will be simultaneously 
+      updated in both GWAS and QTLs locuszoom plots. 
+    </p>
+  </div>
+
   <!-- Show centered Plotly locus alignment manhattan plot(s) if graph is generated -->
   <div 
     class="d-flex justify-content-center" 
@@ -60,6 +74,15 @@
     class="d-flex justify-content-center" 
     id="qtls-locus-alignment-plot">
   </div> -->
+
+  <div class="locus-alignment-content mt-3 px-3" *ngIf="scatter">
+    <p>
+      The following scatter plot shows the correlation between -log10(GWAS p-value) and -log10(QTLs p-value). 
+      The “P-value threshold” can be used to filter QTL and GWAS data before performing correlation analysis. 
+      Both person (r) and spearman (rho) correlation coefficients are calculated. 
+      For detailed colocalization analysis. Please check the “Locus Colocalization” sub-module. 
+    </p>
+  </div>
 
   <!-- P-value threshold input for GWAS scatter plot -->
   <div 

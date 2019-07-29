@@ -43,8 +43,8 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
           if (mainData) {
             // this.geneSymbols = mainData["info"]["gene_symbols"][0]; // gene list
             this.geneSymbols = this.getGeneSymbols(mainData["info"]["gene_list"]["data"][0]); // get gene list symbols only
-            this.locusQuantificationData = mainData["locus_quantification"]["data"][0]; // gene expression data
-            this.locusQuantificationHeatmapData = mainData["locus_quantification_heatmap"]["data"][0]; // gene expression heatmap data
+            this.locusQuantificationData = mainData["locus_quantification"]["data"][0]; // gene quantification data
+            this.locusQuantificationHeatmapData = mainData["locus_quantification_heatmap"]["data"][0]; // gene quantification heatmap data
             if (this.geneSymbols) {
               this.totalNumGenes = this.geneSymbols.length;
               this.selectNumGenes = this.totalNumGenes.toString(); // default number of genes displayed
@@ -55,7 +55,7 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
               if (this.totalNumGenes > 30) {
                 this.selectNumGenes = "30";
                 this.totalNumGenesArray = this.totalNumGenesArray.slice(0, 30);
-                this.warningMessage = 'Data files contain ' + this.totalNumGenes + ' genes. Only top 30 gene expressions with most significant p-values will be displayed.';
+                this.warningMessage = 'Data files contain ' + this.totalNumGenes + ' genes. Only top 30 gene quantifications with most significant p-values will be displayed.';
               }
             }
             this.selectedScale = "linear";

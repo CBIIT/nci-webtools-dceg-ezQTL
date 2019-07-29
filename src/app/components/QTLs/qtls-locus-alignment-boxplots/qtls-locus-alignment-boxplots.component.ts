@@ -26,7 +26,7 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
   boxplotData: Object;
   locusAlignmentData: Object;
   locusAlignmentBoxplotsData: Object;
-  expressionFile: string;
+  quantificationFile: string;
   genotypeFile: string;
   mainData: Object;
   select_qtls_samples: string;
@@ -45,12 +45,12 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
       this.mainData = mainData;
     });
     if (this.mainData && this.boxplotData && !this.disableLocusQuantification) {
-      this.expressionFile = this.mainData["info"]["inputs"]["expression_file"][0]; // expression filename
+      this.quantificationFile = this.mainData["info"]["inputs"]["quantification_file"][0]; // quantification filename
       this.genotypeFile = this.mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
       this.select_qtls_samples = this.mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
       this.locusAlignmentData = this.mainData["locus_alignment"]["data"][0]; // locus alignment data
-      if ((this.expressionFile != 'false' && this.genotypeFile != 'false') || this.select_qtls_samples == 'true') {
-        this.data.calculateLocusAlignmentBoxplots(this.select_qtls_samples, this.expressionFile, this.genotypeFile, this.boxplotData)
+      if ((this.quantificationFile != 'false' && this.genotypeFile != 'false') || this.select_qtls_samples == 'true') {
+        this.data.calculateLocusAlignmentBoxplots(this.select_qtls_samples, this.quantificationFile, this.genotypeFile, this.boxplotData)
           .subscribe(
             res => { 
               this.locusAlignmentBoxplotsData = res["locus_alignment_boxplots"]["data"][0];

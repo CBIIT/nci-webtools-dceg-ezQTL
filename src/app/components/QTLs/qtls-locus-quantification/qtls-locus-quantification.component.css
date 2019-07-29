@@ -3,6 +3,11 @@
     overflow-y: hidden !important;
 }
 
+.locus-quantification-content {
+    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+    font-size: 1.1rem;
+}
+
 #display-number-genes {
     font-size: 9pt;
     font-weight: bold;
