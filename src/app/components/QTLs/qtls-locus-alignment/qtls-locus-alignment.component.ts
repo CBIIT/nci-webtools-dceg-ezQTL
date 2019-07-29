@@ -72,7 +72,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   disableLocusQuantification: boolean;
   requestID: number;
   associationFile: string;
-  expressionFile: string;
+  quantificationFile: string;
   genotypeFile: string;
   gwasFile: string;
   LDFile: string;
@@ -138,7 +138,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.select_qtls_samples = mainData["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
         this.select_gwas_sample = mainData["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
         this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
-        this.expressionFile = mainData["info"]["inputs"]["expression_file"][0]; // expression filename
+        this.quantificationFile = mainData["info"]["inputs"]["quantification_file"][0]; // quantification filename
         this.genotypeFile = mainData["info"]["inputs"]["genotype_file"][0]; // genotype filename
         this.gwasFile = mainData["info"]["inputs"]["gwas_file"][0] // gwas filename
         this.LDFile = mainData["info"]["inputs"]["ld_file"][0] // LD filename
@@ -954,7 +954,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     $(".blur-loading-main").addClass("blur-overlay");
     $(".blur-loading-ecaviar").addClass("blur-overlay");
     // calculate
-    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.expressionFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
+    this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.quantificationFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
       .subscribe(
         res => {
           this.data.changeMainData(res);

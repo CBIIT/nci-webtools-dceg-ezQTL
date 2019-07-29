@@ -4,7 +4,7 @@ const { fileSync } = require('tmp');
 
 var logger = require('../logger');
 
-function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
+function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef) {
     // console.log("Execute main qtls calculation.");
     logger.info("Execute main qtls calculation.");
     return new Promise((resolve, reject) => {
@@ -13,7 +13,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
         logger.info("R Working directory:", workingDirectory);
 
         associationFile = JSON.stringify(associationFile);
-        expressionFile = JSON.stringify(expressionFile);
+        quantificationFile = JSON.stringify(quantificationFile);
         genotypeFile = JSON.stringify(genotypeFile);
         gwasFile = JSON.stringify(gwasFile);
         LDFile = JSON.stringify(LDFile);
@@ -32,7 +32,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
 
 
         // console.log("Association File:", associationFile);
-        // console.log("Expression File:", expressionFile);
+        // console.log("Quantification File:", quantificationFile);
         // console.log("Genotype File:", genotypeFile);
         // console.log("GWAS File:", gwasFile);
         // console.log("LD File:", LDFile);
@@ -50,7 +50,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
         // console.log("Recalculate Ref?", recalculateRef);
         
         logger.info("Association File:", associationFile);
-        logger.info("Expression File:", expressionFile);
+        logger.info("Quantification File:", quantificationFile);
         logger.info("Genotype File:", genotypeFile);
         logger.info("GWAS File:", gwasFile);
         logger.info("LD File:", LDFile);
@@ -68,7 +68,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
         logger.info("Recalculate Ref?", recalculateRef);
 
         var code = readFileSync(rfile).toString();
-        code += `main(${workingDirectory}, ${select_qtls_samples}, ${select_gwas_sample}, ${associationFile}, ${expressionFile}, ${genotypeFile}, ${gwasFile}, ${LDFile}, ${request}, ${select_pop}, ${select_gene}, ${select_dist}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateDist}, ${recalculateRef})`;
+        code += `main(${workingDirectory}, ${select_qtls_samples}, ${select_gwas_sample}, ${associationFile}, ${quantificationFile}, ${genotypeFile}, ${gwasFile}, ${LDFile}, ${request}, ${select_pop}, ${select_gene}, ${select_dist}, ${select_ref}, ${recalculateAttempt}, ${recalculatePop}, ${recalculateGene}, ${recalculateDist}, ${recalculateRef})`;
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(
@@ -102,7 +102,7 @@ function qtlsCalculateMain(rfile, select_qtls_samples, select_gwas_sample, assoc
     });
 }
 
-function qtlsCalculateLocusAlignmentBoxplots(rfile, select_qtls_samples, expressionFile, genotypeFile, info) {
+function qtlsCalculateLocusAlignmentBoxplots(rfile, select_qtls_samples, quantificationFile, genotypeFile, info) {
     // console.log("Execute qtls locus alignment boxplots calculation.");
     logger.info("Execute qtls locus alignment boxplots calculation.");
     return new Promise((resolve, reject) => {
@@ -110,19 +110,19 @@ function qtlsCalculateLocusAlignmentBoxplots(rfile, select_qtls_samples, express
         // console.log("R Working directory:", workingDirectory);
         logger.info("R Working directory:", workingDirectory);
 
-        expressionFile = JSON.stringify(expressionFile);
+        quantificationFile = JSON.stringify(quantificationFile);
         genotypeFile = JSON.stringify(genotypeFile);
         info = JSON.stringify(JSON.stringify(info));
         select_qtls_samples = JSON.stringify(select_qtls_samples);
-        // console.log("Expression File:", expressionFile);
+        // console.log("Quantification File:", quantificationFile);
         // console.log("Genotype File:", genotypeFile);
 
-        logger.info("Expression File:", expressionFile);
+        logger.info("Quantification File:", quantificationFile);
         logger.info("Genotype File:", genotypeFile);
     
         var code = readFileSync(rfile).toString();
         // make sure the R statement below is not appended to a comment in R code file
-        code += `locus_alignment_boxplots(${workingDirectory}, ${select_qtls_samples}, ${expressionFile}, ${genotypeFile}, ${info})`;
+        code += `locus_alignment_boxplots(${workingDirectory}, ${select_qtls_samples}, ${quantificationFile}, ${genotypeFile}, ${info})`;
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(

@@ -83,7 +83,7 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   }
 
   var associationFile = 'false'; // required data file
-  var expressionFile = 'false'; // optional data file
+  var quantificationFile = 'false'; // optional data file
   var genotypeFile = 'false'; // optional data file
   var gwasFile = 'false'; // optional data file 
   var LDFile = 'false'; //optional data file
@@ -106,8 +106,8 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
     if (request.files[i]['fieldname'] == 'association-file') {
       associationFile = request.files[i].filename;
     }
-    if (request.files[i]['fieldname'] == 'expression-file') {
-      expressionFile = request.files[i].filename;
+    if (request.files[i]['fieldname'] == 'quantification-file') {
+      quantificationFile = request.files[i].filename;
     }
     if (request.files[i]['fieldname'] == 'genotype-file') {
       genotypeFile = request.files[i].filename;
@@ -121,7 +121,7 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   }
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
     response.json(data);
   } catch(err) {
     // console.log(err);
@@ -136,7 +136,7 @@ app.post('/qtls-recalculate-main', async (request, response) => {
   logger.info("Recalculation info received.");
 
   var associationFile = request.body.associationFile;
-  var expressionFile = request.body.expressionFile;
+  var quantificationFile = request.body.quantificationFile;
   var genotypeFile = request.body.genotypeFile;
   var gwasFile = request.body.gwasFile;
   var LDFile = request.body.LDFile;
@@ -154,7 +154,7 @@ app.post('/qtls-recalculate-main', async (request, response) => {
   var select_gwas_sample = request.body.select_gwas_sample;
 
   try {
-    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, expressionFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
+    const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
     response.json(data);
   } catch(err) {
     // console.log(err);
@@ -171,13 +171,13 @@ app.post('/qtls-locus-alignment-boxplots', async (request, response) => {
   logger.info("Locus Alignment boxplot info received.");
   logger.info("REQUEST BODY - locus alignment boxplot point info");
   logger.info(request.body);
-  var expressionFile = request.body.expressionFile;
+  var quantificationFile = request.body.quantificationFile;
   var genotypeFile =request.body.genotypeFile;
   var boxplotDataDetailed = request.body.boxplotDataDetailed;
   var select_qtls_samples = request.body.select_qtls_samples;
 
   try {
-    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', select_qtls_samples, expressionFile, genotypeFile, boxplotDataDetailed);
+    const data = await rscript.qtlsCalculateLocusAlignmentBoxplots('./r-calculations/QTLs/qtls.r', select_qtls_samples, quantificationFile, genotypeFile, boxplotDataDetailed);
     response.json(data);
   } catch(err) {
     // console.log(err);
