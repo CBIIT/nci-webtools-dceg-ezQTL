@@ -554,6 +554,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         text: 'QTLs-GWAS Chromosome ' + chromosome + ' Variants',
         xref: 'paper'
       },
+      font: {
+        color: 'black'
+      },
       width: 1000,
       height: 1180,
       yaxis: {
@@ -566,7 +569,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         showticklabels: false,
         linecolor: 'black',
         linewidth: 1,
-        mirror: true
+        mirror: true,
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       yaxis2: {
         autorange: true,
@@ -575,7 +584,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         domain: [0.03, 0.54],
         zeroline: false,
         linecolor: 'black',
-        linewidth: 1
+        linewidth: 1,
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       yaxis3: {
         autorange: true,
@@ -584,7 +599,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         domain: [0.56, 1],
         zeroline: false,
         linecolor: 'black',
-        linewidth: 1
+        linewidth: 1,
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       yaxis4: {
         autorange: true,
@@ -626,7 +647,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         zeroline: false,
         linecolor: 'black',
         linewidth: 1,
-        mirror: "allticks"
+        mirror: "allticks",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       images: [
         {
@@ -821,7 +848,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         showticklabels: false,
         linecolor: 'black',
         linewidth: 1,
-        mirror: true
+        mirror: true,
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       yaxis2: {
         autorange: true,
@@ -831,7 +864,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         domain: [0.05, 1],
         zeroline: false,
         linecolor: 'black',
-        linewidth: 1
+        linewidth: 1,
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       yaxis3: {
         autorange: true,
@@ -857,7 +896,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         zeroline: false,
         linecolor: 'black',
         linewidth: 1,
-        mirror: "allticks"
+        mirror: "allticks",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       images: [
         {
@@ -1520,17 +1565,32 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? (this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData)) : scatterTitle),
         xref: 'paper'
       },
+      font: {
+        color: 'black'
+      },
       width: 1000,
       height: 700,
       yaxis: {
         autorange: true,
         automargin: true,
         title: "-log10(QTLs P-value)",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       xaxis: {
         autorange: true,
         automargin: true,
         title: "-log10(GWAS P-value)",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       margin: {
         l: 40,

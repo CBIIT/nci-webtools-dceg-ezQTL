@@ -119,10 +119,19 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
     }
 
     var playout = {
+        font: {
+          color: 'black'
+        },
         width: 660,
         height: 600,
         xaxis: {
-          title: info['rsnum'] + " genotype: " + info['ref'] + "->" + info['alt']
+          title: info['rsnum'] + " genotype: " + info['ref'] + "->" + info['alt'],
+          font: {
+            color: 'black'
+          },
+          tickfont: {
+            color: 'black'
+          }
         },
         yaxis: {
           title: info['gene_symbol'] + " Quantification (log2)",
@@ -130,7 +139,13 @@ export class QTLsLocusAlignmentBoxplotsComponent implements OnInit {
           showgrid: true,
           zeroline: true,
           dtick: 4,
-          gridwidth: 1
+          gridwidth: 1,
+          font: {
+            color: 'black'
+          },
+          tickfont: {
+            color: 'black'
+          }
         },
         margin: {
           l: 40,

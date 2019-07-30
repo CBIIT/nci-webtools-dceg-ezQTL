@@ -33,8 +33,8 @@
             aria-label="Toggle gene quantification scale linear or log" 
             [(ngModel)]="selectedScale" 
             (change)="triggerReplot()">
-            <mat-button-toggle value="linear">Linear</mat-button-toggle>
-            <mat-button-toggle value="log">Log</mat-button-toggle>
+            <mat-button-toggle value="linear" alt="Toggle linear" aria-label="Toggle linear">Linear</mat-button-toggle>
+            <mat-button-toggle value="log" alt="Toggle log" aria-label="Toggle log">Log</mat-button-toggle>
           </mat-button-toggle-group>
         </div>
         <div class="col-md-auto pl-3">
@@ -44,8 +44,8 @@
             aria-label="Toggle gene quantification values P-value or median" 
             [(ngModel)]="selectedSort" 
             (change)="triggerReplot()">
-            <mat-button-toggle value="pvalue">P-value</mat-button-toggle>
-            <mat-button-toggle value="median">Median</mat-button-toggle>
+            <mat-button-toggle value="pvalue" alt="Toggle P-value" aria-label="Toggle P-value">P-value</mat-button-toggle>
+            <mat-button-toggle value="median" alt="Toggle Median" aria-label="Toggle Median">Median</mat-button-toggle>
           </mat-button-toggle-group>
           <mat-button-toggle-group 
             name="Sort toggle" 
@@ -53,8 +53,8 @@
             [(ngModel)]="selectedSortOrder" 
             (change)="triggerReplot()">
             <!-- [vertical]="true"> -->
-            <mat-button-toggle value="asc"><i class="fas fa-caret-up"></i></mat-button-toggle>
-            <mat-button-toggle value="desc"><i class="fas fa-caret-down"></i></mat-button-toggle>
+            <mat-button-toggle value="asc" alt="Sort ascending" aria-label="Sort ascending"><i class="fas fa-caret-up"></i></mat-button-toggle>
+            <mat-button-toggle value="desc" alt="Sort descending" aria-label="Sort descending"><i class="fas fa-caret-down"></i></mat-button-toggle>
           </mat-button-toggle-group>
           <!-- <button mat-button (click)="resetSort()">Reset</button> -->
         </div>
