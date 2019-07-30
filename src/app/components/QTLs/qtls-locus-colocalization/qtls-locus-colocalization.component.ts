@@ -656,17 +656,32 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         text: "P-value Correlation",
         xref: 'paper'
       },
+      font: {
+        color: 'black'
+      },
       width: 1000,
       height: 700,
       yaxis: {
         autorange: true,
         automargin: true,
         title: (correlation == "R") ? "Spearman R" : "-log10(Spearman P-value)",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       xaxis: {
         autorange: true,
         automargin: true,
         title: (correlation == "R") ? "Pearson R" : "-log10(Pearson P-value)",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
       margin: {
         l: 40,

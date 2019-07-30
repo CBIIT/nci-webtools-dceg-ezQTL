@@ -13,6 +13,10 @@
 }
 
 /* Override selected toggle buttons */
+.mat-button-toggle {
+    color: black !important;
+}
+
 .mat-button-toggle-checked {
     background-color: #3F51B5 !important;
     color: white !important;

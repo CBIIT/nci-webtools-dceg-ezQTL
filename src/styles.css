@@ -17,6 +17,10 @@ body {
   /* padding-left: 0px; */
 }
 
+a {
+  color: blue;
+}
+
 .bg-primary, .btn-primary {
   background-color: #2A71A5 !important;
 }
@@ -88,11 +92,14 @@ body {
   border: 3px solid transparent;
   border-right: none;
   border-left: none;
+  color: white !important;
+  font-weight: 300;
 }
 
 /* Create yellow bar on active nav button */
 .navbar-nav li a.active {
-  border-bottom: 3px solid #F5Ab35;
+  border-bottom: 6px solid #F5Ab35;
+  font-weight: 600;
 }
 
 /** Create additional padding for responsive menu */
@@ -240,4 +247,14 @@ textarea {
 .populationPanel {
   min-width: 500px !important;
   min-height: 500px !important;
+}
+
+/* Angular Material Override */
+
+.ng-star-inserted {
+  color: black !important;
+}
+
+.mat-paginator-range-label {
+  color: black !important;
 }
