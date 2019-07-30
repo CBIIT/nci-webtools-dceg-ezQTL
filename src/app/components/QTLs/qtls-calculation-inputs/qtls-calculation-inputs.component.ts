@@ -38,7 +38,7 @@ export interface GeneVariants {
 export class QTLsCalculationInputsComponent implements OnInit {
 
   qtlsCalculationForm = new FormGroup({
-    referenceGene: new FormControl({value: '', disabled: false}, [Validators.required]),
+    referenceGene: new FormControl({value: '', disabled: false}),
     rsnumber: new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")])
   });
 
@@ -123,6 +123,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       this.warningMessage = "";
       $("#ldref-search-warning").show();
       this.mainData = mainData;
+      this.qtlsCalculationForm.controls["referenceGene"].clearValidators();
       
       if (mainData) {
         this.associationFile = mainData["info"]["inputs"]["association_file"][0]; // association filename
@@ -207,6 +208,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
         if (this.messages) {
           this.warningMessage = this.messages.join('\n');
         }
+        this.qtlsCalculationForm.controls["referenceGene"].setValidators([Validators.required]);
       } else {
         // reset calculation parameters if mainData is null
         this.selectedPop = [];
@@ -215,6 +217,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
         this.selectedGene = "";
         this.selectedGeneSymbol = "";
         this.qtlsCalculationForm.reset();
+        this.qtlsCalculationForm.controls["referenceGene"].clearValidators();
       }
     });
   }

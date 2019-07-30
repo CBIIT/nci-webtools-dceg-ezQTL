@@ -210,6 +210,9 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       };
     }
     var playout = {
+        font: {
+          color: 'black'
+        },
         width: 1000,
         height: 600,
         yaxis: {
@@ -221,10 +224,22 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
           zeroline: true,
           // dtick: 4,
           gridwidth: 1,
+          font: {
+            color: 'black'
+          },
+          tickfont: {
+            color: 'black'
+          }
         },
         xaxis: {
           showticklabels: true,
-          tickangle: 45
+          tickangle: 45,
+          font: {
+            color: 'black'
+          },
+          tickfont: {
+            color: 'black'
+          }
         },
         margin: {
           l: 40,
@@ -333,14 +348,23 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
       }
     ];
     var playout = {
+        font: {
+          color: 'black'
+        },
         width: 900,
         height: 800,
         yaxis: {
           side: "right",
-          tickangle: 35
+          tickangle: 35,
+          font: {
+            color: 'black'
+          },
+          tickfont: {
+            color: 'black'
+          }
         },
         xaxis: {
-          showticklabels: false
+          showticklabels: false,
         },
         margin: {
           r: 100
