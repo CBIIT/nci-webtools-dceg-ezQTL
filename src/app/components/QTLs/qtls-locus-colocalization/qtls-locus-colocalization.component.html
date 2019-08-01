@@ -80,8 +80,7 @@
   <!-- <br> -->
 
   <div class="locus-colocalization-hyprcoloc" [hidden]="selectedResultsDisplay != 'hyprcoloc'">
-
-    <h3 class="ml-1">HyPrColoc</h3>
+    <!-- <h3 class="ml-1">HyPrColoc</h3> -->
 
     <div class="locus-colocalization-content mt-3 px-3">
       <p>
@@ -98,10 +97,10 @@
     </div>
 
     <!-- Hyprcoloc results table -->
-    <div class="hyprcoloc-results pt-2 border border-light rounded" style="background: #E8E8E8 !important;">
+    <div class="hyprcoloc-results pt-2 border border-light rounded" style="background: #FAFAFA !important;">
       <!-- table filter input field -->
       <div class="row ml-2 mr-2">
-        <div class="col-10">
+        <div class="col-10 pl-0">
           <mat-form-field>
               <input matInput 
                 [disabled]="!showHyprcolocTable"
@@ -110,11 +109,15 @@
                 aria-label="Hyprcoloc results data table filter input field">
             </mat-form-field>
         </div>
-        <div class="col-2 pt-4 export-hyprcoloc-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer; text-align: center; vertical-align: middle;">
-          <a (click)="exportHyprcolocTable()" 
-            *ngIf="showHyprcolocTable">
+        <div class="col-2 pr-0 pt-4 export-hyprcoloc-details-table" style="color: #0000EE; text-decoration: none; cursor: pointer; text-align: right; vertical-align: middle;">
+          <button (click)="exportHyprcolocTable()" 
+            *ngIf="showHyprcolocTable" 
+            class="pl-0 pr-0"
+            style="color: blue; background-color: transparent; border-color: transparent;"
+            alt="Export HyPrColoc details table" 
+            aria-label="Export HyPrColoc details table">
             Export
-          </a>
+        </button>
         </div>
       </div>
       <!-- loading spinner -->
@@ -197,7 +200,7 @@
   
       </div>
         
-      <mat-paginator #HyprcolocPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
+      <mat-paginator #HyprcolocPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #FAFAFA !important;"></mat-paginator>
   
     </div>
 
@@ -212,10 +215,10 @@
     </div>
 
     <!-- Hyprcoloc snpscore results table -->
-    <div class="hyprcoloc-snpscore-results pt-2 border border-light rounded" style="background: #E8E8E8 !important;">
+    <div class="hyprcoloc-snpscore-results pt-2 border border-light rounded" style="background: #FAFAFA !important;">
       <!-- table filter input field -->
       <div class="row ml-2 mr-2">
-        <div class="col-10">
+        <div class="col-10 pl-0">
           <mat-form-field>
             <input matInput 
               [disabled]="!showHyprcolocSnpscoreTable"
@@ -224,11 +227,15 @@
               aria-label="Hyprcoloc SNP scores data table filter input field">
           </mat-form-field>
         </div>
-        <div class="col-2 pt-4 export-hyprcoloc-snpscore-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer; text-align: center; vertical-align: middle;">
-          <a (click)="exportHyprcolocSnpscoreTable()" 
-            *ngIf="showHyprcolocSnpscoreTable">
+        <div class="col-2 pr-0 pt-4 export-hyprcoloc-snpscore-details-table" style="color: #0000EE; text-decoration: none; cursor: pointer; text-align: right; vertical-align: middle;">
+          <button (click)="exportHyprcolocSnpscoreTable()" 
+            *ngIf="showHyprcolocSnpscoreTable" 
+            class="pl-0 pr-0"
+            style="color: blue; background-color: transparent; border-color: transparent;" 
+            alt="Export HyPrColoc SNP score table" 
+            aria-label="Export HyPrColoc SNP score table">
             Export
-          </a>
+        </button>
         </div>
       </div>
       <!-- loading spinner -->
@@ -281,7 +288,7 @@
 
       </div>
         
-      <mat-paginator #HyprcolocSnpscorePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
+      <mat-paginator #HyprcolocSnpscorePaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #FAFAFA !important;"></mat-paginator>
 
     </div>
   </div>
@@ -291,7 +298,7 @@
   <!-- <br> -->
 
   <div class="locus-colocalization-ecaviar" [hidden]="selectedResultsDisplay != 'ecaviar'">
-    <h3 class="ml-1">eCAVIAR</h3>
+    <!-- <h3 class="ml-1">eCAVIAR</h3> -->
 
     <div class="locus-colocalization-content mt-3 px-3">
       <p>
@@ -310,10 +317,10 @@
     </div>
 
     <!-- eCAVIAR results table -->
-    <div class="ecaviar-results pt-2 border border-light rounded" style="background: #E8E8E8 !important;">
+    <div class="ecaviar-results pt-2 border border-light rounded" style="background: #FAFAFA !important;">
       <!-- table filter input field -->
       <div class="row ml-2 mr-2">
-        <div class="col-10">
+        <div class="col-10 pl-0">
           <mat-form-field>
             <input matInput 
               [disabled]="!showECAVIARTable"
@@ -322,11 +329,15 @@
               aria-label="eCAVIAR results data table filter input field">
           </mat-form-field>
         </div>
-        <div class="col-2 pt-4 ecaviar-details-table" style="color: #0000EE; text-decoration: underline; cursor: pointer; text-align: center; vertical-align: middle;">
-          <a (click)="exportECAVIARTable()" 
-            *ngIf="showECAVIARTable">
+        <div class="col-2 pr-0 pt-4 ecaviar-details-table" style="color: #0000EE; text-decoration: none; cursor: pointer; text-align: right; vertical-align: middle;">
+          <button (click)="exportECAVIARTable()" 
+            *ngIf="showECAVIARTable" 
+            class="pl-0 pr-0"
+            style="color: blue; background-color: transparent; border-color: transparent;" 
+            alt="Export eCAVIAR details table" 
+            aria-label="Export eCAVIAR details table">
             Export
-          </a>
+        </button>
         </div>
       </div>
       <!-- loading spinner -->
@@ -475,7 +486,7 @@
   
       </div>
         
-      <mat-paginator #ECAVIARPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #E8E8E8 !important;"></mat-paginator>
+      <mat-paginator #ECAVIARPaginator [pageSizeOptions]="[10, 20, 50, 100]" showFirstLastButtons style="background: #FAFAFA !important;"></mat-paginator>
   
     </div>
   </div>
