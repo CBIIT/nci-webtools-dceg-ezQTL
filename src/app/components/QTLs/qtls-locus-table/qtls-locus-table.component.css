@@ -28,13 +28,13 @@ table {
 }
 
 .export-variant-details-table {
-  text-align: center;
+  text-align: right;
   vertical-align: middle;
 }
 
 .export-variant-details-table a {
   color: #0000EE;
-  text-decoration: underline;
+  text-decoration: none;
   cursor: pointer;
   /* font-weight: bold; */
 }
