@@ -11,7 +11,7 @@
           <div class="disabled-post-calc" *ngIf="!selectLoadQTLsSamples">
             <i class="fas fa-file-export mr-1"></i>
             <button (click)="loadQTLsSampleDataFiles()" 
-              class="pl-0 pr-0 qtls-data-load-samples"
+              class="pl-0 pr-0 qtls-data-load-samples disabled-post-calc"
               style="background-color: transparent; border-color: transparent;" 
               alt="Load QTLs sample files"
               aria-label="Load QTLs sample files">
@@ -21,7 +21,7 @@
           <div class="disabled-post-calc" *ngIf="selectLoadQTLsSamples">
             <i class="fas fa-file-excel mr-1"></i>
             <button (click)="loadQTLsSampleDataFiles()" 
-              class="pl-0 pr-0 qtls-data-load-samples"
+              class="pl-0 pr-0 qtls-data-load-samples disabled-post-calc"
               style="background-color: transparent; border-color: transparent;" 
               alt="Unload QTLs sample files"
               aria-label="Unload QTLs sample files">
@@ -333,7 +333,7 @@
           <div class="disabled-post-calc" *ngIf="!selectLoadGWASSample">
             <i class="fas fa-file-export mr-1"></i>
             <button (click)="loadGWASSampleDataFile()" 
-              class="pl-0 pr-0 qtls-data-load-samples"
+              class="pl-0 pr-0 qtls-data-load-samples disabled-post-calc"
               style="background-color: transparent; border-color: transparent;" 
               alt="Load GWAS sample data file"
               aria-label="Load GWAS sample data file">
@@ -343,7 +343,7 @@
           <div class="disabled-post-calc" *ngIf="selectLoadGWASSample">
             <i class="fas fa-file-excel mr-1"></i>
             <button (click)="loadGWASSampleDataFile()" 
-              class="pl-0 pr-0 qtls-data-load-samples"
+              class="pl-0 pr-0 qtls-data-load-samples disabled-post-calc"
               style="background-color: transparent; border-color: transparent;" 
               alt="Unload GWAS sample data file"
               aria-label="Unload GWAS sample data file">
