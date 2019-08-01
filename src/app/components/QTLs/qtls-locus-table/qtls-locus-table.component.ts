@@ -177,14 +177,19 @@ export class QTLsLocusTableComponent implements OnInit {
     });
     var csvContent = exportLines.join("\n");
     var encodedUri = encodeURI(csvContent);
-    var a = document.createElement("a");
-    document.body.appendChild(a);
-    a.setAttribute('style', 'display: none');
-    a.href = encodedUri;
-    a.download = "locus_variant_details_table.csv";
-    a.click();
-    window.URL.revokeObjectURL(encodedUri);
-    a.remove();
+    if (window.navigator.msSaveOrOpenBlob) {
+      var blob = new Blob([encodedUri]);
+      window.navigator.msSaveBlob(blob, "locus_variant_details_table.csv");
+    } else {
+      var a = document.createElement("a");
+      document.body.appendChild(a);
+      a.setAttribute('style', 'display: none');
+      a.href = encodedUri;
+      a.download = "locus_variant_details_table.csv";
+      a.click();
+      window.URL.revokeObjectURL(encodedUri);
+      a.remove();
+    }
   } 
 
   unique(value, index, self) {
