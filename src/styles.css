@@ -98,7 +98,7 @@ a {
 
 /* Create yellow bar on active nav button */
 .navbar-nav li a.active {
-  border-bottom: 6px solid #F5Ab35;
+  border-bottom: 5px solid #F5Ab35;
   font-weight: 600;
 }
 
@@ -251,10 +251,18 @@ textarea {
 
 /* Angular Material Override */
 
-.ng-star-inserted {
+/* .ng-star-inserted {
+  color: black !important;
+} */
+
+mat-paginator {
   color: black !important;
 }
 
-.mat-paginator-range-label {
-  color: black !important;
+.mat-paginator-page-size-label {
+  width: 100% !important;
+}
+
+.mat-sort-header-arrow {
+  color: white !important;
 }
