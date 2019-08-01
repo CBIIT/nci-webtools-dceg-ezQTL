@@ -18,10 +18,15 @@
     font-weight: bold;
     font-size: 14pt;
     padding: 25px !important;
+    color: black;
+}
+
+.mat-tab-disabled {
+    color: #C5C5C5 !important;
 }
 
 .mat-tab-label.mat-tab-label-active {
-    color: #3F51B5 !important;
+    color: #2B387C !important;
 }
 
 .blur-overlay {

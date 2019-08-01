@@ -16,15 +16,18 @@
   <div class="row blur-loading-main">
 
     <!-- Toggle Data Input Side Panel Collapse -->
-    <div class="toggle-view d-flex col-md-auto pl-1 pr-1"
+    <button class="toggle-view d-flex col-md-auto pl-1 pr-1" 
+      style="color: transparent; background-color: transparent; border-color: transparent;"
       (click)="collapseDataInputPanel()" 
-      (keyup.enter)="collapseDataInputPanel()" 
-      (keyup.space)="collapseDataInputPanel()" 
-      tabindex="10">
+      alt="Toggle display data input panel" 
+      aria-label="Toggle display data input panel">
+      <!-- (keyup.enter)="collapseDataInputPanel()" 
+      (keyup.space)="collapseDataInputPanel()" > -->
+      <!-- tabindex="10"> -->
       <div class="d-flex align-items-center justify-content-center">
         <i id="toggle-view-button" class="fas fa-caret-left fa-2x"></i>
       </div>
-    </div>
+    </button>
 
     <!-- Choose Population -->
     <div class="col-md-auto pt-2 pl-3 pr-3 ml-3">
