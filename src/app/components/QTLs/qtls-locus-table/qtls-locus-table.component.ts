@@ -139,7 +139,6 @@ export class QTLsLocusTableComponent implements OnInit {
   }
 
   exportLocusTable() {
-    console.log("Trigger export...");
     var exportLines = [];
     var headers = [
       "gene_id", 
@@ -178,13 +177,10 @@ export class QTLsLocusTableComponent implements OnInit {
     });
     var csvContent = exportLines.join("\n");
     var encodedUri = encodeURI(csvContent);
-    console.log("msSaveOrOpenBlob", window.navigator.msSaveOrOpenBlob);
     if (window.navigator.msSaveOrOpenBlob) {
-      console.log("MS SAVE BLOB");
       var blob = new Blob([encodedUri]);
       window.navigator.msSaveBlob(blob, "locus_variant_details_table.csv");
     } else {
-      console.log("OTHER SAVE A")
       var a = document.createElement("a");
       document.body.appendChild(a);
       a.setAttribute('style', 'display: none');
