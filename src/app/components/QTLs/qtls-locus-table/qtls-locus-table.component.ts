@@ -156,7 +156,11 @@ export class QTLsLocusTableComponent implements OnInit {
       "R2"
     ];
     var headersString = headers.join(",");
-    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    if (window.navigator.msSaveOrOpenBlob) {
+      exportLines.push(headersString);
+    } else {
+      exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    }
     this.VARIANT_DATA.forEach(function (dataRow, index) {
       let line = [];
       line.push(dataRow['gene_id']);
@@ -176,11 +180,12 @@ export class QTLsLocusTableComponent implements OnInit {
       exportLines.push(lineString);
     });
     var csvContent = exportLines.join("\n");
-    var encodedUri = encodeURI(csvContent);
+    // var encodedUri = encodeURI(csvContent);
     if (window.navigator.msSaveOrOpenBlob) {
-      var blob = new Blob([encodedUri]);
+      var blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
       window.navigator.msSaveBlob(blob, "locus_variant_details_table.csv");
     } else {
+      var encodedUri = encodeURI(csvContent);
       var a = document.createElement("a");
       document.body.appendChild(a);
       a.setAttribute('style', 'display: none');
