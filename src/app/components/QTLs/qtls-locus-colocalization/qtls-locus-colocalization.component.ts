@@ -436,7 +436,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       "gene_symbol"
     ];
     var headersString = headers.join(",");
-    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    if (window.navigator.msSaveOrOpenBlob) {
+      exportLines.push(headersString);
+    } else {
+      exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    }
     this.HYPRCOLOC_DATA.forEach(function (dataRow, index) {
       let line = [];
       line.push(dataRow['iteration']);
@@ -452,11 +456,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       exportLines.push(lineString);
     });
     var csvContent = exportLines.join("\n");
-    var encodedUri = encodeURI(csvContent);
     if (window.navigator.msSaveOrOpenBlob) {
-      var blob = new Blob([encodedUri]);
+      var blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
       window.navigator.msSaveBlob(blob, "hyprcoloc_table.csv");
     } else {
+      var encodedUri = encodeURI(csvContent);
       var a = document.createElement("a");
       document.body.appendChild(a);
       a.setAttribute('style', 'display: none');
@@ -477,7 +481,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       "gene_symbol"
     ];
     var headersString = headers.join(",");
-    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    if (window.navigator.msSaveOrOpenBlob) {
+      exportLines.push(headersString);
+    } else {
+      exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    }
     this.HYPRCOLOC_SNPSCORE_DATA.forEach(function (dataRow, index) {
       let line = [];
       line.push(dataRow['rsnum']);
@@ -488,11 +496,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       exportLines.push(lineString);
     });
     var csvContent = exportLines.join("\n");
-    var encodedUri = encodeURI(csvContent);
     if (window.navigator.msSaveOrOpenBlob) {
-      var blob = new Blob([encodedUri]);
+      var blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
       window.navigator.msSaveBlob(blob, "hyprcoloc_snpscores_table.csv");
     } else {
+      var encodedUri = encodeURI(csvContent);
       var a = document.createElement("a");
       document.body.appendChild(a);
       a.setAttribute('style', 'display: none');
@@ -528,7 +536,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       "leadsnp_included"
     ];
     var headersString = headers.join(",");
-    exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    if (window.navigator.msSaveOrOpenBlob) {
+      exportLines.push(headersString);
+    } else {
+      exportLines.push("data:text/csv;charset=utf-8," + headersString);
+    }
     this.ECAVIAR_DATA.forEach(function (dataRow, index) {
       let line = [];
       line.push(dataRow['gene_id']);
@@ -554,11 +566,11 @@ export class QtlsLocusColocalizationComponent implements OnInit {
       exportLines.push(lineString);
     });
     var csvContent = exportLines.join("\n");
-    var encodedUri = encodeURI(csvContent);
     if (window.navigator.msSaveOrOpenBlob) {
-      var blob = new Blob([encodedUri]);
+      var blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
       window.navigator.msSaveBlob(blob, "ecaviar_table.csv");
     } else {
+      var encodedUri = encodeURI(csvContent);
       var a = document.createElement("a");
       document.body.appendChild(a);
       a.setAttribute('style', 'display: none');
