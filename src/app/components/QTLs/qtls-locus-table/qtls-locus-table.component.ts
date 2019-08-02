@@ -179,12 +179,13 @@ export class QTLsLocusTableComponent implements OnInit {
       let lineString = line.join(",");
       exportLines.push(lineString);
     });
-    var csvContent = exportLines.join("\r\n");
-    var encodedUri = encodeURI(csvContent);
+    var csvContent = exportLines.join("\n");
+    // var encodedUri = encodeURI(csvContent);
     if (window.navigator.msSaveOrOpenBlob) {
-      var blob = new Blob([encodedUri], {type: "text/csv;charset=utf-8;"});
+      var blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
       window.navigator.msSaveBlob(blob, "locus_variant_details_table.csv");
     } else {
+      var encodedUri = encodeURI(csvContent);
       var a = document.createElement("a");
       document.body.appendChild(a);
       a.setAttribute('style', 'display: none');
