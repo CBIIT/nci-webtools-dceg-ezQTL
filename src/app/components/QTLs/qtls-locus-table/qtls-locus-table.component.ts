@@ -179,7 +179,7 @@ export class QTLsLocusTableComponent implements OnInit {
       let lineString = line.join(",");
       exportLines.push(lineString);
     });
-    var csvContent = exportLines.join("\n");
+    var csvContent = exportLines.join("\r\n");
     var encodedUri = encodeURI(csvContent);
     if (window.navigator.msSaveOrOpenBlob) {
       var blob = new Blob([encodedUri], {type: "text/csv;charset=utf-8;"});
