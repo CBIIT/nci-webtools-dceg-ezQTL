@@ -52,6 +52,14 @@ export class QTLsResultsService {
   private qtlsType = new BehaviorSubject('assoc');
   currentQtlsType = this.qtlsType.asObservable();
 
+  // boolean: whether or not HyPrColoc calculation is ongoing
+  private hyprcolocIsLoading = new BehaviorSubject(false);
+  currentHyprcolocIsLoading = this.hyprcolocIsLoading.asObservable();
+
+  // boolean: whether or not eCAVIAR calculation is ongoing
+  private ecaviarIsLoading = new BehaviorSubject(false);
+  currentEcaviarIsLoading = this.ecaviarIsLoading.asObservable();
+
   constructor(private http: HttpClient) { }
 
   calculateMain(formData: FormData) {
@@ -184,6 +192,14 @@ export class QTLsResultsService {
 
   changeBlurLoadMain(blurLoadMain: boolean) {
     this.blurLoadMain.next(blurLoadMain);
+  }
+
+  changeHyprcolocIsLoading(hyprcolocIsLoading: boolean) {
+    this.hyprcolocIsLoading.next(hyprcolocIsLoading);
+  }
+
+  changeEcaviarIsLoading(ecaviarIsLoading: boolean) {
+    this.ecaviarIsLoading.next(ecaviarIsLoading);
   }
 
   changeQtlsType(qtlsType: string) {
