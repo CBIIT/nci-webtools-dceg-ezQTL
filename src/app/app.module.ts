@@ -47,6 +47,8 @@ import {
   MatSidenavModule
 } from '@angular/material';
 import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-colocalization/qtls-locus-colocalization.component';
+import { CacheRouteReuseComponent } from './components/cache-route-reuse/cache-route-reuse.component';
+import { RouteReuseStrategy } from '@angular/router';
 
 @NgModule({
   declarations: [
@@ -97,7 +99,10 @@ import { QtlsLocusColocalizationComponent } from './components/QTLs/qtls-locus-c
     MatButtonToggleModule, 
     MatSidenavModule
   ],
-  providers: [],
+  providers: [{
+    provide: RouteReuseStrategy,
+    useClass: CacheRouteReuseComponent
+  }],
   bootstrap: [AppComponent],
   entryComponents: [QTLsLocusAlignmentBoxplotsComponent]
 })
