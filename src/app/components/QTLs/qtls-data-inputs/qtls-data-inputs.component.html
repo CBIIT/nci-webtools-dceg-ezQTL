@@ -520,7 +520,11 @@
           class="mt-3" 
           mat-raised-button 
           (click)="reset()" 
-          [color]="resetColor">
+          [color]="resetColor" 
+          id="reset-tooltip" 
+          data-toggle="tooltip" 
+          data-placement="top" 
+          title="Please wait until HyPrColoc and eCAVIAR calculations are finished before resetting.">
           Reset
         </button>
       </div>

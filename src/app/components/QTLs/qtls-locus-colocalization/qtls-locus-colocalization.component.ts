@@ -105,6 +105,9 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   hyprcolocInitial: boolean;
   ecaviarInitial: boolean;
 
+  hyprcolocIsLoading: boolean;
+  ecaviarIsLoading: boolean;
+
   correlationScatterThreshold = new FormGroup({
     correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
   });
@@ -122,6 +125,8 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     this.selectedResultsDisplay = "pval_correlation";
     this.hyprcolocInitial = true;
     this.ecaviarInitial = true;
+    this.data.currentHyprcolocIsLoading.subscribe(hyprcolocIsLoading => this.hyprcolocIsLoading = hyprcolocIsLoading);
+    this.data.currentEcaviarIsLoading.subscribe(ecaviarIsLoading => this.ecaviarIsLoading = ecaviarIsLoading);
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
         this.selectedResultsDisplay = "pval_correlation";
@@ -280,7 +285,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         var select_ref = this.locusAlignmentDataQTopAnnot["rsnum"].toString();
         var select_chr = this.locusAlignmentDataQTopAnnot["chr"].toString();
         var select_pos = this.locusAlignmentDataQTopAnnot["pos"].toString();
-        
+        this.data.changeHyprcolocIsLoading(true);
         // Run HyprColoc LD calculation then HyprColoc calculation
         this.data.calculateLocusColocalizationHyprcolocLD(this.LDFile, select_ref, select_chr, select_pos, select_dist, this.requestID)
           .subscribe(
@@ -297,12 +302,14 @@ export class QtlsLocusColocalizationComponent implements OnInit {
                       if (this.requestID == requestIDHypercoloc && this.requestID == requestIDHypercoloc) {
                         // console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
                         this.data.changeHyprcolocData(res);
+                        this.data.changeHyprcolocIsLoading(false);
                       } else {
                         // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
                       }
                     },
                     error => {
                       this.handleError(error);
+                      this.data.changeHyprcolocIsLoading(false);
                     }
                   );
               } else {
@@ -311,6 +318,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
             },
             error => {
               this.handleError(error);
+              this.data.changeHyprcolocIsLoading(false);
             }
           );
 
@@ -327,7 +335,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           var select_dist = (parseInt(this.newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
         }
         var select_ref = this.locusAlignmentDataQTopAnnot["rsnum"].toString();
-
+        this.data.changeEcaviarIsLoading(true);
         // Run eCAVIAR calculation
         this.data.calculateLocusColocalizationECAVIAR(this.select_gwas_sample, this.select_qtls_samples, this.gwasFile, this.associationFile, this.LDFile, select_ref, select_dist, this.requestID)
         .subscribe(
@@ -336,12 +344,14 @@ export class QtlsLocusColocalizationComponent implements OnInit {
             if (this.requestID == requestIDECAVIAR && this.requestID == requestIDECAVIAR) {
               // console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
               this.data.changeECAVIARData(res);
+              this.data.changeEcaviarIsLoading(false);
             } else {
               // console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
             }
           },
           error => {
             this.handleError(error);
+            this.data.changeEcaviarIsLoading(false);
           }
         );
 
