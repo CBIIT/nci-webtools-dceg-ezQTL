@@ -50,6 +50,9 @@ export class QTLsDataInputsComponent implements OnInit {
   selectedDist: string;
   rsnumSearch: string;
 
+  hyprcolocIsLoading: boolean;
+  ecaviarIsLoading: boolean;
+
   GTExDatasets: GTExDataset[] = [
     {value: 'ds-0', viewValue: 'Dataset 1'},
     {value: 'ds-1', viewValue: 'Dataset 2'},
@@ -59,6 +62,24 @@ export class QTLsDataInputsComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef, private data: QTLsResultsService) { }
 
   ngOnInit() {
+    this.data.currentHyprcolocIsLoading.subscribe(hyprcolocIsLoading => {
+      this.hyprcolocIsLoading = hyprcolocIsLoading
+      if (!this.hyprcolocIsLoading) {
+        $("#reset-tooltip").tooltip("enable");
+        $("#reset-tooltip").tooltip("hide");
+        $("#reset-tooltip").tooltip("disable");
+      }
+    });
+
+    this.data.currentEcaviarIsLoading.subscribe(ecaviarIsLoading => {
+      this.ecaviarIsLoading = ecaviarIsLoading
+      if (!this.ecaviarIsLoading) {
+        $("#reset-tooltip").tooltip("enable");
+        $("#reset-tooltip").tooltip("hide");
+        $("#reset-tooltip").tooltip("disable");
+      }
+    });
+
     this.data.currentMainData.subscribe(mainData => {
       this.mainData = mainData
       // populate LD Reference field with default variant after initial calculation if blank
@@ -422,74 +443,6 @@ export class QTLsDataInputsComponent implements OnInit {
             $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
             $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
             $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
-            
-            // // Run Locus Colocalization calculations if GWAS and Association Files loaded
-            // var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
-            // var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
-            // var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
-            // var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
-            // var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
-            // if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
-            //   var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-            //   var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-            //   var requestID = res["info"]["inputs"]["request"][0]; // request id
-            //   if (newSelectedDist == "false") {
-            //     var select_dist = "100000"; // default cis-QTL distance (in Kb)
-            //   } else {
-            //     var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
-            //   }
-            //   var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
-            //   var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
-            //   var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
-            //   // Run eCAVIAR calculation
-            //   this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
-            //     .subscribe(
-            //       res => {
-            //         var requestIDECAVIAR = res["ecaviar"]["request"][0];
-            //         if (request_id == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-            //           // console.log("ECAVIAR REQUEST MATCHES", request_id, requestID, requestIDECAVIAR);
-            //           this.data.changeECAVIARData(res);
-            //         } else {
-            //           // console.log("ECAVIAR REQUEST DOES NOT MATCH", request_id, requestID, requestIDECAVIAR);
-            //         }
-            //       },
-            //       error => {
-            //         this.handleError(error);
-            //       }
-            //     );
-            //   // Run HyprColoc LD calculation then HyprColoc calculation
-            //   this.data.calculateLocusColocalizationHyprcolocLD(LDFileName, select_ref, select_chr, select_pos, select_dist, requestID)
-            //     .subscribe(
-            //       res => {
-            //         var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
-            //         var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
-            //         // Run HyprColoc calculation after LD file is generated
-            //         if (request_id == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
-            //           // console.log("HYPRCOLOC LD REQUEST MATCHES", request_id, requestID, requestIDHypercolocLD);
-            //           this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, hyprcolocLDFileName, requestID)
-            //             .subscribe(
-            //               res => {
-            //                 var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
-            //                 if (request_id == requestIDHypercoloc && requestID == requestIDHypercoloc) {
-            //                   // console.log("HYPRCOLOC REQUEST MATCHES", request_id, requestID, requestIDHypercoloc);
-            //                   this.data.changeHyprcolocData(res);
-            //                 } else {
-            //                   // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercoloc);
-            //                 }
-            //               },
-            //               error => {
-            //                 this.handleError(error);
-            //               }
-            //             );
-            //         } else {
-            //           // console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", request_id, requestID, requestIDHypercolocLD);
-            //         }
-            //       },
-            //       error => {
-            //         this.handleError(error);
-            //       }
-            //     );
-            // }
           },
           error => {
             this.handleError(error);
@@ -506,64 +459,80 @@ export class QTLsDataInputsComponent implements OnInit {
   } 
 
   reset() {
-    // hide quantification file genotype file error tooltips if displayed
-    $("#quantification-file-tooltip").tooltip("enable");
-    $("#quantification-file-tooltip").tooltip("hide");
-    $("#quantification-file-tooltip").tooltip("disable");
-    $("#genotype-file-tooltip").tooltip("enable");
-    $("#genotype-file-tooltip").tooltip("hide");
-    $("#genotype-file-tooltip").tooltip("disable");
-    this.disableQTLsToggle = false;
-    this.data.changeResultStatus(false);
-    this.data.changeBlurLoadMain(false);
-    // this.data.changeBlurLoadECAVIAR(false);
-    $(".blur-loading-main").removeClass("blur-overlay");
-    $(".disabled-post-calc").removeClass("disabled-overlay");
-    // remove all calculated data
-    this.data.changeMainData(null);
-    // remove all eCAVIAR calculated data
-    this.data.changeECAVIARData(null);
-    // remove all Hyprcoloc calculate data
-    this.data.changeHyprcolocData(null);
-    // remove any error messages
-    this.data.changeErrorMessage('');
-    // choose default association data file toggle
-    // this.qtlsType = "assoc";
-    this.data.changeQtlsType("assoc");
-    // change result tab back to Locus Alignment
-    this.data.changeSelectedTab(0);
-    // clear any file inputs
-    this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
-    this.qtlsForm.setControl('quantificationFile', new FormControl({value: '', disabled: false}));
-    this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
-    this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
-    this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
-    this.qtlsForm.setControl('cisDistanceInput', new FormControl({value: '100', disabled: false}, [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required]));
-    this.qtlsForm.setControl('rsnumber', new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")]));
-    this.qtlsForm.value.associationFile = false;
-    this.qtlsForm.value.quantificationFile = false;
-    this.qtlsForm.value.genotypeFile = false;
-    this.qtlsForm.value.gwasFile = false;
-    this.qtlsForm.value.LDFile = false;
-    $("#association-file").val("");
-    $("#quantification-file").val("");
-    $("#genotype-file").val("");
-    $("#gwas-file").val("");
-    $("#LD-file").val("");
-    // disable locus colocalization and locus quantification result tabs
-    this.data.changeDisableLocusColocalization(true);
-    this.data.changeDisableLocusQuantification(true);
-    $("#qtls-data-input-association-file").removeClass("disabled-overlay");
-    $("#qtls-data-input-quantification-file").removeClass("disabled-overlay");
-    $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
-    $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
-    $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
-    // clear any loaded sample files
-    this.selectLoadQTLsSamples = false;
-    this.selectLoadGWASSample = false;
-    this.selectLoadLDSample = false;
-    this.selectedDist = "100";
-    this.rsnumSearch = "";
+    if (this.hyprcolocIsLoading || this.ecaviarIsLoading) {
+      // show reset tooltip warning and prevent reset if any hyprcoloc/ecaviar calculation is ongoing
+      $("#reset-tooltip").tooltip("enable");
+      $("#reset-tooltip").tooltip("show");
+      $("#reset-tooltip").tooltip("disable");
+    } else {
+      // hide recalculate/reset tooltip & reset hyprcoloc/ecaviar loading status
+      $("#reset-tooltip").tooltip("enable");
+      $("#reset-tooltip").tooltip("hide");
+      $("#reset-tooltip").tooltip("disable");
+      $("#recalculate-tooltip").tooltip("enable");
+      $("#recalculate-tooltip").tooltip("hide");
+      $("#recalculate-tooltip").tooltip("disable");
+      this.data.changeHyprcolocIsLoading(false);
+      this.data.changeEcaviarIsLoading(false);
+      // hide quantification file genotype file error tooltips if displayed
+      $("#quantification-file-tooltip").tooltip("enable");
+      $("#quantification-file-tooltip").tooltip("hide");
+      $("#quantification-file-tooltip").tooltip("disable");
+      $("#genotype-file-tooltip").tooltip("enable");
+      $("#genotype-file-tooltip").tooltip("hide");
+      $("#genotype-file-tooltip").tooltip("disable");
+      this.disableQTLsToggle = false;
+      this.data.changeResultStatus(false);
+      this.data.changeBlurLoadMain(false);
+      // this.data.changeBlurLoadECAVIAR(false);
+      $(".blur-loading-main").removeClass("blur-overlay");
+      $(".disabled-post-calc").removeClass("disabled-overlay");
+      // remove all calculated data
+      this.data.changeMainData(null);
+      // remove all eCAVIAR calculated data
+      this.data.changeECAVIARData(null);
+      // remove all Hyprcoloc calculate data
+      this.data.changeHyprcolocData(null);
+      // remove any error messages
+      this.data.changeErrorMessage('');
+      // choose default association data file toggle
+      // this.qtlsType = "assoc";
+      this.data.changeQtlsType("assoc");
+      // change result tab back to Locus Alignment
+      this.data.changeSelectedTab(0);
+      // clear any file inputs
+      this.qtlsForm.setControl('associationFile', new FormControl({value: '', disabled: false}, Validators.required));
+      this.qtlsForm.setControl('quantificationFile', new FormControl({value: '', disabled: false}));
+      this.qtlsForm.setControl('genotypeFile', new FormControl({value: '', disabled: false}));
+      this.qtlsForm.setControl('gwasFile', new FormControl({value: '', disabled: false}));
+      this.qtlsForm.setControl('LDFile', new FormControl({value: '', disabled: false}));
+      this.qtlsForm.setControl('cisDistanceInput', new FormControl({value: '100', disabled: false}, [Validators.pattern("^(\-?(?!0)[0-9]+)?$"), Validators.min(1), Validators.max(2000), Validators.required]));
+      this.qtlsForm.setControl('rsnumber', new FormControl({value: '', disabled: false}, [Validators.pattern("^(rs[0-9]+)?$")]));
+      this.qtlsForm.value.associationFile = false;
+      this.qtlsForm.value.quantificationFile = false;
+      this.qtlsForm.value.genotypeFile = false;
+      this.qtlsForm.value.gwasFile = false;
+      this.qtlsForm.value.LDFile = false;
+      $("#association-file").val("");
+      $("#quantification-file").val("");
+      $("#genotype-file").val("");
+      $("#gwas-file").val("");
+      $("#LD-file").val("");
+      // disable locus colocalization and locus quantification result tabs
+      this.data.changeDisableLocusColocalization(true);
+      this.data.changeDisableLocusQuantification(true);
+      $("#qtls-data-input-association-file").removeClass("disabled-overlay");
+      $("#qtls-data-input-quantification-file").removeClass("disabled-overlay");
+      $("#qtls-data-input-genotype-file").removeClass("disabled-overlay");
+      $("#qtls-data-input-gwas-file").removeClass("disabled-overlay");
+      $("#qtls-data-input-LD-file").removeClass("disabled-overlay");
+      // clear any loaded sample files
+      this.selectLoadQTLsSamples = false;
+      this.selectLoadGWASSample = false;
+      this.selectLoadLDSample = false;
+      this.selectedDist = "100";
+      this.rsnumSearch = "";
+    }
   }
 
 }

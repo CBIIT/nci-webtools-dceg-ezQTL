@@ -90,6 +90,9 @@ export class QTLsCalculationInputsComponent implements OnInit {
   geneSymbolsList: string[];
   filteredOptions: Observable<string[]>;
 
+  hyprcolocIsLoading: boolean;
+  ecaviarIsLoading: boolean;
+
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
@@ -115,6 +118,24 @@ export class QTLsCalculationInputsComponent implements OnInit {
       this.errorMessage = "";
       if (errorMessage) {
         this.errorMessage = errorMessage;
+      }
+    });
+
+    this.data.currentHyprcolocIsLoading.subscribe(hyprcolocIsLoading => {
+      this.hyprcolocIsLoading = hyprcolocIsLoading
+      if (!this.hyprcolocIsLoading) {
+        $("#recalculate-tooltip").tooltip("enable");
+        $("#recalculate-tooltip").tooltip("hide");
+        $("#recalculate-tooltip").tooltip("disable");
+      }
+    });
+
+    this.data.currentEcaviarIsLoading.subscribe(ecaviarIsLoading => {
+      this.ecaviarIsLoading = ecaviarIsLoading
+      if (!this.ecaviarIsLoading) {
+        $("#recalculate-tooltip").tooltip("enable");
+        $("#recalculate-tooltip").tooltip("hide");
+        $("#recalculate-tooltip").tooltip("disable");
       }
     });
     
@@ -231,6 +252,12 @@ export class QTLsCalculationInputsComponent implements OnInit {
   }
 
   collapseDataInputPanel() {
+    $("#recalculate-tooltip").tooltip("enable");
+    $("#recalculate-tooltip").tooltip("hide");
+    $("#recalculate-tooltip").tooltip("disable");
+    $("#reset-tooltip").tooltip("enable");
+    $("#reset-tooltip").tooltip("hide");
+    $("#reset-tooltip").tooltip("disable");
     $("#quantification-file-tooltip").tooltip("enable");
     $("#quantification-file-tooltip").tooltip("hide");
     $("#quantification-file-tooltip").tooltip("disable");
@@ -586,136 +613,79 @@ export class QTLsCalculationInputsComponent implements OnInit {
   }
 
   async recalculatePopGeneDistRef() {
-    // get new parameters as string
-    var selectedPopString = this.selectedPop.join('+');
-    var selectedGeneString = this.getGeneID(this.geneList, this.selectedGeneSymbol);
-    var selectedDistNumber = this.selectedDist;
-    // retrieve recalculate statuses
-    var recalculateAttempt = "true";
-    var recalculatePop = this.recalculatePopAttempt;
-    var recalculateGene = this.recalculateGeneAttempt;
-    var recalculateDist = this.recalculateDistAttempt;
-    // change recalculate status to false to disable recalculate button after recalculation completes
-    this.inputChanged = false;
-    // check if rs number ld ref entered is listed as a variant for ref gene
-    // if not, prevent calculation and throw warning
-    if (this.geneSymbolsList.includes(this.selectedGeneSymbol)) {
-      if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
-        this.closeWarning();
-        var selectedRefString = this.rsnumSearch;
-        var recalculateRef = this.recalculateRefAttempt;
-        if (this.rsnumSearch.length == 0) {
-          selectedRefString = "false";
-          recalculateRef = "false";
-        }
-        // reset
-        this.closePopover();
-        this.data.changeBlurLoadMain(true);
-        this.data.changeECAVIARData(null);
-        this.data.changeHyprcolocData(null);
-        this.disableInputs = true;
-        $(".blur-loading-main").addClass("blur-overlay");
-        $(".blur-loading-ecaviar").addClass("blur-overlay");
-        // calculate
-        this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.quantificationFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
-          .subscribe(
-            res => {
-              this.data.changeMainData(res);
-              this.data.changeBlurLoadMain(false);
-              this.disableInputs = false;
-              $(".blur-loading-main").removeClass("blur-overlay");
-              this.recalculatePopAttempt = "false";
-              this.recalculateGeneAttempt = "false";
-              this.recalculateDistAttempt = "false";
-              this.recalculateRefAttempt = "false";
-              if (this.rsnumSearch.length == 0) {
-                this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
-                this.qtlsCalculationForm.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
-              }
-
-              // // Run Locus Colocalization calculations if GWAS and Association Files loaded
-              // var select_qtls_samples = res["info"]["select_qtls_samples"][0]; // use QTLs sample data files ?
-              // var select_gwas_sample = res["info"]["select_gwas_sample"][0]; // use GWAS sample data file ?
-              // var gwasFileName = res["info"]["inputs"]["gwas_file"][0] // gwas filename
-              // var associationFileName = res["info"]["inputs"]["association_file"][0]; // association filename
-              // var LDFileName = res["info"]["inputs"]["ld_file"][0]; // LD filename
-              // if ((gwasFileName && gwasFileName != "false") || select_gwas_sample == 'true') {
-              //   var locusAlignmentDataQTopAnnot = res["locus_alignment"]["top"][0][0]; // locus alignment Top Gene data
-              //   var newSelectedDist = res["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
-              //   var requestID = res["info"]["inputs"]["request"][0]; // request id
-              //   if (newSelectedDist == "false") {
-              //     var select_dist = "100000"; // default cis-QTL distance (in Kb)
-              //   } else {
-              //     var select_dist = (parseInt(newSelectedDist, 10) * 1000).toString(); // recalculated new cis-QTL distance (in Kb)
-              //   }
-              //   var select_ref = locusAlignmentDataQTopAnnot["rsnum"].toString();
-              //   var select_chr = locusAlignmentDataQTopAnnot["chr"].toString();
-              //   var select_pos = locusAlignmentDataQTopAnnot["pos"].toString();
-              //   // Run eCAVIAR calculation
-              //   this.data.calculateLocusColocalizationECAVIAR(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, LDFileName, select_ref, select_dist, requestID)
-              //     .subscribe(
-              //       res => {
-              //         var requestIDECAVIAR = res["ecaviar"]["request"][0];
-              //         if (requestID == requestIDECAVIAR && requestID == requestIDECAVIAR) {
-              //           // console.log("ECAVIAR REQUEST MATCHES", requestID, requestID, requestIDECAVIAR);
-              //           this.data.changeECAVIARData(res);
-              //         } else {
-              //           // console.log("ECAVIAR REQUEST DOES NOT MATCH", requestID, requestID, requestIDECAVIAR);
-              //         }
-              //       },
-              //       error => {
-              //         this.handleError(error);
-              //       }
-              //     );
-              //   // Run HyprColoc LD calculation then HyprColoc calculation
-              //   this.data.calculateLocusColocalizationHyprcolocLD(LDFileName, select_ref, select_chr, select_pos, select_dist, requestID)
-              //     .subscribe(
-              //       res => {
-              //         var hyprcolocLDFileName = res["hyprcoloc_ld"]["filename"][0];
-              //         var requestIDHypercolocLD = res["hyprcoloc_ld"]["request"][0];
-              //         // Run HyprColoc calculation after LD file is generated
-              //         if (requestID == requestIDHypercolocLD && requestID == requestIDHypercolocLD) {
-              //           // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
-              //           this.data.calculateLocusColocalizationHyprcoloc(select_gwas_sample, select_qtls_samples, gwasFileName, associationFileName, hyprcolocLDFileName, requestID)
-              //             .subscribe(
-              //               res => {
-              //                 var requestIDHypercoloc = res["hyprcoloc"]["request"][0];
-              //                 if (requestID == requestIDHypercoloc && requestID == requestIDHypercoloc) {
-              //                   // console.log("HYPRCOLOC REQUEST MATCHES", requestID, requestID, requestIDHypercoloc);
-              //                   this.data.changeHyprcolocData(res);
-              //                 } else {
-              //                   // console.log("HYPRCOLOC REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercoloc);
-              //                 }
-              //               },
-              //               error => {
-              //                 this.handleError(error);
-              //               }
-              //             );
-              //         } else {
-              //           console.log("HYPRCOLOC LD REQUEST DOES NOT MATCH", requestID, requestID, requestIDHypercolocLD);
-              //         }
-              //       },
-              //       error => {
-              //         this.handleError(error);
-              //       }
-              //     );
-              // }
-            },
-            error => {
-              this.handleError(error);
-              this.data.changeBlurLoadMain(false);
-              this.disableInputs = false;
-              $(".blur-loading-main").removeClass("blur-overlay");
-            }
-          );
-      } else {
-        // if rs number ld ref entered is not listed as a variant for ref gene, throw warning alert
-        this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
-      }
+    if (this.hyprcolocIsLoading || this.ecaviarIsLoading) {
+      // show recalculate tooltip warning and prevent recalculation if any hyprcoloc/ecaviar calculation is ongoing
+      $("#recalculate-tooltip").tooltip("enable");
+      $("#recalculate-tooltip").tooltip("show");
+      $("#recalculate-tooltip").tooltip("disable");
     } else {
-      // if ref gene entered is not in in association data, throw warning alert
-      this.warningMessage = this.selectedGeneSymbol + " not found in the association data file. Please enter another gene symbol name."
+      $("#recalculate-tooltip").tooltip("enable");
+      $("#recalculate-tooltip").tooltip("hide");
+      $("#recalculate-tooltip").tooltip("disable");
+      // get new parameters as string
+      var selectedPopString = this.selectedPop.join('+');
+      var selectedGeneString = this.getGeneID(this.geneList, this.selectedGeneSymbol);
+      var selectedDistNumber = this.selectedDist;
+      // retrieve recalculate statuses
+      var recalculateAttempt = "true";
+      var recalculatePop = this.recalculatePopAttempt;
+      var recalculateGene = this.recalculateGeneAttempt;
+      var recalculateDist = this.recalculateDistAttempt;
+      // change recalculate status to false to disable recalculate button after recalculation completes
+      this.inputChanged = false;
+      // check if rs number ld ref entered is listed as a variant for ref gene
+      // if not, prevent calculation and throw warning
+      if (this.geneSymbolsList.includes(this.selectedGeneSymbol)) {
+        if (this.allGeneVariantsOrganized[selectedGeneString].includes(this.rsnumSearch) || this.rsnumSearch.length == 0) {
+          this.closeWarning();
+          var selectedRefString = this.rsnumSearch;
+          var recalculateRef = this.recalculateRefAttempt;
+          if (this.rsnumSearch.length == 0) {
+            selectedRefString = "false";
+            recalculateRef = "false";
+          }
+          // reset
+          this.closePopover();
+          this.data.changeBlurLoadMain(true);
+          this.data.changeECAVIARData(null);
+          this.data.changeHyprcolocData(null);
+          this.disableInputs = true;
+          $(".blur-loading-main").addClass("blur-overlay");
+          $(".blur-loading-ecaviar").addClass("blur-overlay");
+          // calculate
+          this.data.recalculateMain(this.select_qtls_samples, this.select_gwas_sample, this.associationFile, this.quantificationFile, this.genotypeFile, this.gwasFile, this.LDFile, this.requestID, selectedPopString, selectedGeneString, selectedDistNumber, selectedRefString, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef)
+            .subscribe(
+              res => {
+                this.data.changeMainData(res);
+                this.data.changeBlurLoadMain(false);
+                this.disableInputs = false;
+                $(".blur-loading-main").removeClass("blur-overlay");
+                this.recalculatePopAttempt = "false";
+                this.recalculateGeneAttempt = "false";
+                this.recalculateDistAttempt = "false";
+                this.recalculateRefAttempt = "false";
+                if (this.rsnumSearch.length == 0) {
+                  this.rsnumSearch = this.locusAlignmentDataQTopAnnot["rsnum"];
+                  this.qtlsCalculationForm.value.rsnumber = this.locusAlignmentDataQTopAnnot["rsnum"];
+                }
+              },
+              error => {
+                this.handleError(error);
+                this.data.changeBlurLoadMain(false);
+                this.disableInputs = false;
+                $(".blur-loading-main").removeClass("blur-overlay");
+              }
+            );
+        } else {
+          // if rs number ld ref entered is not listed as a variant for ref gene, throw warning alert
+          this.warningMessage = this.rsnumSearch + " not found in the association data file for the chosen reference gene. Please enter another variant."
+        }
+      } else {
+        // if ref gene entered is not in in association data, throw warning alert
+        this.warningMessage = this.selectedGeneSymbol + " not found in the association data file. Please enter another gene symbol name."
+      }
     }
+    
   }
 
 }

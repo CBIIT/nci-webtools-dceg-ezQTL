@@ -198,7 +198,11 @@
         class="mt-2" 
         mat-raised-button color="primary" 
         [disabled]="!mainData || (!inputChanged || selectedPop.length == 0 || qtlsCalculationForm.get('rsnumber').invalid || qtlsCalculationForm.get('referenceGene').invalid)" 
-        (click)="recalculatePopGeneDistRef()">
+        (click)="recalculatePopGeneDistRef()" 
+        id="recalculate-tooltip" 
+        data-toggle="tooltip" 
+        data-placement="right" 
+        title="Please wait until HyPrColoc and eCAVIAR calculations are finished before recalculating.">
         Recalculate
       </button>
     </div>
