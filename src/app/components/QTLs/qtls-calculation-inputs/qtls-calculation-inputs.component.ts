@@ -255,6 +255,9 @@ export class QTLsCalculationInputsComponent implements OnInit {
     $("#recalculate-tooltip").tooltip("enable");
     $("#recalculate-tooltip").tooltip("hide");
     $("#recalculate-tooltip").tooltip("disable");
+    $("#reset-tooltip").tooltip("enable");
+    $("#reset-tooltip").tooltip("hide");
+    $("#reset-tooltip").tooltip("disable");
     $("#quantification-file-tooltip").tooltip("enable");
     $("#quantification-file-tooltip").tooltip("hide");
     $("#quantification-file-tooltip").tooltip("disable");
@@ -611,6 +614,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
 
   async recalculatePopGeneDistRef() {
     if (this.hyprcolocIsLoading || this.ecaviarIsLoading) {
+      // show recalculate tooltip warning and prevent recalculation if any hyprcoloc/ecaviar calculation is ongoing
       $("#recalculate-tooltip").tooltip("enable");
       $("#recalculate-tooltip").tooltip("show");
       $("#recalculate-tooltip").tooltip("disable");

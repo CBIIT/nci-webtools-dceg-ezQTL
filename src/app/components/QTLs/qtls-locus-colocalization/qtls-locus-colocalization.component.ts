@@ -309,6 +309,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
                     },
                     error => {
                       this.handleError(error);
+                      this.data.changeHyprcolocIsLoading(false);
                     }
                   );
               } else {
@@ -317,6 +318,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
             },
             error => {
               this.handleError(error);
+              this.data.changeHyprcolocIsLoading(false);
             }
           );
 
@@ -349,6 +351,7 @@ export class QtlsLocusColocalizationComponent implements OnInit {
           },
           error => {
             this.handleError(error);
+            this.data.changeEcaviarIsLoading(false);
           }
         );
 
