@@ -13,10 +13,11 @@
     <div class="col-md-auto pl-3 pr-3">
       <mat-form-field>
         <mat-label>Number of Genes (for Plot)</mat-label>
-        <mat-select #numGenes [(value)]="selectNumGenes" (selectionChange)="triggerReplot()" required>
+        <mat-select #numGenes [(value)]="selectNumGenes" (selectionChange)="triggerReplot()" role="listbox" required>
           <mat-option 
             *ngFor="let num of totalNumGenesArray" 
-            [value]="num">
+            [value]="num" 
+            role="option">
             {{ num }}
           </mat-option>
         </mat-select>
