@@ -41,8 +41,7 @@
           required 
           [disabled]=!mainData
           #population 
-          role="list"
-          aria-label="populations">
+          role="listbox">
           <!-- Edit dropdown placeholder -->
           <mat-select-trigger>
             <span *ngIf="selectedPop.length < 26">
@@ -68,8 +67,7 @@
             color="primary" 
             [checked]="populationSelectedAll" 
             style="width: 500px;" 
-            aria-labelledby="populations"
-            role="listitem">
+            role="option">
             (ALL) All Populations
           </mat-checkbox>
           <!-- Populate dropdown with all populations -->
@@ -87,8 +85,7 @@
               class="pl-5" 
               *ngFor="let subPopulation of group.subPopulations" 
               [value]="subPopulation.value" 
-              role="listitem"
-              aria-labelledby="populations">
+              role="option">
               ({{ subPopulation.value }}) {{ subPopulation.viewValue }}
             </mat-option>
           </div>
