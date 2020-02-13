@@ -6,13 +6,13 @@
         aria-label="Choose to display either P-value Correlation plot, HyPrColoc data table, or eCAVIAR data table" 
         [(ngModel)]="selectedResultsDisplay" 
         (change)="changeResultsDisplay()">
-        <mat-button-toggle value="pval_correlation">P-value Correlation</mat-button-toggle>
+        <!-- <mat-button-toggle value="pval_correlation">P-value Correlation</mat-button-toggle> -->
         <mat-button-toggle value="hyprcoloc">HyPrColoc</mat-button-toggle>
         <mat-button-toggle value="ecaviar">eCAVIAR</mat-button-toggle>
       </mat-button-toggle-group>
   </div>
 
-  <div class="locus-colocalization-pval-correlation" [hidden]="selectedResultsDisplay != 'pval_correlation'">
+  <!-- <div class="locus-colocalization-pval-correlation" [hidden]="selectedResultsDisplay != 'pval_correlation'">
     <div class="locus-colocalization-content mt-3 px-3">
       <p>
         This scatter plot shows all trait correlation coefficients or P-value calculated from 
@@ -22,7 +22,7 @@
       </p>
     </div>
     <div class="row p-3 justify-content-center" style="margin-right: 0px; margin-left: 0px;">
-      <!-- Toggle Spearman/Pearson correlation type -->
+      Toggle Spearman/Pearson correlation type
       <div class="col-md-auto pl-3 pr-3">
         Pearson/Spearman:
         <mat-button-toggle-group 
@@ -35,7 +35,7 @@
         </mat-button-toggle-group>
       </div>
   
-      <!-- P-value threshold input for correlation scatter plot -->
+      P-value threshold input for correlation scatter plot
       <div 
         class="col-md-auto pl-3 pr-3" 
         id="qtls-locus-colocalization-correlation-scatter-threshold"
@@ -64,7 +64,7 @@
       
     </div>
   
-    <!-- Show centered Plotly locus colocalization scatter plot if graph is generated -->
+    Show centered Plotly locus colocalization scatter plot if graph is generated
     <div 
       class="d-flex justify-content-center" 
       id="qtls-locus-colocalization-correlation-scatter-plot">
@@ -75,7 +75,7 @@
         [config]="correlationScatter.config">
       </plotly-plot>
     </div>
-  </div>
+  </div> -->
 
   <!-- <br> -->
 
@@ -84,15 +84,15 @@
 
     <div class="locus-colocalization-content mt-3 px-3">
       <p>
-        Hypothesis Prioritisation in multi-trait Colocalization (HyPrColoc) analyses. 
-        The first table show the colocalization result including the following information:  
+        Hypothesis Prioritization in multi-trait Colocalization (<a href="https://github.com/jrs95/hyprcoloc" target="_blank">HyPrColoc</a>) analyses (Foley <i>et al</i>. 2019 bioRxiv 592238). 
+        The first table shows the colocalization result including the following information:  
       </p>
       <ul>
-        <li>a cluster of putatively colocalized traits. The last column shows which gene QTLs are colocalized with GWAS.</li>
-        <li>the posterior probability that these traits are colocalized</li>
-        <li>the ‘regional association’ probability* (which is always > the posterior probability)</li>
-        <li>a candidate causal variant explaining the shared association</li>
-        <li>the proportion of the posterior probability explained by this variant (which represents the HyPrColoc multi-trait fine-mapping probability).</li>
+        <li>Traits a cluster of putatively colocalized traits. The last column shows which gene QTLs are colocalized with GWAS.</li>
+        <li>Posterior Probability: the posterior probability that these traits are colocalized</li>
+        <li>Regional association probability: always > the posterior probability. Please see Foley <i>et al</i> for details</li>
+        <li>Candidate SNP: a candidate causal variant explaining the shared association</li>
+        <li>Posterior Explained By SNP: the proportion of the posterior probability explained by the Candidate SNP (which represents the HyPrColoc multi-trait fine-mapping probability).</li>
       </ul>
     </div>
 
@@ -210,7 +210,7 @@
 
     <div class="locus-colocalization-content mt-3 px-3">
       <p>
-        The second table outputs the SNP score of all variants for each pair of colocalized traits. For detail information. Please check the manual of <a href="https://github.com/jrs95/hyprcoloc" target="_blank">HyPrColoc</a>.
+        The second table outputs the SNP score of all variants for each pair of colocalized traits. For detail information, please check the manual of <a href="https://github.com/jrs95/hyprcoloc" target="_blank">HyPrColoc</a>.
       </p>
     </div>
 

@@ -63,6 +63,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   GWASDataR2NA: Object[];
   selectedPop: string[];
   selectedGene: string;
+  selectedGeneSymbol: string;
   selectedDist: string;
   public graph = null;
   public scatter = null;
@@ -107,19 +108,19 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           $("#qtls-locus-alignment-plot").addClass("justify-content-center");
           $("#qtls-locus-alignment-plot").removeClass("justify-content-start");
         }
-        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
-          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
-          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
-        }
+        // if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
+        //   $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
+        //   $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
+        // }
       } else { // input panel shown
         if ($("#qtls-locus-alignment-plot").hasClass("justify-content-center")) {
           $("#qtls-locus-alignment-plot").addClass("justify-content-start");
           $("#qtls-locus-alignment-plot").removeClass("justify-content-center");
         }
-        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
-          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
-          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
-        }
+        // if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
+        //   $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
+        //   $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
+        // }
       }
     });
     this.disableInputs = false;
@@ -158,6 +159,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         this.selectedGene = this.newSelectedGene; // recalculated new gene selection
         this.selectedDist = this.newSelectedDist;
 
+        this.selectedGeneSymbol = this.locusAlignmentDataQTopAnnot["gene_symbol"];
+
         if (this.locusAlignmentData && this.locusAlignmentData[0]) {
           // differentiate variants with/without R2 data for popovers
           this.locusAlignmentDataR2 = this.getPopoverData(this.locusAlignmentData);
@@ -176,6 +179,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             // this.locusAlignmentPlot(this.locusAlignmentData, this.locusAlignmentDataRC, this.locusAlignmentDataQTopAnnot);
           }
         }
+
       }
     });
   }
@@ -240,9 +244,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneData.length; i++) {
       if ('rsnum' in geneData[i]) {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + 'P-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -252,9 +256,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneGWASData.length; i++) {
       if ('rsnum' in geneGWASData[i]) {
-        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + 'P-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + 'P-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -561,6 +565,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       height: 1180,
       yaxis: {
         autorange: true,
+        fixedrange: true,
         // overlaying: false,
         // title: "Gene Density",
         domain: [0, 0.025],
@@ -580,7 +585,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis2: {
         autorange: true,
         automargin: true,
-        title: "GWAS -log10(P-value)",
+        title: "GWAS -log10(<i>P</i>-value)",
         domain: [0.03, 0.54],
         zeroline: false,
         linecolor: 'black',
@@ -595,7 +600,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis3: {
         autorange: true,
         automargin: true,
-        title: "QTLs -log10(P-value)",
+        title: "QTLs -log10(<i>P</i>-value)",
         domain: [0.56, 1],
         zeroline: false,
         linecolor: 'black',
@@ -840,6 +845,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       height: 780,
       yaxis: {
         autorange: true,
+        fixedrange: true,
         // overlaying: false,
         // title: "Gene Density",
         domain: [0, 0.04],
@@ -860,7 +866,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         autorange: true,
         automargin: true,
         // overlaying: 'y3',
-        title: "QTLs -log10(P-value)",
+        title: "QTLs -log10(<i>P</i>-value)",
         domain: [0.05, 1],
         zeroline: false,
         linecolor: 'black',
@@ -1082,13 +1088,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 245
               });
             } else { // input panel shown
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 25
               });
             }
@@ -1123,13 +1129,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
               if (this.collapseInput) { // input panel collapsed
                 $('.popover').show().css({
                   position: "absolute",
-                  top: top + 50, 
+                  top: top + 70, 
                   left: left + 245
                 });
               } else { // input panel shown
                 $('.popover').show().css({
                   position: "absolute",
-                  top: top + 50, 
+                  top: top + 70, 
                   left: left + 25
                 });
               }
@@ -1166,13 +1172,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 245
               });
             } else { // input panel shown
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 25
               });
             }
@@ -1265,9 +1271,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       if ("R2" in scatterData[i] && scatterData[i]["R2"] != "NA") {
         if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           if ('rs' in scatterData[i]) {
-            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
           } else {
-            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
           }
         }
       }
@@ -1281,9 +1287,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       if (!("R2" in scatterData[i]) || scatterData[i]["R2"] == "NA") {
         if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
           if ('rs' in scatterData[i]) {
-            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
           } else {
-            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + 'P-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+            hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
           }
         }
       }
@@ -1494,18 +1500,18 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var pdata = [trace1];
     var playout = {
       title: {
-        text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? (this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData)) : scatterTitle),
+        text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculatePearsonCorrelationTitle(xData, yData) : scatterTitle.split(', ')[1]),
         xref: 'paper'
       },
       font: {
         color: 'black'
       },
-      width: 1000,
+      width: 700,
       height: 700,
       yaxis: {
         autorange: true,
         automargin: true,
-        title: "-log10(QTLs P-value)",
+        title: "-log10(QTL <i>P</i>-value), " + this.selectedGeneSymbol,
         font: {
           color: 'black'
         },
@@ -1516,7 +1522,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       xaxis: {
         autorange: true,
         automargin: true,
-        title: "-log10(GWAS P-value)",
+        title: "-log10(GWAS <i>P</i>-value)",
         font: {
           color: 'black'
         },
@@ -1524,11 +1530,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           color: 'black'
         }
       },
-      margin: {
-        l: 40,
-        r: 40,
-        b: 80,
-      },
+      // margin: {
+      //   l: 40,
+      //   r: 40,
+      //   b: 40,
+      //   t: 40
+      // },
       showlegend: false,
       clickmode: 'none',
       hovermode: 'closest'

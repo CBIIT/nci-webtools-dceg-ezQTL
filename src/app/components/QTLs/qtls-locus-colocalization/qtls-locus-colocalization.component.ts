@@ -67,9 +67,9 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   locusColocalizationData: Object;
   locusAlignmentDataQTopAnnot: Object;
 
-  public correlationScatter = null;
-  selectedCorrelation: string;
-  selectedCorrelationPvalThreshold: number;
+  // public correlationScatter = null;
+  // selectedCorrelation: string;
+  // selectedCorrelationPvalThreshold: number;
 
   requestID: number;
   select_qtls_samples: string;
@@ -108,9 +108,9 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   hyprcolocIsLoading: boolean;
   ecaviarIsLoading: boolean;
 
-  correlationScatterThreshold = new FormGroup({
-    correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
-  });
+  // correlationScatterThreshold = new FormGroup({
+  //   correlationPvalThreshold: new FormControl({value: 1.0, disabled: true}, [Validators.pattern("^(\-?[0-9]*\.?[0-9]*)$"), Validators.min(0.0), Validators.max(1.0)])
+  // });
 
   @ViewChild('HyprcolocPaginator') HyprcolocPaginator: MatPaginator;
   @ViewChild('HyprcolocTableSort') HyprcolocTableSort: MatSort;
@@ -122,14 +122,14 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
-    this.selectedResultsDisplay = "pval_correlation";
+    this.selectedResultsDisplay = "hyprcoloc";
     this.hyprcolocInitial = true;
     this.ecaviarInitial = true;
     this.data.currentHyprcolocIsLoading.subscribe(hyprcolocIsLoading => this.hyprcolocIsLoading = hyprcolocIsLoading);
     this.data.currentEcaviarIsLoading.subscribe(ecaviarIsLoading => this.ecaviarIsLoading = ecaviarIsLoading);
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
-        this.selectedResultsDisplay = "pval_correlation";
+        this.selectedResultsDisplay = "hyprcoloc";
         this.hyprcolocInitial = true;
         this.ecaviarInitial = true;
         this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus
@@ -142,9 +142,10 @@ export class QtlsLocusColocalizationComponent implements OnInit {
         this.requestID = mainData["info"]["inputs"]["request"][0]; // request id
         this.newSelectedDist = mainData["info"]["inputs"]["select_dist"][0]; // inputted cis-QTL distance
         if (this.locusColocalizationData && this.locusColocalizationData[0]) {
-          this.selectedCorrelation = "R";
-          this.selectedCorrelationPvalThreshold = 1.0;
-          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
+          this.changeResultsDisplay();
+          // this.selectedCorrelation = "R";
+          // this.selectedCorrelationPvalThreshold = 1.0;
+          // this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
         }
       }
     });
@@ -600,193 +601,193 @@ export class QtlsLocusColocalizationComponent implements OnInit {
     this.data.changeErrorMessage(errorMessage);
   }
 
-  getCorrelationScatterXR(correlationData) {
-    var p_values = [];
-    for (var i = 0; i < correlationData.length; i++) {
-      p_values.push(correlationData[i]['pearson_r']);
-    }
-    return p_values;
-  }
+  // getCorrelationScatterXR(correlationData) {
+  //   var p_values = [];
+  //   for (var i = 0; i < correlationData.length; i++) {
+  //     p_values.push(correlationData[i]['pearson_r']);
+  //   }
+  //   return p_values;
+  // }
 
-  getCorrelationScatterYR(correlationData) {
-    var pval_nominals = [];
-    for (var i = 0; i < correlationData.length; i++) {
-      pval_nominals.push(correlationData[i]['spearman_r']);
-    }
-    return pval_nominals;
-  }
+  // getCorrelationScatterYR(correlationData) {
+  //   var pval_nominals = [];
+  //   for (var i = 0; i < correlationData.length; i++) {
+  //     pval_nominals.push(correlationData[i]['spearman_r']);
+  //   }
+  //   return pval_nominals;
+  // }
 
-  getCorrelationScatterHoverDataR(correlationData) {
-    var hoverData = [];
-    for (var i = 0; i < correlationData.length; i++) {
-      hoverData.push(correlationData[i]['gene_symbol'] + '<br>' + 'Pearson: ' + correlationData[i]['pearson_r'] + '<br>' + "Spearman: " + correlationData[i]['spearman_r']);
-    }
-    return hoverData;
-  }
+  // getCorrelationScatterHoverDataR(correlationData) {
+  //   var hoverData = [];
+  //   for (var i = 0; i < correlationData.length; i++) {
+  //     hoverData.push(correlationData[i]['gene_symbol'] + '<br>' + 'Pearson: ' + correlationData[i]['pearson_r'] + '<br>' + "Spearman: " + correlationData[i]['spearman_r']);
+  //   }
+  //   return hoverData;
+  // }
 
-  getCorrelationScatterXP(correlationData, threshold) {
-    var p_values = [];
-    for (var i = 0; i < correlationData.length; i++) {
-      if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
-        p_values.push(Math.log10(correlationData[i]['pearson_p']) * -1.0);
-      }
-    }
-    return p_values;
-  }
+  // getCorrelationScatterXP(correlationData, threshold) {
+  //   var p_values = [];
+  //   for (var i = 0; i < correlationData.length; i++) {
+  //     if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
+  //       p_values.push(Math.log10(correlationData[i]['pearson_p']) * -1.0);
+  //     }
+  //   }
+  //   return p_values;
+  // }
 
-  getCorrelationScatterYP(correlationData, threshold) {
-    var pval_nominals = [];
-    for (var i = 0; i < correlationData.length; i++) {
-      if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
-        pval_nominals.push(Math.log10(correlationData[i]['spearman_p']) * -1.0);
-      }
-    }
-    return pval_nominals;
-  }
+  // getCorrelationScatterYP(correlationData, threshold) {
+  //   var pval_nominals = [];
+  //   for (var i = 0; i < correlationData.length; i++) {
+  //     if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
+  //       pval_nominals.push(Math.log10(correlationData[i]['spearman_p']) * -1.0);
+  //     }
+  //   }
+  //   return pval_nominals;
+  // }
 
-  getCorrelationScatterHoverDataP(correlationData, threshold) {
-    var hoverData = [];
-    for (var i = 0; i < correlationData.length; i++) {
-      if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
-        hoverData.push(correlationData[i]['gene_symbol'] + '<br>' + 'Pearson: ' + correlationData[i]['pearson_p'] + '<br>' + "Spearman: " + correlationData[i]['spearman_p']);
-      }
-    }
-    return hoverData;
-  }
+  // getCorrelationScatterHoverDataP(correlationData, threshold) {
+  //   var hoverData = [];
+  //   for (var i = 0; i < correlationData.length; i++) {
+  //     if (correlationData[i]['pearson_p'] <= parseFloat(threshold) && correlationData[i]['spearman_p'] <= parseFloat(threshold)) {
+  //       hoverData.push(correlationData[i]['gene_symbol'] + '<br>' + 'Pearson: ' + correlationData[i]['pearson_p'] + '<br>' + "Spearman: " + correlationData[i]['spearman_p']);
+  //     }
+  //   }
+  //   return hoverData;
+  // }
 
-  locusColocalizationCorrelationScatterPlot(correlationData, correlation, threshold) {
-    if (correlation == "R") {
-      var xDataR = this.getCorrelationScatterXR(correlationData);
-      // console.log("xData", xData);
-      var yDataR = this.getCorrelationScatterYR(correlationData);
-      // console.log("yData", yData);
-      var hoverDataR = this.getCorrelationScatterHoverDataR(correlationData);
-    } else {
-      var xDataP = this.getCorrelationScatterXP(correlationData, threshold);
-      // console.log("xData", xData);
-      var yDataP = this.getCorrelationScatterYP(correlationData, threshold);
-      // console.log("yData", yData);
-      var hoverDataP = this.getCorrelationScatterHoverDataP(correlationData, threshold);
-    }
-    var trace1 = {
-      x: (correlation == "R") ? xDataR : xDataP,
-      y: (correlation == "R") ? yDataR : yDataP,
-      text: (correlation == "R") ? hoverDataR : hoverDataP,
-      hoverinfo: 'text',
-      mode: 'markers',
-      type: 'scatter',
-      marker: {
-        size: 12,
-        color: "#cccccc",
-        // color: scatterColorData,
-        // colorscale: 'Viridis',
-        // reversescale: true,
-        line: {
-          color: 'black',
-          width: 1
-        },
-      }
-    };
-    var pdata = [trace1];
-    var playout = {
-      title: {
-        text: "P-value Correlation",
-        xref: 'paper'
-      },
-      font: {
-        color: 'black'
-      },
-      width: 1000,
-      height: 700,
-      yaxis: {
-        autorange: true,
-        automargin: true,
-        title: (correlation == "R") ? "Spearman R" : "-log10(Spearman P-value)",
-        font: {
-          color: 'black'
-        },
-        tickfont: {
-          color: 'black'
-        }
-      },
-      xaxis: {
-        autorange: true,
-        automargin: true,
-        title: (correlation == "R") ? "Pearson R" : "-log10(Pearson P-value)",
-        font: {
-          color: 'black'
-        },
-        tickfont: {
-          color: 'black'
-        }
-      },
-      margin: {
-        l: 40,
-        r: 40,
-        b: 80,
-      },
-      showlegend: false,
-      clickmode: 'none',
-      hovermode: 'closest'
-    };
-    this.correlationScatter = {
-      data: pdata,
-      layout: playout,
-      config: {
-        displaylogo: false,
-        modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
-        toImageButtonOptions: {
-          format: 'svg', // one of png, svg, jpeg, webp
-          filename: 'locus_colocalization_correlation_scatter',
-          width: 1000,
-          height: 700,
-          scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
-        }
-      }
-    };
-  }
+  // locusColocalizationCorrelationScatterPlot(correlationData, correlation, threshold) {
+  //   if (correlation == "R") {
+  //     var xDataR = this.getCorrelationScatterXR(correlationData);
+  //     // console.log("xData", xData);
+  //     var yDataR = this.getCorrelationScatterYR(correlationData);
+  //     // console.log("yData", yData);
+  //     var hoverDataR = this.getCorrelationScatterHoverDataR(correlationData);
+  //   } else {
+  //     var xDataP = this.getCorrelationScatterXP(correlationData, threshold);
+  //     // console.log("xData", xData);
+  //     var yDataP = this.getCorrelationScatterYP(correlationData, threshold);
+  //     // console.log("yData", yData);
+  //     var hoverDataP = this.getCorrelationScatterHoverDataP(correlationData, threshold);
+  //   }
+  //   var trace1 = {
+  //     x: (correlation == "R") ? xDataR : xDataP,
+  //     y: (correlation == "R") ? yDataR : yDataP,
+  //     text: (correlation == "R") ? hoverDataR : hoverDataP,
+  //     hoverinfo: 'text',
+  //     mode: 'markers',
+  //     type: 'scatter',
+  //     marker: {
+  //       size: 12,
+  //       color: "#cccccc",
+  //       // color: scatterColorData,
+  //       // colorscale: 'Viridis',
+  //       // reversescale: true,
+  //       line: {
+  //         color: 'black',
+  //         width: 1
+  //       },
+  //     }
+  //   };
+  //   var pdata = [trace1];
+  //   var playout = {
+  //     title: {
+  //       text: "P-value Correlation",
+  //       xref: 'paper'
+  //     },
+  //     font: {
+  //       color: 'black'
+  //     },
+  //     width: 1000,
+  //     height: 700,
+  //     yaxis: {
+  //       autorange: true,
+  //       automargin: true,
+  //       title: (correlation == "R") ? "Spearman R" : "-log10(Spearman P-value)",
+  //       font: {
+  //         color: 'black'
+  //       },
+  //       tickfont: {
+  //         color: 'black'
+  //       }
+  //     },
+  //     xaxis: {
+  //       autorange: true,
+  //       automargin: true,
+  //       title: (correlation == "R") ? "Pearson R" : "-log10(Pearson P-value)",
+  //       font: {
+  //         color: 'black'
+  //       },
+  //       tickfont: {
+  //         color: 'black'
+  //       }
+  //     },
+  //     margin: {
+  //       l: 40,
+  //       r: 40,
+  //       b: 80,
+  //     },
+  //     showlegend: false,
+  //     clickmode: 'none',
+  //     hovermode: 'closest'
+  //   };
+  //   this.correlationScatter = {
+  //     data: pdata,
+  //     layout: playout,
+  //     config: {
+  //       displaylogo: false,
+  //       modeBarButtonsToRemove: ["lasso2d", "hoverCompareCartesian", "hoverClosestCartesian"],
+  //       toImageButtonOptions: {
+  //         format: 'svg', // one of png, svg, jpeg, webp
+  //         filename: 'locus_colocalization_correlation_scatter',
+  //         width: 1000,
+  //         height: 700,
+  //         scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+  //       }
+  //     }
+  //   };
+  // }
 
-  triggerCorrelationReplot() {
-    if (this.selectedCorrelation == "R") {
-      this.correlationScatterThreshold.controls['correlationPvalThreshold'].disable();
-    } else {
-      this.correlationScatterThreshold.controls['correlationPvalThreshold'].enable();
-    }
-    this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
-  }
+  // triggerCorrelationReplot() {
+  //   if (this.selectedCorrelation == "R") {
+  //     this.correlationScatterThreshold.controls['correlationPvalThreshold'].disable();
+  //   } else {
+  //     this.correlationScatterThreshold.controls['correlationPvalThreshold'].enable();
+  //   }
+  //   this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
+  // }
 
-  changeCorrelationPvalThreshold(event: any) {
-    var threshold = event.target.value;
-    if (threshold == 1.0) {
-      this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 1.0);
-    } else {
-      if (threshold >= 0.0 && threshold <= 1.0) {
-        if (threshold.length > 0) {
-          this.selectedCorrelationPvalThreshold = threshold;
-          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
-        } else {
-          this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 0.0);
-        }
-      }
-    }
-  }
+  // changeCorrelationPvalThreshold(event: any) {
+  //   var threshold = event.target.value;
+  //   if (threshold == 1.0) {
+  //     this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 1.0);
+  //   } else {
+  //     if (threshold >= 0.0 && threshold <= 1.0) {
+  //       if (threshold.length > 0) {
+  //         this.selectedCorrelationPvalThreshold = threshold;
+  //         this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
+  //       } else {
+  //         this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, 0.0);
+  //       }
+  //     }
+  //   }
+  // }
 
-  clearCorrelationPvalThreshold() {
-    this.selectedCorrelationPvalThreshold = 1.0;
-    this.correlationScatterThreshold.value.correlationPvalThreshold = '1.0';
-    this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
-  }
+  // clearCorrelationPvalThreshold() {
+  //   this.selectedCorrelationPvalThreshold = 1.0;
+  //   this.correlationScatterThreshold.value.correlationPvalThreshold = '1.0';
+  //   this.locusColocalizationCorrelationScatterPlot(this.locusColocalizationData, this.selectedCorrelation, this.selectedCorrelationPvalThreshold);
+  // }
 
-  correlationPvalThresholdErrorMsg() {
-    var msg = "";
-    if (this.correlationScatterThreshold.value.correlationPvalThreshold > 1.0) {
-      msg = "Threshold must be <= 1.0";
-    } else if (this.correlationScatterThreshold.value.correlationPvalThreshold < 0.0) {
-      msg = "Threshold must be >= 0.0";
-    } else {
-      msg = "Invalid threshold";
-    }
-    return msg;
-  }
+  // correlationPvalThresholdErrorMsg() {
+  //   var msg = "";
+  //   if (this.correlationScatterThreshold.value.correlationPvalThreshold > 1.0) {
+  //     msg = "Threshold must be <= 1.0";
+  //   } else if (this.correlationScatterThreshold.value.correlationPvalThreshold < 0.0) {
+  //     msg = "Threshold must be >= 0.0";
+  //   } else {
+  //     msg = "Invalid threshold";
+  //   }
+  //   return msg;
+  // }
 
 }
