@@ -108,19 +108,19 @@ export class QTLsLocusAlignmentComponent implements OnInit {
           $("#qtls-locus-alignment-plot").addClass("justify-content-center");
           $("#qtls-locus-alignment-plot").removeClass("justify-content-start");
         }
-        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
-          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
-          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
-        }
+        // if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-start")) {
+        //   $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-center");
+        //   $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-start");
+        // }
       } else { // input panel shown
         if ($("#qtls-locus-alignment-plot").hasClass("justify-content-center")) {
           $("#qtls-locus-alignment-plot").addClass("justify-content-start");
           $("#qtls-locus-alignment-plot").removeClass("justify-content-center");
         }
-        if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
-          $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
-          $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
-        }
+        // if ($("#qtls-locus-alignment-scatter-plot").hasClass("justify-content-center")) {
+        //   $("#qtls-locus-alignment-scatter-plot").addClass("justify-content-start");
+        //   $("#qtls-locus-alignment-scatter-plot").removeClass("justify-content-center");
+        // }
       }
     });
     this.disableInputs = false;
@@ -1088,13 +1088,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 245
               });
             } else { // input panel shown
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 25
               });
             }
@@ -1129,13 +1129,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
               if (this.collapseInput) { // input panel collapsed
                 $('.popover').show().css({
                   position: "absolute",
-                  top: top + 50, 
+                  top: top + 70, 
                   left: left + 245
                 });
               } else { // input panel shown
                 $('.popover').show().css({
                   position: "absolute",
-                  top: top + 50, 
+                  top: top + 70, 
                   left: left + 25
                 });
               }
@@ -1172,13 +1172,13 @@ export class QTLsLocusAlignmentComponent implements OnInit {
             if (this.collapseInput) { // input panel collapsed
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 245
               });
             } else { // input panel shown
               $('.popover').show().css({
                 position: "absolute",
-                top: top + 50, 
+                top: top + 70, 
                 left: left + 25
               });
             }
