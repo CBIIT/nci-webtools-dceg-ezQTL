@@ -369,7 +369,16 @@ export class QTLsLocusQuanitificationComponent implements OnInit {
         margin: {
           r: 100
         },
-        showlegend: false
+        showlegend: true,
+        colorbar: {
+          tickvals: [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1],
+          tickmode: "array",
+          thickness: 15,
+          title: {
+            text: 'Correlation',
+            side: 'right'
+          }
+        },
     };
     this.heatmap = { 
       data: pdata, 
