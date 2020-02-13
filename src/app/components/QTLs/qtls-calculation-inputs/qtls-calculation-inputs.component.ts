@@ -267,7 +267,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
     $("#toggle-view-button").toggleClass('fa-caret-left fa-caret-right');
     // toggle position of locus alignment manhattan plot for popovers to fit
     $("#qtls-locus-alignment-plot").toggleClass('justify-content-start justify-content-center');
-    $("#qtls-locus-alignment-scatter-plot").toggleClass('justify-content-start justify-content-center');
+    // $("#qtls-locus-alignment-scatter-plot").toggleClass('justify-content-start justify-content-center');
     var direction = $("#toggle-view-button").attr("class");
     if (direction.includes("left")) {
       // show input panel
