@@ -565,6 +565,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       height: 1180,
       yaxis: {
         autorange: true,
+        fixedrange: true,
         // overlaying: false,
         // title: "Gene Density",
         domain: [0, 0.025],
@@ -844,6 +845,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       height: 780,
       yaxis: {
         autorange: true,
+        fixedrange: true,
         // overlaying: false,
         // title: "Gene Density",
         domain: [0, 0.04],
