@@ -15,7 +15,7 @@
               style="background-color: transparent; border-color: transparent;" 
               alt="Load QTLs sample files"
               aria-label="Load QTLs sample files">
-              Load Samples
+              Load Sample Files
             </button>
           </div>
           <div class="disabled-post-calc" *ngIf="selectLoadQTLsSamples">
@@ -25,7 +25,7 @@
               style="background-color: transparent; border-color: transparent;" 
               alt="Unload QTLs sample files"
               aria-label="Unload QTLs sample files">
-              Unload Samples
+              Unload Sample Files
             </button>
           </div>
         </div>
@@ -62,7 +62,7 @@
         *ngIf="qtlsType == 'assoc'">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
-            Association Data File <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
+            Association (QTL) Data File <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
           </div>
         </div>
         <div class="row mb-3">
@@ -337,7 +337,7 @@
               style="background-color: transparent; border-color: transparent;" 
               alt="Load GWAS sample data file"
               aria-label="Load GWAS sample data file">
-              Load Sample
+              Load Sample File
           </button>
           </div>
           <div class="disabled-post-calc" *ngIf="selectLoadGWASSample">
@@ -347,7 +347,7 @@
               style="background-color: transparent; border-color: transparent;" 
               alt="Unload GWAS sample data file"
               aria-label="Unload GWAS sample data file">
-              Unload Sample
+              Unload Sample File
           </button>
           </div>
         </div>
@@ -464,7 +464,7 @@
       <div class="qtls-data-inputs" id="qtls-data-input-ldref">
         <div class="row">
           <div class="ml-3 datafile-title">
-            LD Reference
+            LD Reference SNP
           </div>
         </div>
         <div class="row">
@@ -472,11 +472,11 @@
             <input 
               #rsnumSearchInput
               matInput 
-              placeholder="LD Reference" 
+              placeholder="LD Reference SNP" 
               (keyup)="enableSearchLDRef($event)" 
               [(ngModel)]="rsnumSearch" 
               formControlName="rsnumber" 
-              aria-label="LD Reference (rs numeber) input field">
+              aria-label="LD Reference (RS number) input field">
             <button mat-button 
               matSuffix 
               mat-icon-button 
