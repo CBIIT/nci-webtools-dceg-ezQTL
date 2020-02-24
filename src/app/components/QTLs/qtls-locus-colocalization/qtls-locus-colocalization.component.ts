@@ -122,14 +122,14 @@ export class QtlsLocusColocalizationComponent implements OnInit {
   constructor(private data: QTLsResultsService) { }
 
   ngOnInit() {
-    this.selectedResultsDisplay = "hyprcoloc";
+    this.selectedResultsDisplay = "ecaviar";
     this.hyprcolocInitial = true;
     this.ecaviarInitial = true;
     this.data.currentHyprcolocIsLoading.subscribe(hyprcolocIsLoading => this.hyprcolocIsLoading = hyprcolocIsLoading);
     this.data.currentEcaviarIsLoading.subscribe(ecaviarIsLoading => this.ecaviarIsLoading = ecaviarIsLoading);
     this.data.currentMainData.subscribe(mainData => {
       if (mainData) {
-        this.selectedResultsDisplay = "hyprcoloc";
+        this.selectedResultsDisplay = "ecaviar";
         this.hyprcolocInitial = true;
         this.ecaviarInitial = true;
         this.locusColocalizationData = mainData["locus_colocalization_correlation"]["data"][0]; // locus

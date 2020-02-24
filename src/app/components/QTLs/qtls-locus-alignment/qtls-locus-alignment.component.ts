@@ -244,9 +244,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneData.length; i++) {
       if ('rsnum' in geneData[i]) {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['chr'] + ':' + geneData[i]['pos'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['chr'] + ':' + geneData[i]['pos'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -256,9 +256,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneGWASData.length; i++) {
       if ('rsnum' in geneGWASData[i]) {
-        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneGWASData[i]['chr'] + ':' + geneGWASData[i]['pos'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneGWASData[i]['chr'] + ':' + geneGWASData[i]['pos'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -403,6 +403,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y3'
     };
+    // console.log("qDataTopAnnot", qDataTopAnnot);
+    // console.log("xLDRef", xLDRef);
+    // console.log("yLDRef", yLDRef);
+    // console.log("LDRefHighlight", LDRefHighlight);
     // highlight top point GWAS
     var LDRefHighlightGWAS = {
       x: [xLDRef],
@@ -747,6 +751,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
+
+    // console.log("qDataTopAnnot", qDataTopAnnot);
+    // console.log("xLDRef", qDataTopAnnot['pos'] / 1000000.0);
+    // console.log("yLDRef", Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+    // console.log("LDRefHighlight", LDRefHighlight);
+
     // graph scatter where R2 != NA
     var trace1 = {
       x: xData,
@@ -1043,9 +1053,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   linkGnomADBrowser() {
-    var variant_id = this.popoverData["variant_id"].split(":");
-    var chromosome = variant_id[0];
-    var position = variant_id[1];
+    var chromosome = this.popoverData["chr"];
+    var position = this.popoverData["pos"];
     var ref = this.popoverData["ref"];
     var alt = this.popoverData["alt"];
     var url = "http://gnomad.broadinstitute.org/variant/" + chromosome + "-" + position + "-" + ref + "-" + alt
