@@ -1346,32 +1346,93 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return finites;
   }
 
-  getLinearRegression(xData, yData) {
-    // console.log("xData", xData);
-    // console.log("yData", yData);
-    // var sum = (accumulator, currentValue) => accumulator + currentValue;
-    var n = (xData.length + yData.length) / 2;
-    var xy = []
-    var x2 = xData.map(x => x * x);
-    for (var i = 0; i < xData.length; i++) {
-      xy.push(xData[i] * yData[i]);
+  // getLinearRegression(xData, yData) {
+  //   console.log("xData", xData);
+  //   console.log("yData", yData);
+  //   // var sum = (accumulator, currentValue) => accumulator + currentValue;
+  //   var n = (xData.length + yData.length) / 2;
+  //   var xy = []
+  //   var x2 = xData.map(x => x * x);
+  //   for (var i = 0; i < xData.length; i++) {
+  //     xy.push(xData[i] * yData[i]);
+  //   }
+  //   var sum_x = this.getSum(xData);
+  //   // console.log("sum_x", sum_x);
+  //   var sum_y = this.getSum(yData);
+  //   // console.log("sum_y", sum_y);
+  //   var sum_xy = this.getSum(xy);
+  //   // console.log("sum_xy", sum_xy);
+  //   var sum_x2 = this.getSum(x2);
+  //   // console.log("sum_x2", sum_x2);
+  //   var a_numer = (sum_y * sum_x2) - (sum_x * sum_xy);
+  //   var a_denom = (n * sum_x2) - (sum_x * sum_x);
+  //   var a = a_numer / a_denom;
+  //   var b_numer = (n * sum_xy) - (sum_x * sum_y);
+  //   var b_denom = (n * sum_x2) - (sum_x * sum_x);
+  //   var b = b_numer / b_denom;
+  //   return [a, b];
+  // }
+
+  getLinearRegression(values_x, values_y) {
+    var sum_x = 0;
+    var sum_y = 0;
+    var sum_xy = 0;
+    var sum_xx = 0;
+    var count = 0;
+
+    /*
+     * We'll use those variables for faster read/write access.
+     */
+    var x = 0;
+    var y = 0;
+    var values_length = values_x.length;
+
+    if (values_length != values_y.length) {
+        throw new Error('The parameters values_x and values_y need to have same size!');
     }
-    var sum_x = this.getSum(xData);
-    // console.log("sum_x", sum_x);
-    var sum_y = this.getSum(yData);
-    // console.log("sum_y", sum_y);
-    var sum_xy = this.getSum(xy);
-    // console.log("sum_xy", sum_xy);
-    var sum_x2 = this.getSum(x2);
-    // console.log("sum_x2", sum_x2);
-    var a_numer = (sum_y * sum_x2) - (sum_x * sum_xy);
-    var a_denom = (n * sum_x2) - (sum_x * sum_x);
-    var a = a_numer / a_denom;
-    var b_numer = (n * sum_xy) - (sum_x * sum_y);
-    var b_denom = (n * sum_x2) - (sum_x * sum_x);
-    var b = b_numer / b_denom;
-    return [a, b];
-  }
+
+    /*
+     * Nothing to do.
+     */
+    if (values_length === 0) {
+        return [ [], [] ];
+    }
+
+    /*
+     * Calculate the sum for each of the parts necessary.
+     */
+    for (var v = 0; v < values_length; v++) {
+        x = values_x[v];
+        y = values_y[v];
+        sum_x += x;
+        sum_y += y;
+        sum_xx += x*x;
+        sum_xy += x*y;
+        count++;
+    }
+
+    /*
+     * Calculate m and b for the formular:
+     * y = x * m + b
+     */
+    var m = (count*sum_xy - sum_x*sum_y) / (count*sum_xx - sum_x*sum_x);
+    var b = (sum_y/count) - (m*sum_x)/count;
+
+    /*
+     * We will make the x and y result line now
+     */
+    var result_values_x = [];
+    var result_values_y = [];
+
+    for (var v = 0; v < values_length; v++) {
+        x = values_x[v];
+        y = x * m + b;
+        result_values_x.push(x);
+        result_values_y.push(y);
+    }
+
+    return [result_values_x, result_values_y];
+}
 
   getSumDiffAbsSquared(arr1, arr2) {
     var d = [];
@@ -1481,31 +1542,35 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // [a, b] -> Y = a + bX
     var linear_regression = this.getLinearRegression(xData, yData);
     var a = linear_regression[0];
-    // console.log("a", a);
+    console.log("a", a);
     var b = linear_regression[1];
-    // console.log("b", b);
+    console.log("b", b);
     var xDataFinites = this.removeInfinities(xData);
-    // console.log(xDataFinites);
-    var xMin = Math.min.apply(null, xDataFinites);
-    // console.log("xMin", xMin);
-    var xMax = Math.max.apply(null, xDataFinites);
-    // console.log("xMax", xMax);
-    var yMin = a + (b * xMin);
-    // console.log("yMin", yMin);
-    var yMax = a + (b * xMax);
+    // // console.log(xDataFinites);
+    // var xMin = Math.min.apply(null, xDataFinites);
+    // // console.log("xMin", xMin);
+    // var xMax = Math.max.apply(null, xDataFinites);
+    // // console.log("xMax", xMax);
+    // var yMin = a + (b * xMin);
+    // // console.log("yMin", yMin);
+    // var yMax = a + (b * xMax);
     // console.log("yMax", yMax);
-    var trace2 = {
-      x: [xMin, xMax],
-      y: [yMin, yMax],
-      // hoverinfo: 'x+y',
-      mode: 'lines',
-      type: 'scatter',
-      name: "lines",
-      line: {
-        color: "blue",
-      }
-    };
-    var pdata = [trace1, trace1R2NA, trace2];
+    // var trace2 = {
+    //   x: [xMin, xMax],
+    //   y: [yMin, yMax],
+    //   // hoverinfo: 'x+y',
+    //   mode: 'lines',
+    //   type: 'scatter',
+    //   name: "lines",
+    //   line: {
+    //     color: "blue",
+    //   }
+    // };
+    var pdata = [
+      trace1, 
+      trace1R2NA, 
+      // trace2
+    ];
     // var pdata = [trace1];
     var playout = {
       title: {
