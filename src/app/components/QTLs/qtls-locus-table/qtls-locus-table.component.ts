@@ -68,7 +68,7 @@ export class QTLsLocusTableComponent implements OnInit {
       variant['variant_id'] = geneData[i]['variant_id'];
       variant['rsnum'] = geneData[i]['rsnum'];
       variant['chr'] = geneData[i]['chr'];
-      variant['pos'] = geneData[i]['variant_id'].split(':')[1];
+      variant['pos'] = geneData[i]['pos'];
       variant['ref'] = geneData[i]['ref'];
       variant['alt'] = geneData[i]['alt'];
       variant['tss_distance'] = geneData[i]['tss_distance'];
