@@ -244,9 +244,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneData.length; i++) {
       if ('rsnum' in geneData[i]) {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['chr'] + ':' + geneData[i]['pos'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneData[i]['chr'] + ':' + geneData[i]['pos'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -256,9 +256,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     var hoverData = [];
     for (var i = 0; i < geneGWASData.length; i++) {
       if ('rsnum' in geneGWASData[i]) {
-        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneGWASData[i]['chr'] + ':' + geneGWASData[i]['pos'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
       } else {
-        hoverData.push('chr' + geneGWASData[i]['variant_id'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+        hoverData.push('chr' + geneGWASData[i]['chr'] + ':' + geneGWASData[i]['pos'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
       }
     }
     return hoverData;
@@ -403,6 +403,10 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y3'
     };
+    // console.log("qDataTopAnnot", qDataTopAnnot);
+    // console.log("xLDRef", xLDRef);
+    // console.log("yLDRef", yLDRef);
+    // console.log("LDRefHighlight", LDRefHighlight);
     // highlight top point GWAS
     var LDRefHighlightGWAS = {
       x: [xLDRef],
@@ -747,6 +751,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       },
       yaxis: 'y2'
     };
+
+    // console.log("qDataTopAnnot", qDataTopAnnot);
+    // console.log("xLDRef", qDataTopAnnot['pos'] / 1000000.0);
+    // console.log("yLDRef", Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+    // console.log("LDRefHighlight", LDRefHighlight);
+
     // graph scatter where R2 != NA
     var trace1 = {
       x: xData,
@@ -1043,9 +1053,8 @@ export class QTLsLocusAlignmentComponent implements OnInit {
   }
 
   linkGnomADBrowser() {
-    var variant_id = this.popoverData["variant_id"].split(":");
-    var chromosome = variant_id[0];
-    var position = variant_id[1];
+    var chromosome = this.popoverData["chr"];
+    var position = this.popoverData["pos"];
     var ref = this.popoverData["ref"];
     var alt = this.popoverData["alt"];
     var url = "http://gnomad.broadinstitute.org/variant/" + chromosome + "-" + position + "-" + ref + "-" + alt
@@ -1337,32 +1346,53 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     return finites;
   }
 
-  getLinearRegression(xData, yData) {
-    // console.log("xData", xData);
-    // console.log("yData", yData);
-    // var sum = (accumulator, currentValue) => accumulator + currentValue;
-    var n = (xData.length + yData.length) / 2;
-    var xy = []
-    var x2 = xData.map(x => x * x);
-    for (var i = 0; i < xData.length; i++) {
-      xy.push(xData[i] * yData[i]);
+  getLeastSquaresLine(valuesXRaw, valuesYRaw) {
+    if (valuesXRaw.length === 0 || valuesYRaw.length === 0 || (valuesXRaw.length != valuesYRaw.length)) {
+      return [ [], [] ];
     }
-    var sum_x = this.getSum(xData);
-    // console.log("sum_x", sum_x);
-    var sum_y = this.getSum(yData);
-    // console.log("sum_y", sum_y);
-    var sum_xy = this.getSum(xy);
-    // console.log("sum_xy", sum_xy);
-    var sum_x2 = this.getSum(x2);
-    // console.log("sum_x2", sum_x2);
-    var a_numer = (sum_y * sum_x2) - (sum_x * sum_xy);
-    var a_denom = (n * sum_x2) - (sum_x * sum_x);
-    var a = a_numer / a_denom;
-    var b_numer = (n * sum_xy) - (sum_x * sum_y);
-    var b_denom = (n * sum_x2) - (sum_x * sum_x);
-    var b = b_numer / b_denom;
-    return [a, b];
-  }
+    var valuesXY = valuesXRaw.map(function(e, i) {
+      return [e, valuesYRaw[i]];
+    });
+    var valuesXYRemoveInfinities = [];
+    valuesXY.map(function(e) {
+      if (isFinite(e[0]) && isFinite(e[1])) {
+        valuesXYRemoveInfinities.push(e);
+      }
+    });
+    var valuesX = valuesXYRemoveInfinities.map(function(e) {
+      return e[0];
+    });
+    var valuesY = valuesXYRemoveInfinities.map(function(e) {
+      return e[1];
+    });
+    var sumX = 0;
+    var sumY = 0;
+    var sumXY = 0;
+    var sumXX = 0;
+    var count = 0;
+    var x = 0;
+    var y = 0;
+    for (var i = 0; i < valuesX.length; i++) {
+        x = valuesX[i];
+        y = valuesY[i];
+        sumX += x;
+        sumY += y;
+        sumXX += x * x;
+        sumXY += x * y;
+        count++;
+    }
+    var m = (count * sumXY - sumX * sumY) / (count * sumXX - sumX * sumX);
+    var b = (sumY / count) - (m * sumX) / count;
+    var resultX = [];
+    var resultY = [];
+    for (var j = 0; j < valuesX.length; j++) {
+        x = valuesX[j];
+        y = (x * m) + b;
+        resultX.push(x);
+        resultY.push(y);
+    }
+    return [resultX, resultY];
+}
 
   getSumDiffAbsSquared(arr1, arr2) {
     var d = [];
@@ -1469,25 +1499,11 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         },
       }
     };
-    // [a, b] -> Y = a + bX
-    var linear_regression = this.getLinearRegression(xData, yData);
-    var a = linear_regression[0];
-    // console.log("a", a);
-    var b = linear_regression[1];
-    // console.log("b", b);
-    var xDataFinites = this.removeInfinities(xData);
-    // console.log(xDataFinites);
-    var xMin = Math.min.apply(null, xDataFinites);
-    // console.log("xMin", xMin);
-    var xMax = Math.max.apply(null, xDataFinites);
-    // console.log("xMax", xMax);
-    var yMin = a + (b * xMin);
-    // console.log("yMin", yMin);
-    var yMax = a + (b * xMax);
-    // console.log("yMax", yMax);
+    var least_sqaures = this.getLeastSquaresLine(xData, yData);
+
     var trace2 = {
-      x: [xMin, xMax],
-      y: [yMin, yMax],
+      x: least_sqaures[0],
+      y: least_sqaures[1],
       // hoverinfo: 'x+y',
       mode: 'lines',
       type: 'scatter',
@@ -1496,7 +1512,12 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         color: "blue",
       }
     };
-    var pdata = [trace1, trace1R2NA, trace2];
+
+    var pdata = [
+      trace1, 
+      trace1R2NA, 
+      trace2
+    ];
     // var pdata = [trace1];
     var playout = {
       title: {

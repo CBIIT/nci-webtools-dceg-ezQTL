@@ -6,7 +6,7 @@
       <span aria-hidden="true">&times;</span>
     </button>
     <div class="popover-content" *ngIf="popoverData">
-      <b>chr{{ popoverData.variant_id }}</b>
+      <b>chr{{ popoverData.chr }}:{{ popoverData.pos }}</b>
       <br>
       <span *ngIf="popoverData.rsnum">
         <b>{{ popoverData.rsnum }}</b>

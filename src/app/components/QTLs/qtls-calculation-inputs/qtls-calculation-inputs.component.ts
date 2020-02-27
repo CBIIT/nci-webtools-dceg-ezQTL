@@ -248,7 +248,11 @@ export class QTLsCalculationInputsComponent implements OnInit {
     if (value && value.length > 0) {
       filterValue = value.toLowerCase();
     }
-    return this.geneSymbolsList.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
+    return this.geneSymbolsList.filter(option => {
+      if (option) {
+        option.toLowerCase().indexOf(filterValue) === 0
+      }
+    });
   }
 
   collapseDataInputPanel() {
