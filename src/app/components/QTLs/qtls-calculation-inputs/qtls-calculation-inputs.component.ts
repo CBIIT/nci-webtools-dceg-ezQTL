@@ -273,7 +273,7 @@ export class QTLsCalculationInputsComponent implements OnInit {
       if (title.includes("Hide")) {
         return "Show input panel";
       } else {
-        return "Hide input pabel"
+        return "Hide input panel"
       }
     });
     // toggle position of locus alignment manhattan plot for popovers to fit
