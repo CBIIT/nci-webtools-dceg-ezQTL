@@ -49,6 +49,13 @@ export class QTLsComponent implements OnInit {
   toggleView() {
     // console.log("clicked");
     $("#toggle-view-button").toggleClass('fa-caret-left fa-caret-right');
+    $(".toggle-view").attr("title", function(idx, title) {
+      if (title.includes("Hide")) {
+        return "Show input panel";
+      } else {
+        return "Hide input pabel"
+      }
+    });
     // toggle position of locus alignment manhattan plot for popovers to fit
     $("#qtls-locus-alignment-plot").toggleClass('justify-content-start justify-content-center');
     // $("#qtls-locus-alignment-scatter-plot").toggleClass('justify-content-start justify-content-center');
