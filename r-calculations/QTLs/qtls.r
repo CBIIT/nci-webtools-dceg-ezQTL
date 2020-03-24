@@ -389,6 +389,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   
   # initialize messages to empty
   warningMessages <- list()
+  errorMessages <- list()
   
   ## parameters define ##
   if (identical(select_pop, 'false')) {
@@ -432,7 +433,13 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     }
   }
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
-  
+  # check if there are multiple chromosomes in the input assoc file
+  if (length(unique(qdata$chr)) > 1) {
+    errorMessages <- c(errorMessages, "Multiple chromosomes detected in Association Data File. Make sure data is on one chromosome only.")
+    dataSourceJSON <- c(toJSON(list(info=list(inputs=list(association_file=assocFile, quantification_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, ld_file=LDFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request), messages=list(warnings=warningMessages, errors=errorMessages)))))
+    return(dataSourceJSON)
+  } 
+
   ## check if initial LD Reference rsnum input is in qdata
   ## if not found, set value to null and throw warning message
   if (!is.null(rsnum) && !(rsnum %in% qdata$rsnum)) {
@@ -492,7 +499,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_quantification_heatmap_data <- locus_quantification[[2]]
   
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, quantification_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, ld_file=LDFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request), messages=list(warnings=warningMessages)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization_correlation=list(data=locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(info=list(recalculateAttempt=recalculateAttempt, recalculatePop=recalculatePop, recalculateGene=recalculateGene, recalculateDist=recalculateDist, recalculateRef=recalculateRef, select_qtls_samples=select_qtls_samples, select_gwas_sample=select_gwas_sample, top_gene_variants=list(data=top_gene_variants_data), all_gene_variants=list(data=all_gene_variants_data), gene_list=list(data=gene_list_data), inputs=list(association_file=assocFile, quantification_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, ld_file=LDFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request), messages=list(warnings=warningMessages, errors=errorMessages)), locus_quantification=list(data=locus_quantification_data), locus_quantification_heatmap=list(data=locus_quantification_heatmap_data), locus_alignment=list(data=locus_alignment_data, rc=rcdata_region_data, top=qdata_top_annotation_data), locus_alignment_gwas_scatter=list(data=locus_alignment_gwas_scatter_data, title=locus_alignment_gwas_scatter_title), gwas=list(data=gwas_example_data),locus_colocalization_correlation=list(data=locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
   
   # unlink(paste0('tmp/*',request,'*'))

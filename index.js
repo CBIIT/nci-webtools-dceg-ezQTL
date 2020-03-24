@@ -122,7 +122,14 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
 
   try {
     const data = await rscript.qtlsCalculateMain('./r-calculations/QTLs/qtls.r', select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request_id, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef);
-    response.json(data);
+    if (data['info']['messages']['errors'].length > 0) {
+      var errorMessages = data['info']['messages']['errors'].join(" ");
+      logger.info(errorMessages);
+      response.status(500);
+      response.json(errorMessages.toString());
+    } else {
+      response.json(data);
+    }
   } catch(err) {
     // console.log(err);
     logger.info(err);
