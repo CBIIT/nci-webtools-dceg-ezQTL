@@ -282,7 +282,6 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   handleError(error) {
-    console.log(error);
     var errorMessage = "";
     if (error.error.includes("Rscript")) {
       var errorTrimmed = error.error.trim().split('\n');
@@ -290,7 +289,6 @@ export class QTLsDataInputsComponent implements OnInit {
     } else {
       errorMessage = error.error;
     }
-    console.log(errorMessage);
     this.data.changeErrorMessage(errorMessage);
   }
 

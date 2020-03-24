@@ -91,7 +91,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants) { 
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants) { 
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -230,14 +230,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
     locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
     ld_data <- readRDS(paste0("tmp/",request,".ld_data.rds"))
-  } else {
-    out <- fread(input = LDFile,header = FALSE, showProgress = FALSE)
-    info <- out[,1:5]
-    colnames(info) <- c("chr", "pos", "id", "ref", "alt")
-    out <- as.matrix(out[,-(1:5)]);
-    colnames(out) <- NULL
-    ld_data <- list("Sigma" = out, "info" = info)
-  }
+  } 
   
   index <- which(ld_data$info$id==rsnum|str_detect(ld_data$info$id,paste0(";",rsnum))|str_detect(ld_data$info$id,paste0(rsnum,";")))
   
@@ -275,12 +268,6 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, kgpan
   locus_colocalization_data <- list(c())
   # if GWAS data file is loaded
   if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
-    if (identical(select_gwas_sample, 'false')) {
-      gwasdatafile <- paste0('input/', gwasFile)
-    } else {
-      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
-    }
-    gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
     ## return relevent gwas data ##
     gwas_example_data <- gwas_example(gwasdata, qdata_region)
     ## return locus alignment gwas scatter data
@@ -301,24 +288,13 @@ locus_quantification_heatmap <- function(edata_boxplot) {
   return(list(setNames(as.data.frame(tmpdata), tmpdata_colnames)))
 }
 
-locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile) {
+locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile, edata, gdata) {
   # initialize boxplot data as empty until data file detected
   locus_quantification_data <- list(c())
   # initialize heatmap data as empty until data file detected
   locus_quantification_heatmap_data <- list(c())
   # check to see if boxplot data files are present
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
-    if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('input/', genoFile)
-      edatafile <- paste0('input/', exprFile)
-    } else {
-      gdatafile <- paste0('../static/assets/files/', 'MX2.genotyping.txt') 
-      edatafile <- paste0('../static/assets/files/', 'MX2.quantification.txt') 
-    }
-    
-    gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
-    edata <- read_delim(edatafile,delim = "\t",col_names = T)
-    
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {    
     tmp <- tmp %>% 
       slice(1:30)
     
@@ -435,10 +411,76 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
   # check if there are multiple chromosomes in the input assoc file
   if (length(unique(qdata$chr)) > 1) {
-    errorMessages <- c(errorMessages, "Multiple chromosomes detected in Association Data File. Make sure data is on one chromosome only.")
-    dataSourceJSON <- c(toJSON(list(info=list(inputs=list(association_file=assocFile, quantification_file=exprFile, genotype_file=genoFile, gwas_file=gwasFile, ld_file=LDFile, select_pop=select_pop, select_gene=select_gene, select_dist=select_dist, select_ref=select_ref, request=request), messages=list(warnings=warningMessages, errors=errorMessages)))))
-    return(dataSourceJSON)
+    errorMessages <- c(errorMessages, "Multiple chromosomes detected in Association Data File, make sure data is on one chromosome only.")
+    # dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
+    # return(dataSourceJSON)
   } 
+
+  # if boxplot data files are loaded
+  edata <- 'false'
+  gdata <- 'false'
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
+    if (identical(select_qtls_samples, 'false')) {
+      gdatafile <- paste0('input/', genoFile)
+      edatafile <- paste0('input/', exprFile)
+    } else {
+      gdatafile <- paste0('../static/assets/files/', 'MX2.genotyping.txt') 
+      edatafile <- paste0('../static/assets/files/', 'MX2.quantification.txt') 
+    }
+    
+    gdata <- read_delim(gdatafile,delim = "\t",col_names = T)
+    # check if there are multiple chromosomes in the input genotype file
+    if (length(unique(gdata$chr)) > 1) {
+      errorMessages <- c(errorMessages, "Multiple chromosomes detected in Genotype Data File, make sure data is on one chromosome only.")
+      # dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
+      # return(dataSourceJSON)
+    } 
+    edata <- read_delim(edatafile,delim = "\t",col_names = T)
+    # check if there are multiple chromosomes in the input expression (quantification) file
+    if (length(unique(edata$chr)) > 1) {
+      errorMessages <- c(errorMessages, "Multiple chromosomes detected in Quantification Data File, make sure data is on one chromosome only.")
+      # dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
+      # return(dataSourceJSON)
+    } 
+  }
+
+  ## if LD File is loaded
+  ld_data <- 'false'
+  if (!identical(LDFile, 'false')) {
+    out <- fread(input = LDFile,header = FALSE, showProgress = FALSE)
+    info <- out[,1:5]
+    colnames(info) <- c("chr", "pos", "id", "ref", "alt")
+    if (length(unique(info$chr)) > 1) {
+      errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
+    } else {
+      out <- as.matrix(out[,-(1:5)]);
+      colnames(out) <- NULL
+      ld_data <- list("Sigma" = out, "info" = info)
+    }
+  }
+
+  ## if GWAS File is loaded
+  gwasdata <- 'false'
+  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
+    if (identical(select_gwas_sample, 'false')) {
+      gwasdatafile <- paste0('input/', gwasFile)
+    } else {
+      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
+    }
+    gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
+    # check if there are multiple chromosomes in the input GWAS file
+    if (length(unique(gwasdata$chr)) > 1) {
+      errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
+      # dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
+      # return(dataSourceJSON)
+    } 
+  }
+
+  ## return errors if there are any
+  if (length(errorMessages) > 0) {
+    dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
+    return(dataSourceJSON)
+  }
 
   ## check if initial LD Reference rsnum input is in qdata
   ## if not found, set value to null and throw warning message
@@ -483,7 +525,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
@@ -494,7 +536,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile)
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile, edata, gdata)
   locus_quantification_data <- locus_quantification[[1]]
   locus_quantification_heatmap_data <- locus_quantification[[2]]
   
