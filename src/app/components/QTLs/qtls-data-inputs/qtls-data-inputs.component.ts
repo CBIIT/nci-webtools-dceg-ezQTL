@@ -282,11 +282,13 @@ export class QTLsDataInputsComponent implements OnInit {
   }
 
   handleError(error) {
-    console.log(error);
-    var errorTrimmed = error.error.trim().split('\n');
-    // var errorMessage = errorTrimmed.slice(1, errorTrimmed.length - 1).join(' ');
-    var errorMessage = errorTrimmed[2];
-    console.log(errorMessage);
+    var errorMessage = "";
+    if (error.error.includes("Rscript")) {
+      var errorTrimmed = error.error.trim().split('\n');
+      errorMessage = errorTrimmed[2];
+    } else {
+      errorMessage = error.error;
+    }
     this.data.changeErrorMessage(errorMessage);
   }
 
