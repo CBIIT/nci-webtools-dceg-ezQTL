@@ -131,7 +131,6 @@ app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
       response.json(data);
     }
   } catch(err) {
-    // console.log(err);
     logger.info(err);
     response.status(500);
     response.json(err.toString());
