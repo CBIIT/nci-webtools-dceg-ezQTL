@@ -604,7 +604,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       yaxis3: {
         autorange: true,
         automargin: true,
-        title: "QTLs -log10(<i>P</i>-value)",
+        title: "QTLs -log10(<i>P</i>-value), " + this.selectedGeneSymbol,
         domain: [0.56, 1],
         zeroline: false,
         linecolor: 'black',
@@ -876,7 +876,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
         autorange: true,
         automargin: true,
         // overlaying: 'y3',
-        title: "QTLs -log10(<i>P</i>-value)",
+        title: "QTLs -log10(<i>P</i>-value), " + this.selectedGeneSymbol,
         domain: [0.05, 1],
         zeroline: false,
         linecolor: 'black',
@@ -1421,9 +1421,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       var numer = 6.0 * sumSquaredDiffRanks;
       var denom = xData.length * (Math.pow(xData.length, 2) - 1)
       var rho = 1 - (numer / denom);
-      return "rho=" + rho.toFixed(3);
+      return "Spearman rho=" + rho.toFixed(3);
     } else {
-      return "rho=NA"
+      return "Spearman rho=NA"
     }
   }
 
@@ -1443,9 +1443,9 @@ export class QTLsLocusAlignmentComponent implements OnInit {
       var ySumDataMinusMeanSquared = this.getSum(yDataMinusMeanSquared);
       var denom = Math.sqrt(xSumDataMinusMeanSquared * ySumDataMinusMeanSquared);
       var r = numer / denom;
-      return "r=" + r.toFixed(3);
+      return "Pearson's r=" + r.toFixed(3);
     } else {
-      return "r=NA";
+      return "Pearson's r=NA";
     }
   }
 
@@ -1521,7 +1521,7 @@ export class QTLsLocusAlignmentComponent implements OnInit {
     // var pdata = [trace1];
     var playout = {
       title: {
-        text: "QTLs-GWAS Gene Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculatePearsonCorrelationTitle(xData, yData) : scatterTitle.split(', ')[1]),
+        text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
         xref: 'paper'
       },
       font: {
