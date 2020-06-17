@@ -94,11 +94,11 @@ export class QTLsLocusTableComponent implements OnInit {
   //   this.dataSource.filterPredicate = (data, filterValue) => (data.rsnum.trim().toLowerCase().indexOf(filterValue.trim().toLowerCase()) !== -1);  
   // }
 
-  linkGTExGeneID(gene_id) {
-    var url = "https://gtexportal.org/home/gene/" + gene_id
-    var win = window.open(url, '_blank');
-    win.focus();
-  } 
+  // linkGTExGeneID(gene_id) {
+  //   var url = "https://gtexportal.org/home/gene/" + gene_id
+  //   var win = window.open(url, '_blank');
+  //   win.focus();
+  // } 
 
   // linkGTExGeneSymbol(gene_symbol) {
   //   var url = "https://gtexportal.org/home/gene/" + gene_symbol
@@ -106,11 +106,11 @@ export class QTLsLocusTableComponent implements OnInit {
   //   win.focus();
   // } 
 
-  linkGTExVariantID(chr, pos, ref, alt) {
-    var url = "https://gtexportal.org/home/snp/" + chr + "_" + pos + "_" + ref + "_" + alt + "_b37"
-    var win = window.open(url, '_blank');
-    win.focus();
-  } 
+  // linkGTExVariantID(chr, pos, ref, alt) {
+  //   var url = "https://gtexportal.org/home/snp/" + chr + "_" + pos + "_" + ref + "_" + alt + "_b37"
+  //   var win = window.open(url, '_blank');
+  //   win.focus();
+  // } 
 
   // linkGTExRSNum(rsnum) {
   //   var url = "https://gtexportal.org/home/snp/" + rsnum

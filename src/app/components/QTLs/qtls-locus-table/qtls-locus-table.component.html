@@ -36,7 +36,8 @@
         <ng-container matColumnDef="gene_id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="gene_id"> Gene ID </th>
           <td mat-cell *matCellDef="let variant">
-            <a (click)="linkGTExGeneID(variant.gene_id)">{{variant.gene_id}}</a>
+            {{variant.gene_id}}
+            <!-- <a (click)="linkGTExGeneID(variant.gene_id)">{{variant.gene_id}}</a> -->
           </td>
         </ng-container>
     
@@ -53,7 +54,8 @@
         <ng-container matColumnDef="variant_id">
           <th mat-header-cell *matHeaderCellDef mat-sort-header="variant_id"> Variant ID </th>
           <td mat-cell *matCellDef="let variant"> 
-            <a (click)="linkGTExVariantID(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.variant_id}}</a>
+            {{variant.variant_id}}
+            <!-- <a (click)="linkGTExVariantID(variant.chr, variant.pos, variant.ref, variant.alt)">{{variant.variant_id}}</a> -->
           </td>
         </ng-container>
     
