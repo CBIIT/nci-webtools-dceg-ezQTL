@@ -19,7 +19,7 @@
       output from <a href="http://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/" target="_blank">Matrix
         eQTL</a>
       and <a href="http://fastqtl.sourceforge.net/" target="_blank">FastQTL</a>).
-      vQTLs need the specific column names. The following sections show examples of each input file for vQTL.
+      vQTLs need the specific column names. Please make sure you have exactly the same header names in the input files. The following sections show examples of each input file for vQTL.
     </p>
   </div>
   <div class="mt-5">
@@ -27,7 +27,7 @@
       <b>QTLs Data</b>
     </p>
     <p>
-      Association data need to be prepared in the following format. “Gene_id” is used as index gene identification
+      Association data need to be prepared in the following format. “gene_id” is used as index gene identification
       number to filter the QTL data for the locuszoom plot and colocalization analysis. The “gene_symbol” will be
       used for gene selection. The “rsnum” is used to index the QTL data and can be used as the LD reference variants
       in locuszoom plot.
@@ -38,7 +38,7 @@
           <th scope="col">gene_id</th>
           <th scope="col">gene_symbol</th>
           <th scope="col">variant_id</th>
-          <th scope="col">rsum</th>
+          <th scope="col">rsnum</th>
           <th scope="col">chr</th>
           <th scope="col">pos</th>
           <th scope="col">ref</th>
