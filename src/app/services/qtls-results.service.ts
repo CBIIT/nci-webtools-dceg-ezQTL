@@ -139,10 +139,12 @@ export class QTLsResultsService {
     return this.http.post(url, JSON.stringify(locusColocalizationHyprcolocLDParameters), {headers: headers});
   }
 
-  calculateLocusColocalizationHyprcoloc(select_gwas_sample: string, select_qtls_samples: string, gwasFile: string, associationFile: string, LDFile: string, request_id: number) {
+  calculateLocusColocalizationHyprcoloc(select_gwas_sample: string, select_qtls_samples: string, select_dist: string, select_ref: string,gwasFile: string, associationFile: string, LDFile: string, request_id: number) {
     let locusColocalizationHyprcolocParameters= {
       select_gwas_sample: select_gwas_sample,
       select_qtls_samples: select_qtls_samples,
+      select_dist: select_dist,
+      select_ref: select_ref,
       gwasFile: gwasFile,
       associationFile: associationFile,
       LDFile: LDFile,

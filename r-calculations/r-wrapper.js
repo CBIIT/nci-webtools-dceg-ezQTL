@@ -289,7 +289,7 @@ function qtlsCalculateLocusColocalizationHyprcolocLD(rfile, ldfile, select_ref, 
     });
 }
 
-function qtlsCalculateLocusColocalizationHyprcoloc(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldfile, request) {
+function qtlsCalculateLocusColocalizationHyprcoloc(rfile, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, ldfile, request) {
     // console.log("Execute qtls locus colocalization Hyprcoloc calculation.");
     logger.info("Execute qtls locus colocalization Hyprcoloc calculation.");
     return new Promise((resolve, reject) => {
@@ -299,6 +299,8 @@ function qtlsCalculateLocusColocalizationHyprcoloc(rfile, select_gwas_sample, se
 
         select_gwas_sample = JSON.stringify(select_gwas_sample);
         select_qtls_samples = JSON.stringify(select_qtls_samples);
+        select_dist = JSON.stringify(select_dist);
+        select_ref = JSON.stringify(select_ref);
         gwasFile = JSON.stringify(gwasFile);
         associationFile = JSON.stringify(associationFile);
         ldfile = JSON.stringify(ldfile);
@@ -313,6 +315,8 @@ function qtlsCalculateLocusColocalizationHyprcoloc(rfile, select_gwas_sample, se
 
         logger.info("Selected GWAS Sample File:", select_gwas_sample);
         logger.info("Selected QTLs Sample Files:", select_qtls_samples);
+        logger.info("Selected Dist:", select_dist);
+        logger.info("Selected Ref:", select_ref);
         logger.info("GWAS File:", gwasFile);
         logger.info("Association File:", associationFile);
         logger.info("LD File:", ldfile);
@@ -320,7 +324,7 @@ function qtlsCalculateLocusColocalizationHyprcoloc(rfile, select_gwas_sample, se
     
         var code = readFileSync(rfile).toString();
         // make sure the R statement below is not appended to a comment in R code file
-        code += `locus_colocalization_hyprcoloc(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${gwasFile}, ${associationFile}, ${ldfile}, ${request})`;
+        code += `locus_colocalization_hyprcoloc(${workingDirectory}, ${select_gwas_sample}, ${select_qtls_samples}, ${select_dist}, ${select_ref}, ${gwasFile}, ${associationFile}, ${ldfile}, ${request})`;
 
         const rcode = `
             suppressWarnings(suppressMessages(suppressPackageStartupMessages(

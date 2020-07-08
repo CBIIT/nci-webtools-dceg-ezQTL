@@ -254,13 +254,15 @@ app.post('/qtls-locus-colocalization-hyprcoloc', async (request, response) => {
   logger.info(request.body);
   var select_gwas_sample = request.body.select_gwas_sample;
   var select_qtls_samples = request.body.select_qtls_samples;
+  var select_dist = request.body.select_dist;
+  var select_ref = request.body.select_ref;
   var gwasFile = request.body.gwasFile;
   var associationFile = request.body.associationFile;
   var LDFile = request.body.LDFile;
   var request_id = request.body.request_id;
 
   try {
-    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, request_id);
+    const data = await rscript.qtlsCalculateLocusColocalizationHyprcoloc('./r-calculations/QTLs/qtls-locus-colocalization-hyprcoloc.r', select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, LDFile, request_id);
     response.json(data);
   } catch(err) {
     // console.log(err);
