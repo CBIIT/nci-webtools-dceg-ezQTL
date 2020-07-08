@@ -296,7 +296,9 @@ export class QtlsLocusColocalizationComponent implements OnInit {
               // Run HyprColoc calculation after LD file is generated
               if (this.requestID == requestIDHypercolocLD && this.requestID == requestIDHypercolocLD) {
                 // console.log("HYPRCOLOC LD REQUEST MATCHES", requestID, requestID, requestIDHypercolocLD);
-                this.data.calculateLocusColocalizationHyprcoloc(this.select_gwas_sample, this.select_qtls_samples, this.gwasFile, this.associationFile, hyprcolocLDFileName, this.requestID)
+                // console.log("hyprcoloc select_dist", select_dist);
+                // console.log("hyprcoloc select_ref", select_ref);
+                this.data.calculateLocusColocalizationHyprcoloc(this.select_gwas_sample, this.select_qtls_samples, select_dist, select_ref, this.gwasFile, this.associationFile, hyprcolocLDFileName, this.requestID)
                   .subscribe(
                     res => {
                       var requestIDHypercoloc = res["hyprcoloc"]["request"][0];

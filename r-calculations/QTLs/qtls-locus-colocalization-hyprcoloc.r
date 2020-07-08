@@ -1,4 +1,4 @@
-locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, gwasfile, qtlfile, ldfile, request) {
+locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request) {
   setwd(workDir)
   .libPaths(c(.libPaths(),"~/R"))
   library(hyprcoloc)
@@ -28,8 +28,25 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   ## for jiyeon ##
   
   trait1 <- read_delim(gwasfile,delim = '\t',col_names = T,col_types = cols('chr'='c','ref'='c','alt'='c'))
-  trait2 <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = cols('chr'='c','variant_id'='c','ref'='c','alt'='c'))
+  cedistance <- strtoi(select_dist, base = 0L)
+  index1 <- which(trait1$rsnum==select_ref)[1]  
+  minpos1 <- trait1$pos[index1] - cedistance
+  if (minpos1 < 0) {
+    minpos1 = 0
+  }
+  maxpos1 <- trait1$pos[index1] + cedistance
   
+  trait1<- subset(trait1, pos > minpos1 & pos < maxpos1)
+  trait2 <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = cols('chr'='c','variant_id'='c','ref'='c','alt'='c'))
+  index2 <- which(trait2$rsnum==select_ref)[1]  
+  minpos2 <- trait2$pos[index2] - cedistance
+  if (minpos2 < 0) {
+    minpos2 = 0
+  }
+  maxpos2 <- trait2$pos[index2] + cedistance
+  
+  trait2<- subset(trait2, pos > minpos2 & pos < maxpos2)
+
   gene2symbol <-  trait2 %>% select(gene_id,gene_symbol) %>% unique()
   
   ld.matrix <- read_delim(ldfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
