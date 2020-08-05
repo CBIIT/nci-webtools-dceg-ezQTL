@@ -465,7 +465,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('input/', gwasFile)
     } else {
-      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
+      gwasdatafile <- paste0('../static/assets/files/', 'MX2.GWAS.rs.txt')
     }
     gwasdata <- read_delim(gwasdatafile,delim = "\t",col_names = T)
     # check if there are multiple chromosomes in the input GWAS file
