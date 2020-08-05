@@ -280,4 +280,5 @@ app.get('/ping', async (request, response) => {
 
 app.use('/', express.static('static'));
 
-app.listen(3000);
+var server = app.listen(3000);
+server.setTimeout(900000);
