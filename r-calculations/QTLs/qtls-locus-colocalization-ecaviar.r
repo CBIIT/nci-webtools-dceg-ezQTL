@@ -4,7 +4,7 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   setwd(workDir)
   ## use sample data files or user-uploaded data files
   if (identical(select_gwas_sample, 'true')) {
-    gwasFile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
+    gwasFile <- paste0('../static/assets/files/', 'MX2.GWAS.rs.txt')
   } else {
     gwasFile <- paste0('input/', gwasFile)
   }
@@ -50,7 +50,7 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
 workingDirectory <- "/Users/jiangk3/Desktop/dev/nci-webtools-dceg-vQTL/r-calculations"
 select_gwas_sample <- "false"
 select_qtls_samples <- "false"
-gwasFile <- "1562699926201.MX2.GWAS.txt"
+gwasFile <- "1562699926201.MX2.GWAS.rs.txt"
 assocFile <- "1562699926201.MX2.eQTL.txt"
 ##LDFile <- "888888888.MX2.LD.gz"
 LDFile <- "false"

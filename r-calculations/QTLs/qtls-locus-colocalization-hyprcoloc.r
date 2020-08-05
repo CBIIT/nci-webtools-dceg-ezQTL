@@ -11,7 +11,7 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
 ##  prefix <- args[4]
 
   if (identical(select_gwas_sample, 'true')) {
-    gwasfile <- paste0('../static/assets/files/', 'MX2.GWAS.txt')
+    gwasfile <- paste0('../static/assets/files/', 'MX2.GWAS.rs.txt')
   } else {
     gwasfile <- paste0('input/', gwasfile)
   }
