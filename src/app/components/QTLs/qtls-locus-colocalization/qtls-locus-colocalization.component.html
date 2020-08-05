@@ -94,6 +94,9 @@
         <li>Candidate SNP: a candidate causal variant explaining the shared association</li>
         <li>Posterior Explained By SNP: the proportion of the posterior probability explained by the Candidate SNP (which represents the HyPrColoc multi-trait fine-mapping probability).</li>
       </ul>
+      <p>
+        HyPrColoc analysis will be performed based on the user-defined cis-QTL Distance on the input file loading page. Only overlapping SNPs between GWAS and QTLs are used for colocalization analysis.
+      </p>
     </div>
 
     <!-- Hyprcoloc results table -->
@@ -309,10 +312,12 @@
         threshold in GWAS. For detailed information, please check the <a href="http://zarlab.cs.ucla.edu/tag/ecaviar/" target="_blank">eCAVIAR paper</a>.  
       </p>
       <p>
-        vQTL performs the eCAVIAR analysis for each gene in QTL data together with GWAS data. Two results will be reported based on the 
-        number of SNPs tested: SNPs in +/- 100 kb range (CLPP and Prob_in_pCausalSet) or 50 (CLPP2 and Prob_in_pCausalSet2) SNPs around the GWAS lead SNPs. 
-        vQTL combines GWAS, QTL, and eCAVIAR results into one table as shown below. If no QTLs are found for GWAS lead SNP (Lead SNP included=”N”), 
-        vQTL will use the nearest variant as a locational proxy of “GWAS lead SNP” for the eCAVIAR analysis. 
+        vQTL performs the eCAVIAR analysis for each gene in QTL data together with GWAS data. Two results will be reported based on the number of SNPs tested: 
+        SNPs in up to +/- 100 kb range as specified in cis-QTL Distance (CLPP and Prob_in_pCausalSet) or +/- 50 SNPs (CLPP2 and Prob_in_pCausalSet2) around 
+        the GWAS lead SNP. If there are less than +/- 10 SNPs around the GWAS lead SNP (or LD reference SNP) within the user-specified cis-QTL Distance, 
+        the analysis will not be performed. vQTL combines GWAS, QTL, and eCAVIAR results into one table as shown below. If no QTLs are found for GWAS lead 
+        SNP (Lead SNP included=”N”), vQTL will use the nearest variant as a locational proxy of “GWAS lead SNP” for the eCAVIAR analysis. Only overlapping 
+        SNPs between GWAS and QTLs are used for colocalization analysis.
       </p>
     </div>
 
