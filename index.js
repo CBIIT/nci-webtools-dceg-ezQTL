@@ -58,13 +58,6 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage: storage });
 
-
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
 app.post('/qtls-calculate-main', upload.any(), async (request, response) => {
   // console.log("Main calculation reached.");
   logger.info("Main calculation reached.");
