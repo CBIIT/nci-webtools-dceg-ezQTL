@@ -1,6 +1,6 @@
 <!-- Inputs -->
 <form [formGroup]="qtlsForm">
-  <div class="border border-light rounded p-3 mr-3">
+  <div class="border border-light rounded px-3 py-2 mr-3">
     <div class="qtls-data-files mb-4">
 
       <div class="datafile-type">
@@ -29,8 +29,8 @@
             </button>
           </div>
         </div>
-        <div>
-          <small>Upload locus specific region, <= 5Mb size</small>
+        <div class="footnote">
+          <small>Upload locus specific region, &le; 5Mb size</small>
         </div>
       </div>
 
@@ -267,7 +267,7 @@
       <div class="qtls-data-inputs" id="qtls-data-input-LD-file">
         <div class="row mb-2">
           <div class="ml-3 datafile-title">
-            LD Data File (Default: 1KG Phase 3, EUR)
+            LD Data File<span class="footnote ml-1">(Default: 1KG Phase 3, EUR)</span>
           </div>
         </div>
         <div class="row mb-3">
@@ -354,8 +354,8 @@
           </button>
           </div>
         </div>
-        <div>
-          <small>Upload locus specific region, <= 5Mb size</small>
+        <div class="footnote">
+          <small>Upload locus specific region, &le; 5Mb size</small>
         </div>
       </div>
 
@@ -441,7 +441,7 @@
       <div class="qtls-data-inputs" id="qtls-data-input-distance">
         <div class="row">
           <div class="ml-3 datafile-title">
-            cis-QTL Distance (+/- Kb) up to 5Mb <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup>
+            cis-QTL Distance<sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup> <span class="footnote ml-1">(+/- Kb up to 5Mb)</span>
           </div>
         </div>
         <div class="row">
@@ -470,7 +470,7 @@
       <div class="qtls-data-inputs" id="qtls-data-input-ldref">
         <div class="row">
           <div class="ml-3 datafile-title">
-            SNP (Default: lowest GWAS P-value SNP)
+            SNP<span class="footnote ml-1">(Default: lowest GWAS P-value SNP)</span>
           </div>
         </div>
         <div class="row">
@@ -495,15 +495,14 @@
           </mat-form-field>
         </div>
       </div>
-
+      <div class="footnote">
+        <small><sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup> indicates required field</small>
+      </div>
     </div>
 
     <div class="w-100 mt-1 mb-2 border border-light"></div>
 
     <div class="qtls-data-files mb-1">
-      <div class="qtls-data-inputs datafile-title">
-        <sup><i class="fas fa-star-of-life" style="color:red; font-size: 7pt;"></i></sup> = required field
-      </div>
       <div>
         <i class="fas fa-download mr-1"></i><a href="assets/files/MX2.examples.gz" download>Download Example Data</a>
       </div>

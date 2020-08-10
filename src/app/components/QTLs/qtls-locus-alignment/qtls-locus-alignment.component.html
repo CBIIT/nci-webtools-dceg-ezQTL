@@ -78,11 +78,13 @@
     id="qtls-locus-alignment-plot">
   </div> -->
 
-  <div class="locus-alignment-content px-3 text-center">
+  <div class="locus-alignment-content px-3 text-center footnote">
     <p>
-      Click on the SNP to show additional information and actions
+      <small>Click on the SNP to show additional information and actions</small>
     </p>
   </div>
+
+  <div class="w-100 mt-1 mb-2 border border-light"></div>
 
   <div class="locus-alignment-content mt-3 px-3" *ngIf="scatter">
     <p>
@@ -97,28 +99,35 @@
     class="d-flex justify-content-center" 
     id="qtls-locus-alignment-scatter-threshold"
     *ngIf="scatter">
-    <form [formGroup]="GWASScatterThreshold">
-      <mat-form-field class="pval-threshold-input-field">
-        <input 
-          #pvalThreshold
-          matInput 
-          placeholder="P-value Threshold" 
-          (keyup)="changePvalThreshold($event)" 
-          (keydown.enter)="$event.preventDefault()" 
-          [(ngModel)]="selectedPvalThreshold" 
-          formControlName="pvalThreshold" 
-          aria-label="P-value threshold input field">
-        <button 
-          mat-button 
-          matSuffix 
-          mat-icon-button 
-          aria-label="Clear" 
-          (click)="clearPvalThreshold()" >
-          <mat-icon>close</mat-icon>
-        </button>
-        <mat-error *ngIf="GWASScatterThreshold.invalid">{{ pvalThresholdErrorMsg() }}</mat-error>
-      </mat-form-field>
-    </form>
+    <div class="row">
+      <div class="col datafile-title px-0 pt-3 threshold-title">
+        P-value Threshold
+      </div>
+      <div class="col">
+        <form [formGroup]="GWASScatterThreshold">
+          <mat-form-field class="pval-threshold-input-field" floatLabel="never">
+            <input 
+              #pvalThreshold
+              matInput 
+              placeholder="P-value Threshold" 
+              (keyup)="changePvalThreshold($event)" 
+              (keydown.enter)="$event.preventDefault()" 
+              [(ngModel)]="selectedPvalThreshold" 
+              formControlName="pvalThreshold" 
+              aria-label="P-value threshold input field">
+            <button 
+              mat-button 
+              matSuffix 
+              mat-icon-button 
+              aria-label="Clear" 
+              (click)="clearPvalThreshold()" >
+              <mat-icon>close</mat-icon>
+            </button>
+            <mat-error *ngIf="GWASScatterThreshold.invalid">{{ pvalThresholdErrorMsg() }}</mat-error>
+          </mat-form-field>
+        </form>
+      </div>
+    </div>
   </div>
 
   <!-- Show centered Plotly locus alignment scatter plot if graph is generated -->
