@@ -75,3 +75,9 @@
 .data-input-field {
     width: 230px !important;
 }
+
+.footnote {
+    color: #595959 !important;
+    font-style: italic;
+    font-weight: normal !important;
+}

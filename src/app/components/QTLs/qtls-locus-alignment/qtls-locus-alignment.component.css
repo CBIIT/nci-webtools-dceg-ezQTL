@@ -72,3 +72,14 @@
 .pval-threshold-input-field {
   width: 180px !important;
 }
+
+.footnote {
+  color: #595959 !important;
+  font-style: italic;
+}
+
+.threshold-title {
+  color: #595959 !important;
+  /* font-size: 10pt; */
+  font-weight: bold;
+}
