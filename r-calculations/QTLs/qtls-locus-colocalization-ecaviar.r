@@ -39,6 +39,11 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   ecaviarfile <- paste0('../static/output/', request, '.eCAVIAR.txt')
   ecaviardata <- read_delim(ecaviarfile, delim = "\t", col_names = T)
   ecaviardata_colnames <- colnames(ecaviardata)
+  ## cast p-value columns to string to prevent json rounding
+  if (length(ecaviardata) > 1) {
+    ecaviardata[10] <- lapply(ecaviardata[10], as.character)
+    ecaviardata[13] <- lapply(ecaviardata[13], as.character)
+  }
   ## parse outputfile to JSON and return to frontend
   locus_colocalization_ecaviar_data <- list(setNames(as.data.frame(ecaviardata), ecaviardata_colnames))
   dataSourceJSON <- c(toJSON(list(ecaviar=list(request=request, data=locus_colocalization_ecaviar_data))))
