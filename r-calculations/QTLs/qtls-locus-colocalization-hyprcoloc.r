@@ -83,7 +83,7 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
     betas <- tdata[,c("effect","slope")] %>% rename(GWAS=effect,QTL=slope) %>% as.matrix()
     ses <-   tdata[,c("se","slope_se")] %>% rename(GWAS=se,QTL=slope_se) %>% as.matrix()
     traits <- c('GWAS','QTL')
-    rsid=rownames(tdata)
+    # rsid=rownames(tdata)
     
     rsindex=tdata %>% select(chr,pos,rsnum) %>% left_join(ld.info) %>% select(Seq,rsnum) %>% filter(!is.na(Seq))  ##
     ld.matrix.seq <- ld.matrix[rsindex$Seq,rsindex$Seq]
@@ -93,7 +93,7 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
     ses <- ses[rsindex$rsnum,] ##
     
     binary.traits <- c(1,0)
-    res <- hyprcoloc(betas, ses, trait.names=traits, snp.id=rsid,binary.outcomes = binary.traits,snpscores = TRUE,ld.matrix = ld.matrix.seq);
+    res <- hyprcoloc(betas, ses, trait.names=traits, snp.id=rsindex$rsnum,binary.outcomes = binary.traits,snpscores = TRUE,ld.matrix = ld.matrix.seq);
     
     result_hyprcoloc <- bind_rows(result_hyprcoloc,res[[1]] %>% mutate(gene_id=geneid))
     if(length(res)>1) {
