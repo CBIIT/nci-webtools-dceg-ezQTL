@@ -1,0 +1,37 @@
+$enable-shadows: false;
+$enable-gradients: false;
+
+/** Colors */
+$blue: rgb(24, 83, 148);
+$dark-blue: rgb(18, 46, 81);
+$primary-darker: $dark-blue;
+$body-color: black;
+
+/** Cards */
+$card-cap-bg: #f1f1f1;
+
+/** Headings */
+$headings-font-weight: 700;
+
+/** Responsive Breakpoints */
+$grid-breakpoints: (xs: 0,
+    sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px,
+    xxxl: 1600px,
+    xxxxl: 1920px,
+) !default;
+
+$container-max-widths: (sm: 540px,
+    md: 720px,
+    lg: 960px,
+    xl: 1140px,
+    xxl: 1320px,
+    xxxl: 1500px,
+    xxxxl: 1800px,
+) !default;
+
+$grid-columns: 12 !default;
+$grid-gutter-width: 24px !default;
