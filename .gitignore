@@ -1,54 +1,18 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# app
+**/node_modules/
+angular/
 
-# compiled output
-/dist
-/tmp
-/out-tsc
-
-
-# dependencies
-/node_modules
-
-# IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+# client
+# client/build/
 
 # misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+# **/.eslintcache
+# **/.vscode
+# **.gz.tbi
 
-# System Files
-.DS_Store
-Thumbs.db
-# package-lock.json
-
-# R Calculations
-/r-calculations/tmp/
-/r-calculations/.RData
-/r-calculations/.Rhistory
-.Rhistory
-
-r-calculations/data/1000G/
-r-calculations/data/1kginfo
-
-# Input/Output save directories
-static/output/
-/r-calculations/input/
+# server
+server/config.json
+**/logs/
+**/data/
+**/apache_logs/
+**/tmp/
