@@ -1,7 +1,0 @@
-{
-    "tmp_dir": "./r-calculations/tmp/",
-    "input_dir": "./r-calculations/input/",
-    "static_output_dir": "./static/output/",
-    "log_dir": "../logs/"
-}
- 

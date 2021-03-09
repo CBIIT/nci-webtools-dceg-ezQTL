@@ -1,0 +1,22 @@
+{
+    "server": {
+        "port": 3000,
+        "client": "../client/build"
+    },
+    "logs": {
+        "folder": "../logs",
+        "level": "debug"
+    },
+    "data": {
+        "folder": "../data"
+    },
+    "aws": {
+        "region": "us-east-1",
+        "aws_access_key_id": "",
+        "aws_secret_access_key": "",
+        "s3": {
+            "bucket": "nci-cbiit-dceg-dev",
+            "subFolder": "ezQTL"
+          }
+    }
+}
