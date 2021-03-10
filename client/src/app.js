@@ -7,6 +7,7 @@ import { Help } from './components/pages/help/help';
 import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
 import 'font-awesome/css/font-awesome.min.css';
+import { ErrorModal } from './components/controls/error-modal/error-modal';
 
 export function App() {
   const { pathname } = useLocation();
@@ -55,6 +56,7 @@ export function App() {
         </div>
       </Navbar>
       <div id="main" style={{backgroundColor: '#EEEEEE'}}>
+        <ErrorModal />
         <div className="bg-white container py-4 shadow">
           <Route
             exact
