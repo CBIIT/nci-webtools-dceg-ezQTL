@@ -5,6 +5,8 @@ import {
     MainPanel
 } from '../../controls/sidebar-container/sidebar-container';
 import { QTLsGWASForm } from './qtls-gwas-form';
+import { QTLsGWASResultsForm } from './qtls-gwas-results/qtls-gwas-results-form';
+import { QTLsGWASResults } from './qtls-gwas-results/qtls-gwas-results';
 
 export function QTLsGWAS() {
     const [openSidebar, setOpenSidebar] = useState(true);
@@ -22,8 +24,11 @@ export function QTLsGWAS() {
                 </SidebarPanel>
 
                 <MainPanel className="col-lg-9">
+                    <div className="border border-secondary rounded mb-3">
+                        <QTLsGWASResultsForm />
+                    </div>
                     <div className="border border-secondary rounded">
-                        CONTENT
+                        <QTLsGWASResults />
                     </div>
                 </MainPanel>
                 </SidebarContainer>
