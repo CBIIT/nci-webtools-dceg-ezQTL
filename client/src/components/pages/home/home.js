@@ -2,7 +2,7 @@ import React from 'react';
 
 export function Home() {
     return (
-        <div className="px-3">
+        <div className="px-2">
             <div id="home-logo" class="text-center">
                 <img height="150" src="assets/images/ezqtl-logo.png" alt="ezQTL Logo" />
             </div>
