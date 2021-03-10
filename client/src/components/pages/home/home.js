@@ -4,7 +4,7 @@ export function Home() {
     return (
         <div className="px-3">
             <div id="home-logo" class="text-center">
-                <img height="150" src="assets/images/vqtl-logo.png" alt="vQTL Logo" />
+                <img height="150" src="assets/images/ezqtl-logo.png" alt="ezQTL Logo" />
             </div>
             <div class="mt-4">
                 <p>
@@ -88,11 +88,11 @@ export function Home() {
                 <p>
                     <b>Citations:</b>
                     <br />
-                    vQTL, a web-based tool for integrative visualization of Quantitative Trait Loci for GWAS annotation. 
+                    ezQTL, a web-based tool for integrative visualization of Quantitative Trait Loci for GWAS annotation. 
                     (<i>manuscript in preparation</i>)
                 </p>
                 <p>
-                    vQTL was developed by Dr. <a href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu" target="_blank" rel="noreferrer">Tongwu Zhang</a> and Dr. <a href="https://dceg.cancer.gov/about/staff-directory/choi-jiyeon" target="_blank" rel="noreferrer">Jiyeon Choi</a> in the lab of Dr. <a href="https://dceg.cancer.gov/about/staff-directory/biographies/K-N/brown-kevin" target="_blank" rel="noreferrer">Kevin Brown</a>
+                    ezQTL was developed by Dr. <a href="https://dceg.cancer.gov/about/staff-directory/zhang-tongwu" target="_blank" rel="noreferrer">Tongwu Zhang</a> and Dr. <a href="https://dceg.cancer.gov/about/staff-directory/choi-jiyeon" target="_blank" rel="noreferrer">Jiyeon Choi</a> in the lab of Dr. <a href="https://dceg.cancer.gov/about/staff-directory/biographies/K-N/brown-kevin" target="_blank" rel="noreferrer">Kevin Brown</a>
                     , in collaboration with the NCI Center for Biomedical Informatics and Information Technology. 
                     Support for this project comes from the Division of Cancer Epidemiology and Genetics Informatics Tool Challenge. 
                 </p>
