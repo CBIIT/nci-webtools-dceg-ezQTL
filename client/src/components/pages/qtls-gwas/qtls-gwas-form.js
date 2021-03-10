@@ -26,12 +26,30 @@ export function QTLsGWASForm() {
     const handleReset = () => {
         console.log("reset!");
         const initialState = getInitialState();
-        console.log(initialState['qtlsGWAS']);
         dispatch(actions.updateKey({ 
             key: 'qtlsGWAS', 
             data: initialState['qtlsGWAS']
         }));
     };
+
+    const handleSubmit = () => {
+        console.log("submit!");
+        dispatch(actions.updateKey({ 
+            key: 'qtlsGWAS', 
+            data: { 
+                submitted: true,
+                isLoading: true
+            }
+        }));
+        setTimeout(()=> {
+            dispatch(actions.updateKey({ 
+                key: 'qtlsGWAS', 
+                data: { 
+                    isLoading: false
+                }
+            }));
+        }, 3000);
+    }
 
     return (
         <Form className="py-1 px-2">
@@ -47,9 +65,10 @@ export function QTLsGWASForm() {
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: {loadSampleQTLs: true}
+                                        data: { loadSampleQTLs: true }
                                     }));
-                                }}>
+                                }}
+                                disabled={submitted}>
                                 <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
                                 Load Sample Files
                             </Button>
@@ -59,10 +78,11 @@ export function QTLsGWASForm() {
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: {loadSampleQTLs: false}
+                                        data: { loadSampleQTLs: false }
                                     }));
-                                }}>
-                                <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
+                                }}
+                                disabled={submitted}>
+                                <i className="fa fa-file-excel-o mr-1" style={{color: 'black'}}></i> 
                                 Unload Sample Files
                             </Button>
                         </>
@@ -182,9 +202,10 @@ export function QTLsGWASForm() {
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: {loadSampleGWAS: true}
+                                        data: { loadSampleGWAS: true }
                                     }));
-                                }}>
+                                }}
+                                disabled={submitted}>
                                 <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
                                 Load Sample File
                             </Button>
@@ -194,10 +215,11 @@ export function QTLsGWASForm() {
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: {loadSampleGWAS: false}
+                                        data: { loadSampleGWAS: false }
                                     }));
-                                }}>
-                                <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
+                                }}
+                                disabled={submitted}>
+                                <i className="fa fa-file-excel-o mr-1" style={{color: 'black'}}></i> 
                                 Unload Sample File
                             </Button>
                         </>
@@ -247,11 +269,11 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.Control 
                         id="qtls-distance-input"
-                        // disabled={submitted}
+                        disabled={submitted}
                         onChange={(e) => {
                             dispatch(actions.updateKey({ 
                                 key: 'qtlsGWAS', 
-                                data: {distance: e.target.value}
+                                data: { distance: e.target.value }
                             }));
                         }}
                         value={distance}
@@ -264,11 +286,11 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.Control 
                         id="qtls-snp-input"
-                        // disabled={submitted}
+                        disabled={submitted}
                         onChange={(e) => {
                             dispatch(actions.updateKey({ 
                                 key: 'qtlsGWAS', 
-                                data: {refSNP: e.target.value}
+                                data: { refSNP: e.target.value }
                             }));
                         }}
                         value={refSNP}
@@ -280,7 +302,7 @@ export function QTLsGWASForm() {
                 <div className="w-100 border border-top mx-3 my-2"></div>
                 <div className="col-sm-12">
                     <i className="fa fa-download mr-1"></i> 
-                    <a href="javascript:void(0)">Download Example Data</a>
+                    <a href="assets/files/MX2.examples.gz" download>Download Example Data</a>
                 </div>
             </div>
             <div className="row">
@@ -290,10 +312,11 @@ export function QTLsGWASForm() {
                         className="w-100"
                         variant="primary"
                         type="button"
-                        // onClick={() => {
-                        //     if (validateForm()) handleSubmit();
-                        // }}
-                        >
+                        onClick={() => {
+                            handleSubmit();
+                            // if (validateForm()) handleSubmit();
+                        }}
+                        disabled={submitted}>
                         Submit
                     </Button>
                 </div>
@@ -302,8 +325,7 @@ export function QTLsGWASForm() {
                         // disabled={loading.active}
                         className="w-100"
                         variant="secondary"
-                        onClick={() => handleReset()}
-                        >
+                        onClick={() => handleReset()}>
                         Reset
                     </Button>
                 </div>
