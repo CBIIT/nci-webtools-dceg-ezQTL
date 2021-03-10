@@ -12,7 +12,7 @@ export function QTLsGWAS() {
     const [openSidebar, setOpenSidebar] = useState(true);
 
     return (
-        <div className="px-3">
+        <div className="px-2">
             <SidebarContainer
                 className=""
                 collapsed={!openSidebar}
