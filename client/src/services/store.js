@@ -2,15 +2,18 @@ import { configureStore } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit';
 
 const getInitialState = () => ({
+  // qtlsGWAS: {
+
+  // },
   errorModal: {
     visible: false,
     details: ``,
-    message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:FORGE2-TFWebAdmin@cancer.gov">FORGE2-TFWebAdmin@cancer.gov</a>.`,
+    message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:FORGE2-TFWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
   }
 });
 
 export const { actions, reducer } = createSlice({
-  name: 'reduxState',
+  name: 'ezQTL',
   initialState: getInitialState(),
   reducers: {
     updateKey: (state, action) => {
@@ -25,6 +28,6 @@ export const { actions, reducer } = createSlice({
 
 export default configureStore({
   reducer: {
-    reduxState: reducer
+    ezQTL: reducer
   }
 })
