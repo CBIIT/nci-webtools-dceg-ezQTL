@@ -37,7 +37,9 @@ legend {
 }
 
 .btn-link {
-    text-decoration: underline;
+    all: unset;
+    color: #185394;
+    // text-decoration: underline;
 }
 
 .form-label {

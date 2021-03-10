@@ -1,10 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit';
 
-const getInitialState = () => ({
-  // qtlsGWAS: {
-
-  // },
+export const getInitialState = () => ({
+  qtlsGWAS: {
+    loadSampleQTLs: false,
+    loadSampleGWAS: false,
+    associationFile: null,
+    quantificationFile: null,
+    genotypeFile: null,
+    ldFile: null,
+    gwasFile: null,
+    distance: 100,
+    refSNP: '',
+    population: null,
+    refGene: null,
+    refSNPPost: null,
+    submitted: false,
+    isLoading: false
+  },
   errorModal: {
     visible: false,
     details: ``,
@@ -19,7 +32,10 @@ export const { actions, reducer } = createSlice({
     updateKey: (state, action) => {
         return {
             ...state,
-            [action.payload.key]: action.payload.data
+            [action.payload.key]: {
+              ...state[action.payload.key],
+              ...action.payload.data
+            }
         }
     },
     resetAll: getInitialState,

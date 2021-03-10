@@ -1,7 +1,38 @@
 import React from 'react';
 import { Form, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { actions, getInitialState } from '../../../services/store';
 
 export function QTLsGWASForm() {
+    const dispatch = useDispatch();
+
+    const {
+        loadSampleQTLs,
+        loadSampleGWAS,
+        associationFile,
+        quantificationFile,
+        genotypeFile,
+        ldFile,
+        gwasFile,
+        distance,
+        refSNP,
+        population,
+        refGene,
+        refSNPPost,
+        submitted,
+        isLoading
+    } = useSelector(({ezQTL}) => ezQTL.qtlsGWAS);
+
+    const handleReset = () => {
+        console.log("reset!");
+        const initialState = getInitialState();
+        console.log(initialState['qtlsGWAS']);
+        dispatch(actions.updateKey({ 
+            key: 'qtlsGWAS', 
+            data: initialState['qtlsGWAS']
+        }));
+    };
+
     return (
         <Form className="py-1 px-2">
             <Form.Group className="row">
@@ -9,8 +40,33 @@ export function QTLsGWASForm() {
                     <b>QTLs Data Files</b>
                 </div>
                 <div className="col-sm-6">
-                    <i className="fa fa-file mr-1"></i> 
-                    <a href="javascript:void(0)">Load Sample Files</a>
+                    {
+                        !loadSampleQTLs ? 
+                        <>
+                            <Button variant="link"
+                                onClick={(_) => {
+                                    dispatch(actions.updateKey({ 
+                                        key: 'qtlsGWAS', 
+                                        data: {loadSampleQTLs: true}
+                                    }));
+                                }}>
+                                <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
+                                Load Sample Files
+                            </Button>
+                        </> :
+                        <>
+                            <Button variant="link"
+                                onClick={(_) => {
+                                    dispatch(actions.updateKey({ 
+                                        key: 'qtlsGWAS', 
+                                        data: {loadSampleQTLs: false}
+                                    }));
+                                }}>
+                                <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
+                                Unload Sample Files
+                            </Button>
+                        </>
+                    }
                 </div>
                 <div className="col-sm-12">
                     <small>
@@ -26,14 +82,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-association-file"
-                        // disabled={submitted}
+                        disabled={submitted || loadSampleQTLs}
                         label={
-                            // inputFile.size
-                            // ? inputFile.name
-                            // : storeFilename
-                            // ? storeFilename
-                            // : 
-                            'Choose File'
+                            associationFile ? associationFile.name : 
+                            loadSampleQTLs ? 'MX2.eQTL.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -53,14 +105,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-quantification-file"
-                        // disabled={submitted}
+                        disabled={submitted || loadSampleQTLs}
                         label={
-                            // inputFile.size
-                            // ? inputFile.name
-                            // : storeFilename
-                            // ? storeFilename
-                            // : 
-                            'Choose File'
+                            quantificationFile ? quantificationFile.name : 
+                            loadSampleQTLs ? 'MX2.quantification.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -80,14 +128,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-genotype-file"
-                        // disabled={submitted}
+                        disabled={submitted || loadSampleQTLs}
                         label={
-                            // inputFile.size
-                            // ? inputFile.name
-                            // : storeFilename
-                            // ? storeFilename
-                            // : 
-                            'Choose File'
+                            genotypeFile ? genotypeFile.name : 
+                            loadSampleQTLs ? 'MX2.genotyping.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -107,14 +151,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-ld-file"
-                        // disabled={submitted}
+                        disabled={submitted || loadSampleQTLs}
                         label={
-                            // inputFile.size
-                            // ? inputFile.name
-                            // : storeFilename
-                            // ? storeFilename
-                            // : 
-                            'Choose File'
+                            ldFile ? ldFile.name : 
+                            loadSampleQTLs ? 'MX2.LD.gz' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -135,8 +175,33 @@ export function QTLsGWASForm() {
                     <b>GWAS Data File</b>
                 </div>
                 <div className="col-sm-6">
-                    <i className="fa fa-file mr-1"></i> 
-                    <a href="javascript:void(0)">Load Sample File</a>
+                    {
+                        !loadSampleGWAS ? 
+                        <>
+                            <Button variant="link"
+                                onClick={(_) => {
+                                    dispatch(actions.updateKey({ 
+                                        key: 'qtlsGWAS', 
+                                        data: {loadSampleGWAS: true}
+                                    }));
+                                }}>
+                                <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
+                                Load Sample File
+                            </Button>
+                        </> :
+                        <>
+                            <Button variant="link"
+                                onClick={(_) => {
+                                    dispatch(actions.updateKey({ 
+                                        key: 'qtlsGWAS', 
+                                        data: {loadSampleGWAS: false}
+                                    }));
+                                }}>
+                                <i className="fa fa-file mr-1" style={{color: 'black'}}></i> 
+                                Unload Sample File
+                            </Button>
+                        </>
+                    }
                 </div>
                 <div className="col-sm-12">
                     <small>
@@ -152,14 +217,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-gwas-file"
-                        // disabled={submitted}
+                        disabled={submitted || loadSampleGWAS}
                         label={
-                            // inputFile.size
-                            // ? inputFile.name
-                            // : storeFilename
-                            // ? storeFilename
-                            // : 
-                            'Choose File'
+                            gwasFile ? gwasFile.name : 
+                            loadSampleGWAS ? 'MX2.GWAS.rs.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -187,7 +248,13 @@ export function QTLsGWASForm() {
                     <Form.Control 
                         id="qtls-distance-input"
                         // disabled={submitted}
-                        value="100"
+                        onChange={(e) => {
+                            dispatch(actions.updateKey({ 
+                                key: 'qtlsGWAS', 
+                                data: {distance: e.target.value}
+                            }));
+                        }}
+                        value={distance}
                         // custom
                     />
                 </div>
@@ -198,7 +265,13 @@ export function QTLsGWASForm() {
                     <Form.Control 
                         id="qtls-snp-input"
                         // disabled={submitted}
-                        // value=""
+                        onChange={(e) => {
+                            dispatch(actions.updateKey({ 
+                                key: 'qtlsGWAS', 
+                                data: {refSNP: e.target.value}
+                            }));
+                        }}
+                        value={refSNP}
                         // custom
                     />
                 </div>
@@ -229,7 +302,7 @@ export function QTLsGWASForm() {
                         // disabled={loading.active}
                         className="w-100"
                         variant="secondary"
-                        // onClick={() => handleReset()}
+                        onClick={() => handleReset()}
                         >
                         Reset
                     </Button>
