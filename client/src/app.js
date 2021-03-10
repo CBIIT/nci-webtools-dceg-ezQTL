@@ -6,6 +6,7 @@ import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
 import { Help } from './components/pages/help/help';
 import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
+import 'font-awesome/css/font-awesome.min.css';
 
 export function App() {
   const { pathname } = useLocation();

@@ -10,6 +10,7 @@
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.3",
     "bootstrap": "^4.6.0",
+    "font-awesome": "^4.7.0",
     "node-sass": "^4.14.1",
     "plotly.js": "^1.58.4",
     "react": "^17.0.1",
