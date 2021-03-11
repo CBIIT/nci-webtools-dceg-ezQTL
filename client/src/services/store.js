@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { createSlice } from '@reduxjs/toolkit';
+import { qtlsGWASCalculation } from './actions';
 
 export const getInitialState = () => ({
   qtlsGWAS: {
@@ -16,7 +17,8 @@ export const getInitialState = () => ({
     refGene: null,
     refSNPPost: null,
     submitted: false,
-    isLoading: false
+    isLoading: false,
+    activeResultsTab: 'locus-alignment'
   },
   errorModal: {
     visible: false,
@@ -38,7 +40,7 @@ export const { actions, reducer } = createSlice({
             }
         }
     },
-    resetAll: getInitialState,
+    resetAll: getInitialState
   },
 });
 

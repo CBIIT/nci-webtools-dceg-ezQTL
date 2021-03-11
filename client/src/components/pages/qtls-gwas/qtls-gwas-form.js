@@ -2,6 +2,7 @@ import React from 'react';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { actions, getInitialState } from '../../../services/store';
+import { qtlsGWASCalculation } from '../../../services/actions';
 
 export function QTLsGWASForm() {
     const dispatch = useDispatch();
@@ -34,21 +35,22 @@ export function QTLsGWASForm() {
 
     const handleSubmit = () => {
         console.log("submit!");
-        dispatch(actions.updateKey({ 
-            key: 'qtlsGWAS', 
-            data: { 
-                submitted: true,
-                isLoading: true
-            }
-        }));
-        setTimeout(()=> {
-            dispatch(actions.updateKey({ 
-                key: 'qtlsGWAS', 
-                data: { 
-                    isLoading: false
-                }
-            }));
-        }, 3000);
+        dispatch(qtlsGWASCalculation());
+        // dispatch(actions.updateKey({ 
+        //     key: 'qtlsGWAS', 
+        //     data: { 
+        //         submitted: true,
+        //         isLoading: true
+        //     }
+        // }));
+        // setTimeout(()=> {
+        //     dispatch(actions.updateKey({ 
+        //         key: 'qtlsGWAS', 
+        //         data: { 
+        //             isLoading: false
+        //         }
+        //     }));
+        // }, 3000);
     }
 
     return (
@@ -317,7 +319,7 @@ export function QTLsGWASForm() {
                             // if (validateForm()) handleSubmit();
                         }}
                         disabled={submitted}>
-                        Submit
+                        Calculate
                     </Button>
                 </div>
                 <div className="col-sm-6">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { actions } from '../../../../services/store';
 import { Tabs, Tab, Form, Button } from 'react-bootstrap';
 import { LocusAlignment } from './locus-alignment';
 import { LocusColocalization } from './locus-colocalization';
@@ -8,6 +9,8 @@ import { LocusTable } from './locus-table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export function QTLsGWASResults() {
+    const dispatch = useDispatch();
+
     const {
         loadSampleQTLs,
         loadSampleGWAS,
@@ -22,7 +25,8 @@ export function QTLsGWASResults() {
         refGene,
         refSNPPost,
         submitted,
-        isLoading
+        isLoading,
+        activeResultsTab
     } = useSelector(({ezQTL}) => ezQTL.qtlsGWAS);
 
     const tabs = [
@@ -47,15 +51,19 @@ export function QTLsGWASResults() {
             title: 'Locus Quantification',
         }
     ]
-    const [key, setKey] = useState('locus-alignment');
 
     return (
         <>
             <LoadingOverlay active={isLoading} />
             <Tabs
                 id="controlled-tab-example"
-                activeKey={key}
-                onSelect={(k) => setKey(k)}>
+                activeKey={activeResultsTab}
+                onSelect={(k) => {
+                    dispatch(actions.updateKey({ 
+                        key: 'qtlsGWAS', 
+                        data: { activeResultsTab: k }
+                    }));
+                }}>
                 {
                     tabs.map((item) => 
                         <Tab 
