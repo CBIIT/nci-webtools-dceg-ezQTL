@@ -18,11 +18,11 @@ export function qtlsGWASCalculation(params) {
         
         axios.post('api/qtls-calculate-main', params)
             .then(function (response) {
-                console.log(response);
+                console.log(response.data);
                 dispatch(actions.updateKey({ 
                     key: 'qtlsGWAS', 
                     data: { 
-                        results: response 
+                        results: response.data
                     }
                 }));
             })
