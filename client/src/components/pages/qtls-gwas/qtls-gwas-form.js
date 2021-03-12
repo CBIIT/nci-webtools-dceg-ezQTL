@@ -8,18 +8,23 @@ export function QTLsGWASForm() {
     const dispatch = useDispatch();
 
     const {
-        loadSampleQTLs,
-        loadSampleGWAS,
+        select_qtls_samples,
+        select_gwas_sample,
         associationFile,
         quantificationFile,
         genotypeFile,
-        ldFile,
         gwasFile,
-        distance,
-        refSNP,
-        population,
-        refGene,
-        refSNPPost,
+        LDFile,
+        request,
+        select_pop,
+        select_gene,
+        select_dist,
+        select_ref,
+        recalculateAttempt,
+        recalculatePop,
+        recalculateGene,
+        recalculateDist,
+        recalculateRef,
         submitted,
         isLoading
     } = useSelector(({ezQTL}) => ezQTL.qtlsGWAS);
@@ -35,22 +40,25 @@ export function QTLsGWASForm() {
 
     const handleSubmit = () => {
         console.log("submit!");
-        dispatch(qtlsGWASCalculation());
-        // dispatch(actions.updateKey({ 
-        //     key: 'qtlsGWAS', 
-        //     data: { 
-        //         submitted: true,
-        //         isLoading: true
-        //     }
-        // }));
-        // setTimeout(()=> {
-        //     dispatch(actions.updateKey({ 
-        //         key: 'qtlsGWAS', 
-        //         data: { 
-        //             isLoading: false
-        //         }
-        //     }));
-        // }, 3000);
+
+        dispatch(qtlsGWASCalculation({
+            select_qtls_samples,
+            select_gwas_sample,
+            associationFile,
+            quantificationFile,
+            genotypeFile,
+            gwasFile,
+            LDFile,
+            select_pop,
+            select_gene,
+            select_dist,
+            select_ref,
+            recalculateAttempt,
+            recalculatePop,
+            recalculateGene,
+            recalculateDist,
+            recalculateRef
+        }));
     }
 
     return (
@@ -61,13 +69,13 @@ export function QTLsGWASForm() {
                 </div>
                 <div className="col-sm-6">
                     {
-                        !loadSampleQTLs ? 
+                        !select_qtls_samples ? 
                         <>
                             <Button variant="link"
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: { loadSampleQTLs: true }
+                                        data: { select_qtls_samples: true }
                                     }));
                                 }}
                                 disabled={submitted}>
@@ -80,7 +88,7 @@ export function QTLsGWASForm() {
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: { loadSampleQTLs: false }
+                                        data: { select_qtls_samples: false }
                                     }));
                                 }}
                                 disabled={submitted}>
@@ -104,10 +112,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-association-file"
-                        disabled={submitted || loadSampleQTLs}
+                        disabled={submitted || select_qtls_samples}
                         label={
                             associationFile ? associationFile.name : 
-                            loadSampleQTLs ? 'MX2.eQTL.txt' : 'Choose File'
+                            select_qtls_samples ? 'MX2.eQTL.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -127,10 +135,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-quantification-file"
-                        disabled={submitted || loadSampleQTLs}
+                        disabled={submitted || select_qtls_samples}
                         label={
                             quantificationFile ? quantificationFile.name : 
-                            loadSampleQTLs ? 'MX2.quantification.txt' : 'Choose File'
+                            select_qtls_samples ? 'MX2.quantification.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -150,10 +158,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-genotype-file"
-                        disabled={submitted || loadSampleQTLs}
+                        disabled={submitted || select_qtls_samples}
                         label={
                             genotypeFile ? genotypeFile.name : 
-                            loadSampleQTLs ? 'MX2.genotyping.txt' : 'Choose File'
+                            select_qtls_samples ? 'MX2.genotyping.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -173,10 +181,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-ld-file"
-                        disabled={submitted || loadSampleQTLs}
+                        disabled={submitted || select_qtls_samples}
                         label={
-                            ldFile ? ldFile.name : 
-                            loadSampleQTLs ? 'MX2.LD.gz' : 'Choose File'
+                            LDFile ? LDFile.name : 
+                            select_qtls_samples ? 'MX2.LD.gz' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -198,13 +206,13 @@ export function QTLsGWASForm() {
                 </div>
                 <div className="col-sm-6">
                     {
-                        !loadSampleGWAS ? 
+                        !select_gwas_sample ? 
                         <>
                             <Button variant="link"
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: { loadSampleGWAS: true }
+                                        data: { select_gwas_sample: true }
                                     }));
                                 }}
                                 disabled={submitted}>
@@ -217,7 +225,7 @@ export function QTLsGWASForm() {
                                 onClick={(_) => {
                                     dispatch(actions.updateKey({ 
                                         key: 'qtlsGWAS', 
-                                        data: { loadSampleGWAS: false }
+                                        data: { select_gwas_sample: false }
                                     }));
                                 }}
                                 disabled={submitted}>
@@ -241,10 +249,10 @@ export function QTLsGWASForm() {
                     </Form.Label>
                     <Form.File 
                         id="qtls-gwas-file"
-                        disabled={submitted || loadSampleGWAS}
+                        disabled={submitted || select_gwas_sample}
                         label={
                             gwasFile ? gwasFile.name : 
-                            loadSampleGWAS ? 'MX2.GWAS.rs.txt' : 'Choose File'
+                            select_gwas_sample ? 'MX2.GWAS.rs.txt' : 'Choose File'
                         }
                         // accept=".tsv, .txt"
                         // isInvalid={checkValid ? !validFile : false}
@@ -275,10 +283,10 @@ export function QTLsGWASForm() {
                         onChange={(e) => {
                             dispatch(actions.updateKey({ 
                                 key: 'qtlsGWAS', 
-                                data: { distance: e.target.value }
+                                data: { select_dist: e.target.value }
                             }));
                         }}
-                        value={distance}
+                        value={select_dist}
                         // custom
                     />
                 </div>
@@ -292,10 +300,10 @@ export function QTLsGWASForm() {
                         onChange={(e) => {
                             dispatch(actions.updateKey({ 
                                 key: 'qtlsGWAS', 
-                                data: { refSNP: e.target.value }
+                                data: { select_ref: e.target.value }
                             }));
                         }}
-                        value={refSNP}
+                        value={select_ref}
                         // custom
                     />
                 </div>
