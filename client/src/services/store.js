@@ -4,21 +4,27 @@ import { qtlsGWASCalculation } from './actions';
 
 export const getInitialState = () => ({
   qtlsGWAS: {
-    loadSampleQTLs: false,
-    loadSampleGWAS: false,
+    select_qtls_samples: false,
+    select_gwas_sample: false,
     associationFile: null,
     quantificationFile: null,
     genotypeFile: null,
-    ldFile: null,
     gwasFile: null,
-    distance: 100,
-    refSNP: '',
-    population: null,
-    refGene: null,
-    refSNPPost: null,
+    LDFile: null,
+    request: '',
+    select_pop: false,
+    select_gene: null,
+    select_dist: 100,
+    select_ref: false,
+    recalculateAttempt: false,
+    recalculatePop: false,
+    recalculateGene: false,
+    recalculateDist: false,
+    recalculateRef: false,
     submitted: false,
     isLoading: false,
-    activeResultsTab: 'locus-alignment'
+    activeResultsTab: 'locus-alignment',
+    results: null
   },
   errorModal: {
     visible: false,
