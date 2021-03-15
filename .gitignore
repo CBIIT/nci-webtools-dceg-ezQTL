@@ -1,6 +1,7 @@
 # app
 **/node_modules/
 angular/
+www/
 
 # client
 # client/build/

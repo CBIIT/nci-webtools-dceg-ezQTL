@@ -11,7 +11,7 @@ import { ErrorModal } from './components/controls/error-modal/error-modal';
 
 export function App() {
   const { pathname } = useLocation();
-  useEffect(_ => window.scrollTo(0, 0), [pathname]);
+  useEffect((_) => window.scrollTo(0, 0), [pathname]);
 
   const links = [
     {
@@ -33,7 +33,11 @@ export function App() {
       <header className="bg-primary-gradient py-3">
         <div className="container px-0">
           <a href="https://dceg.cancer.gov/" target="_blank" rel="noreferrer">
-            <img src="assets/images/dceg-logo-inverted.svg" alt="NCI Logo" className="w-50" />
+            <img
+              src="assets/images/dceg-logo-inverted.svg"
+              alt="NCI Logo"
+              className="w-50"
+            />
           </a>
         </div>
       </header>
@@ -42,38 +46,38 @@ export function App() {
           <Navbar.Toggle aria-controls="app-navbar" />
           <Navbar.Collapse id="app-navbar">
             <Nav className="mr-auto">
-              {links.map((link, index) => 
+              {links.map((link, index) => (
                 <NavLink
-                    key={`navlink-${index}`}
-                    exact={link.route === '/'}
-                    activeClassName="active font-weight-bold"
-                    className="nav-link px-3"
-                    to={link.route}>
-                    {link.title}
-                </NavLink>)}
+                  key={`navlink-${index}`}
+                  exact={link.route === '/'}
+                  activeClassName="active font-weight-bold"
+                  className="nav-link px-3"
+                  to={link.route}
+                >
+                  {link.title}
+                </NavLink>
+              ))}
             </Nav>
           </Navbar.Collapse>
         </div>
       </Navbar>
-      <div id="main" style={{backgroundColor: '#EEEEEE'}}>
+      <div id="main" style={{ backgroundColor: '#EEEEEE' }}>
         <ErrorModal />
         <div className="bg-white container py-4 shadow">
-          <Route
-            exact
-            path={`/`}
-            render={() => <Redirect to="/home" />}
-          />
+          <Route exact path={`/`} render={() => <Redirect to="/home" />} />
           <Route path="/home" exact={true} component={Home} />
           <Route path="/qtls" exact component={QTLsGWAS} />
           <Route path="/help" component={Help} />
         </div>
       </div>
-      <NCIFooter 
+      <NCIFooter
         className="py-4 bg-primary-gradient text-light"
         title={
           <div className="mb-4">
-              <div className="h4 mb-0">Division of Cancer Epidemiology and Genetics</div>
-              <div className="h6">at the National Cancer Institute</div>
+            <div className="h4 mb-0">
+              Division of Cancer Epidemiology and Genetics
+            </div>
+            <div className="h6">at the National Cancer Institute</div>
           </div>
         }
       />

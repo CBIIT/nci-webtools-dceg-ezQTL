@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { SidebarContainer, MainPanel, SidebarPanel } from './sidebar-container';
 
-describe('SidebarContainer Module', function() {
+describe('SidebarContainer Module', function () {
   test('SidebarContainer renders correctly', () => {
     const sidebarText = 'Sidebar';
     const mainText = 'Main';

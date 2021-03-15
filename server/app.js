@@ -15,8 +15,8 @@ const app = express();
 app.use('/api', apiRouter);
 
 // serve public folder during local development
-if (process.env.NODE_ENV !== 'production')
-    app.use(express.static(config.server.client));
+// if (process.env.NODE_ENV !== 'production')
+app.use(express.static(config.server.client));
 
 // global error handler
 app.use((error, request, response, next) => {

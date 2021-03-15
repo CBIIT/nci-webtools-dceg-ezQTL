@@ -1,15 +1,17 @@
-*, ::after, ::before {
-    outline: none;
+*,
+::after,
+::before {
+  outline: none;
 }
 
 // higher contrast selection
-::selection { 
-    color: white;
-    background: $primary-darker;
+::selection {
+  color: white;
+  background: $primary-darker;
 }
 
 body {
-    min-width: 400px;
+  min-width: 400px;
 }
 
 // hr {
@@ -17,104 +19,111 @@ body {
 // }
 
 legend {
-    width: inherit;
+  width: inherit;
 }
 
 .bg-primary-darker {
-    background-color: $primary-darker !important;
+  background-color: $primary-darker !important;
 }
 
 .bg-primary-gradient {
-    background: linear-gradient(45deg, $primary, $primary-darker) !important;
+  background: linear-gradient(45deg, $primary, $primary-darker) !important;
 }
 
 .alert-dismissible .close {
-    padding: 0 .25rem;
+  padding: 0 0.25rem;
 }
 
 .btn {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .btn-link {
-    all: unset;
-    color: #185394;
-    // text-decoration: underline;
+  all: unset;
+  color: #185394;
+  // text-decoration: underline;
 }
 
 .form-label {
-    font-weight: 500;
+  font-weight: 500;
 }
 
 .nav-link {
-    // font-weight: 500;
-    border-bottom: 7px solid transparent;
-    border-top: 7px solid transparent;
+  // font-weight: 500;
+  border-bottom: 7px solid transparent;
+  border-top: 7px solid transparent;
 }
 
 .navbar-dark {
-    .navbar-toggler {
-        border: none;
-    }
+  .navbar-toggler {
+    border: none;
+  }
 
-    .navbar-nav .nav-link {
-        color: white;
-        transition: all 0.1s;
-        &.active{
-            border-bottom-color: #F5Ab35;
-        }
+  .navbar-nav .nav-link {
+    color: white;
+    transition: all 0.1s;
+    &.active {
+      border-bottom-color: #f5ab35;
     }
+  }
 }
 
 .card-header-tabs.nav-tabs .nav-item .nav-link {
-    border-bottom-width: 2px;
-    border-color: transparent;
-    &:hover, &:focus, &.active {
-        color: black;
-        background-color: $card-cap-bg;
-        border-bottom-color: $primary;
-    }
+  border-bottom-width: 2px;
+  border-color: transparent;
+  &:hover,
+  &:focus,
+  &.active {
+    color: black;
+    background-color: $card-cap-bg;
+    border-bottom-color: $primary;
+  }
 }
 
-.custom-checkbox .custom-control-input:disabled:checked ~ .custom-control-label::before,
-.custom-checkbox .custom-control-input[readonly]:checked ~ .custom-control-label::before {
-    background-color: rgba(24, 83, 148, 0.5);
+.custom-checkbox
+  .custom-control-input:disabled:checked
+  ~ .custom-control-label::before,
+.custom-checkbox
+  .custom-control-input[readonly]:checked
+  ~ .custom-control-label::before {
+  background-color: rgba(24, 83, 148, 0.5);
 }
 
 .legend {
-    font-size: 1rem;
-    white-space: nowrap;
+  font-size: 1rem;
+  white-space: nowrap;
 }
 
-input[type=number].no-spinner {
-    -moz-appearance: textfield;
+input[type='number'].no-spinner {
+  -moz-appearance: textfield;
 }
 
 input::-webkit-outer-spin-button.no-spinner,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .react-bootstrap-table table {
-    table-layout: auto;
+  table-layout: auto;
 }
 
 .react-bootstrap-table-pagination {
-    margin: 0;
+  margin: 0;
 }
 
 .table.table-bordered {
-    th {
-        border-top: 1px solid  #dee2e6;
-    }
+  th {
+    border-top: 1px solid #dee2e6;
+  }
 }
 
 .table-nowrap {
-    td, th {
-        white-space: nowrap;
-        max-width: 300px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+  td,
+  th {
+    white-space: nowrap;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
