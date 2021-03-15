@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { LoadingOverlay } from './loading-overlay';
 
-describe('LoadingOverlay Module', function() {
+describe('LoadingOverlay Module', function () {
   test('LoadingOverlay renders correctly', () => {
     const props = { active: true, content: 'Test' };
     render(<LoadingOverlay {...props} />);

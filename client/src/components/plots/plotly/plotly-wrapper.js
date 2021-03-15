@@ -2,7 +2,7 @@ import React from 'react';
 import Plot from 'react-plotly.js';
 import './plotly-wrapper.scss';
 
-export const PlotlyWrapper = params => {
+export const PlotlyWrapper = (params) => {
   return (
     <Plot
       {...params}

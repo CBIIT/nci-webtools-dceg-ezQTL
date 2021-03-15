@@ -10,18 +10,19 @@ const overlayStyle = {
   height: '100%',
   backgroundColor: '#fff',
   opacity: '0.8',
-  zIndex: 9999
+  zIndex: 9999,
 };
 
 const loaderStyle = {
-  textAlign: 'center'
+  textAlign: 'center',
 };
 
-const DefaultLoader = props => (
+const DefaultLoader = (props) => (
   <div
     style={{ ...loaderStyle, ...props.loaderStyle }}
     {...props.loaderProps}
-    data-testid="DefaultLoader">
+    data-testid="DefaultLoader"
+  >
     {props.children || props.content || (
       <>
         <Spinner animation="border" variant="primary" role="status"></Spinner>
@@ -35,7 +36,7 @@ const DefaultLoader = props => (
  * Example Usage: <LoadingOverlay active={loading}>Loading</LoadingOverlay>
  * @param {*} props
  */
-export const LoadingOverlay = props => {
+export const LoadingOverlay = (props) => {
   const overlayNode = useRef(null);
   const loaderNode = useRef(null);
   useNonStaticParent(overlayNode);
@@ -46,7 +47,8 @@ export const LoadingOverlay = props => {
         data-testid="LoadingOverlay"
         ref={overlayNode}
         style={{ ...overlayStyle, ...props.overlayStyle }}
-        {...props.overlayProps}>
+        {...props.overlayProps}
+      >
         <div style={{ visibility: 'hidden' }} ref={loaderNode}>
           {(props.loader || DefaultLoader)(props)}
         </div>

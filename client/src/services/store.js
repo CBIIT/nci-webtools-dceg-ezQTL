@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import { qtlsGWASCalculation } from './actions';
 
@@ -24,13 +24,13 @@ export const getInitialState = () => ({
     submitted: false,
     isLoading: false,
     activeResultsTab: 'locus-alignment',
-    results: null
+    results: null,
   },
   errorModal: {
     visible: false,
     details: ``,
     message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:FORGE2-TFWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
-  }
+  },
 });
 
 export const { actions, reducer } = createSlice({
@@ -38,20 +38,20 @@ export const { actions, reducer } = createSlice({
   initialState: getInitialState(),
   reducers: {
     updateKey: (state, action) => {
-        return {
-            ...state,
-            [action.payload.key]: {
-              ...state[action.payload.key],
-              ...action.payload.data
-            }
-        }
+      return {
+        ...state,
+        [action.payload.key]: {
+          ...state[action.payload.key],
+          ...action.payload.data,
+        },
+      };
     },
-    resetAll: getInitialState
+    resetAll: getInitialState,
   },
 });
 
 export default configureStore({
   reducer: {
-    ezQTL: reducer
-  }
-})
+    ezQTL: reducer,
+  },
+});

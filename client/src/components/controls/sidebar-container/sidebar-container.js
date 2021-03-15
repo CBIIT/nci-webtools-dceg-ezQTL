@@ -11,8 +11,9 @@ export const CollapseButton = ({ collapsed, toggleCollapse }) => (
       background: 'transparent',
       border: 'none',
       outline: 'none',
-      color: 'rgb(0, 126, 167)'
-    }}>
+      color: 'rgb(0, 126, 167)',
+    }}
+  >
     <span className="sr-only">Show or hide input sidebar</span>
     <i
       className={`
@@ -28,11 +29,11 @@ export function SidebarContainer({
   onCollapsed = () => {},
   children = [],
   className = '',
-  collapseButton = CollapseButton
+  collapseButton = CollapseButton,
 }) {
   // find children for sidebar and main panel
-  let sidebarPanel = children.find(c => c.type === SidebarPanel);
-  let mainPanel = children.find(c => c.type === MainPanel);
+  let sidebarPanel = children.find((c) => c.type === SidebarPanel);
+  let mainPanel = children.find((c) => c.type === MainPanel);
 
   // determine css classes for panel containers
   let sidebarPanelClass = sidebarPanel.props.className || 'col-md-3';
@@ -53,7 +54,8 @@ export function SidebarContainer({
     <div data-testid="SidebarContainer" className={`row ${className}`}>
       <div
         data-testid="SidebarPanel"
-        className={_collapsed ? 'd-none' : sidebarPanelClass}>
+        className={_collapsed ? 'd-none' : sidebarPanelClass}
+      >
         {sidebarPanel}
       </div>
 
@@ -62,10 +64,11 @@ export function SidebarContainer({
         className={`
                 position-relative
                 ${_collapsed ? 'col-md' : mainPanelClass}
-            `}>
+            `}
+      >
         {collapseButton({
           collapsed: _collapsed,
-          toggleCollapse: toggleCollapse
+          toggleCollapse: toggleCollapse,
         })}
         {mainPanel}
       </div>

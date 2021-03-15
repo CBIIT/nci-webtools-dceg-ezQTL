@@ -5,20 +5,23 @@ import { actions } from '../../../services/store';
 
 export function ErrorModal(props) {
   const dispatch = useDispatch();
-  const errorModal = useSelector(({ezQTL}) => ezQTL.errorModal);
-  const closeErrorModal = () => dispatch(actions.updateKey({ 
-    key: 'errorModal', 
-    data: { 
-      visible: false 
-    }
-  }));
+  const errorModal = useSelector(({ ezQTL }) => ezQTL.errorModal);
+  const closeErrorModal = () =>
+    dispatch(
+      actions.updateKey({
+        key: 'errorModal',
+        data: {
+          visible: false,
+        },
+      })
+    );
 
   return (
     <Modal
       data-testid="ErrorModal"
       show={errorModal.visible}
       onHide={closeErrorModal}
-      >
+    >
       <Modal.Header closeButton>
         <Modal.Title>Internal Server Error</Modal.Title>
       </Modal.Header>
@@ -28,11 +31,7 @@ export function ErrorModal(props) {
           data-testid="ErrorModalMessage"
           dangerouslySetInnerHTML={{ __html: errorModal.message }}
         />
-        {errorModal.details && 
-          <pre>
-            {errorModal.details}
-          </pre>
-        }
+        {errorModal.details && <pre>{errorModal.details}</pre>}
       </Modal.Body>
 
       <Modal.Footer>

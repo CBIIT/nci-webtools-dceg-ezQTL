@@ -1,7 +1,7 @@
 {
     "server": {
         "port": 3000,
-        "client": "../client/build"
+        "client": "../www"
     },
     "logs": {
         "folder": "../logs",
