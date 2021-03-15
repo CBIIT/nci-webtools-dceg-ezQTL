@@ -10,6 +10,9 @@
     "data": {
         "folder": "../data"
     },
+    "R": {
+        "workDir": "../"
+    },
     "aws": {
         "region": "us-east-1",
         "aws_access_key_id": "",
