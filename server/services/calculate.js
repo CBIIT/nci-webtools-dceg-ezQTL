@@ -1,9 +1,11 @@
 const { v1: uuidv1 } = require('uuid');
 const r = require('r-wrapper').async;
 const path = require('path');
+const logger = require('../services/logger');
 
 async function qtlsCalculateMain(params, res, next) {
-    console.log("params", params);
+    logger.info("Execute /qtls-calculate-main");
+    logger.debug(params);
     const {
         select_qtls_samples,
         select_gwas_sample,
@@ -51,33 +53,13 @@ async function qtlsCalculateMain(params, res, next) {
                 recalculateRef
             ]
         );
+        logger.info("Finished /qtls-calculate-main");
         res.json(JSON.parse(wrapper));
     } catch (err) {
-        console.log(err);
+        logger.error("Error /qtls-calculate-main");
+        logger.error(err);
         res.status(500).json(err);
     }
-    // console.log("qtlsCalculateMain", [
-    //                 rfile,
-    //                 workingDirectory,
-    //                 select_qtls_samples,
-    //                 select_gwas_sample,
-    //                 associationFile,
-    //                 quantificationFile,
-    //                 genotypeFile,
-    //                 gwasFile,
-    //                 LDFile,
-    //                 request,
-    //                 select_pop,
-    //                 select_gene,
-    //                 select_dist,
-    //                 select_ref,
-    //                 recalculateAttempt,
-    //                 recalculatePop,
-    //                 recalculateGene,
-    //                 recalculateDist,
-    //                 recalculateRef
-    //             ]);
-    // res.json({content: 'hi'});
 }
 
 module.exports = {
