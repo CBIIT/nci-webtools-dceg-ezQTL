@@ -208,6 +208,7 @@ export function uploadFile(params) {
       console.log(error);
       if (error) {
         dispatch(updateError({ visible: true }));
+        dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' }));
       }
     }
   }
@@ -628,7 +629,7 @@ export function qtlsGWASCalculation(params) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' }));
         }
       })
       .then(function () {

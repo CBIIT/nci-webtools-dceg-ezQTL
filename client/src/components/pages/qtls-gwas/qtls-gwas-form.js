@@ -404,7 +404,11 @@ export function QTLsGWASForm() {
               handleSubmit();
               // if (validateForm()) handleSubmit();
             }}
-            disabled={submitted}
+            disabled={
+              submitted || 
+              select_dist.length <= 0 || 
+              (!_associationFile && !select_qtls_samples)
+            }
           >
             Calculate
           </Button>
