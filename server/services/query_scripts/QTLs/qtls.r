@@ -9,15 +9,15 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
 
 locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
   if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
-    cmd <- paste0('bcftools view -S tmp/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'.','locus.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'.','input','.vcf.gz')
+    cmd <- paste0('bcftools view -S tmp/',request,'/',request,'.','extracted','.panel -R ',paste0('tmp/',request,'/',request,'.','locus.bed'),' -O z  ', in_path,'|bcftools sort -O z -o tmp/',request,'/',request,'.','input','.vcf.gz')
     system(cmd)
-    cmd <- paste0('bcftools index -t tmp/',request,'.','input','.vcf.gz')
+    cmd <- paste0('bcftools index -t tmp/',request,'/',request,'.','input','.vcf.gz')
     system(cmd)
     regionLD <- paste0(chromosome,":",min(qdata_region_pos),"-",max(qdata_region_pos))
     in_bin <- '/usr/local/bin/emeraLD'
-    getLD <- emeraLD2R(path = paste0('tmp/',request,'.','input','.vcf.gz'), bin = in_bin) 
+    getLD <- emeraLD2R(path = paste0('tmp/',request,'/',request,'.','input','.vcf.gz'), bin = in_bin) 
     ld_data <- getLD(region = regionLD)
-    saveRDS(ld_data, file=paste0("tmp/",request,".ld_data.rds"))
+    saveRDS(ld_data, file=paste0("tmp/",request,'/',request,".ld_data.rds"))
   }
 }
 
@@ -119,7 +119,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   qdata <- subset(qdata, pos > minpos & pos < maxpos)
   
   kgvcfpath <- paste0(workDir, '/data/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
-  in_path <- paste0(workDir, '/tmp/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
+  in_path <- paste0(workDir, '/tmp/',request,'/',request,'.','chr',chromosome,'_',minpos,'_',maxpos,'.vcf.gz')
   
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
     locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos)
@@ -150,9 +150,9 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     }
   }
   
-  cmd = paste0("tabix data/Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/",request,'.',"rc_temp",".txt")
+  cmd = paste0("tabix data/Recombination_Rate/",popshort,".txt.gz ",chromosome,":",minpos,"-",maxpos," >tmp/",request,'/',request,'.',"rc_temp",".txt")
   system(cmd)
-  rcdata <- read_delim(paste0('tmp/',request,'.','rc_temp','.txt'),delim = "\t",col_names = F)
+  rcdata <- read_delim(paste0('tmp/',request,'/',request,'.','rc_temp','.txt'),delim = "\t",col_names = F)
   colnames(rcdata) <- c('chr','pos','rate','map','filtered')
   rcdata$pos <- as.integer(rcdata$pos)
   
@@ -207,10 +207,10 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     select(chr,start,pos) %>% 
     arrange(chr,start,pos) %>% 
     unique() %>% 
-    write_delim(paste0('tmp/',request,'.','locus.bed'),delim = '\t',col_names = F)
+    write_delim(paste0('tmp/',request,'/',request,'.','locus.bed'),delim = '\t',col_names = F)
   
   ## remove any previous extracted panel if exists
-  unlink(paste0('tmp/',request,'.','extracted','.panel'))
+  unlink(paste0('tmp/',request,'/',request,'.','extracted','.panel'))
   ## read multiple population selections
   # select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
   for(pop_i in select_pop_list){
@@ -218,18 +218,18 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
       kgpanel %>% 
         filter(super_pop==pop_i) %>% 
         select(sample) %>% 
-        write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F, append = TRUE)
+        write_delim(paste0('tmp/',request,'/',request,'.','extracted','.panel'),delim = '\t',col_names = F, append = TRUE)
     } else if (pop_i %in% kgpanel$pop) {
       kgpanel %>% 
         filter(pop==pop_i) %>% 
         select(sample) %>% 
-        write_delim(paste0('tmp/',request,'.','extracted','.panel'),delim = '\t',col_names = F, append = TRUE)
+        write_delim(paste0('tmp/',request,'/',request,'.','extracted','.panel'),delim = '\t',col_names = F, append = TRUE)
     }
   }
   
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
     locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
-    ld_data <- readRDS(paste0("tmp/",request,".ld_data.rds"))
+    ld_data <- readRDS(paste0("tmp/",request,'/',request,".ld_data.rds"))
   } 
   
   index <- which(ld_data$info$id==rsnum|str_detect(ld_data$info$id,paste0(";",rsnum))|str_detect(ld_data$info$id,paste0(rsnum,";")))
@@ -362,6 +362,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   library(jsonlite)
   library(broom)
   library(data.table)
+
+  dir.create(file.path(workDir, paste0('tmp/',request)))
   
   # initialize messages to empty
   warningMessages <- list()
