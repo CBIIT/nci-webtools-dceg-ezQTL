@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,7 +8,12 @@ const { v1: uuidv1 } = require('uuid');
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
+  
   const [_associationFile, _setAssociationFile] = useState('');
+  const [_quantificationFile, _setQuantificationFile] = useState('');
+  const [_genotypeFile, _setGenotypeFile] = useState('');
+  const [_LDFile, _setLDFile] = useState('');
+  const [_gwasFile, _setGwasFile] = useState('');
 
   const {
     select_qtls_samples,
@@ -30,7 +35,14 @@ export function QTLsGWASForm() {
     recalculateRef,
     submitted,
     isLoading,
+    isError
   } = useSelector((state) => state.qtlsGWAS);
+
+  useEffect(() => _setAssociationFile(associationFile), [associationFile]);
+  useEffect(() => _setQuantificationFile(quantificationFile), [quantificationFile]);
+  useEffect(() => _setGenotypeFile(genotypeFile), [genotypeFile]);
+  useEffect(() => _setLDFile(LDFile), [LDFile]);
+  useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
 
   const handleReset = () => {
     console.log('reset!');
@@ -38,6 +50,11 @@ export function QTLsGWASForm() {
     dispatch(
       updateQTLsGWAS(getInitialState().qtlsGWAS)
     );
+    _setAssociationFile('');
+    _setQuantificationFile('');
+    _setGenotypeFile('');
+    _setLDFile('');
+    _setGwasFile('');
   };
 
   const handleSubmit = () => {
@@ -45,7 +62,17 @@ export function QTLsGWASForm() {
     const request = uuidv1();
     dispatch(
       uploadFile({
-        dataFile: _associationFile,
+        dataFiles: [_associationFile, _quantificationFile, _genotypeFile, _LDFile, _gwasFile],
+        associationFile: _associationFile,
+        quantificationFile: _quantificationFile,
+        genotypeFile: _genotypeFile,
+        LDFile:  _LDFile,
+        gwasFile: _gwasFile,
+        associationFileName: _associationFile ? _associationFile.name : false,
+        quantificationFileName: _quantificationFile ? _quantificationFile.name : false,
+        genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
+        LDFileName:  _LDFile ? _LDFile.name : false,
+        gwasFileName: _gwasFile ? _gwasFile.name : false,
         request
       })
     );
@@ -85,6 +112,10 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
+                  _setAssociationFile('');
+                  _setQuantificationFile('');
+                  _setGenotypeFile('');
+                  _setLDFile('');
                   dispatch(
                     updateQTLsGWAS({ select_qtls_samples: true })
                   );
@@ -100,6 +131,10 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
+                  _setAssociationFile('');
+                  _setQuantificationFile('');
+                  _setGenotypeFile('');
+                  _setLDFile('');
                   dispatch(updateQTLsGWAS({ select_qtls_samples: false }));
                 }}
                 disabled={submitted}
@@ -128,7 +163,7 @@ export function QTLsGWASForm() {
             disabled={submitted || select_qtls_samples}
             label={
               _associationFile
-                ? _associationFile.name
+                ? _associationFile.name ||  _associationFile.filename
                 : select_qtls_samples
                 ? 'MX2.eQTL.txt'
                 : 'Choose File'
@@ -154,12 +189,15 @@ export function QTLsGWASForm() {
             id="qtls-quantification-file"
             disabled={submitted || select_qtls_samples}
             label={
-              quantificationFile
-                ? quantificationFile.name
+              _quantificationFile
+                ? _quantificationFile.name || _quantificationFile.filename
                 : select_qtls_samples
                 ? 'MX2.quantification.txt'
                 : 'Choose File'
             }
+            onChange={(e) => {
+              _setQuantificationFile(e.target.files[0])
+            }}
             // accept=".tsv, .txt"
             // isInvalid={checkValid ? !validFile : false}
             // feedback="Please upload a data file"
@@ -178,12 +216,15 @@ export function QTLsGWASForm() {
             id="qtls-genotype-file"
             disabled={submitted || select_qtls_samples}
             label={
-              genotypeFile
-                ? genotypeFile.name
+              _genotypeFile
+                ? _genotypeFile.name || _genotypeFile.filename
                 : select_qtls_samples
                 ? 'MX2.genotyping.txt'
                 : 'Choose File'
             }
+            onChange={(e) => {
+              _setGenotypeFile(e.target.files[0])
+            }}
             // accept=".tsv, .txt"
             // isInvalid={checkValid ? !validFile : false}
             // feedback="Please upload a data file"
@@ -207,12 +248,15 @@ export function QTLsGWASForm() {
             id="qtls-ld-file"
             disabled={submitted || select_qtls_samples}
             label={
-              LDFile
-                ? LDFile.name
+              _LDFile
+                ? _LDFile.name || _LDFile.filename
                 : select_qtls_samples
                 ? 'MX2.LD.gz'
                 : 'Choose File'
             }
+            onChange={(e) => {
+              _setLDFile(e.target.files[0])
+            }}
             // accept=".tsv, .txt"
             // isInvalid={checkValid ? !validFile : false}
             // feedback="Please upload a data file"
@@ -237,6 +281,7 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
+                  _setGwasFile('');
                   dispatch(updateQTLsGWAS({ select_gwas_sample: true }));
                 }}
                 disabled={submitted}
@@ -250,6 +295,7 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
+                  _setGwasFile('');
                   dispatch(updateQTLsGWAS({ select_gwas_sample: false }));
                 }}
                 disabled={submitted}
@@ -275,12 +321,15 @@ export function QTLsGWASForm() {
             id="qtls-gwas-file"
             disabled={submitted || select_gwas_sample}
             label={
-              gwasFile
-                ? gwasFile.name
+              _gwasFile
+                ? _gwasFile.name || _gwasFile.filename
                 : select_gwas_sample
                 ? 'MX2.GWAS.rs.txt'
                 : 'Choose File'
             }
+            onChange={(e) => {
+              _setGwasFile(e.target.files[0])
+            }}
             // accept=".tsv, .txt"
             // isInvalid={checkValid ? !validFile : false}
             // feedback="Please upload a data file"
@@ -330,7 +379,7 @@ export function QTLsGWASForm() {
             onChange={(e) => {
               dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
             }}
-            value={select_ref}
+            value={select_ref ? select_ref : ''}
             // custom
           />
         </div>
@@ -364,8 +413,9 @@ export function QTLsGWASForm() {
           <Button
             // disabled={loading.active}
             className="w-100"
-            variant="secondary"
+            variant={isError ? "danger" : "secondary"}
             onClick={() => handleReset()}
+            disabled={submitted && isLoading}
           >
             Reset
           </Button>
