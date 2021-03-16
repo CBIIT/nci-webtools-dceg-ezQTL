@@ -26,10 +26,6 @@ export function LocusAlignmentPlot(params) {
     ],
   };
 
-  const playout = {
-
-  }
-
   return (
     <>
       <div

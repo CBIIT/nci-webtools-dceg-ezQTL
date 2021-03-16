@@ -171,6 +171,27 @@ const removeInfinities = (arr) => {
   return finites;
 }
 
+export function uploadFile(params) {
+  return async function (dispatch, getState) {
+    console.log("uploadFile params", params)
+    var fd = new FormData();
+    fd.append('dataFile', params.dataFile);
+    fd.append('request_id', params.request.toString());
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+
+    try {
+      const res = await axios.post('api/file-upload', fd, config);
+      console.log(res.data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+}
+
 export function qtlsGWASCalculation(params) {
   return async function (dispatch, getState) {
     // const qtlsGWASState = getState();

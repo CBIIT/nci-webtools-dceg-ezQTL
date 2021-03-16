@@ -1,12 +1,10 @@
-const { v1: uuidv1 } = require('uuid');
 const r = require('r-wrapper').async;
 const path = require('path');
 const logger = require('../services/logger');
 
 async function qtlsCalculateMain(params, res, next) {
-    logger.info("Execute /qtls-calculate-main");
-    logger.debug(params);
     const {
+        request,
         select_qtls_samples,
         select_gwas_sample,
         associationFile,
@@ -25,8 +23,11 @@ async function qtlsCalculateMain(params, res, next) {
         recalculateRef,
         workingDirectory
     } = params;
+
+    logger.info(`[${request}] Execute /qtls-calculate-main`);
+    logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
+
     const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
-    const request = uuidv1();
     try {
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -53,11 +54,10 @@ async function qtlsCalculateMain(params, res, next) {
                 recalculateRef
             ]
         );
-        logger.info("Finished /qtls-calculate-main");
+        logger.info(`[${request}] Finished /qtls-calculate-main`);
         res.json(JSON.parse(wrapper));
     } catch (err) {
-        logger.error("Error /qtls-calculate-main");
-        logger.error(err);
+        logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
         res.status(500).json(err);
     }
 }

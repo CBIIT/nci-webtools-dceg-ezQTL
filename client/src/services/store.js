@@ -35,6 +35,7 @@ export const getInitialState = async () => {
       locus_quantification_heatmap: null,
       locus_alignment:{
         data: null,
+        layout: null,
         top : {
           chr: null,
           gene_symbol: null
