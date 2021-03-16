@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Route, useLocation, NavLink, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Route, useLocation, NavLink, Redirect } from 'react-router-dom';
 import { NCIFooter } from '@cbiitss/react-components';
 import { Home } from './components/pages/home/home';
 import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
@@ -10,8 +10,8 @@ import 'font-awesome/css/font-awesome.min.css';
 import { ErrorModal } from './components/controls/error-modal/error-modal';
 
 export function App() {
-  const { pathname } = useLocation();
-  useEffect((_) => window.scrollTo(0, 0), [pathname]);
+  // const { pathname } = useLocation();
+  // useEffect((_) => window.scrollTo(0, 0), [pathname]);
 
   const links = [
     {
@@ -29,7 +29,7 @@ export function App() {
   ];
 
   return (
-    <>
+    <Router>
       <header className="bg-primary-gradient py-3">
         <div className="container px-0">
           <a href="https://dceg.cancer.gov/" target="_blank" rel="noreferrer">
@@ -81,6 +81,6 @@ export function App() {
           </div>
         }
       />
-    </>
+    </Router>
   );
 }

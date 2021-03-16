@@ -5,26 +5,9 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 
 export function QTLsGWASResultsForm() {
   const {
-    select_qtls_samples,
-    select_gwas_sample,
-    associationFile,
-    quantificationFile,
-    genotypeFile,
-    gwasFile,
-    LDFile,
-    request,
-    select_pop,
-    select_gene,
-    select_dist,
-    select_ref,
-    recalculateAttempt,
-    recalculatePop,
-    recalculateGene,
-    recalculateDist,
-    recalculateRef,
     submitted,
     isLoading,
-  } = useSelector(({ ezQTL }) => ezQTL.qtlsGWAS);
+  } = useSelector((state) => state.qtlsGWAS);
 
   return (
     <>

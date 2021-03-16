@@ -1,20 +1,12 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, Button } from 'react-bootstrap';
-import { actions } from '../../../services/store';
+import { updateError } from '../../../services/actions';
 
 export function ErrorModal(props) {
   const dispatch = useDispatch();
-  const errorModal = useSelector(({ ezQTL }) => ezQTL.errorModal);
-  const closeErrorModal = () =>
-    dispatch(
-      actions.updateKey({
-        key: 'errorModal',
-        data: {
-          visible: false,
-        },
-      })
-    );
+  const errorModal = useSelector((state) => state.errorModal);
+  const closeErrorModal = () => dispatch(updateError({ visible: false }));
 
   return (
     <Modal
