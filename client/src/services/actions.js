@@ -3,6 +3,7 @@ export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
 export const UPDATE_ERROR = 'UPDATE_ERROR';
 
 const axios = require('axios');
+const FormData = require('form-data');
 
 export function updateKey(key, data) {
   return { type: UPDATE_KEY, key, data };
@@ -173,10 +174,18 @@ const removeInfinities = (arr) => {
 
 export function uploadFile(params) {
   return async function (dispatch, getState) {
-    console.log("uploadFile params", params)
-    var fd = new FormData();
-    fd.append('dataFile', params.dataFile);
-    fd.append('request_id', params.request.toString());
+    const form = new FormData();
+    form.append('request_id', params.request.toString());
+    form.append('associationFile', params.associationFile);
+    form.append('quantificationFile', params.quantificationFile);
+    form.append('genotypeFile', params.genotypeFile);
+    form.append('gwasFile', params.gwasFile);
+    form.append('LDFile', params.LDFile);
+    form.append('associationFileName', params.associationFileName);
+    form.append('quantificationFileName', params.quantificationFileName);
+    form.append('genotypeFileName', params.genotypeFileName);
+    form.append('gwasFileName', params.gwasFileName);
+    form.append('LDFileName', params.LDFileName);
     const config = {
       headers: {
         'Content-Type': 'multipart/form-data'
@@ -184,10 +193,22 @@ export function uploadFile(params) {
     }
 
     try {
-      const res = await axios.post('api/file-upload', fd, config);
-      console.log(res.data);
-    } catch (err) {
-      console.log(err);
+      const res = await axios.post('api/file-upload', form, config);
+      if (res.data.files && res.data.files.length > 0) {
+        dispatch(updateQTLsGWAS({
+            associationFile: res.data.body.associationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.associationFileName)[0] : '',
+            quantificationFile: res.data.body.quantificationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.quantificationFileName)[0] : '',
+            genotypeFile: res.data.body.genotypeFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.genotypeFileName)[0] : '',
+            gwasFile: res.data.body.gwasFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.gwasFileName)[0] : '',
+            LDFile: res.data.body.LDFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.LDFileName)[0] : '',
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      if (error) {
+        dispatch(updateError({ visible: true }));
+      }
     }
   }
 }
@@ -562,6 +583,7 @@ export function qtlsGWASCalculation(params) {
               openSidebar: false,
               select_qtls_samples: response.data['info']['select_qtls_samples'][0],
               select_gwas_sample: response.data['info']['select_gwas_sample'][0],
+              select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
               recalculateAttempt: response.data['info']['recalculateAttempt'][0],
               recalculatePop: response.data['info']['recalculatePop'][0],
               recalculateGene: response.data['info']['recalculateGene'][0],
@@ -606,6 +628,7 @@ export function qtlsGWASCalculation(params) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
+          dispatch(updateQTLsGWAS({ isError: true }));
         }
       })
       .then(function () {

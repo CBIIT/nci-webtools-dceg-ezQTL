@@ -25,6 +25,7 @@ export const getInitialState = async () => {
       recalculateRef: false,
       submitted: false,
       isLoading: false,
+      isError: false,
       activeResultsTab: 'locus-alignment',
       top_gene_variants: null,
       all_gene_variants: null,
