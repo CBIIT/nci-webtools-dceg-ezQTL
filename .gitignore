@@ -10,6 +10,7 @@ www/
 # **/.eslintcache
 # **/.vscode
 # **.gz.tbi
+**/.DS_Store
 
 # server
 server/config.json
