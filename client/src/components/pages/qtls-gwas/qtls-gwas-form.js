@@ -1,12 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { qtlsGWASCalculation, updateQTLsGWAS } from '../../../services/actions';
+import { qtlsGWASCalculation, uploadFile, updateQTLsGWAS } from '../../../services/actions';
+const { v1: uuidv1 } = require('uuid');
 
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
+  const [_associationFile, _setAssociationFile] = useState('');
 
   const {
     select_qtls_samples,
@@ -40,9 +42,17 @@ export function QTLsGWASForm() {
 
   const handleSubmit = () => {
     console.log('submit!');
+    const request = uuidv1();
+    dispatch(
+      uploadFile({
+        dataFile: _associationFile,
+        request
+      })
+    );
 
     dispatch(
       qtlsGWASCalculation({
+        request,
         select_qtls_samples,
         select_gwas_sample,
         associationFile,
@@ -117,12 +127,15 @@ export function QTLsGWASForm() {
             id="qtls-association-file"
             disabled={submitted || select_qtls_samples}
             label={
-              associationFile
-                ? associationFile.name
+              _associationFile
+                ? _associationFile.name
                 : select_qtls_samples
                 ? 'MX2.eQTL.txt'
                 : 'Choose File'
             }
+            onChange={(e) => {
+              _setAssociationFile(e.target.files[0])
+            }}
             // accept=".tsv, .txt"
             // isInvalid={checkValid ? !validFile : false}
             // feedback="Please upload a data file"

@@ -25,6 +25,7 @@
     "react-table": "^7.6.3",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
+    "uuid": "^8.3.2",
     "web-vitals": "^1.1.0"
   },
   "scripts": {
