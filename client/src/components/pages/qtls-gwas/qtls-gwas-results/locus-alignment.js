@@ -61,7 +61,7 @@ export function LocusAlignment() {
           <div className="text-center footnote">
             <p>
               <small>
-                Click on the SNP to show additional information and actions
+                <i>Click on the SNP to show additional information and actions</i>
               </small>
             </p>
           </div>

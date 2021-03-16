@@ -172,6 +172,622 @@ const removeInfinities = (arr) => {
   return finites;
 }
 
+const drawLocusAlignment = (response) => {
+  const geneDataR2 = getPopoverData(response.data['locus_alignment']['data'][0]);
+  const geneDataR2NA = getPopoverDataR2NA(response.data['locus_alignment']['data'][0]);
+
+  const xData = getXData(geneDataR2);
+  const yData = getYData(geneDataR2);
+  const xDataR2NA = getXData(geneDataR2NA);
+  const yDataR2NA = getYData(geneDataR2NA);
+  const colorData = getColorData(geneDataR2);
+  const xDataRC = getXDataRC(response.data['locus_alignment']['rc'][0]);
+  const yDataRC = getYDataRC(response.data['locus_alignment']['rc'][0]);
+  const hoverData = getHoverData(geneDataR2);
+  const hoverDataR2NA = getHoverData(geneDataR2NA);
+  const hoverDataRC = getHoverDataRC(response.data['locus_alignment']['rc'][0]);
+  const xLDRef = response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
+  const yLDRef = Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0;
+  const yDataFinites = removeInfinities(yData);
+  const topPvalY = Math.max.apply(null, yDataFinites);
+  const topPvalIdx = yData.indexOf(topPvalY);
+
+  // mark point with most significant P-value
+  const topPvalMarker = {
+    x: [xData[topPvalIdx]],
+    y: [topPvalY],
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      symbol: "diamond",
+      size: 15,
+      opacity: 1.0,
+      color: "#ff66cc",
+      line: {
+        color: '#ff66cc',
+        width: 2
+      },
+    },
+    yaxis: 'y2'
+  };
+  // highlight top point
+  const LDRefHighlight = {
+    x: [response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0],
+    y: [Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0],
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      opacity: 1.0, 
+      size: 15,
+      color: "red"
+    },
+    yaxis: 'y2'
+  };
+
+  // console.log("qDataTopAnnot", qDataTopAnnot);
+  // console.log("xLDRef", qDataTopAnnot['pos'] / 1000000.0);
+  // console.log("yLDRef", Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
+  // console.log("LDRefHighlight", LDRefHighlight);
+
+  // graph scatter where R2 != NA
+  const trace1 = {
+    x: xData,
+    y: yData,
+    text: hoverData,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      opacity: 1.0,
+      color: colorData,
+      colorscale: 'Viridis',
+      reversescale: true,
+      line: {
+        color: 'black',
+        width: 1
+      },
+    },
+    yaxis: 'y2'
+  };
+  // graph scatter where R2 == NA
+  const trace1R2NA = {
+    x: xDataR2NA,
+    y: yDataR2NA,
+    text: hoverDataR2NA,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      opacity: 1.0,
+      color: '#cccccc',
+      line: {
+        color: 'black',
+        width: 1
+      },
+    },
+    yaxis: 'y2'
+  };
+  // graph recombination rate line
+  const trace2 = {
+    x: xDataRC,
+    y: yDataRC,
+    text: hoverDataRC,
+    hoverinfo: 'text',
+    yaxis: 'y3',
+    type: 'scatter',
+    opacity: 0.35,
+    line: {
+      color: 'blue',
+      width: 1
+    }
+  };
+  // graph gene density where R2 != NA
+  const trace3 = {
+    x: xData,
+    y: Array(xData.length).fill(0),
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      symbol: "line-ns-open",
+      size: 16,
+      color: colorData,
+      colorscale: 'Viridis',
+      reversescale: true
+    },
+    yaxis: 'y'
+
+  };
+  // graph gene density where R2 == NA
+  const trace3R2NA = {
+    x: xDataR2NA,
+    y: Array(xDataR2NA.length).fill(0),
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      symbol: "line-ns-open",
+      size: 16,
+      color: '#cccccc',
+    },
+    yaxis: 'y'
+
+  };
+  const pdata = [
+    topPvalMarker, 
+    LDRefHighlight, 
+    trace1, 
+    trace1R2NA, 
+    trace2, 
+    trace3, 
+    trace3R2NA
+  ];
+
+  const locus_alignment_plot_layout = {
+    title: {
+      text: 'QTLs Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' Variants',
+      xref: 'paper'
+    },
+    width: 1000,
+    height: 780,
+    yaxis: {
+      autorange: true,
+      fixedrange: true,
+      // overlaying: false,
+      // title: "Gene Density",
+      domain: [0, 0.04],
+      zeroline: false,
+      showgrid: false,
+      showticklabels: false,
+      linecolor: 'black',
+      linewidth: 1,
+      mirror: true,
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    yaxis2: {
+      autorange: true,
+      automargin: true,
+      // overlaying: 'y3',
+      title: "QTLs -log10(<i>P</i>-value), " + response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+      domain: [0.05, 1],
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    yaxis3: {
+      autorange: true,
+      automargin: true,
+      overlaying: 'y2',
+      title: 'QTLs Recombination Rate (cM/Mb)',
+      titlefont: {
+        color: 'blue'
+      },
+      tickfont: {
+        color: 'blue'
+      },
+      side: 'right',
+      showgrid: false,
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1
+    },
+    xaxis: {
+      autorange: true,
+      title: "Chromosome " + response.data['locus_alignment']['top'][0][0]['chr'] + " (Mb)",
+      // dtick: 0.1,
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+      mirror: "allticks",
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    images: [
+      {
+        x: 0,
+        y: 1.02,
+        sizex: 1.0,
+        sizey: 1.0,
+        source: 'assets/images/qtls_locus_alignment_r2_legend_transparent.png',
+        xanchor: "left",
+        xref: "paper",
+        yanchor: "bottom",
+        yref: "paper"
+      }
+    ],
+    margin: {
+      l: 40,
+      r: 40,
+      b: 80,
+      t: 120
+    },
+    showlegend: false,
+    clickmode: 'event',
+    hovermode: 'closest'
+  };
+  
+  return {
+    pdata,
+    locus_alignment_plot_layout
+  }
+}
+
+const drawLocusAlignmentGWAS = (response) => {
+  const geneDataR2 = getPopoverData(response.data['locus_alignment']['data'][0]);
+  const geneDataR2NA = getPopoverDataR2NA(response.data['locus_alignment']['data'][0]);
+  const geneGWASDataR2 = getPopoverDataGWAS(response.data['gwas']['data'][0]);
+  const geneGWASDataR2NA = getPopoverDataGWASR2NA(response.data['gwas']['data'][0]);
+
+  const xData = getXData(geneDataR2);
+  const yData = getYData(geneDataR2);
+  const xDataR2NA = getXData(geneDataR2NA);
+  const yDataR2NA = getYData(geneDataR2NA);
+  const yGWASData = getYGWASData(geneGWASDataR2);
+  const yGWASDataR2NA = getYGWASData(geneGWASDataR2NA);
+  const colorData = getColorData(geneDataR2);
+  const xDataRC = getXDataRC(response.data['locus_alignment']['rc'][0]);
+  const yDataRC = getYDataRC(response.data['locus_alignment']['rc'][0]);
+  const hoverData = getHoverData(geneDataR2);
+  const hoverDataR2NA = getHoverData(geneDataR2NA);
+  const hoverDataGWAS = getHoverDataGWAS(geneGWASDataR2);
+  const hoverDataGWASR2NA = getHoverDataGWAS(geneGWASDataR2NA);
+  const hoverDataRC = getHoverDataRC(response.data['locus_alignment']['rc'][0]);
+  const xLDRef = response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
+  const yLDRef = Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0;
+  const yDataFinites = removeInfinities(yData);
+  const topPvalY = Math.max.apply(null, yDataFinites);
+  const topPvalIdx = yData.indexOf(topPvalY);
+
+  // mark point with most significant P-value
+  const topPvalMarker = {
+    x: [xData[topPvalIdx]], 
+    y: [topPvalY], 
+    hoverinfo: 'none', 
+    mode: 'markers', 
+    type: 'scatter', 
+    marker: {
+      symbol: "diamond",
+      size: 15,
+      opacity: 1.0,
+      color: "#ff66cc",
+      line: {
+        color: '#ff66cc',
+        width: 2
+      },
+    },
+    yaxis: 'y3'
+  };
+  // highlight top point
+  const LDRefHighlight = {
+    x: [xLDRef],
+    y: [yLDRef],
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 15,
+      color: "red"
+    },
+    yaxis: 'y3'
+  };
+  // highlight top point GWAS
+  const LDRefHighlightGWAS = {
+    x: [xLDRef],
+    y: [getYLDRefGWAS(xData, yGWASData, response.data['locus_alignment']['top'][0][0])],
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 15,
+      color: "red"
+    },
+    yaxis: 'y2'
+  };
+  // graph GWAS scatter where R2 != NA
+  const trace1 = {
+    x: xData,
+    y: yGWASData,
+    text: hoverDataGWAS,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      color: colorData,
+      colorscale: 'Viridis',
+      reversescale: true,
+      line: {
+        color: 'black',
+        width: 1
+      },
+    },
+    yaxis: 'y2'
+  };
+  // graph GWAS scatter where R2 == NA
+  const trace1R2NA = {
+    x: xDataR2NA,
+    y: yGWASDataR2NA,
+    text: hoverDataGWASR2NA,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      color: '#cccccc',
+      line: {
+        color: 'black',
+        width: 1
+      },
+    },
+    yaxis: 'y2'
+  };
+  // graph recombination rate line GWAS
+  const trace2 = {
+    x: xDataRC,
+    y: yDataRC,
+    text: hoverDataRC,
+    hoverinfo: 'text',
+    yaxis: 'y4',
+    type: 'scatter',
+    opacity: 0.35,
+    line: {
+      color: 'blue',
+      width: 1
+    }
+  };
+  // graph scatter where R2 != NA
+  const trace3 = {
+    x: xData,
+    y: yData,
+    text: hoverData,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      color: colorData,
+      colorscale: 'Viridis',
+      reversescale: true,
+      line: {
+        color: 'black',
+        width: 1
+      },
+    },
+    yaxis: 'y3'
+  };
+  // graph scatter where R2 == NA
+  const trace3R2NA = {
+    x: xDataR2NA,
+    y: yDataR2NA,
+    text: hoverDataR2NA,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      color: '#cccccc',
+      line: {
+        color: 'black',
+        width: 1
+      },
+    },
+    yaxis: 'y3'
+  };
+  // graph recombination rate line
+  const trace4 = {
+    x: xDataRC,
+    y: yDataRC,
+    text: hoverDataRC,
+    hoverinfo: 'text',
+    yaxis: 'y5',
+    type: 'scatter',
+    opacity: 0.35,
+    line: {
+      color: 'blue',
+      width: 1
+    }
+  };
+  // graph gene density where R2 != NA
+  const trace5 = {
+    x: xData,
+    y: Array(xData.length).fill(0),
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      symbol: "line-ns-open",
+      size: 16,
+      color: colorData,
+      colorscale: 'Viridis',
+      reversescale: true
+    },
+    yaxis: 'y'
+  };
+  // graph gene density where R2 == NA
+  const trace5R2NA = {
+    x: xDataR2NA,
+    y: Array(xDataR2NA.length).fill(0),
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      symbol: "line-ns-open",
+      size: 16,
+      color: '#cccccc',
+    },
+    yaxis: 'y'
+  };
+  
+  const pdata = [
+    topPvalMarker,
+    LDRefHighlight, 
+    LDRefHighlightGWAS, 
+    trace1, 
+    trace1R2NA,
+    trace2, 
+    trace3, 
+    trace3R2NA, 
+    trace4, 
+    trace5, 
+    trace5R2NA
+  ];
+
+  const locus_alignment_plot_layout = {
+    title: {
+      text: 'QTLs-GWAS Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' Variants',
+      xref: 'paper',
+    },
+    font: {
+      color: 'black',
+    },
+    width: 1000,
+    height: 1180,
+    yaxis: {
+      autorange: true,
+      fixedrange: true,
+      // overlaying: false,
+      // title: "Gene Density",
+      domain: [0, 0.025],
+      zeroline: false,
+      showgrid: false,
+      showticklabels: false,
+      linecolor: 'black',
+      linewidth: 1,
+      mirror: true,
+      font: {
+        color: 'black',
+      },
+      tickfont: {
+        color: 'black',
+      },
+    },
+    yaxis2: {
+      autorange: true,
+      automargin: true,
+      title: 'GWAS -log10(<i>P</i>-value)',
+      domain: [0.03, 0.54],
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+      font: {
+        color: 'black',
+      },
+      tickfont: {
+        color: 'black',
+      },
+    },
+    yaxis3: {
+      autorange: true,
+      automargin: true,
+      title: 'QTLs -log10(<i>P</i>-value), ' + response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+      domain: [0.56, 1],
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+      font: {
+        color: 'black',
+      },
+      tickfont: {
+        color: 'black',
+      },
+    },
+    yaxis4: {
+      autorange: true,
+      automargin: true,
+      title: 'Recombination Rate (cM/Mb)',
+      titlefont: {
+        color: 'blue',
+      },
+      tickfont: {
+        color: 'blue',
+      },
+      overlaying: 'y2',
+      side: 'right',
+      showgrid: false,
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+    },
+    yaxis5: {
+      autorange: true,
+      automargin: true,
+      title: 'Recombination Rate (cM/Mb)',
+      titlefont: {
+        color: 'blue',
+      },
+      tickfont: {
+        color: 'blue',
+      },
+      overlaying: 'y3',
+      side: 'right',
+      showgrid: false,
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+    },
+    xaxis: {
+      autorange: true,
+      title: 'Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' (Mb)',
+      zeroline: false,
+      linecolor: 'black',
+      linewidth: 1,
+      mirror: 'allticks',
+      font: {
+        color: 'black',
+      },
+      tickfont: {
+        color: 'black',
+      },
+    },
+    images: [
+      {
+        x: 0,
+        y: 1.01,
+        sizex: 1.0,
+        sizey: 1.0,
+        source: 'assets/images/qtls_locus_alignment_r2_legend_transparent.png',
+        xanchor: 'left',
+        xref: 'paper',
+        yanchor: 'bottom',
+        yref: 'paper',
+      },
+    ],
+    margin: {
+      l: 40,
+      r: 40,
+      b: 80,
+      t: 120,
+    },
+    showlegend: false,
+    clickmode: 'event',
+    hovermode: 'closest',
+  };
+
+  return {
+    pdata,
+    locus_alignment_plot_layout
+  }
+}
+
 export function uploadFile(params) {
   return async function (dispatch, getState) {
     const form = new FormData();
@@ -228,357 +844,11 @@ export function qtlsGWASCalculation(params) {
     axios
       .post('api/qtls-calculate-main', params)
       .then(function (response) {
-        // console.log(response.data);
-
-        const geneDataR2 = getPopoverData(response.data['locus_alignment']['data'][0]);
-        const geneDataR2NA = getPopoverDataR2NA(response.data['locus_alignment']['data'][0]);
-        const geneGWASDataR2 = getPopoverDataGWAS(response.data['gwas']['data'][0]);
-        const geneGWASDataR2NA = getPopoverDataGWASR2NA(response.data['gwas']['data'][0]);
-
-        const xData = getXData(geneDataR2);
-        const yData = getYData(geneDataR2);
-        const xDataR2NA = getXData(geneDataR2NA);
-        const yDataR2NA = getYData(geneDataR2NA);
-        const yGWASData = getYGWASData(geneGWASDataR2);
-        const yGWASDataR2NA = getYGWASData(geneGWASDataR2NA);
-        const colorData = getColorData(geneDataR2);
-        const xDataRC = getXDataRC(response.data['locus_alignment']['rc'][0]);
-        const yDataRC = getYDataRC(response.data['locus_alignment']['rc'][0]);
-        const hoverData = getHoverData(geneDataR2);
-        const hoverDataR2NA = getHoverData(geneDataR2NA);
-        const hoverDataGWAS = getHoverDataGWAS(geneGWASDataR2);
-        const hoverDataGWASR2NA = getHoverDataGWAS(geneGWASDataR2NA);
-        const hoverDataRC = getHoverDataRC(response.data['locus_alignment']['rc'][0]);
-        const xLDRef = response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
-        const yLDRef = Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0;
-        const yDataFinites = removeInfinities(yData);
-        const topPvalY = Math.max.apply(null, yDataFinites);
-        const topPvalIdx = yData.indexOf(topPvalY);
-
-        // mark point with most significant P-value
-        const topPvalMarker = {
-          x: [xData[topPvalIdx]], 
-          y: [topPvalY], 
-          hoverinfo: 'none', 
-          mode: 'markers', 
-          type: 'scatter', 
-          marker: {
-            symbol: "diamond",
-            size: 15,
-            opacity: 1.0,
-            color: "#ff66cc",
-            line: {
-              color: '#ff66cc',
-              width: 2
-            },
-          },
-          yaxis: 'y3'
-        };
-        // highlight top point
-        const LDRefHighlight = {
-          x: [xLDRef],
-          y: [yLDRef],
-          hoverinfo: 'none',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            size: 15,
-            color: "red"
-          },
-          yaxis: 'y3'
-        };
-        // highlight top point GWAS
-        const LDRefHighlightGWAS = {
-          x: [xLDRef],
-          y: [getYLDRefGWAS(xData, yGWASData, response.data['locus_alignment']['top'][0][0])],
-          hoverinfo: 'none',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            size: 15,
-            color: "red"
-          },
-          yaxis: 'y2'
-        };
-        // graph GWAS scatter where R2 != NA
-        const trace1 = {
-          x: xData,
-          y: yGWASData,
-          text: hoverDataGWAS,
-          hoverinfo: 'text',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            size: 7,
-            color: colorData,
-            colorscale: 'Viridis',
-            reversescale: true,
-            line: {
-              color: 'black',
-              width: 1
-            },
-          },
-          yaxis: 'y2'
-        };
-        // graph GWAS scatter where R2 == NA
-        const trace1R2NA = {
-          x: xDataR2NA,
-          y: yGWASDataR2NA,
-          text: hoverDataGWASR2NA,
-          hoverinfo: 'text',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            size: 7,
-            color: '#cccccc',
-            line: {
-              color: 'black',
-              width: 1
-            },
-          },
-          yaxis: 'y2'
-        };
-        // graph recombination rate line GWAS
-        const trace2 = {
-          x: xDataRC,
-          y: yDataRC,
-          text: hoverDataRC,
-          hoverinfo: 'text',
-          yaxis: 'y4',
-          type: 'scatter',
-          opacity: 0.35,
-          line: {
-            color: 'blue',
-            width: 1
-          }
-        };
-        // graph scatter where R2 != NA
-        const trace3 = {
-          x: xData,
-          y: yData,
-          text: hoverData,
-          hoverinfo: 'text',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            size: 7,
-            color: colorData,
-            colorscale: 'Viridis',
-            reversescale: true,
-            line: {
-              color: 'black',
-              width: 1
-            },
-          },
-          yaxis: 'y3'
-        };
-        // graph scatter where R2 == NA
-        const trace3R2NA = {
-          x: xDataR2NA,
-          y: yDataR2NA,
-          text: hoverDataR2NA,
-          hoverinfo: 'text',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            size: 7,
-            color: '#cccccc',
-            line: {
-              color: 'black',
-              width: 1
-            },
-          },
-          yaxis: 'y3'
-        };
-        // graph recombination rate line
-        const trace4 = {
-          x: xDataRC,
-          y: yDataRC,
-          text: hoverDataRC,
-          hoverinfo: 'text',
-          yaxis: 'y5',
-          type: 'scatter',
-          opacity: 0.35,
-          line: {
-            color: 'blue',
-            width: 1
-          }
-        };
-        // graph gene density where R2 != NA
-        const trace5 = {
-          x: xData,
-          y: Array(xData.length).fill(0),
-          hoverinfo: 'none',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            symbol: "line-ns-open",
-            size: 16,
-            color: colorData,
-            colorscale: 'Viridis',
-            reversescale: true
-          },
-          yaxis: 'y'
-        };
-        // graph gene density where R2 == NA
-        const trace5R2NA = {
-          x: xDataR2NA,
-          y: Array(xDataR2NA.length).fill(0),
-          hoverinfo: 'none',
-          mode: 'markers',
-          type: 'scatter',
-          marker: {
-            symbol: "line-ns-open",
-            size: 16,
-            color: '#cccccc',
-          },
-          yaxis: 'y'
-        };
         
-        const pdata = [
-          topPvalMarker,
-          LDRefHighlight, 
-          LDRefHighlightGWAS, 
-          trace1, 
-          trace1R2NA,
-          trace2, 
-          trace3, 
-          trace3R2NA, 
-          trace4, 
-          trace5, 
-          trace5R2NA
-        ];
-
-        const locus_alignment_plot_layout = {
-          title: {
-            text: 'QTLs-GWAS Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' Variants',
-            xref: 'paper',
-          },
-          font: {
-            color: 'black',
-          },
-          width: 1000,
-          height: 1180,
-          yaxis: {
-            autorange: true,
-            fixedrange: true,
-            // overlaying: false,
-            // title: "Gene Density",
-            domain: [0, 0.025],
-            zeroline: false,
-            showgrid: false,
-            showticklabels: false,
-            linecolor: 'black',
-            linewidth: 1,
-            mirror: true,
-            font: {
-              color: 'black',
-            },
-            tickfont: {
-              color: 'black',
-            },
-          },
-          yaxis2: {
-            autorange: true,
-            automargin: true,
-            title: 'GWAS -log10(<i>P</i>-value)',
-            domain: [0.03, 0.54],
-            zeroline: false,
-            linecolor: 'black',
-            linewidth: 1,
-            font: {
-              color: 'black',
-            },
-            tickfont: {
-              color: 'black',
-            },
-          },
-          yaxis3: {
-            autorange: true,
-            automargin: true,
-            title: 'QTLs -log10(<i>P</i>-value), ' + response.data['locus_alignment']['top'][0][0]['gene_symbol'],
-            domain: [0.56, 1],
-            zeroline: false,
-            linecolor: 'black',
-            linewidth: 1,
-            font: {
-              color: 'black',
-            },
-            tickfont: {
-              color: 'black',
-            },
-          },
-          yaxis4: {
-            autorange: true,
-            automargin: true,
-            title: 'Recombination Rate (cM/Mb)',
-            titlefont: {
-              color: 'blue',
-            },
-            tickfont: {
-              color: 'blue',
-            },
-            overlaying: 'y2',
-            side: 'right',
-            showgrid: false,
-            zeroline: false,
-            linecolor: 'black',
-            linewidth: 1,
-          },
-          yaxis5: {
-            autorange: true,
-            automargin: true,
-            title: 'Recombination Rate (cM/Mb)',
-            titlefont: {
-              color: 'blue',
-            },
-            tickfont: {
-              color: 'blue',
-            },
-            overlaying: 'y3',
-            side: 'right',
-            showgrid: false,
-            zeroline: false,
-            linecolor: 'black',
-            linewidth: 1,
-          },
-          xaxis: {
-            autorange: true,
-            title: 'Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' (Mb)',
-            zeroline: false,
-            linecolor: 'black',
-            linewidth: 1,
-            mirror: 'allticks',
-            font: {
-              color: 'black',
-            },
-            tickfont: {
-              color: 'black',
-            },
-          },
-          images: [
-            {
-              x: 0,
-              y: 1.01,
-              sizex: 1.0,
-              sizey: 1.0,
-              source: 'assets/images/qtls_locus_alignment_r2_legend_transparent.png',
-              xanchor: 'left',
-              xref: 'paper',
-              yanchor: 'bottom',
-              yref: 'paper',
-            },
-          ],
-          margin: {
-            l: 40,
-            r: 40,
-            b: 80,
-            t: 120,
-          },
-          showlegend: false,
-          clickmode: 'event',
-          hovermode: 'closest',
-        };
+        const {
+          pdata,
+          locus_alignment_plot_layout
+        } = Object.keys(response.data['gwas']['data'][0]).length > 0 ? drawLocusAlignmentGWAS(response) : drawLocusAlignment(response);
 
         dispatch(updateQTLsGWAS({
               openSidebar: false,
