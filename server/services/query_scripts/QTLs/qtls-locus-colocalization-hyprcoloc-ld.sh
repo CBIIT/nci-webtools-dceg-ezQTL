@@ -14,7 +14,7 @@ request=$5
 
 #eCAVIAR
 
-prefix=tmp/${request}.${leadsnp}_ldtmp
+prefix=tmp/${request}/${request}.${leadsnp}_ldtmp
 mkdir -p $prefix 
 cd $prefix 
 
