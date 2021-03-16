@@ -324,8 +324,8 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   locus_alignment_boxplots_data <- list(c())
   if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
     if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('input/', genoFile)
-      edatafile <- paste0('input/', exprFile)
+      gdatafile <- paste0('tmp/',request,'/', genoFile)
+      edatafile <- paste0('tmp/',request,'/', exprFile)
     } else {
       gdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.genotyping.txt') 
       edatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.quantification.txt') 
@@ -405,9 +405,9 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     qdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.eQTL.txt') 
     LDFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.LD.gz') 
   } else {
-    qdatafile <- paste0('input/', assocFile)
-    if (!identical(LDFile, 'false') && !startsWith(LDFile, "input/")) {
-      LDFile <- paste0('input/', LDFile)
+    qdatafile <- paste0('tmp/',request,'/', assocFile)
+    if (!identical(LDFile, 'false')) {
+      LDFile <- paste0('tmp/',request,'/', LDFile)
     }
   }
   qdata <- read_delim(qdatafile,delim = "\t",col_names = T,col_types = cols(variant_id='c'))
@@ -423,8 +423,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   gdata <- 'false'
   if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
     if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('input/', genoFile)
-      edatafile <- paste0('input/', exprFile)
+      gdatafile <- paste0('tmp/',request,'/', genoFile)
+      edatafile <- paste0('tmp/',request,'/', exprFile)
     } else {
       gdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.genotyping.txt') 
       edatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.quantification.txt') 
@@ -465,7 +465,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   gwasdata <- 'false'
   if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
     if (identical(select_gwas_sample, 'false')) {
-      gwasdatafile <- paste0('input/', gwasFile)
+      gwasdatafile <- paste0('tmp/',request,'/', gwasFile)
     } else {
       gwasdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.GWAS.rs.txt')
     }

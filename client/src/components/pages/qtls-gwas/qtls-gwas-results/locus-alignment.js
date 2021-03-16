@@ -16,7 +16,7 @@ export function LocusAlignment() {
         <LoadingOverlay
           active={true}
           content={
-            'Select data in the left panel and click Calculate to see results here.'
+            <>Select data in the left panel and click <b>Calculate</b> to see results here.</>
           }
         />
       )}

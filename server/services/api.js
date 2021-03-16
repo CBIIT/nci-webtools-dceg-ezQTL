@@ -51,10 +51,6 @@ apiRouter.get('/ping', (request, response) => {
 
 // file upload route
 apiRouter.post('/file-upload', upload.any(), async (req, res) => {
-    // const dataFile = req.file.path;
-    // req.file is the name of your file in the form above, here 'uploaded_file'
-    // req.body will hold the text fields, if there were any 
-    // console.log(req.file, req.body)
     logger.info(`[${req.body.request_id}] Execute /file-upload`);
     logger.debug(`[${req.body.request_id}] Parameters ${JSON.stringify(req.body, undefined, 4)}`);
     try {
