@@ -6,6 +6,8 @@ import { LocusAlignmentPlot } from './locus-alignment-plot';
 export function LocusAlignment() {
   const {
     submitted,
+    isError,
+    locus_alignment
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -18,7 +20,15 @@ export function LocusAlignment() {
           }
         />
       )}
-      {submitted && (
+      {submitted && isError && (
+        <LoadingOverlay
+          active={true}
+          content={
+            <b className="text-danger">Please check input files. Reset form to try again.</b>
+          }
+        />
+      )}
+      {submitted && !isError && locus_alignment.data && (
         <>
           <p>
             Two{' '}

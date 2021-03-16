@@ -16,6 +16,7 @@ export function QTLsGWASResults() {
     submitted,
     isLoading,
     activeResultsTab,
+    isError
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -52,7 +53,7 @@ export function QTLsGWASResults() {
         }}
       >
         {tabs.map((item) => (
-          <Tab eventKey={item.key} title={item.title} disabled={!submitted}>
+          <Tab eventKey={item.key} title={item.title} disabled={!submitted || isError}>
             {item.component}
           </Tab>
         ))}
