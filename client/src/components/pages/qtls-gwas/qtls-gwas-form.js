@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { RootContext } from '../../../index';
 import { Form, Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { actions, getInitialState } from '../../../services/store';
-import { qtlsGWASCalculation } from '../../../services/actions';
+import { qtlsGWASCalculation, updateQTLsGWAS } from '../../../services/actions';
 
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
 
   const {
     select_qtls_samples,
@@ -27,16 +28,13 @@ export function QTLsGWASForm() {
     recalculateRef,
     submitted,
     isLoading,
-  } = useSelector(({ ezQTL }) => ezQTL.qtlsGWAS);
+  } = useSelector((state) => state.qtlsGWAS);
 
   const handleReset = () => {
     console.log('reset!');
-    const initialState = getInitialState();
+    console.log(getInitialState().qtlsGWAS);
     dispatch(
-      actions.updateKey({
-        key: 'qtlsGWAS',
-        data: initialState['qtlsGWAS'],
-      })
+      updateQTLsGWAS(getInitialState().qtlsGWAS)
     );
   };
 
@@ -78,10 +76,7 @@ export function QTLsGWASForm() {
                 variant="link"
                 onClick={(_) => {
                   dispatch(
-                    actions.updateKey({
-                      key: 'qtlsGWAS',
-                      data: { select_qtls_samples: true },
-                    })
+                    updateQTLsGWAS({ select_qtls_samples: true })
                   );
                 }}
                 disabled={submitted}
@@ -95,12 +90,7 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
-                  dispatch(
-                    actions.updateKey({
-                      key: 'qtlsGWAS',
-                      data: { select_qtls_samples: false },
-                    })
-                  );
+                  dispatch(updateQTLsGWAS({ select_qtls_samples: false }));
                 }}
                 disabled={submitted}
               >
@@ -234,12 +224,7 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
-                  dispatch(
-                    actions.updateKey({
-                      key: 'qtlsGWAS',
-                      data: { select_gwas_sample: true },
-                    })
-                  );
+                  dispatch(updateQTLsGWAS({ select_gwas_sample: true }));
                 }}
                 disabled={submitted}
               >
@@ -252,12 +237,7 @@ export function QTLsGWASForm() {
               <Button
                 variant="link"
                 onClick={(_) => {
-                  dispatch(
-                    actions.updateKey({
-                      key: 'qtlsGWAS',
-                      data: { select_gwas_sample: false },
-                    })
-                  );
+                  dispatch(updateQTLsGWAS({ select_gwas_sample: false }));
                 }}
                 disabled={submitted}
               >
@@ -318,12 +298,7 @@ export function QTLsGWASForm() {
             id="qtls-distance-input"
             disabled={submitted}
             onChange={(e) => {
-              dispatch(
-                actions.updateKey({
-                  key: 'qtlsGWAS',
-                  data: { select_dist: e.target.value },
-                })
-              );
+              dispatch(updateQTLsGWAS({ select_dist: e.target.value }));
             }}
             value={select_dist}
             // custom
@@ -340,12 +315,7 @@ export function QTLsGWASForm() {
             id="qtls-snp-input"
             disabled={submitted}
             onChange={(e) => {
-              dispatch(
-                actions.updateKey({
-                  key: 'qtlsGWAS',
-                  data: { select_ref: e.target.value },
-                })
-              );
+              dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
             }}
             value={select_ref}
             // custom

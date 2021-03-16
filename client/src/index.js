@@ -1,17 +1,28 @@
-import React from 'react';
+import React, { createContext } from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter as Router } from 'react-router-dom';
-import { App } from './app';
-import store from './services/store';
 import { Provider } from 'react-redux';
+import * as clonedeep from 'lodash.clonedeep';
+import { getStore } from './services/store';
+import { App } from './app';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <Router>
+export const RootContext = createContext({
+  getInitialState: _ => { }
+});
+
+getStore().then(store => {
+  // disconnect initialState from store state
+  const initialState = clonedeep(store.getState());
+
+  ReactDOM.render(
+    <RootContext.Provider value={{
+      // always return new references
+      getInitialState: _ => clonedeep(initialState)
+    }}>
+      <Provider store={store}>
         <App />
-      </Router>
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+      </Provider>,
+  </RootContext.Provider>,
+    document.getElementById('root')
+  );
+})
+

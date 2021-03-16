@@ -3,10 +3,10 @@ import React from 'react';
 export function Help() {
   return (
     <div className="px-2">
-      <div id="help-logo" class="text-center">
+      <div id="help-logo" className="text-center">
         <img height="150" src="assets/images/ezqtl-logo.png" alt="ezQTL Logo" />
       </div>
-      <div class="mt-3">
+      <div className="mt-3">
         <p>
           <b>Data format for GWAS-QTL module</b>
         </p>
@@ -46,7 +46,7 @@ export function Help() {
           input file for vQTL.
         </p>
       </div>
-      <div class="mt-5">
+      <div className="mt-5">
         <p>
           <b>QTLs Data</b>
         </p>
@@ -58,96 +58,98 @@ export function Help() {
           index the QTL data and can be used as the LD reference variants in
           locuszoom plot.
         </p>
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th scope="col">gene_id</th>
-              <th scope="col">gene_symbol</th>
-              <th scope="col">variant_id</th>
-              <th scope="col">rsnum</th>
-              <th scope="col">chr</th>
-              <th scope="col">pos</th>
-              <th scope="col">ref</th>
-              <th scope="col">alt</th>
-              <th scope="col">tss_distance</th>
-              <th scope="col">pval_nominal</th>
-              <th scope="col">slope</th>
-              <th scope="col">slope_se</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>ENSG00000157601.9</td>
-              <td>MX1</td>
-              <td>21:42642038</td>
-              <td>rs8133778</td>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>-150193</td>
-              <td>0.686</td>
-              <td>0.057</td>
-              <td>0.140</td>
-            </tr>
-            <tr>
-              <td>ENSG00000160179.14</td>
-              <td>ABCG1</td>
-              <td>21:42642038</td>
-              <td>rs8133778</td>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>-977761</td>
-              <td>0.217</td>
-              <td>-0.173</td>
-              <td>0.139</td>
-            </tr>
-            <tr>
-              <td>ENSG00000182240.11</td>
-              <td>BACE2</td>
-              <td>21:42642038</td>
-              <td>rs8133778</td>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>102310</td>
-              <td>0.806</td>
-              <td>-0.031</td>
-              <td>0.127</td>
-            </tr>
-            <tr>
-              <td>ENSG00000183421.7</td>
-              <td>RIPK4</td>
-              <td>21:42642038</td>
-              <td>rs8133778</td>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>-545228</td>
-              <td>0.730</td>
-              <td>-0.054</td>
-              <td>0.156</td>
-            </tr>
-            <tr>
-              <td>ENSG00000183486.8</td>
-              <td>MX2</td>
-              <td>21:42642038</td>
-              <td>rs8133778</td>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>-91832</td>
-              <td>0.713</td>
-              <td>-0.053</td>
-              <td>0.144</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{overflowX: 'auto'}}>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th scope="col">gene_id</th>
+                <th scope="col">gene_symbol</th>
+                <th scope="col">variant_id</th>
+                <th scope="col">rsnum</th>
+                <th scope="col">chr</th>
+                <th scope="col">pos</th>
+                <th scope="col">ref</th>
+                <th scope="col">alt</th>
+                <th scope="col">tss_distance</th>
+                <th scope="col">pval_nominal</th>
+                <th scope="col">slope</th>
+                <th scope="col">slope_se</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ENSG00000157601.9</td>
+                <td>MX1</td>
+                <td>21:42642038</td>
+                <td>rs8133778</td>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>-150193</td>
+                <td>0.686</td>
+                <td>0.057</td>
+                <td>0.140</td>
+              </tr>
+              <tr>
+                <td>ENSG00000160179.14</td>
+                <td>ABCG1</td>
+                <td>21:42642038</td>
+                <td>rs8133778</td>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>-977761</td>
+                <td>0.217</td>
+                <td>-0.173</td>
+                <td>0.139</td>
+              </tr>
+              <tr>
+                <td>ENSG00000182240.11</td>
+                <td>BACE2</td>
+                <td>21:42642038</td>
+                <td>rs8133778</td>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>102310</td>
+                <td>0.806</td>
+                <td>-0.031</td>
+                <td>0.127</td>
+              </tr>
+              <tr>
+                <td>ENSG00000183421.7</td>
+                <td>RIPK4</td>
+                <td>21:42642038</td>
+                <td>rs8133778</td>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>-545228</td>
+                <td>0.730</td>
+                <td>-0.054</td>
+                <td>0.156</td>
+              </tr>
+              <tr>
+                <td>ENSG00000183486.8</td>
+                <td>MX2</td>
+                <td>21:42642038</td>
+                <td>rs8133778</td>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>-91832</td>
+                <td>0.713</td>
+                <td>-0.053</td>
+                <td>0.144</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p>
           Quantification data need to be prepared in the following format. The
           “gene_id” column was used as the index id to link to other data. The
@@ -155,72 +157,74 @@ export function Help() {
           be raw data, normalized data or log transformed data; each will have
           different visualization for the QTL boxplot and locus quantification.
         </p>
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th scope="col">chr</th>
-              <th scope="col">start</th>
-              <th scope="col">end</th>
-              <th scope="col">gene_id</th>
-              <th scope="col">C56_1</th>
-              <th scope="col">C136_1</th>
-              <th scope="col">C10_1</th>
-              <th scope="col">C171_1</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>21</td>
-              <td>42520059</td>
-              <td>42520060</td>
-              <td>ENSG00000226496.1</td>
-              <td>3.99</td>
-              <td>3.37</td>
-              <td>5.42</td>
-              <td>4.03</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42539727</td>
-              <td>42539728</td>
-              <td>ENSG00000182240.11</td>
-              <td>13014.08</td>
-              <td>13268.56</td>
-              <td>17585.04</td>
-              <td>13436.05</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42733869</td>
-              <td>42733870</td>
-              <td>ENSG00000183486.8</td>
-              <td>322.94</td>
-              <td>2014.49</td>
-              <td>1364.76</td>
-              <td>2135.06</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42792230</td>
-              <td>42792231</td>
-              <td>ENSG00000157601.9</td>
-              <td>484.53</td>
-              <td>1555.70</td>
-              <td>2100.77</td>
-              <td>2204.26</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42814668</td>
-              <td>42814669</td>
-              <td>ENSG00000228318.1</td>
-              <td>0.05</td>
-              <td>3.61</td>
-              <td>1.26</td>
-              <td>2.93</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{overflowX: 'auto'}}>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th scope="col">chr</th>
+                <th scope="col">start</th>
+                <th scope="col">end</th>
+                <th scope="col">gene_id</th>
+                <th scope="col">C56_1</th>
+                <th scope="col">C136_1</th>
+                <th scope="col">C10_1</th>
+                <th scope="col">C171_1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>21</td>
+                <td>42520059</td>
+                <td>42520060</td>
+                <td>ENSG00000226496.1</td>
+                <td>3.99</td>
+                <td>3.37</td>
+                <td>5.42</td>
+                <td>4.03</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42539727</td>
+                <td>42539728</td>
+                <td>ENSG00000182240.11</td>
+                <td>13014.08</td>
+                <td>13268.56</td>
+                <td>17585.04</td>
+                <td>13436.05</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42733869</td>
+                <td>42733870</td>
+                <td>ENSG00000183486.8</td>
+                <td>322.94</td>
+                <td>2014.49</td>
+                <td>1364.76</td>
+                <td>2135.06</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42792230</td>
+                <td>42792231</td>
+                <td>ENSG00000157601.9</td>
+                <td>484.53</td>
+                <td>1555.70</td>
+                <td>2100.77</td>
+                <td>2204.26</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42814668</td>
+                <td>42814669</td>
+                <td>ENSG00000228318.1</td>
+                <td>0.05</td>
+                <td>3.61</td>
+                <td>1.26</td>
+                <td>2.93</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p>
           Genotype data need to be prepared in the following format. The sample
           name (starting at 5th column) should be the same as quantification
@@ -228,72 +232,74 @@ export function Help() {
           “CT”) (0=reference allele and 1=alternative allele). The chr, pos, ref
           and alt information are used as index id link to association data.
         </p>
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th scope="col">chr</th>
-              <th scope="col">pos</th>
-              <th scope="col">ref</th>
-              <th scope="col">alt</th>
-              <th scope="col">C56_1</th>
-              <th scope="col">C136_1</th>
-              <th scope="col">C10_1</th>
-              <th scope="col">C171_1</th>
-              <th scope="col">C104_1</th>
-              <th scope="col">C72_1</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/0</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642096</td>
-              <td>A</td>
-              <td>G</td>
-              <td>0/0</td>
-              <td>0/0</td>
-              <td>0/0</td>
-              <td>0/1</td>
-              <td>0/1</td>
-              <td>0/0</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642405</td>
-              <td>G</td>
-              <td>A</td>
-              <td>0/0</td>
-              <td>0/0</td>
-              <td>0/0</td>
-              <td>0/0</td>
-              <td>0/0</td>
-              <td>0/0</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642642</td>
-              <td>A</td>
-              <td>G</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>1/1</td>
-              <td>0/1</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{overflowX: 'auto'}}>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th scope="col">chr</th>
+                <th scope="col">pos</th>
+                <th scope="col">ref</th>
+                <th scope="col">alt</th>
+                <th scope="col">C56_1</th>
+                <th scope="col">C136_1</th>
+                <th scope="col">C10_1</th>
+                <th scope="col">C171_1</th>
+                <th scope="col">C104_1</th>
+                <th scope="col">C72_1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/0</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642096</td>
+                <td>A</td>
+                <td>G</td>
+                <td>0/0</td>
+                <td>0/0</td>
+                <td>0/0</td>
+                <td>0/1</td>
+                <td>0/1</td>
+                <td>0/0</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642405</td>
+                <td>G</td>
+                <td>A</td>
+                <td>0/0</td>
+                <td>0/0</td>
+                <td>0/0</td>
+                <td>0/0</td>
+                <td>0/0</td>
+                <td>0/0</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642642</td>
+                <td>A</td>
+                <td>G</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>1/1</td>
+                <td>0/1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <p>
           LD data should not include the column name. The first 5 columns are
           chr, pos, rsnum, ref and alt, respectively, which record the basic
@@ -301,74 +307,76 @@ export function Help() {
           interest. The remaining columns are the pairwise matrix, representing
           the LD (R value) between two variants.
         </p>
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th scope="col">21</th>
-              <th scope="col">42642038</th>
-              <th scope="col">rs8133778</th>
-              <th scope="col">A</th>
-              <th scope="col">G</th>
-              <th scope="col">1.000</th>
-              <th scope="col">0.198</th>
-              <th scope="col">-0.051</th>
-              <th scope="col">0.020</th>
-              <th scope="col">0.101</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>21</td>
-              <td>42642096</td>
-              <td>rs68087522</td>
-              <td>A</td>
-              <td>G</td>
-              <td>0.198</td>
-              <td>1.000</td>
-              <td>-0.010</td>
-              <td>-0.010</td>
-              <td>-0.052</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642110</td>
-              <td>rs542372488</td>
-              <td>T</td>
-              <td>C</td>
-              <td>-0.051</td>
-              <td>-0.010</td>
-              <td>1.000</td>
-              <td>-0.001</td>
-              <td>-0.005</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642322</td>
-              <td>rs73368336</td>
-              <td>C</td>
-              <td>T</td>
-              <td>0.020</td>
-              <td>-0.010</td>
-              <td>-0.001</td>
-              <td>1.000</td>
-              <td>-0.005</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642405</td>
-              <td>rs77240271</td>
-              <td>G</td>
-              <td>A</td>
-              <td>0.101</td>
-              <td>-0.052</td>
-              <td>-0.005</td>
-              <td>-0.005</td>
-              <td>1.000</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{overflowX: 'auto'}}>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th scope="col">21</th>
+                <th scope="col">42642038</th>
+                <th scope="col">rs8133778</th>
+                <th scope="col">A</th>
+                <th scope="col">G</th>
+                <th scope="col">1.000</th>
+                <th scope="col">0.198</th>
+                <th scope="col">-0.051</th>
+                <th scope="col">0.020</th>
+                <th scope="col">0.101</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>21</td>
+                <td>42642096</td>
+                <td>rs68087522</td>
+                <td>A</td>
+                <td>G</td>
+                <td>0.198</td>
+                <td>1.000</td>
+                <td>-0.010</td>
+                <td>-0.010</td>
+                <td>-0.052</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642110</td>
+                <td>rs542372488</td>
+                <td>T</td>
+                <td>C</td>
+                <td>-0.051</td>
+                <td>-0.010</td>
+                <td>1.000</td>
+                <td>-0.001</td>
+                <td>-0.005</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642322</td>
+                <td>rs73368336</td>
+                <td>C</td>
+                <td>T</td>
+                <td>0.020</td>
+                <td>-0.010</td>
+                <td>-0.001</td>
+                <td>1.000</td>
+                <td>-0.005</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642405</td>
+                <td>rs77240271</td>
+                <td>G</td>
+                <td>A</td>
+                <td>0.101</td>
+                <td>-0.052</td>
+                <td>-0.005</td>
+                <td>-0.005</td>
+                <td>1.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="mt-5">
+      <div className="mt-5">
         <p>
           <b>GWAS Data</b>
         </p>
@@ -377,80 +385,82 @@ export function Help() {
           index id linking to QTL data. “zscore” can be calculated based on the
           effect size (“effect”) and standard error (“se”): zscore=effect/se.
         </p>
-        <table class="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th scope="col">chr</th>
-              <th scope="col">pos</th>
-              <th scope="col">ref</th>
-              <th scope="col">alt</th>
-              <th scope="col">rsnum</th>
-              <th scope="col">pvalue</th>
-              <th scope="col">zscore</th>
-              <th scope="col">effect</th>
-              <th scope="col">se</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>rs8133778</td>
-              <td>0.806</td>
-              <td>-0.246</td>
-              <td>-0.003</td>
-              <td>0.011</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642093</td>
-              <td>C</td>
-              <td>T</td>
-              <td>rs771407982</td>
-              <td>0.206</td>
-              <td>-1.264</td>
-              <td>-1.455</td>
-              <td>1.152</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642096</td>
-              <td>A</td>
-              <td>G</td>
-              <td>rs68087522</td>
-              <td>0.330</td>
-              <td>0.974</td>
-              <td>0.018</td>
-              <td>0.018</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642322</td>
-              <td>C</td>
-              <td>T</td>
-              <td>rs73368336</td>
-              <td>0.543</td>
-              <td>-0.608</td>
-              <td>-0.181</td>
-              <td>0.298</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642405</td>
-              <td>G</td>
-              <td>A</td>
-              <td>rs77240271</td>
-              <td>0.078</td>
-              <td>-1.761</td>
-              <td>-0.047</td>
-              <td>0.027</td>
-            </tr>
-          </tbody>
-        </table>
+        <div style={{overflowX: 'auto'}}>
+          <table className="table table-bordered table-striped">
+            <thead>
+              <tr>
+                <th scope="col">chr</th>
+                <th scope="col">pos</th>
+                <th scope="col">ref</th>
+                <th scope="col">alt</th>
+                <th scope="col">rsnum</th>
+                <th scope="col">pvalue</th>
+                <th scope="col">zscore</th>
+                <th scope="col">effect</th>
+                <th scope="col">se</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>21</td>
+                <td>42642038</td>
+                <td>A</td>
+                <td>G</td>
+                <td>rs8133778</td>
+                <td>0.806</td>
+                <td>-0.246</td>
+                <td>-0.003</td>
+                <td>0.011</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642093</td>
+                <td>C</td>
+                <td>T</td>
+                <td>rs771407982</td>
+                <td>0.206</td>
+                <td>-1.264</td>
+                <td>-1.455</td>
+                <td>1.152</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642096</td>
+                <td>A</td>
+                <td>G</td>
+                <td>rs68087522</td>
+                <td>0.330</td>
+                <td>0.974</td>
+                <td>0.018</td>
+                <td>0.018</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642322</td>
+                <td>C</td>
+                <td>T</td>
+                <td>rs73368336</td>
+                <td>0.543</td>
+                <td>-0.608</td>
+                <td>-0.181</td>
+                <td>0.298</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642405</td>
+                <td>G</td>
+                <td>A</td>
+                <td>rs77240271</td>
+                <td>0.078</td>
+                <td>-1.761</td>
+                <td>-0.047</td>
+                <td>0.027</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="mt-5">
+      <div className="mt-5">
         <p>
           <b>Understanding Linkage Disequilibrium (LD)</b>
         </p>
@@ -484,7 +494,7 @@ export function Help() {
           The LD information will be used in the colocalization analysis.
         </p>
       </div>
-      <div class="mt-5">
+      <div className="mt-5">
         <p>
           <b>Colocalization Analysis</b>
         </p>
@@ -523,7 +533,7 @@ export function Help() {
           arbitrary number of causal variants.
         </p>
       </div>
-      <div class="mt-5">
+      <div className="mt-5">
         <p>
           <b>Contact</b>
         </p>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { actions } from '../../../../services/store';
+// import { actions } from '../../../../services/store';
+import { updateQTLsGWAS } from '../../../../services/actions';
 import { Tabs, Tab, Form, Button } from 'react-bootstrap';
 import { LocusAlignment } from './locus-alignment';
 import { LocusColocalization } from './locus-colocalization';
@@ -12,27 +13,10 @@ export function QTLsGWASResults() {
   const dispatch = useDispatch();
 
   const {
-    select_qtls_samples,
-    select_gwas_sample,
-    associationFile,
-    quantificationFile,
-    genotypeFile,
-    gwasFile,
-    LDFile,
-    request,
-    select_pop,
-    select_gene,
-    select_dist,
-    select_ref,
-    recalculateAttempt,
-    recalculatePop,
-    recalculateGene,
-    recalculateDist,
-    recalculateRef,
     submitted,
     isLoading,
     activeResultsTab,
-  } = useSelector(({ ezQTL }) => ezQTL.qtlsGWAS);
+  } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
     {
@@ -64,12 +48,7 @@ export function QTLsGWASResults() {
         id="controlled-tab-example"
         activeKey={activeResultsTab}
         onSelect={(k) => {
-          dispatch(
-            actions.updateKey({
-              key: 'qtlsGWAS',
-              data: { activeResultsTab: k },
-            })
-          );
+          dispatch(updateQTLsGWAS({ activeResultsTab: k }));
         }}
       >
         {tabs.map((item) => (

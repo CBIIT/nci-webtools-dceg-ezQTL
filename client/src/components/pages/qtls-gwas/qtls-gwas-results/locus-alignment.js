@@ -5,27 +5,8 @@ import { LocusAlignmentPlot } from './locus-alignment-plot';
 
 export function LocusAlignment() {
   const {
-    select_qtls_samples,
-    select_gwas_sample,
-    associationFile,
-    quantificationFile,
-    genotypeFile,
-    gwasFile,
-    LDFile,
-    request,
-    select_pop,
-    select_gene,
-    select_dist,
-    select_ref,
-    recalculateAttempt,
-    recalculatePop,
-    recalculateGene,
-    recalculateDist,
-    recalculateRef,
     submitted,
-    isLoading,
-    results,
-  } = useSelector(({ ezQTL }) => ezQTL.qtlsGWAS);
+  } = useSelector((state) => state.qtlsGWAS);
 
   return (
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
@@ -62,10 +43,12 @@ export function LocusAlignment() {
             circle indicates the current LD reference variant, which will be
             simultaneously updated in both GWAS and QTLs LocusZoom plots.
           </p>
+              
+          <div style={{overflowX: 'auto'}}>
+            <LocusAlignmentPlot />
+          </div>
 
-          <LocusAlignmentPlot />
-
-          <div class="text-center footnote">
+          <div className="text-center footnote">
             <p>
               <small>
                 Click on the SNP to show additional information and actions
@@ -73,10 +56,10 @@ export function LocusAlignment() {
             </p>
           </div>
 
-          <div class="w-100 mt-1 mb-2 border"></div>
+          <div className="w-100 mt-1 mb-2 border"></div>
 
           {/* scatter && */}
-          <div class="mt-3">
+          <div className="mt-3">
             <p>
               The following scatter plot shows the correlation between
               -log10(GWAS <i>P</i>-value) and -log10(QTLs <i>P</i>-value). The “
