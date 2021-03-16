@@ -196,11 +196,11 @@ export function uploadFile(params) {
       const res = await axios.post('api/file-upload', form, config);
       if (res.data.files && res.data.files.length > 0) {
         dispatch(updateQTLsGWAS({
-            associationFile: res.data.body.associationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.associationFileName)[0] : '',
-            quantificationFile: res.data.body.quantificationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.quantificationFileName)[0] : '',
-            genotypeFile: res.data.body.genotypeFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.genotypeFileName)[0] : '',
-            gwasFile: res.data.body.gwasFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.gwasFileName)[0] : '',
-            LDFile: res.data.body.LDFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.LDFileName)[0] : '',
+            associationFile: res.data.body.associationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.associationFileName)[0].filename : '',
+            quantificationFile: res.data.body.quantificationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.quantificationFileName)[0].filename : '',
+            genotypeFile: res.data.body.genotypeFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.genotypeFileName)[0].filename : '',
+            gwasFile: res.data.body.gwasFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.gwasFileName)[0].filename : '',
+            LDFile: res.data.body.LDFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.LDFileName)[0].filename : '',
           })
         );
       }
@@ -228,7 +228,7 @@ export function qtlsGWASCalculation(params) {
     axios
       .post('api/qtls-calculate-main', params)
       .then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
 
         const geneDataR2 = getPopoverData(response.data['locus_alignment']['data'][0]);
         const geneDataR2NA = getPopoverDataR2NA(response.data['locus_alignment']['data'][0]);

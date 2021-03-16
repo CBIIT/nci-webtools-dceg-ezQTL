@@ -45,8 +45,6 @@ export function QTLsGWASForm() {
   useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
 
   const handleReset = () => {
-    console.log('reset!');
-    console.log(getInitialState().qtlsGWAS);
     dispatch(
       updateQTLsGWAS(getInitialState().qtlsGWAS)
     );
@@ -57,10 +55,9 @@ export function QTLsGWASForm() {
     _setGwasFile('');
   };
 
-  const handleSubmit = () => {
-    console.log('submit!');
+  async function handleSubmit() {
     const request = uuidv1();
-    dispatch(
+    await dispatch(
       uploadFile({
         dataFiles: [_associationFile, _quantificationFile, _genotypeFile, _LDFile, _gwasFile],
         associationFile: _associationFile,
@@ -77,16 +74,16 @@ export function QTLsGWASForm() {
       })
     );
 
-    dispatch(
+    await dispatch(
       qtlsGWASCalculation({
         request,
         select_qtls_samples,
         select_gwas_sample,
-        associationFile,
-        quantificationFile,
-        genotypeFile,
-        gwasFile,
-        LDFile,
+        associationFile: (_associationFile && _associationFile.name) || false,
+        quantificationFile: (_quantificationFile && _quantificationFile.name) || false,
+        genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
+        gwasFile: (_gwasFile && _gwasFile.name) || false,
+        LDFile: (_LDFile && _LDFile.name) || false,
         select_pop,
         select_gene,
         select_dist,
@@ -163,7 +160,7 @@ export function QTLsGWASForm() {
             disabled={submitted || select_qtls_samples}
             label={
               _associationFile
-                ? _associationFile.name ||  _associationFile.filename
+                ? _associationFile.name ||  _associationFile.filename || _associationFile
                 : select_qtls_samples
                 ? 'MX2.eQTL.txt'
                 : 'Choose File'
@@ -190,7 +187,7 @@ export function QTLsGWASForm() {
             disabled={submitted || select_qtls_samples}
             label={
               _quantificationFile
-                ? _quantificationFile.name || _quantificationFile.filename
+                ? _quantificationFile.name || _quantificationFile.filename || _quantificationFile
                 : select_qtls_samples
                 ? 'MX2.quantification.txt'
                 : 'Choose File'
@@ -217,7 +214,7 @@ export function QTLsGWASForm() {
             disabled={submitted || select_qtls_samples}
             label={
               _genotypeFile
-                ? _genotypeFile.name || _genotypeFile.filename
+                ? _genotypeFile.name || _genotypeFile.filename || _genotypeFile
                 : select_qtls_samples
                 ? 'MX2.genotyping.txt'
                 : 'Choose File'
@@ -249,7 +246,7 @@ export function QTLsGWASForm() {
             disabled={submitted || select_qtls_samples}
             label={
               _LDFile
-                ? _LDFile.name || _LDFile.filename
+                ? _LDFile.name || _LDFile.filename || _LDFile
                 : select_qtls_samples
                 ? 'MX2.LD.gz'
                 : 'Choose File'
@@ -322,7 +319,7 @@ export function QTLsGWASForm() {
             disabled={submitted || select_gwas_sample}
             label={
               _gwasFile
-                ? _gwasFile.name || _gwasFile.filename
+                ? _gwasFile.name || _gwasFile.filename || _gwasFile
                 : select_gwas_sample
                 ? 'MX2.GWAS.rs.txt'
                 : 'Choose File'
