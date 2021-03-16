@@ -15,7 +15,7 @@ export const getInitialState = async () => {
       LDFile: null,
       request: '',
       select_pop: false,
-      select_gene: null,
+      select_gene: false,
       select_dist: 100,
       select_ref: false,
       recalculateAttempt: false,
