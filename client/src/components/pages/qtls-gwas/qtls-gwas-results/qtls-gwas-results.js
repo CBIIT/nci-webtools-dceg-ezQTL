@@ -17,7 +17,8 @@ export function QTLsGWASResults() {
     isLoading,
     activeResultsTab,
     isError,
-    gwas
+    gwas,
+    locus_quantification
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -43,7 +44,7 @@ export function QTLsGWASResults() {
       component: <LocusQuantifiation />,
       key: 'locus-quantification',
       title: 'Locus Quantification',
-      disabled: !submitted || isError
+      disabled: !submitted || isError || !(locus_quantification && locus_quantification.data && Object.keys(locus_quantification.data).length > 0)
     },
   ];
 
