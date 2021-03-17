@@ -46,7 +46,9 @@ export function QTLsGWASResultsForm() {
               {/* </Form.Control> */}
             </div>
             <div className="col-md-4">
-              <Form.Label className="mb-0">Reference Gene</Form.Label>
+              <Form.Label className="mb-0">
+                Reference Gene <span style={{ display: submitted && !isLoading ? 'inline' : 'none', color: 'red' }}>*</span>
+              </Form.Label>
               <Form.Control
                 id="qtls-results-gene-input"
                 disabled={!submitted}

@@ -812,11 +812,11 @@ export function uploadFile(params) {
       const res = await axios.post('api/file-upload', form, config);
       if (res.data.files && res.data.files.length > 0) {
         dispatch(updateQTLsGWAS({
-            associationFile: res.data.body.associationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.associationFileName)[0].filename : '',
-            quantificationFile: res.data.body.quantificationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.quantificationFileName)[0].filename : '',
-            genotypeFile: res.data.body.genotypeFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.genotypeFileName)[0].filename : '',
-            gwasFile: res.data.body.gwasFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.gwasFileName)[0].filename : '',
-            LDFile: res.data.body.LDFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.LDFileName)[0].filename : '',
+            associationFile: res.data.body.associationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.associationFileName)[0].filename : false,
+            quantificationFile: res.data.body.quantificationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.quantificationFileName)[0].filename : false,
+            genotypeFile: res.data.body.genotypeFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.genotypeFileName)[0].filename : false,
+            gwasFile: res.data.body.gwasFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.gwasFileName)[0].filename : false,
+            LDFile: res.data.body.LDFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.LDFileName)[0].filename : false,
           })
         );
       }
@@ -854,14 +854,14 @@ export function qtlsGWASCalculation(params) {
 
         dispatch(updateQTLsGWAS({
               openSidebar: false,
-              select_qtls_samples: response.data['info']['select_qtls_samples'][0],
-              select_gwas_sample: response.data['info']['select_gwas_sample'][0],
+              select_qtls_samples: response.data['info']['select_qtls_samples'][0] === 'true' ? true : false,
+              select_gwas_sample: response.data['info']['select_gwas_sample'][0] === 'true' ? true : false,
               select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
-              recalculateAttempt: response.data['info']['recalculateAttempt'][0],
-              recalculatePop: response.data['info']['recalculatePop'][0],
-              recalculateGene: response.data['info']['recalculateGene'][0],
-              recalculateDist: response.data['info']['recalculateDist'][0],
-              recalculateRef: response.data['info']['recalculateRef'][0],
+              recalculateAttempt: response.data['info']['recalculateAttempt'][0] === 'true' ? true : false,
+              recalculatePop: response.data['info']['recalculatePop'][0] === 'true' ? true : false,
+              recalculateGene: response.data['info']['recalculateGene'][0] === 'true' ? true : false,
+              recalculateDist: response.data['info']['recalculateDist'][0]=== 'true' ? true : false,
+              recalculateRef: response.data['info']['recalculateRef'][0] === 'true' ? true : false,
               top_gene_variants: {
                 data: response.data['info']['top_gene_variants']['data'][0]
               },
