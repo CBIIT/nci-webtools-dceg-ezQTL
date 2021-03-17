@@ -354,6 +354,7 @@ export function QTLsGWASForm() {
             </small>
           </Form.Label>
           <Form.Control
+            type="number"
             id="qtls-distance-input"
             disabled={submitted}
             onChange={(e) => {

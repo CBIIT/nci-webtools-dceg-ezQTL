@@ -845,6 +845,8 @@ export function qtlsGWASCalculation(params) {
       .post('api/qtls-calculate-main', params)
       .then(function (response) {
         
+        console.log('api/qtls-calculate-main response.data', response.data);
+
         const {
           pdata,
           locus_alignment_plot_layout
@@ -870,7 +872,7 @@ export function qtlsGWASCalculation(params) {
                 data: response.data['info']['gene_list']['data'][0]
               },
               inputs: response.data['info']['inputs'],
-              messages: response.data['info']['inputs'],
+              messages: response.data['info']['messages'],
               locus_quantification: {
                 data: response.data['locus_quantification']['data'][0],
               },
