@@ -42,8 +42,6 @@ export const getInitialState = async () => {
           gene_symbol: null
         }
       },
-      // locus_alignment_plot_layout: null,
-      // locus_alignment_plot_data: null,
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
       gwas: null
