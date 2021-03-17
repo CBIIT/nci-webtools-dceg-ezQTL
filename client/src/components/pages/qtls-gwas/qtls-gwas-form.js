@@ -1,6 +1,8 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button } from 'react-bootstrap';
+import Overlay from 'react-bootstrap/Overlay';
+import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import { qtlsGWASCalculation, uploadFile, updateQTLsGWAS } from '../../../services/actions';
 const { v1: uuidv1 } = require('uuid');
@@ -8,12 +10,18 @@ const { v1: uuidv1 } = require('uuid');
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
+
+  const quantificationFileControl = useRef(null);
+  const genotypeFileControl = useRef(null);
   
   const [_associationFile, _setAssociationFile] = useState('');
   const [_quantificationFile, _setQuantificationFile] = useState('');
   const [_genotypeFile, _setGenotypeFile] = useState('');
   const [_LDFile, _setLDFile] = useState('');
   const [_gwasFile, _setGwasFile] = useState('');
+  const [showQuantificationTooltip, setShowQuantificationTooltip] = useState(false);
+  const [showGenotypeTooltip, setShowGenotypeTooltip] = useState(false);
+
 
   const {
     select_qtls_samples,
@@ -56,6 +64,16 @@ export function QTLsGWASForm() {
   };
 
   async function handleSubmit() {
+    if (_quantificationFile && !_genotypeFile) {
+      setShowGenotypeTooltip(true);
+      setTimeout(() => setShowGenotypeTooltip(false), 5000);
+      return;
+    }
+    if (!_quantificationFile && _genotypeFile) {
+      setShowQuantificationTooltip(true);
+      setTimeout(() => setShowQuantificationTooltip(false), 5000);
+      return;
+    }
     const request = uuidv1();
     await dispatch(
       uploadFile({
@@ -158,6 +176,7 @@ export function QTLsGWASForm() {
           <Form.File
             id="qtls-association-file"
             disabled={submitted || select_qtls_samples}
+            key={_associationFile}
             label={
               _associationFile
                 ? _associationFile.name ||  _associationFile.filename || _associationFile
@@ -183,8 +202,10 @@ export function QTLsGWASForm() {
         <div className="col-sm-12">
           <Form.Label className="mb-0">Quantification Data File</Form.Label>
           <Form.File
+            ref={quantificationFileControl}
             id="qtls-quantification-file"
             disabled={submitted || select_qtls_samples}
+            key={_quantificationFile}
             label={
               _quantificationFile
                 ? _quantificationFile.name || _quantificationFile.filename || _quantificationFile
@@ -206,12 +227,21 @@ export function QTLsGWASForm() {
             // }}
             custom
           />
+          <Overlay target={quantificationFileControl.current} show={showQuantificationTooltip} placement="bottom">
+            {(props) => (
+              <Tooltip id="overlay-example" {...props}>
+                Please input accompanying Quantification Data File with Genotype Data File.
+              </Tooltip>
+            )}
+          </Overlay>
         </div>
         <div className="col-sm-12">
           <Form.Label className="mb-0">Genotype Data File</Form.Label>
           <Form.File
+            ref={genotypeFileControl}
             id="qtls-genotype-file"
             disabled={submitted || select_qtls_samples}
+            key={_genotypeFile}
             label={
               _genotypeFile
                 ? _genotypeFile.name || _genotypeFile.filename || _genotypeFile
@@ -233,6 +263,13 @@ export function QTLsGWASForm() {
             // }}
             custom
           />
+          <Overlay target={genotypeFileControl.current} show={showGenotypeTooltip} placement="bottom">
+            {(props) => (
+              <Tooltip id="overlay-example" {...props}>
+                Please input accompanying Genotype Data File with Quantification Data File.
+              </Tooltip>
+            )}
+          </Overlay>
         </div>
         <div className="col-sm-12">
           <Form.Label className="mb-0">
@@ -244,6 +281,7 @@ export function QTLsGWASForm() {
           <Form.File
             id="qtls-ld-file"
             disabled={submitted || select_qtls_samples}
+            key={_LDFile}
             label={
               _LDFile
                 ? _LDFile.name || _LDFile.filename || _LDFile
@@ -317,6 +355,7 @@ export function QTLsGWASForm() {
           <Form.File
             id="qtls-gwas-file"
             disabled={submitted || select_gwas_sample}
+            key={_gwasFile}
             label={
               _gwasFile
                 ? _gwasFile.name || _gwasFile.filename || _gwasFile
