@@ -30,9 +30,7 @@ export const getInitialState = async () => {
       top_gene_variants: null,
       all_gene_variants: null,
       gene_list: null,
-      inputs: {
-        select_pop: []
-      },
+      inputs: null,
       messages: null,
       locus_quantification: null,
       locus_quantification_heatmap: null,

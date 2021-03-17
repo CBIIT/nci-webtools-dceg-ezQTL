@@ -17,8 +17,8 @@ export function QTLsGWASResultsForm() {
   const [_selectGene, _setSelectGene] = useState('');
   const [_selectRef, _setSelectRef] = useState('');
 
-  useEffect(() => _setSelectPop(inputs['select_pop'][0]), [inputs]);
-  useEffect(() => _setSelectGene(locus_alignment.top['gene_symbol']), [locus_alignment]);
+  useEffect(() => _setSelectPop(inputs ? inputs['select_pop'][0] : ''), [inputs]);
+  useEffect(() => _setSelectGene(locus_alignment['top']['gene_symbol'] ? locus_alignment['top']['gene_symbol'] : ''), [locus_alignment]);
   useEffect(() => _setSelectRef(select_ref), [select_ref]);
 
   return (

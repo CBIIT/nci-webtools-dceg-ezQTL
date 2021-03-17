@@ -16,7 +16,8 @@ export function QTLsGWASResults() {
     submitted,
     isLoading,
     activeResultsTab,
-    isError
+    isError,
+    gwas
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -24,21 +25,25 @@ export function QTLsGWASResults() {
       component: <LocusAlignment />,
       key: 'locus-alignment',
       title: 'Locus Alignment',
+      disabled: !submitted || isError
     },
     {
       component: <LocusColocalization />,
       key: 'locus-colocalization',
       title: 'Locus Colocalization',
+      disabled: !submitted || isError || !(gwas && gwas.data && Object.keys(gwas.data).length > 0)
     },
     {
       component: <LocusTable />,
       key: 'locus-table',
       title: 'Locus Table',
+      disabled: !submitted || isError
     },
     {
       component: <LocusQuantifiation />,
       key: 'locus-quantification',
       title: 'Locus Quantification',
+      disabled: !submitted || isError
     },
   ];
 
@@ -52,8 +57,11 @@ export function QTLsGWASResults() {
           dispatch(updateQTLsGWAS({ activeResultsTab: k }));
         }}
       >
-        {tabs.map((item) => (
-          <Tab eventKey={item.key} title={item.title} disabled={!submitted || isError}>
+        {tabs.map((item, idx) => (
+          <Tab key={item.key} 
+            eventKey={item.key} 
+            title={item.title} 
+            disabled={item.disabled}>
             {item.component}
           </Tab>
         ))}
