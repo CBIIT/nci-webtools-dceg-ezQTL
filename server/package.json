@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.8.1",
     "compression": "^1.7.4",
     "express": "^4.17.1",
     "form-data": "^4.0.0",
@@ -17,6 +18,7 @@
     "r-wrapper": "^1.1.0",
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.0"
+    "winston-daily-rotate-file": "^4.5.0",
+    "xlsx": "^0.16.9"
   }
 }
