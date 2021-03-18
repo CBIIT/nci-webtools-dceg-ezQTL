@@ -8,16 +8,14 @@ const apiRouter = express.Router();
 const multer = require('multer');
 const fs = require('fs');
 const XLSX = require('xlsx');
-const {
-  S3Client,
-  ListObjectsV2Command,
-  GetObjectCommand,
-} = require('@aws-sdk/client-s3');
+const AWS = require('aws-sdk');
 
 const dataDir = path.resolve(config.data.folder);
 const tmpDir = path.resolve(config.tmp.folder);
 const awsInfo = config.aws;
 const workingDirectory = path.resolve(config.R.workDir);
+
+AWS.config.update(awsInfo);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -81,5 +79,39 @@ apiRouter.post('/file-upload', upload.any(), async (req, res) => {
 apiRouter.post('/qtls-calculate-main', (req, res, next) =>
   qtlsCalculateMain({ ...req.body, workingDirectory }, res, next)
 );
+
+// get list of public GTEx data
+apiRouter.post('/getPublicGTEx', async (req, res, next) => {
+  try {
+    let buffers = [];
+    const filestream = new AWS.S3()
+      .getObject({
+        Bucket: awsInfo.s3.data,
+        Key: `${awsInfo.s3.subFolder}/vQTL2_resource.xlsx`,
+      })
+      .createReadStream();
+
+    filestream
+      .on('data', (data) => buffers.push(data))
+      .on('end', () => {
+        const buffer = Buffer.concat(buffers);
+        const workbook = XLSX.read(buffer);
+        const sheetNames = workbook.SheetNames;
+        const data = sheetNames.reduce(
+          (acc, sheet) => ({
+            ...acc,
+            [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
+          }),
+          {}
+        );
+
+        res.json(data);
+      })
+      .on('error', next);
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
 
 module.exports = { apiRouter };

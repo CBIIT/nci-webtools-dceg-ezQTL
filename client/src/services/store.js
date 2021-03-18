@@ -37,15 +37,15 @@ export const getInitialState = async () => {
       locus_alignment: {
         data: null,
         layout: null,
-        top : {
+        top: {
           chr: null,
-          gene_symbol: null
-        }
+          gene_symbol: null,
+        },
       },
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
       gwas: null,
-      locus_table: null
+      locus_table: null,
       // locus_table: {
       //   globalFilter: '',
       //   data: [],
@@ -54,6 +54,18 @@ export const getInitialState = async () => {
       //     pageSize: 0
       //   }
       // }
+      publicGTEx: [],
+      loadingPublic: false,
+      dataset: 'cis-QTL dataset',
+      datasetOptions: [],
+      genome: '',
+      genomeOptions: [],
+      project: '',
+      projectOptions: [],
+      tissue: '',
+      tissueOptions: [],
+      chromosome: '',
+      chromosomeOptions: [],
     },
     errorModal: {
       visible: false,
@@ -63,15 +75,16 @@ export const getInitialState = async () => {
   };
 
   return initialState;
-}
+};
 
-export const getStore = async _ => createStore(
-  rootReducer,
-  await getInitialState(),
-  compose(
-    applyMiddleware(ReduxThunk),
-    window.__REDUX_DEVTOOLS_EXTENSION__
-      ? window.__REDUX_DEVTOOLS_EXTENSION__({ trace: true })
-      : e => e
-  )
-);
+export const getStore = async (_) =>
+  createStore(
+    rootReducer,
+    await getInitialState(),
+    compose(
+      applyMiddleware(ReduxThunk),
+      window.__REDUX_DEVTOOLS_EXTENSION__
+        ? window.__REDUX_DEVTOOLS_EXTENSION__({ trace: true })
+        : (e) => e
+    )
+  );

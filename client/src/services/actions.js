@@ -20,42 +20,42 @@ export function updateError(data) {
 const getPopoverData = (geneData) => {
   let dataR2 = [];
   for (let i = 0; i < geneData.length; i++) {
-    if ("R2" in geneData[i] && geneData[i]["R2"] != "NA") {
+    if ('R2' in geneData[i] && geneData[i]['R2'] != 'NA') {
       dataR2.push(geneData[i]);
     }
   }
   return dataR2;
-}
+};
 
 const getPopoverDataR2NA = (geneData) => {
   let dataR2NA = [];
   for (let i = 0; i < geneData.length; i++) {
-    if (!("R2" in geneData[i]) || geneData[i]["R2"] == "NA") {
+    if (!('R2' in geneData[i]) || geneData[i]['R2'] == 'NA') {
       dataR2NA.push(geneData[i]);
     }
   }
   return dataR2NA;
-}
+};
 
 const getPopoverDataGWAS = (geneData) => {
   let dataGWASR2 = [];
   for (let i = 0; i < geneData.length; i++) {
-    if ("R2" in geneData[i] && geneData[i]["R2"] != "NA") {
+    if ('R2' in geneData[i] && geneData[i]['R2'] != 'NA') {
       dataGWASR2.push(geneData[i]);
     }
   }
   return dataGWASR2;
-}
+};
 
 const getPopoverDataGWASR2NA = (geneData) => {
   let dataGWASR2NA = [];
   for (let i = 0; i < geneData.length; i++) {
-    if (!("R2" in geneData[i]) || geneData[i]["R2"] == "NA") {
+    if (!('R2' in geneData[i]) || geneData[i]['R2'] == 'NA') {
       dataGWASR2NA.push(geneData[i]);
     }
   }
   return dataGWASR2NA;
-}
+};
 
 const getXData = (geneData) => {
   let xData = [];
@@ -63,7 +63,7 @@ const getXData = (geneData) => {
     xData.push(geneData[i]['pos'] / 1000000.0);
   }
   return xData;
-}
+};
 
 const getYData = (geneData) => {
   let yData = [];
@@ -71,39 +71,127 @@ const getYData = (geneData) => {
     yData.push(Math.log10(geneData[i]['pval_nominal']) * -1.0);
   }
   return yData;
-}
+};
 
 const getHoverData = (geneData) => {
   let hoverData = [];
   for (let i = 0; i < geneData.length; i++) {
     if ('rsnum' in geneData[i]) {
-      hoverData.push('chr' + geneData[i]['chr'] + ':' + geneData[i]['pos'] + '<br>' + geneData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+      hoverData.push(
+        'chr' +
+          geneData[i]['chr'] +
+          ':' +
+          geneData[i]['pos'] +
+          '<br>' +
+          geneData[i]['rsnum'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneData[i]['ref'] +
+          '/' +
+          geneData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneData[i]['pval_nominal'] +
+          '<br>' +
+          'Slope: ' +
+          geneData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
+      );
     } else {
-      hoverData.push('chr' + geneData[i]['chr'] + ':' + geneData[i]['pos'] + '<br>' + 'Ref/Alt: ' + geneData[i]['ref'] + '/' + geneData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneData[i]['pval_nominal'] + '<br>' + 'Slope: ' + geneData[i]['slope'] + '<br>' + "R2: " + (geneData[i]['R2'] ? geneData[i]['R2'] : "NA").toString());
+      hoverData.push(
+        'chr' +
+          geneData[i]['chr'] +
+          ':' +
+          geneData[i]['pos'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneData[i]['ref'] +
+          '/' +
+          geneData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneData[i]['pval_nominal'] +
+          '<br>' +
+          'Slope: ' +
+          geneData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
+      );
     }
   }
   return hoverData;
-}
+};
 
 const getHoverDataGWAS = (geneGWASData) => {
   let hoverData = [];
   for (let i = 0; i < geneGWASData.length; i++) {
     if ('rsnum' in geneGWASData[i]) {
-      hoverData.push('chr' + geneGWASData[i]['chr'] + ':' + geneGWASData[i]['pos'] + '<br>' + geneGWASData[i]['rsnum'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+      hoverData.push(
+        'chr' +
+          geneGWASData[i]['chr'] +
+          ':' +
+          geneGWASData[i]['pos'] +
+          '<br>' +
+          geneGWASData[i]['rsnum'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneGWASData[i]['ref'] +
+          '/' +
+          geneGWASData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneGWASData[i]['pvalue'] +
+          '<br>' +
+          'Slope: ' +
+          geneGWASData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
+      );
     } else {
-      hoverData.push('chr' + geneGWASData[i]['chr'] + ':' + geneGWASData[i]['pos'] + '<br>' + 'Ref/Alt: ' + geneGWASData[i]['ref'] + '/' + geneGWASData[i]['alt'] + '<br>' + '<i>P</i>-value: ' + geneGWASData[i]['pvalue'] + '<br>' + 'Slope: ' + geneGWASData[i]['slope'] + '<br>' + "R2: " + (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : "NA").toString());
+      hoverData.push(
+        'chr' +
+          geneGWASData[i]['chr'] +
+          ':' +
+          geneGWASData[i]['pos'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneGWASData[i]['ref'] +
+          '/' +
+          geneGWASData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneGWASData[i]['pvalue'] +
+          '<br>' +
+          'Slope: ' +
+          geneGWASData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
+      );
     }
   }
   return hoverData;
-}
+};
 
 const getHoverDataRC = (geneDataRC) => {
   let hoverDataRC = [];
   for (let i = 0; i < geneDataRC.length; i++) {
-    hoverDataRC.push('chr' + geneDataRC[i]['chr'] + ':' + geneDataRC[i]['pos'] + '<br>' + 'Rate: ' + geneDataRC[i]['rate']);
+    hoverDataRC.push(
+      'chr' +
+        geneDataRC[i]['chr'] +
+        ':' +
+        geneDataRC[i]['pos'] +
+        '<br>' +
+        'Rate: ' +
+        geneDataRC[i]['rate']
+    );
   }
   return hoverDataRC;
-}
+};
 
 const getYGWASData = (geneData) => {
   let yData = [];
@@ -111,14 +199,14 @@ const getYGWASData = (geneData) => {
     yData.push(Math.log10(geneData[i]['pvalue']) * -1.0);
   }
   return yData;
-}
+};
 
 const getYLDRefGWAS = (xData, yGWASData, locusAlignmentDataQTopAnnot) => {
   let LDRefPos = locusAlignmentDataQTopAnnot['pos'] / 1000000.0;
   let pointIndex = xData.indexOf(LDRefPos);
   let yLDRef = yGWASData[pointIndex];
   return yLDRef;
-}
+};
 
 const getColorData = (geneData) => {
   let colorData = [];
@@ -127,10 +215,11 @@ const getColorData = (geneData) => {
   }
   // normalize R2 color data between 0 and 1 for color spectrum
   for (let i = 0; i < colorData.length; i++) {
-    colorData[i] = (colorData[i] / (Math.max.apply(null, colorData) / 100) ) / 100.0;
+    colorData[i] =
+      colorData[i] / (Math.max.apply(null, colorData) / 100) / 100.0;
   }
   return colorData;
-}
+};
 
 const getXDataRC = (geneDataRC) => {
   let xData = [];
@@ -138,7 +227,7 @@ const getXDataRC = (geneDataRC) => {
     xData.push(geneDataRC[i]['pos'] / 1000000.0);
   }
   return xData;
-}
+};
 
 const getYDataRC = (geneDataRC) => {
   let yData = [];
@@ -146,11 +235,11 @@ const getYDataRC = (geneDataRC) => {
     yData.push(geneDataRC[i]['rate']);
   }
   return yData;
-}
+};
 
 const getMaxFinite = (data) => {
   let max = Number.NEGATIVE_INFINITY;
-  for(let i = 0; 0 < data.length; i++) {
+  for (let i = 0; 0 < data.length; i++) {
     if (isFinite(data[i])) {
       if (data[i] > max) {
         max = data[i];
@@ -158,23 +247,26 @@ const getMaxFinite = (data) => {
     }
   }
   return max;
-}
+};
 
 const removeInfinities = (arr) => {
   let finites = [];
-  for (let i = 0; i < arr.length; i ++) {
+  for (let i = 0; i < arr.length; i++) {
     if (isFinite(arr[i])) {
       finites.push(arr[i]);
     } else {
-
     }
   }
   return finites;
-}
+};
 
 const drawLocusAlignment = (response) => {
-  const geneDataR2 = getPopoverData(response.data['locus_alignment']['data'][0]);
-  const geneDataR2NA = getPopoverDataR2NA(response.data['locus_alignment']['data'][0]);
+  const geneDataR2 = getPopoverData(
+    response.data['locus_alignment']['data'][0]
+  );
+  const geneDataR2NA = getPopoverDataR2NA(
+    response.data['locus_alignment']['data'][0]
+  );
 
   const xData = getXData(geneDataR2);
   const yData = getYData(geneDataR2);
@@ -186,8 +278,11 @@ const drawLocusAlignment = (response) => {
   const hoverData = getHoverData(geneDataR2);
   const hoverDataR2NA = getHoverData(geneDataR2NA);
   const hoverDataRC = getHoverDataRC(response.data['locus_alignment']['rc'][0]);
-  const xLDRef = response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
-  const yLDRef = Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0;
+  const xLDRef =
+    response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
+  const yLDRef =
+    Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) *
+    -1.0;
   const yDataFinites = removeInfinities(yData);
   const topPvalY = Math.max.apply(null, yDataFinites);
   const topPvalIdx = yData.indexOf(topPvalY);
@@ -200,30 +295,34 @@ const drawLocusAlignment = (response) => {
     mode: 'markers',
     type: 'scatter',
     marker: {
-      symbol: "diamond",
+      symbol: 'diamond',
       size: 15,
       opacity: 1.0,
-      color: "#ff66cc",
+      color: '#ff66cc',
       line: {
         color: '#ff66cc',
-        width: 2
+        width: 2,
       },
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
   // highlight top point
   const LDRefHighlight = {
     x: [response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0],
-    y: [Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0],
+    y: [
+      Math.log10(
+        response.data['locus_alignment']['top'][0][0]['pval_nominal']
+      ) * -1.0,
+    ],
     hoverinfo: 'none',
     mode: 'markers',
     type: 'scatter',
     marker: {
-      opacity: 1.0, 
+      opacity: 1.0,
       size: 15,
-      color: "red"
+      color: 'red',
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
 
   // console.log("qDataTopAnnot", qDataTopAnnot);
@@ -247,10 +346,10 @@ const drawLocusAlignment = (response) => {
       reversescale: true,
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
   // graph scatter where R2 == NA
   const trace1R2NA = {
@@ -266,10 +365,10 @@ const drawLocusAlignment = (response) => {
       color: '#cccccc',
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
   // graph recombination rate line
   const trace2 = {
@@ -282,8 +381,8 @@ const drawLocusAlignment = (response) => {
     opacity: 0.35,
     line: {
       color: 'blue',
-      width: 1
-    }
+      width: 1,
+    },
   };
   // graph gene density where R2 != NA
   const trace3 = {
@@ -293,14 +392,13 @@ const drawLocusAlignment = (response) => {
     mode: 'markers',
     type: 'scatter',
     marker: {
-      symbol: "line-ns-open",
+      symbol: 'line-ns-open',
       size: 16,
       color: colorData,
       colorscale: 'Viridis',
-      reversescale: true
+      reversescale: true,
     },
-    yaxis: 'y'
-
+    yaxis: 'y',
   };
   // graph gene density where R2 == NA
   const trace3R2NA = {
@@ -310,27 +408,29 @@ const drawLocusAlignment = (response) => {
     mode: 'markers',
     type: 'scatter',
     marker: {
-      symbol: "line-ns-open",
+      symbol: 'line-ns-open',
       size: 16,
       color: '#cccccc',
     },
-    yaxis: 'y'
-
+    yaxis: 'y',
   };
   const pdata = [
-    topPvalMarker, 
-    LDRefHighlight, 
-    trace1, 
-    trace1R2NA, 
-    trace2, 
-    trace3, 
-    trace3R2NA
+    topPvalMarker,
+    LDRefHighlight,
+    trace1,
+    trace1R2NA,
+    trace2,
+    trace3,
+    trace3R2NA,
   ];
 
   const locus_alignment_plot_layout = {
     title: {
-      text: 'QTLs Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' Variants',
-      xref: 'paper'
+      text:
+        'QTLs Chromosome ' +
+        response.data['locus_alignment']['top'][0][0]['chr'] +
+        ' Variants',
+      xref: 'paper',
     },
     width: 1000,
     height: 780,
@@ -347,27 +447,29 @@ const drawLocusAlignment = (response) => {
       linewidth: 1,
       mirror: true,
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     yaxis2: {
       autorange: true,
       automargin: true,
       // overlaying: 'y3',
-      title: "QTLs -log10(<i>P</i>-value), " + response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+      title:
+        'QTLs -log10(<i>P</i>-value), ' +
+        response.data['locus_alignment']['top'][0][0]['gene_symbol'],
       domain: [0.05, 1],
       zeroline: false,
       linecolor: 'black',
       linewidth: 1,
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     yaxis3: {
       autorange: true,
@@ -375,31 +477,34 @@ const drawLocusAlignment = (response) => {
       overlaying: 'y2',
       title: 'QTLs Recombination Rate (cM/Mb)',
       titlefont: {
-        color: 'blue'
+        color: 'blue',
       },
       tickfont: {
-        color: 'blue'
+        color: 'blue',
       },
       side: 'right',
       showgrid: false,
       zeroline: false,
       linecolor: 'black',
-      linewidth: 1
+      linewidth: 1,
     },
     xaxis: {
       autorange: true,
-      title: "Chromosome " + response.data['locus_alignment']['top'][0][0]['chr'] + " (Mb)",
+      title:
+        'Chromosome ' +
+        response.data['locus_alignment']['top'][0][0]['chr'] +
+        ' (Mb)',
       // dtick: 0.1,
       zeroline: false,
       linecolor: 'black',
       linewidth: 1,
-      mirror: "allticks",
+      mirror: 'allticks',
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     images: [
       {
@@ -408,34 +513,40 @@ const drawLocusAlignment = (response) => {
         sizex: 1.0,
         sizey: 1.0,
         source: 'assets/images/qtls_locus_alignment_r2_legend_transparent.png',
-        xanchor: "left",
-        xref: "paper",
-        yanchor: "bottom",
-        yref: "paper"
-      }
+        xanchor: 'left',
+        xref: 'paper',
+        yanchor: 'bottom',
+        yref: 'paper',
+      },
     ],
     margin: {
       l: 40,
       r: 40,
       b: 80,
-      t: 120
+      t: 120,
     },
     showlegend: false,
     clickmode: 'event',
-    hovermode: 'closest'
+    hovermode: 'closest',
   };
-  
+
   return {
     pdata,
-    locus_alignment_plot_layout
-  }
-}
+    locus_alignment_plot_layout,
+  };
+};
 
 const drawLocusAlignmentGWAS = (response) => {
-  const geneDataR2 = getPopoverData(response.data['locus_alignment']['data'][0]);
-  const geneDataR2NA = getPopoverDataR2NA(response.data['locus_alignment']['data'][0]);
+  const geneDataR2 = getPopoverData(
+    response.data['locus_alignment']['data'][0]
+  );
+  const geneDataR2NA = getPopoverDataR2NA(
+    response.data['locus_alignment']['data'][0]
+  );
   const geneGWASDataR2 = getPopoverDataGWAS(response.data['gwas']['data'][0]);
-  const geneGWASDataR2NA = getPopoverDataGWASR2NA(response.data['gwas']['data'][0]);
+  const geneGWASDataR2NA = getPopoverDataGWASR2NA(
+    response.data['gwas']['data'][0]
+  );
 
   const xData = getXData(geneDataR2);
   const yData = getYData(geneDataR2);
@@ -451,30 +562,33 @@ const drawLocusAlignmentGWAS = (response) => {
   const hoverDataGWAS = getHoverDataGWAS(geneGWASDataR2);
   const hoverDataGWASR2NA = getHoverDataGWAS(geneGWASDataR2NA);
   const hoverDataRC = getHoverDataRC(response.data['locus_alignment']['rc'][0]);
-  const xLDRef = response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
-  const yLDRef = Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) * -1.0;
+  const xLDRef =
+    response.data['locus_alignment']['top'][0][0]['pos'] / 1000000.0;
+  const yLDRef =
+    Math.log10(response.data['locus_alignment']['top'][0][0]['pval_nominal']) *
+    -1.0;
   const yDataFinites = removeInfinities(yData);
   const topPvalY = Math.max.apply(null, yDataFinites);
   const topPvalIdx = yData.indexOf(topPvalY);
 
   // mark point with most significant P-value
   const topPvalMarker = {
-    x: [xData[topPvalIdx]], 
-    y: [topPvalY], 
-    hoverinfo: 'none', 
-    mode: 'markers', 
-    type: 'scatter', 
+    x: [xData[topPvalIdx]],
+    y: [topPvalY],
+    hoverinfo: 'none',
+    mode: 'markers',
+    type: 'scatter',
     marker: {
-      symbol: "diamond",
+      symbol: 'diamond',
       size: 15,
       opacity: 1.0,
-      color: "#ff66cc",
+      color: '#ff66cc',
       line: {
         color: '#ff66cc',
-        width: 2
+        width: 2,
       },
     },
-    yaxis: 'y3'
+    yaxis: 'y3',
   };
   // highlight top point
   const LDRefHighlight = {
@@ -485,22 +599,28 @@ const drawLocusAlignmentGWAS = (response) => {
     type: 'scatter',
     marker: {
       size: 15,
-      color: "red"
+      color: 'red',
     },
-    yaxis: 'y3'
+    yaxis: 'y3',
   };
   // highlight top point GWAS
   const LDRefHighlightGWAS = {
     x: [xLDRef],
-    y: [getYLDRefGWAS(xData, yGWASData, response.data['locus_alignment']['top'][0][0])],
+    y: [
+      getYLDRefGWAS(
+        xData,
+        yGWASData,
+        response.data['locus_alignment']['top'][0][0]
+      ),
+    ],
     hoverinfo: 'none',
     mode: 'markers',
     type: 'scatter',
     marker: {
       size: 15,
-      color: "red"
+      color: 'red',
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
   // graph GWAS scatter where R2 != NA
   const trace1 = {
@@ -517,10 +637,10 @@ const drawLocusAlignmentGWAS = (response) => {
       reversescale: true,
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
   // graph GWAS scatter where R2 == NA
   const trace1R2NA = {
@@ -535,10 +655,10 @@ const drawLocusAlignmentGWAS = (response) => {
       color: '#cccccc',
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
     },
-    yaxis: 'y2'
+    yaxis: 'y2',
   };
   // graph recombination rate line GWAS
   const trace2 = {
@@ -551,8 +671,8 @@ const drawLocusAlignmentGWAS = (response) => {
     opacity: 0.35,
     line: {
       color: 'blue',
-      width: 1
-    }
+      width: 1,
+    },
   };
   // graph scatter where R2 != NA
   const trace3 = {
@@ -569,10 +689,10 @@ const drawLocusAlignmentGWAS = (response) => {
       reversescale: true,
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
     },
-    yaxis: 'y3'
+    yaxis: 'y3',
   };
   // graph scatter where R2 == NA
   const trace3R2NA = {
@@ -587,10 +707,10 @@ const drawLocusAlignmentGWAS = (response) => {
       color: '#cccccc',
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
     },
-    yaxis: 'y3'
+    yaxis: 'y3',
   };
   // graph recombination rate line
   const trace4 = {
@@ -603,8 +723,8 @@ const drawLocusAlignmentGWAS = (response) => {
     opacity: 0.35,
     line: {
       color: 'blue',
-      width: 1
-    }
+      width: 1,
+    },
   };
   // graph gene density where R2 != NA
   const trace5 = {
@@ -614,13 +734,13 @@ const drawLocusAlignmentGWAS = (response) => {
     mode: 'markers',
     type: 'scatter',
     marker: {
-      symbol: "line-ns-open",
+      symbol: 'line-ns-open',
       size: 16,
       color: colorData,
       colorscale: 'Viridis',
-      reversescale: true
+      reversescale: true,
     },
-    yaxis: 'y'
+    yaxis: 'y',
   };
   // graph gene density where R2 == NA
   const trace5R2NA = {
@@ -630,30 +750,33 @@ const drawLocusAlignmentGWAS = (response) => {
     mode: 'markers',
     type: 'scatter',
     marker: {
-      symbol: "line-ns-open",
+      symbol: 'line-ns-open',
       size: 16,
       color: '#cccccc',
     },
-    yaxis: 'y'
+    yaxis: 'y',
   };
-  
+
   const pdata = [
     topPvalMarker,
-    LDRefHighlight, 
-    LDRefHighlightGWAS, 
-    trace1, 
+    LDRefHighlight,
+    LDRefHighlightGWAS,
+    trace1,
     trace1R2NA,
-    trace2, 
-    trace3, 
-    trace3R2NA, 
-    trace4, 
-    trace5, 
-    trace5R2NA
+    trace2,
+    trace3,
+    trace3R2NA,
+    trace4,
+    trace5,
+    trace5R2NA,
   ];
 
   const locus_alignment_plot_layout = {
     title: {
-      text: 'QTLs-GWAS Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' Variants',
+      text:
+        'QTLs-GWAS Chromosome ' +
+        response.data['locus_alignment']['top'][0][0]['chr'] +
+        ' Variants',
       xref: 'paper',
     },
     font: {
@@ -698,7 +821,9 @@ const drawLocusAlignmentGWAS = (response) => {
     yaxis3: {
       autorange: true,
       automargin: true,
-      title: 'QTLs -log10(<i>P</i>-value), ' + response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+      title:
+        'QTLs -log10(<i>P</i>-value), ' +
+        response.data['locus_alignment']['top'][0][0]['gene_symbol'],
       domain: [0.56, 1],
       zeroline: false,
       linecolor: 'black',
@@ -746,7 +871,10 @@ const drawLocusAlignmentGWAS = (response) => {
     },
     xaxis: {
       autorange: true,
-      title: 'Chromosome ' + response.data['locus_alignment']['top'][0][0]['chr'] + ' (Mb)',
+      title:
+        'Chromosome ' +
+        response.data['locus_alignment']['top'][0][0]['chr'] +
+        ' (Mb)',
       zeroline: false,
       linecolor: 'black',
       linewidth: 1,
@@ -784,9 +912,9 @@ const drawLocusAlignmentGWAS = (response) => {
 
   return {
     pdata,
-    locus_alignment_plot_layout
-  }
-}
+    locus_alignment_plot_layout,
+  };
+};
 
 export function uploadFile(params) {
   return async function (dispatch, getState) {
@@ -804,19 +932,47 @@ export function uploadFile(params) {
     form.append('LDFileName', params.LDFileName);
     const config = {
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }
+        'Content-Type': 'multipart/form-data',
+      },
+    };
 
     try {
       const res = await axios.post('api/file-upload', form, config);
       if (res.data.files && res.data.files.length > 0) {
-        dispatch(updateQTLsGWAS({
-            associationFile: res.data.body.associationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.associationFileName)[0].filename : false,
-            quantificationFile: res.data.body.quantificationFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.quantificationFileName)[0].filename : false,
-            genotypeFile: res.data.body.genotypeFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.genotypeFileName)[0].filename : false,
-            gwasFile: res.data.body.gwasFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.gwasFileName)[0].filename : false,
-            LDFile: res.data.body.LDFileName !== 'false' ? res.data.files.filter((item) => item.filename === res.data.body.LDFileName)[0].filename : false,
+        dispatch(
+          updateQTLsGWAS({
+            associationFile:
+              res.data.body.associationFileName !== 'false'
+                ? res.data.files.filter(
+                    (item) =>
+                      item.filename === res.data.body.associationFileName
+                  )[0].filename
+                : false,
+            quantificationFile:
+              res.data.body.quantificationFileName !== 'false'
+                ? res.data.files.filter(
+                    (item) =>
+                      item.filename === res.data.body.quantificationFileName
+                  )[0].filename
+                : false,
+            genotypeFile:
+              res.data.body.genotypeFileName !== 'false'
+                ? res.data.files.filter(
+                    (item) => item.filename === res.data.body.genotypeFileName
+                  )[0].filename
+                : false,
+            gwasFile:
+              res.data.body.gwasFileName !== 'false'
+                ? res.data.files.filter(
+                    (item) => item.filename === res.data.body.gwasFileName
+                  )[0].filename
+                : false,
+            LDFile:
+              res.data.body.LDFileName !== 'false'
+                ? res.data.files.filter(
+                    (item) => item.filename === res.data.body.LDFileName
+                  )[0].filename
+                : false,
           })
         );
       }
@@ -824,10 +980,12 @@ export function uploadFile(params) {
       console.log(error);
       if (error) {
         dispatch(updateError({ visible: true }));
-        dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' }));
+        dispatch(
+          updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' })
+        );
       }
     }
-  }
+  };
 }
 
 export function qtlsGWASCalculation(params) {
@@ -835,85 +993,134 @@ export function qtlsGWASCalculation(params) {
     // const qtlsGWASState = getState();
     // console.log('qtlsGWASState', qtlsGWASState);
 
-    dispatch(updateQTLsGWAS({
-          submitted: true,
-          isLoading: true,
-        })
+    dispatch(
+      updateQTLsGWAS({
+        submitted: true,
+        isLoading: true,
+      })
     );
 
     axios
       .post('api/qtls-calculate-main', params)
       .then(function (response) {
-        
         console.log('api/qtls-calculate-main response.data', response.data);
 
-        const {
-          pdata,
-          locus_alignment_plot_layout
-        } = Object.keys(response.data['gwas']['data'][0]).length > 0 ? drawLocusAlignmentGWAS(response) : drawLocusAlignment(response);
+        const { pdata, locus_alignment_plot_layout } =
+          Object.keys(response.data['gwas']['data'][0]).length > 0
+            ? drawLocusAlignmentGWAS(response)
+            : drawLocusAlignment(response);
 
-        dispatch(updateQTLsGWAS({
-              openSidebar: false,
-              select_qtls_samples: response.data['info']['select_qtls_samples'][0] === 'true' ? true : false,
-              select_gwas_sample: response.data['info']['select_gwas_sample'][0] === 'true' ? true : false,
-              select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
-              recalculateAttempt: response.data['info']['recalculateAttempt'][0] === 'true' ? true : false,
-              recalculatePop: response.data['info']['recalculatePop'][0] === 'true' ? true : false,
-              recalculateGene: response.data['info']['recalculateGene'][0] === 'true' ? true : false,
-              recalculateDist: response.data['info']['recalculateDist'][0]=== 'true' ? true : false,
-              recalculateRef: response.data['info']['recalculateRef'][0] === 'true' ? true : false,
-              top_gene_variants: {
-                data: response.data['info']['top_gene_variants']['data'][0]
-              },
-              all_gene_variants: {
-                data: response.data['info']['all_gene_variants']['data'][0]
-              },
-              gene_list: { 
-                data: response.data['info']['gene_list']['data'][0]
-              },
-              inputs: response.data['info']['inputs'],
-              messages: response.data['info']['messages'],
-              locus_quantification: {
-                data: response.data['locus_quantification']['data'][0],
-              },
-              locus_quantification_heatmap: {
-                data: response.data['locus_quantification_heatmap']['data'][0]
-              },
-              locus_alignment: {
-                data: pdata,
-                layout: locus_alignment_plot_layout,
-                top: response.data['locus_alignment']['top'][0][0],
-              },
-              locus_alignment_gwas_scatter: {
-                data: response.data['locus_alignment_gwas_scatter']['data'][0],
-                title: response.data['locus_alignment_gwas_scatter']['title'][0]
-              },
-              locus_colocalization_correlation: {
-                data: response.data['locus_colocalization_correlation']['data'][0]
-              },
-              gwas: {
-                data: response.data['gwas']['data'][0]
-              },
-              locus_table: {
-                data: response.data['locus_alignment']['data'][0],
-                globalFilter: '',
-                // pagination: {
-                //   pageIndex: 0,
-                //   pageSize: 0
-                // }
-              }
-            })
+        dispatch(
+          updateQTLsGWAS({
+            openSidebar: false,
+            select_qtls_samples:
+              response.data['info']['select_qtls_samples'][0] === 'true'
+                ? true
+                : false,
+            select_gwas_sample:
+              response.data['info']['select_gwas_sample'][0] === 'true'
+                ? true
+                : false,
+            select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
+            recalculateAttempt:
+              response.data['info']['recalculateAttempt'][0] === 'true'
+                ? true
+                : false,
+            recalculatePop:
+              response.data['info']['recalculatePop'][0] === 'true'
+                ? true
+                : false,
+            recalculateGene:
+              response.data['info']['recalculateGene'][0] === 'true'
+                ? true
+                : false,
+            recalculateDist:
+              response.data['info']['recalculateDist'][0] === 'true'
+                ? true
+                : false,
+            recalculateRef:
+              response.data['info']['recalculateRef'][0] === 'true'
+                ? true
+                : false,
+            top_gene_variants: {
+              data: response.data['info']['top_gene_variants']['data'][0],
+            },
+            all_gene_variants: {
+              data: response.data['info']['all_gene_variants']['data'][0],
+            },
+            gene_list: {
+              data: response.data['info']['gene_list']['data'][0],
+            },
+            inputs: response.data['info']['inputs'],
+            messages: response.data['info']['messages'],
+            locus_quantification: {
+              data: response.data['locus_quantification']['data'][0],
+            },
+            locus_quantification_heatmap: {
+              data: response.data['locus_quantification_heatmap']['data'][0],
+            },
+            locus_alignment: {
+              data: pdata,
+              layout: locus_alignment_plot_layout,
+              top: response.data['locus_alignment']['top'][0][0],
+            },
+            locus_alignment_gwas_scatter: {
+              data: response.data['locus_alignment_gwas_scatter']['data'][0],
+              title: response.data['locus_alignment_gwas_scatter']['title'][0],
+            },
+            locus_colocalization_correlation: {
+              data:
+                response.data['locus_colocalization_correlation']['data'][0],
+            },
+            gwas: {
+              data: response.data['gwas']['data'][0],
+            },
+            locus_table: {
+              data: response.data['locus_alignment']['data'][0],
+              globalFilter: '',
+              // pagination: {
+              //   pageIndex: 0,
+              //   pageSize: 0
+              // }
+            },
+          })
         );
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' }));
+          dispatch(
+            updateQTLsGWAS({
+              isError: true,
+              activeResultsTab: 'locus-alignment',
+            })
+          );
         }
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoading: false }));
       });
+  };
+}
+
+export function getPublicGTEx() {
+  return async function (dispatch, getState) {
+    try {
+      dispatch(updateQTLsGWAS({ loadingPublic: true }));
+      const { data } = await axios.post('api/getPublicGTEx');
+      dispatch(updateQTLsGWAS({ publicGTEx: data, loadingPublic: false }));
+    } catch (error) {
+      console.log(error);
+      if (error) {
+        dispatch(updateError({ visible: true }));
+        dispatch(
+          updateQTLsGWAS({
+            loadingPublic: false,
+            isError: true,
+          })
+        );
+      }
+    }
   };
 }
