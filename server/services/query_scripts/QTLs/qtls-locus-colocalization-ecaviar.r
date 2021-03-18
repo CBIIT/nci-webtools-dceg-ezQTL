@@ -6,15 +6,15 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- paste0('../static/assets/files/', 'MX2.GWAS.rs.txt')
   } else {
-    gwasFile <- paste0('input/', gwasFile)
+    gwasFile <- paste0('tmp/',request,'/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
     assocFile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
     LDFile <- paste0('../static/assets/files/', 'MX2.LD.gz')
   } else {
-    assocFile <- paste0('input/', assocFile)
-    if (!identical(LDFile, 'false') && !startsWith(LDFile, "input/")) {
-      LDFile <- paste0('input/', LDFile)
+    assocFile <- paste0('tmp/',request,'/', assocFile)
+    if (!identical(LDFile, 'false')) {
+      LDFile <- paste0('tmp/',request,'/', LDFile)
     }
   }
 

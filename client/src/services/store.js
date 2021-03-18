@@ -15,7 +15,7 @@ export const getInitialState = async () => {
       LDFile: null,
       request: '',
       select_pop: false,
-      select_gene: null,
+      select_gene: false,
       select_dist: 100,
       select_ref: false,
       recalculateAttempt: false,
@@ -25,6 +25,7 @@ export const getInitialState = async () => {
       recalculateRef: false,
       submitted: false,
       isLoading: false,
+      isError: false,
       activeResultsTab: 'locus-alignment',
       top_gene_variants: null,
       all_gene_variants: null,
@@ -33,7 +34,7 @@ export const getInitialState = async () => {
       messages: null,
       locus_quantification: null,
       locus_quantification_heatmap: null,
-      locus_alignment:{
+      locus_alignment: {
         data: null,
         layout: null,
         top : {
@@ -41,11 +42,18 @@ export const getInitialState = async () => {
           gene_symbol: null
         }
       },
-      // locus_alignment_plot_layout: null,
-      // locus_alignment_plot_data: null,
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
-      gwas: null
+      gwas: null,
+      locus_table: null
+      // locus_table: {
+      //   globalFilter: '',
+      //   data: [],
+      //   pagination: {
+      //     pageIndex: 0,
+      //     pageSize: 0
+      //   }
+      // }
     },
     errorModal: {
       visible: false,
