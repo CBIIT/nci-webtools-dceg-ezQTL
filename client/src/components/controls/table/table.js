@@ -4,7 +4,7 @@ import { Dropdown, Form, Row, Col, Button } from 'react-bootstrap';
 import {
   useTable,
   useGlobalFilter,
-  useFilters,
+  // useFilters,
   useAsyncDebounce,
   useSortBy,
   usePagination,
@@ -83,6 +83,7 @@ export default function Table({
   globalFilter: globalSearch,
   pagination,
   mergeState,
+  defaultSort
 }) {
   const defaultColumn = useMemo(
     () => ({
@@ -96,7 +97,7 @@ export default function Table({
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    setHiddenColumns,
+    // setHiddenColumns,
     setGlobalFilter,
     rows,
     page,
@@ -116,12 +117,13 @@ export default function Table({
       initialState: {
         hiddenColumns: hidden,
         globalFilter: globalSearch,
-        sortBy: [{ id: 'Year', desc: true }],
+        // sortBy: [{ id: 'R2', desc: true }],
+        sortBy: defaultSort,
         ...pagination,
       },
     },
     useGlobalFilter,
-    useFilters,
+    // useFilters,
     useSortBy,
     usePagination
   );
@@ -130,9 +132,6 @@ export default function Table({
     <div className="mb-5">
       <Row className="mb-2">
         <Col md="8">
-          <strong>{title}</strong>
-        </Col>
-        <Col md="3">
           {(globalSearch || globalSearch == '') && (
             <GlobalFilter
               globalFilter={globalFilter}
@@ -142,53 +141,8 @@ export default function Table({
             />
           )}
         </Col>
-        <Col md="1">
-          <Dropdown>
-            <Dropdown.Toggle
-              variant="secondary"
-              size="sm"
-              id={`${title.replace(/\s/g, '')}-controls`}
-              block
-            >
-              Columns
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Form>
-                {columns
-                  // ignore DOI and Github column
-                  .filter(({ id }) => id != 'DOI' && id != 'Github')
-                  .map(({ id, Header }) => {
-                    return (
-                      <Form.Group
-                        key={`${title.replace(/\s/g, '')}-${id}`}
-                        controlId={`${title.replace(
-                          /\s/g,
-                          ''
-                        )}-${id}-visibility`}
-                        className="my-1 px-2"
-                      >
-                        <Form.Check
-                          type="checkbox"
-                          label={Header}
-                          checked={hiddenColumns.indexOf(id) == -1}
-                          onChange={() =>
-                            setHiddenColumns((hiddenColumns) => {
-                              const index = hiddenColumns.indexOf(id);
-                              const newHidden =
-                                index > -1
-                                  ? hiddenColumns.filter((c) => c != id)
-                                  : [...hiddenColumns, id];
-                              mergeState({ hidden: newHidden });
-                              return newHidden;
-                            })
-                          }
-                        />
-                      </Form.Group>
-                    );
-                  })}
-              </Form>
-            </Dropdown.Menu>
-          </Dropdown>
+        <Col md="3">
+          Export
         </Col>
       </Row>
 

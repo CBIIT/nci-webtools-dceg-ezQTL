@@ -44,7 +44,16 @@ export const getInitialState = async () => {
       },
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
-      gwas: null
+      gwas: null,
+      locus_table: null
+      // locus_table: {
+      //   globalFilter: '',
+      //   data: [],
+      //   pagination: {
+      //     pageIndex: 0,
+      //     pageSize: 0
+      //   }
+      // }
     },
     errorModal: {
       visible: false,

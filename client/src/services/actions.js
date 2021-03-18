@@ -893,6 +893,14 @@ export function qtlsGWASCalculation(params) {
               },
               gwas: {
                 data: response.data['gwas']['data'][0]
+              },
+              locus_table: {
+                data: response.data['locus_alignment']['data'][0],
+                globalFilter: '',
+                // pagination: {
+                //   pageIndex: 0,
+                //   pageSize: 0
+                // }
               }
             })
         );
