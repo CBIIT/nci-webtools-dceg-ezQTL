@@ -13,6 +13,7 @@ export function ErrorModal(props) {
       data-testid="ErrorModal"
       show={errorModal.visible}
       onHide={closeErrorModal}
+      style={{zIndex: '999999'}}
     >
       <Modal.Header closeButton>
         <Modal.Title>Internal Server Error</Modal.Title>

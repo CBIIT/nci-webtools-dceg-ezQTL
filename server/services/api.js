@@ -15,8 +15,6 @@ const workingDirectory = path.resolve(config.R.workDir);
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        console.log("req", req);
-        console.log("req.body", req.body);
         const { request_id } = req.body;
         const uploadDir = path.resolve(tmpDir, request_id);
         if (!fs.existsSync(uploadDir)){
@@ -26,7 +24,6 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        // console.log('file', file);
         cb(null, file.originalname)
     }
 });
@@ -53,12 +50,19 @@ apiRouter.get('/ping', (request, response) => {
 });
 
 // file upload route
-apiRouter.post('/file-upload', upload.single('dataFile'), async (req, res) => {
-    // const dataFile = req.file.path;
-    // req.file is the name of your file in the form above, here 'uploaded_file'
-    // req.body will hold the text fields, if there were any 
-    console.log(req.file, req.body)
-    res.json({ msg: 'file uploaded' });
+apiRouter.post('/file-upload', upload.any(), async (req, res) => {
+    logger.info(`[${req.body.request_id}] Execute /file-upload`);
+    logger.debug(`[${req.body.request_id}] Parameters ${JSON.stringify(req.body, undefined, 4)}`);
+    try {
+        logger.info(`[${req.body.request_id}] Finished /file-upload`);
+        res.json({
+            files:req.files, 
+            body: req.body
+        });
+    } catch (err) {
+        logger.error(`[${req.body.request_id}] Error /file-upload ${err}`);
+        res.status(500).json(err);
+    }
 });
 
 // calculation routes

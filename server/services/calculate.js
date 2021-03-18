@@ -34,24 +34,24 @@ async function qtlsCalculateMain(params, res, next) {
             "qtlsCalculateMain",
             [
                 rfile,
-                workingDirectory,
+                workingDirectory.toString(),
                 select_qtls_samples.toString(),
                 select_gwas_sample.toString(),
-                associationFile,
-                quantificationFile,
-                genotypeFile,
-                gwasFile,
-                LDFile,
-                request,
+                associationFile.toString(),
+                quantificationFile.toString(),
+                genotypeFile.toString(),
+                gwasFile.toString(),
+                LDFile.toString(),
+                request.toString(),
                 select_pop.toString(),
-                select_gene,
-                select_dist,
+                select_gene.toString(),
+                select_dist.toString(),
                 select_ref.toString(),
-                recalculateAttempt,
-                recalculatePop,
-                recalculateGene,
-                recalculateDist,
-                recalculateRef
+                recalculateAttempt.toString(),
+                recalculatePop.toString(),
+                recalculateGene.toString(),
+                recalculateDist.toString(),
+                recalculateRef.toString()
             ]
         );
         logger.info(`[${request}] Finished /qtls-calculate-main`);

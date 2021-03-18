@@ -6,6 +6,8 @@ import { LocusAlignmentPlot } from './locus-alignment-plot';
 export function LocusAlignment() {
   const {
     submitted,
+    isError,
+    locus_alignment
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -14,11 +16,19 @@ export function LocusAlignment() {
         <LoadingOverlay
           active={true}
           content={
-            'Select data in the left panel and click Calculate to see results here.'
+            <>Select data in the left panel and click <b>Calculate</b> to see results here.</>
           }
         />
       )}
-      {submitted && (
+      {submitted && isError && (
+        <LoadingOverlay
+          active={true}
+          content={
+            <b className="text-danger">Please check input files. Reset form to try again.</b>
+          }
+        />
+      )}
+      {submitted && !isError && locus_alignment.data && (
         <>
           <p>
             Two{' '}
@@ -51,7 +61,7 @@ export function LocusAlignment() {
           <div className="text-center footnote">
             <p>
               <small>
-                Click on the SNP to show additional information and actions
+                <i>Click on the SNP to show additional information and actions</i>
               </small>
             </p>
           </div>
