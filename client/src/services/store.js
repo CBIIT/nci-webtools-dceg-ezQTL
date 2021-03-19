@@ -49,9 +49,9 @@ export const getInitialState = async () => {
       locus_table: null,
       hyprcoloc: null,
       hyprcolocSNPScore: null,
-      isLoadingHyprcoloc: true,
+      isLoadingHyprcoloc: false,
       ecaviar: null,
-      isLoadingECaviar: true
+      isLoadingECaviar: false
       // locus_table: {
       //   globalFilter: '',
       //   data: [],
