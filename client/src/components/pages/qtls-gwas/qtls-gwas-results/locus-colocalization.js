@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import ToggleButton from 'react-bootstrap/ToggleButton';
-import ButtonGroup from 'react-bootstrap/ButtonGroup'
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateQTLsGWAS } from '../../../../services/actions';
 
 export function LocusColocalization() {
-  const [radioValue, setRadioValue] = useState('hyprcoloc');
+  const dispatch = useDispatch();
+
+  const {
+    activeColocalizationTab
+  } = useSelector((state) => state.qtlsGWAS);
 
   const radios = [
     { name: 'HyPrColoc', value: 'hyprcoloc' },
@@ -21,8 +27,10 @@ export function LocusColocalization() {
               variant="primary"
               name="radio"
               value={radio.value}
-              checked={radioValue === radio.value}
-              onChange={(e) => setRadioValue(e.currentTarget.value)}
+              checked={activeColocalizationTab === radio.value}
+              onChange={(e) => 
+                dispatch(updateQTLsGWAS({ activeColocalizationTab: e.currentTarget.value }))
+              }
             >
               {radio.name}
             </ToggleButton>
@@ -30,7 +38,7 @@ export function LocusColocalization() {
         </ButtonGroup>
       </div>
       {
-        radioValue === 'hyprcoloc' && (
+        activeColocalizationTab === 'hyprcoloc' && (
           <>
             <p>
               Hypothesis Prioritization in multi-trait Colocalization (<a href="https://github.com/jrs95/hyprcoloc" target="_blank" rel="noreferrer">HyPrColoc</a>) analyses (Foley <i>et al</i>. 2019 bioRxiv 592238). 
@@ -62,7 +70,7 @@ export function LocusColocalization() {
         )
       }
       {
-        radioValue === 'ecaviar' && (
+        activeColocalizationTab === 'ecaviar' && (
           <>
             <p>
               eCAVIAR is a novel probabilistic model for integrating GWAS and eQTL data that extends the CAVIAR framework to 

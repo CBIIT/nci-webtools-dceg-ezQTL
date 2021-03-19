@@ -27,6 +27,7 @@ export const getInitialState = async () => {
       isLoading: false,
       isError: false,
       activeResultsTab: 'locus-alignment',
+      activeColocalizationTab: 'hyprcoloc',
       top_gene_variants: null,
       all_gene_variants: null,
       gene_list: null,
