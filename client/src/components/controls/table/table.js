@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import BTable from 'react-bootstrap/Table';
 import { Dropdown, Form, Row, Col, Button } from 'react-bootstrap';
 import {
@@ -7,7 +7,7 @@ import {
   // useFilters,
   useAsyncDebounce,
   useSortBy,
-  usePagination,
+  usePagination
 } from 'react-table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -15,6 +15,7 @@ import {
   faSortUp,
   faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
+import {CSVLink, CSVDownload} from 'react-csv';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);
@@ -85,6 +86,7 @@ export default function Table({
   mergeState,
   defaultSort
 }) {
+
   const defaultColumn = useMemo(
     () => ({
       Filter: DefaultColumnFilter,
@@ -128,9 +130,18 @@ export default function Table({
     usePagination
   );
 
+  const exportCSV = (inData) => {
+    const exportColumns = Object.keys(inData[0]);
+    let exportData = inData.map(el => Object.values(el));
+    exportData.unshift(exportColumns);
+    return (exportData);
+  };
+
+  const csvData = exportCSV(data);
+
   return (
     <div className="mb-5">
-      <Row className="mb-2">
+      <Row className="mb-2 justify-content-between">
         <Col md="8">
           {(globalSearch || globalSearch == '') && (
             <GlobalFilter
@@ -141,8 +152,13 @@ export default function Table({
             />
           )}
         </Col>
-        <Col md="3">
-          Export
+        <Col md="auto">
+          <CSVLink
+            data={csvData}
+            filename={'locus_variant_details_table.csv'}
+          >
+            Export
+          </CSVLink>
         </Col>
       </Row>
 
