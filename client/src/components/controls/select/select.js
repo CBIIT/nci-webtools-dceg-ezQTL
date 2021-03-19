@@ -25,7 +25,7 @@ export default function Select({
 
   return (
     <Group controlId={id} className={className}>
-      <Label>{label}</Label>
+      <Label className="mb-0">{label}</Label>
       <ReactSelect
         inputId={id}
         options={options}
