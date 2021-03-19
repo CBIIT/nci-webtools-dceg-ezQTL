@@ -11,7 +11,7 @@ export function LocusAlignment() {
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
-    <div className="px-3 py-2" style={{ minHeight: '500px' }}>
+    <div className="px-3 py-2" style={{ minHeight: '250px' }}>
       {!submitted && (
         <LoadingOverlay
           active={true}

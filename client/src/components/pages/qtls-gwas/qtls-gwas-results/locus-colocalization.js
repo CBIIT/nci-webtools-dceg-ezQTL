@@ -1,19 +1,213 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateQTLsGWAS } from '../../../../services/actions';
+import Table from '../../../controls/table/table';
+import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
 export function LocusColocalization() {
   const dispatch = useDispatch();
 
   const {
-    activeColocalizationTab
+    activeColocalizationTab,
+    hyprcoloc,
+    hyprcolocSNPScore,
+    isLoadingHyprcoloc,
+    ecaviar,
+    isLoadingECaviar
   } = useSelector((state) => state.qtlsGWAS);
 
   const radios = [
     { name: 'HyPrColoc', value: 'hyprcoloc' },
     { name: 'eCAVIAR', value: 'ecaviar' }
+  ];
+
+  const hyprcolocColumns = [
+    {
+      Header: 'Iterations',
+      accessor: 'iteration',
+      id: 'iteration'
+    },
+    {
+      Header: 'Traits',
+      accessor: 'traits',
+      id: 'traits'
+    },
+    {
+      Header: 'Posterior Probability',
+      accessor: 'posterior_prob',
+      id: 'posterior_prob'
+    },
+    {
+      Header: 'Regional Probability',
+      accessor: 'regional_prob',
+      id: 'regional_prob'
+    },
+    {
+      Header: 'Candidate SNP',
+      accessor: 'candidate_snp',
+      id: 'candidate_snp'
+    },
+    {
+      Header: 'Posterior Explained By SNP',
+      accessor: 'posterior_explained_by_snp',
+      id: 'posterior_explained_by_snp'
+    },
+    {
+      Header: 'Dropped Trait',
+      accessor: 'dropped_trait',
+      id: 'dropped_trait'
+    },
+    {
+      Header: 'Gene ID',
+      accessor: 'gene_id',
+      id: 'gene_id'
+    },
+    {
+      Header: 'Gene Symbol',
+      accessor: 'gene_symbol',
+      id: 'gene_symbol'
+    },
+  ];
+
+  const hyprcolocSNPScoreColumns = [
+    {
+      Header: 'RS Number',
+      accessor: 'rsnum',
+      id: 'rsnum'
+    },
+    {
+      Header: 'SNP Score',
+      accessor: 'snpscore',
+      id: 'snpscore'
+    },
+    {
+      Header: 'Gene ID',
+      accessor: 'gene_id',
+      id: 'gene_id'
+    },
+    {
+      Header: 'Gene Symbol',
+      accessor: 'gene_symbol',
+      id: 'gene_symbol'
+    }
+  ];
+
+  const ecaviarColumns = [
+    {
+      Header: 'Gene ID',
+      accessor: 'gene_id',
+      id: 'gene_id'
+    },
+    {
+      Header: 'Gene Symbol',
+      accessor: 'gene_symbol',
+      id: 'gene_symbol'
+    },
+    {
+      Header: 'RS Number',
+      accessor: 'rsnum',
+      id: 'rsnum'
+    },
+    {
+      Header: 'Chromosome',
+      accessor: 'chr',
+      id: 'chr'
+    },
+    {
+      Header: 'Position',
+      accessor: 'pos',
+      id: 'pos'
+    },
+    {
+      Header: 'Ref',
+      accessor: 'ref',
+      id: 'ref'
+    },
+    {
+      Header: 'Alt',
+      accessor: 'alt',
+      id: 'alt'
+    },
+    {
+      Header: 'TSS Distance',
+      accessor: 'tss_distance',
+      id: 'tss_distance'
+    },
+    {
+      Header: 'Nominal P-value',
+      accessor: 'pval_nominal',
+      id: 'pval_nominal',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
+    },
+    {
+      Header: 'slope',
+      accessor: 'slope',
+      id: 'slope'
+    },
+    {
+      Header: 'Slope SE',
+      accessor: 'slope_se',
+      id: 'slope_se'
+    },
+    {
+      Header: 'GWAS P-value',
+      accessor: 'gwas_pvalue',
+      id: 'gwas_pvalue',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
+    },
+    {
+      Header: 'GWAS Z',
+      accessor: 'gwas_z',
+      id: 'gwas_z'
+    },
+    {
+      Header: 'Lead SNP',
+      accessor: 'Leadsnp',
+      id: 'Leadsnp'
+    },
+    {
+      Header: 'Prob_in_pCausalSet',
+      accessor: 'Prob_in_pCausalSet',
+      id: 'Prob_in_pCausalSet'
+    },
+    {
+      Header: 'CLPP',
+      accessor: 'CLPP',
+      id: 'CLPP'
+    },
+    {
+      Header: 'Prob_in_pCausalSet2',
+      accessor: 'Prob_in_pCausalSet2',
+      id: 'Prob_in_pCausalSet2'
+    },
+    {
+      Header: 'CLPP2',
+      accessor: 'CLPP2',
+      id: 'CLPP2'
+    },
+    {
+      Header: 'Lead SNP Included',
+      accessor: 'leadsnp_included',
+      id: 'leadsnp_included'
+    }
   ];
 
   return (
@@ -55,16 +249,35 @@ export function LocusColocalization() {
               HyPrColoc analysis will be performed based on the user-defined cis-QTL Distance on the input file loading page. Only overlapping SNPs between GWAS and QTLs are used for colocalization analysis.
             </p>
 
-            <div style={{overflowX: 'auto'}}>
-              TABLE
+            <div>
+              <LoadingOverlay active={isLoadingHyprcoloc} content={null} />
+              <Table
+                title=""
+                columns={hyprcolocColumns}
+                data={[]}
+                hidden={[]}
+                globalFilter={''}
+                // pagination={locus_table.pagination}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcoloc: { ...hyprcoloc, ...state }}))}
+                defaultSort={[{ id: 'posterior_prob', desc: true }]}
+              />
             </div>
 
             <p>
               The second table outputs the SNP score of all variants for each pair of colocalized traits. For detailed information, please check the manual of <a href="https://github.com/jrs95/hyprcoloc" target="_blank" rel="noreferrer">HyPrColoc</a>.
             </p>      
-
-            <div style={{overflowX: 'auto'}}>
-              TABLE
+            <div>
+              <LoadingOverlay active={isLoadingHyprcoloc} content={null} />
+              <Table
+                title=""
+                columns={hyprcolocSNPScoreColumns}
+                data={[]}
+                hidden={[]}
+                globalFilter={''}
+                // pagination={locus_table.pagination}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcolocSNPScore: { ...hyprcolocSNPScore, ...state }}))}
+                defaultSort={[{ id: 'snpscore', desc: true }]}
+              />
             </div>
           </>
         )
@@ -88,8 +301,18 @@ export function LocusColocalization() {
               SNPs between GWAS and QTLs are used for colocalization analysis.
             </p>
 
-            <div style={{overflowX: 'auto'}}>
-              TABLE
+            <div>
+              <LoadingOverlay active={isLoadingECaviar} content={null} />
+              <Table
+                title=""
+                columns={ecaviarColumns}
+                data={[]}
+                hidden={[]}
+                globalFilter={''}
+                // pagination={locus_table.pagination}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ ecaviar: { ...ecaviar, ...state }}))}
+                defaultSort={[{ id: 'posterior_prob', desc: true }]}
+              />
             </div>
           </>
         )
