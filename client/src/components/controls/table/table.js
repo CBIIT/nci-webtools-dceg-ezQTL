@@ -137,7 +137,7 @@ export default function Table({
     return (exportData);
   };
 
-  const csvData = exportCSV(data);
+  const csvData = data && data.length > 0 ? exportCSV(data) : [];
 
   return (
     <div className="mb-5">
@@ -178,6 +178,7 @@ export default function Table({
                 <th
                   id={column.id.replace(/\s|\W/g, '')}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
+                  className="text-nowrap"
                 >
                   {column.render('Header')}
                   {column.canSort && (
@@ -210,6 +211,18 @@ export default function Table({
           ))}
         </thead>
         <tbody {...getTableBodyProps}>
+          {
+            !data || data.length === 0 && 
+            <tr>
+              {
+                columns.map(() => {
+                  return (
+                    <td style={{height: '200px'}}></td>
+                  )
+                })
+              }
+            </tr>
+          }
           {page.map((row, i) => {
             prepareRow(row);
             return (
