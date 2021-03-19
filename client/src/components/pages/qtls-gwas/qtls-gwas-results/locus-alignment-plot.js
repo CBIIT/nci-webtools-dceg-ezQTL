@@ -76,6 +76,8 @@ export function LocusAlignmentPlot(params) {
                   x: xOffset,
                   y: yOffset
                 });
+              } else {
+                updateTooltip({ visible: false });
               }
             }}
             onRelayout={relayout => {
