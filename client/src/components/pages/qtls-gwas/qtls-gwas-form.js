@@ -111,18 +111,16 @@ export function QTLsGWASForm() {
   }
   function getChromosomeOptions(data, genome, project) {
     const sortNum = (a, b) => parseInt(a, 10) - parseInt(b, 10);
-    return !noFilter
-      ? [
-          ...new Set(
-            data
-              .filter(
-                (row) =>
-                  row['Genome_build'] == genome && row['Project'] == project
-              )
-              .map((row) => row['Chromosome'])
-          ),
-        ].sort(sortNum)
-      : [...new Set(data.map((row) => row['Chromosome']))].sort(sortNum);
+
+    return [
+      ...new Set(
+        data
+          .filter(
+            (row) => row['Genome_build'] == genome && row['Project'] == project
+          )
+          .map((row) => row['Chromosome'])
+      ),
+    ].sort(sortNum);
   }
 
   function handleDataset(dataset) {
@@ -681,7 +679,9 @@ export function QTLsGWASForm() {
             <Col>
               <Form.Group>
                 <Select
-                  disabled={publicLoading || noFilter}
+                  disabled={
+                    publicLoading || (noFilter && dataset == 'cis-QTL dataset')
+                  }
                   id="genomeBuild"
                   label="Genome Build"
                   value={genome}
@@ -695,7 +695,9 @@ export function QTLsGWASForm() {
             <Col>
               <Form.Group>
                 <Select
-                  disabled={publicLoading || noFilter}
+                  disabled={
+                    publicLoading || (noFilter && dataset == 'cis-QTL dataset')
+                  }
                   id="project"
                   label="Project"
                   value={project}
@@ -706,20 +708,37 @@ export function QTLsGWASForm() {
             </Col>
           </Row>
           {dataset == 'cis-QTL dataset' ? (
-            <Row>
-              <Col>
-                <Form.Group>
-                  <Select
-                    disabled={publicLoading}
-                    id="tissue"
-                    label="Tissue"
-                    value={tissue}
-                    options={tissueOptions}
-                    onChange={handleTissue}
+            <>
+              <Row>
+                <Col>
+                  <Form.Group>
+                    <Select
+                      disabled={publicLoading}
+                      id="tissue"
+                      label="Tissue"
+                      value={tissue}
+                      options={tissueOptions}
+                      onChange={handleTissue}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <Form.Check
+                    id="noFilter"
+                    className="mb-3"
+                    label="All Tissues"
+                    type="checkbox"
+                    disabled={publicLoading || !Object.keys(publicGTEx).length}
+                    checked={noFilter == true}
+                    onChange={(_) => {
+                      setFilter(!noFilter);
+                    }}
                   />
-                </Form.Group>
-              </Col>
-            </Row>
+                </Col>
+              </Row>
+            </>
           ) : (
             <Row>
               <Col>
@@ -736,23 +755,6 @@ export function QTLsGWASForm() {
               </Col>
             </Row>
           )}
-          <Row>
-            <Col>
-              <Form.Check
-                id="noFilter"
-                className="mb-3"
-                label={`All ${
-                  dataset == 'cis-QTL dataset' ? 'Tissues' : 'Chromosomes'
-                }`}
-                type="checkbox"
-                disabled={publicLoading || !Object.keys(publicGTEx).length}
-                checked={noFilter == true}
-                onChange={(_) => {
-                  setFilter(!noFilter);
-                }}
-              />
-            </Col>
-          </Row>
         </div>
       )}
       <div className="row">
