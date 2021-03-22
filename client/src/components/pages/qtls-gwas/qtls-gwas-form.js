@@ -32,7 +32,8 @@ export function QTLsGWASForm() {
   const [qtlPublic, setQtlSource] = useState(false);
   const [gwasPublic, setGwasSource] = useState(false);
   const [ldPublic, setLdSource] = useState(false);
-  const [noFilter, setFilter] = useState(false);
+  const [allTissues, viewAllTissues] = useState(false);
+  const [allPhenotypes, viewAllPhenotypes] = useState(false);
 
   const {
     select_qtls_samples,
@@ -69,8 +70,8 @@ export function QTLsGWASForm() {
     xQtlOptions,
     tissue,
     tissueOptions,
-    chromosome,
-    chromosomeOptions,
+    phenotype,
+    phenotypeOptions,
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
@@ -91,7 +92,12 @@ export function QTLsGWASForm() {
   useEffect(() => {
     if (Object.keys(publicGTEx).length && genome) populatePublicParameters();
   }, [genome]);
-  useEffect(() => handleQtlProject(), [noFilter]);
+  useEffect(() => {
+    if (publicGTEx.length) handleQtlProject(qtlProject);
+  }, [allTissues]);
+  useEffect(() => {
+    if (publicGTEx.length) handleLdProject(ldProject);
+  }, [allPhenotypes]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -126,7 +132,7 @@ export function QTLsGWASForm() {
   }
 
   function getTissueOptions(data, project, xQtl) {
-    return !noFilter
+    return !allTissues
       ? [
           ...new Set(
             data
@@ -138,7 +144,35 @@ export function QTLsGWASForm() {
               .map((row) => row['Tissue'])
           ),
         ]
-      : [...new Set(data.map((row) => row['Tissue']))];
+      : [
+          ...new Set(
+            data
+              .filter((row) => row['Genome_build'] == genome)
+              .map((row) => row['Tissue'])
+          ),
+        ];
+  }
+
+  function getPhenotypeOptions(data, project) {
+    return !allPhenotypes
+      ? [
+          ...new Set(
+            data
+              .filter(
+                (row) =>
+                  row['Genome_build'] == genome && row['Project'] == project
+                // && row['xQTL'] == xQtl
+              )
+              .map((row) => row['Phenotype'])
+          ),
+        ]
+      : [
+          ...new Set(
+            data
+              .filter((row) => row['Genome_build'] == genome)
+              .map((row) => row['Phenotype'])
+          ),
+        ];
   }
 
   function populatePublicParameters() {
@@ -146,7 +180,7 @@ export function QTLsGWASForm() {
     const ldData = publicGTEx['LD dataset'];
 
     const qtlProjectOptions = getProjectOptions(qtlData);
-    const xQtlOptions = getXqtlOptions(qtlData, qtlProjectOptions[0]) || [];
+    const xQtlOptions = ['']; //getXqtlOptions(qtlData, qtlProjectOptions[0]);
     const tissueOptions = getTissueOptions(
       qtlData,
       qtlProjectOptions[0],
@@ -173,12 +207,12 @@ export function QTLsGWASForm() {
 
   function handleQtlProject(project) {
     const data = publicGTEx['cis-QTL dataset'];
-    const xQtlOptions = getXqtlOptions(data, project);
+    const xQtlOptions = ['']; //getXqtlOptions(data, project);
     const tissueOptions = getTissueOptions(data, project, xQtlOptions[0]);
     // console.log(tissueOptions);
     dispatch(
       updateQTLsGWAS({
-        project: project,
+        qtlProject: project,
         tissue: tissueOptions[0],
         tissueOptions: tissueOptions,
       })
@@ -186,13 +220,20 @@ export function QTLsGWASForm() {
   }
 
   function handleGwasProject(project) {
-    const data = publicGTEx['GWAS dataset'];
-
-    dispatch(updateQTLsGWAS({ project: project }));
+    dispatch(updateQTLsGWAS({ gwasProject: project }));
   }
 
   function handleLdProject(project) {
-    dispatch(updateQTLsGWAS({ project: project }));
+    const data = publicGTEx['LD dataset'];
+    const phenotypeOptions = getPhenotypeOptions(data, project);
+
+    dispatch(
+      updateQTLsGWAS({
+        gwasProject: project,
+        phenotype: phenotypeOptions[0],
+        phenotypeOptions: phenotypeOptions,
+      })
+    );
   }
 
   function handleXqtl(xQtl) {
@@ -203,6 +244,10 @@ export function QTLsGWASForm() {
 
   function handleTissue(tissue) {
     dispatch(updateQTLsGWAS({ tissue: tissue }));
+  }
+
+  function handlePhenotype(phenotype) {
+    dispatch(updateQTLsGWAS({ phenotype: phenotype }));
   }
 
   const handleReset = () => {
@@ -348,7 +393,7 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading || noFilter}
+                        disabled={publicLoading || allTissues}
                         id="genomeBuild"
                         label="Genome Build"
                         value={genome}
@@ -364,7 +409,7 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading || noFilter}
+                        disabled={publicLoading || allTissues}
                         id="project"
                         label="Project"
                         value={qtlProject}
@@ -378,7 +423,7 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading || noFilter}
+                        disabled={publicLoading || allTissues}
                         id="qtlType"
                         label="QTL Type"
                         value={xQtl}
@@ -405,16 +450,16 @@ export function QTLsGWASForm() {
                 <Row>
                   <Col>
                     <Form.Check
-                      id="noFilter"
+                      id="allTissues"
                       className="mb-3"
                       label="All Tissues"
                       type="checkbox"
                       disabled={
                         publicLoading || !Object.keys(publicGTEx).length
                       }
-                      checked={noFilter == true}
+                      checked={allTissues}
                       onChange={(_) => {
-                        setFilter(!noFilter);
+                        viewAllTissues(!allTissues);
                       }}
                     />
                   </Col>
@@ -559,14 +604,45 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading}
-                        id="ldProject"
+                        disabled={publicLoading || allPhenotypes}
+                        id="gwasProject"
                         label="Project"
-                        value={ldProject}
-                        options={ldProjectOptions}
-                        onChange={handleLdProject}
+                        value={gwasProject}
+                        options={gwasProjectOptions}
+                        onChange={handleGwasProject}
                       />
                     </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Form.Group>
+                      <Select
+                        disabled={publicLoading}
+                        id="gwasPhenotype"
+                        label="Phenotype"
+                        value={phenotype}
+                        options={phenotypeOptions}
+                        onChange={handlePhenotype}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Form.Check
+                      id="allPhenotypes"
+                      className="mb-3"
+                      label="All Phenotypes"
+                      type="checkbox"
+                      disabled={
+                        publicLoading || !Object.keys(publicGTEx).length
+                      }
+                      checked={allPhenotypes}
+                      onChange={(_) => {
+                        viewAllPhenotypes(!allPhenotypes);
+                      }}
+                    />
                   </Col>
                 </Row>
               </div>
@@ -602,7 +678,7 @@ export function QTLsGWASForm() {
         <Row>
           <div className="w-100 border border-top mx-3 my-2"></div>
           <div className="col-sm-6">
-            <b>GWAS Data File</b>
+            <b>GWAS Data</b>
           </div>
           <div className="col-sm-6">
             {!select_gwas_sample ? (
@@ -646,7 +722,7 @@ export function QTLsGWASForm() {
           <div className="w-100 border border-top mx-3 my-2"></div>
           <Form.Group className="col-sm-12">
             <div className="d-flex">
-              <Form.Label className="mb-0 mr-auto">GWAS Data File</Form.Label>
+              <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
               <Form.Check
                 inline
                 id="gwasSource"
@@ -656,31 +732,50 @@ export function QTLsGWASForm() {
                 onChange={(_) => setGwasSource(!gwasPublic)}
               />
             </div>
-            <Form.File
-              id="qtls-gwas-file"
-              disabled={submitted || select_gwas_sample}
-              key={_gwasFile}
-              label={
-                _gwasFile
-                  ? _gwasFile.name || _gwasFile.filename || _gwasFile
-                  : select_gwas_sample
-                  ? 'MX2.GWAS.rs.txt'
-                  : 'Choose File'
-              }
-              onChange={(e) => {
-                _setGwasFile(e.target.files[0]);
-              }}
-              // accept=".tsv, .txt"
-              // isInvalid={checkValid ? !validFile : false}
-              // feedback="Please upload a data file"
-              // onChange={(e) => {
-              //     setInput(e.target.files[0]);
-              //     mergeVisualize({
-              //     storeFilename: e.target.files[0].name,
-              //     });
-              // }}
-              custom
-            />
+            {gwasPublic ? (
+              <div className="mt-2">
+                <Row>
+                  <Col>
+                    <Form.Group>
+                      <Select
+                        disabled={publicLoading}
+                        id="ldProject"
+                        label="Project"
+                        value={ldProject}
+                        options={ldProjectOptions}
+                        onChange={handleLdProject}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </div>
+            ) : (
+              <Form.File
+                id="qtls-gwas-file"
+                disabled={submitted || select_gwas_sample}
+                key={_gwasFile}
+                label={
+                  _gwasFile
+                    ? _gwasFile.name || _gwasFile.filename || _gwasFile
+                    : select_gwas_sample
+                    ? 'MX2.GWAS.rs.txt'
+                    : 'Choose File'
+                }
+                onChange={(e) => {
+                  _setGwasFile(e.target.files[0]);
+                }}
+                // accept=".tsv, .txt"
+                // isInvalid={checkValid ? !validFile : false}
+                // feedback="Please upload a data file"
+                // onChange={(e) => {
+                //     setInput(e.target.files[0]);
+                //     mergeVisualize({
+                //     storeFilename: e.target.files[0].name,
+                //     });
+                // }}
+                custom
+              />
+            )}
           </Form.Group>
         </Row>
         <Row>

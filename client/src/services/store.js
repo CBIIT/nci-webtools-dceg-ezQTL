@@ -68,6 +68,8 @@ export const getInitialState = async () => {
       xQtlOptions: [],
       tissue: '',
       tissueOptions: [],
+      phenotype: '',
+      phenotypeOptions: [],
     },
     errorModal: {
       visible: false,
