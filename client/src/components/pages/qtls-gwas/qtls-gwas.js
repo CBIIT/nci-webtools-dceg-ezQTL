@@ -32,16 +32,16 @@ export function QTLsGWAS() {
         }
       >
         <SidebarPanel className="col-lg-3">
-          <div className="border border-secondary rounded">
+          <div className="border rounded">
             <QTLsGWASForm />
           </div>
         </SidebarPanel>
 
         <MainPanel className="col-lg-9">
-          <div className="border border-secondary rounded mb-3">
+          <div className="border rounded mb-3">
             <QTLsGWASResultsForm />
           </div>
-          <div className="border border-secondary rounded">
+          <div className="border rounded">
             <QTLsGWASResults />
           </div>
         </MainPanel>
