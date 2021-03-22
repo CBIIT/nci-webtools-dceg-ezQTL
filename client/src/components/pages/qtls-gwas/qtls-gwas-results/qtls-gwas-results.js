@@ -52,6 +52,7 @@ export function QTLsGWASResults() {
     <>
       <LoadingOverlay active={isLoading} />
       <Tabs
+        // variant="pills"
         id="controlled-tab-example"
         activeKey={activeResultsTab}
         onSelect={(k) => {
@@ -62,7 +63,8 @@ export function QTLsGWASResults() {
           <Tab key={item.key} 
             eventKey={item.key} 
             title={item.title} 
-            disabled={item.disabled}>
+            disabled={item.disabled}
+            tabClassName={"border-top-0 rounded-0 " + (idx === 0 ? 'border-left-0' : '')}>
             {item.component}
           </Tab>
         ))}
