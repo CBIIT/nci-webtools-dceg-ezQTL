@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 // import { actions } from '../../../../services/store';
 import { updateQTLsGWAS } from '../../../../services/actions';
 import { Tabs, Tab, Form, Button } from 'react-bootstrap';
+import { LocusQC } from './locus-qc';
+import { LocusLD } from './locus-ld';
 import { LocusAlignment } from './locus-alignment';
 import { LocusColocalization } from './locus-colocalization';
 import { LocusQuantifiation } from './locus-quantification';
@@ -22,6 +24,18 @@ export function QTLsGWASResults() {
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
+    {
+      component: <LocusQC />,
+      key: 'locus-qc',
+      title: 'Locus QC',
+      disabled: !submitted || isError
+    },
+    {
+      component: <LocusLD />,
+      key: 'locus-ld',
+      title: 'Locus LD',
+      disabled: !submitted || isError
+    },
     {
       component: <LocusAlignment />,
       key: 'locus-alignment',
