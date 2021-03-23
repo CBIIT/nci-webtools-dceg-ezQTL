@@ -235,6 +235,7 @@ const drawLocusAlignment = (response) => {
   const trace1 = {
     x: xData,
     y: yData,
+    customdata: geneDataR2,
     text: hoverData,
     hoverinfo: 'text',
     mode: 'markers',
@@ -506,6 +507,7 @@ const drawLocusAlignmentGWAS = (response) => {
   const trace1 = {
     x: xData,
     y: yGWASData,
+    customdata: geneGWASDataR2,
     text: hoverDataGWAS,
     hoverinfo: 'text',
     mode: 'markers',
@@ -558,6 +560,7 @@ const drawLocusAlignmentGWAS = (response) => {
   const trace3 = {
     x: xData,
     y: yData,
+    customdata: geneDataR2,
     text: hoverData,
     hoverinfo: 'text',
     mode: 'markers',
@@ -824,7 +827,7 @@ export function uploadFile(params) {
       console.log(error);
       if (error) {
         dispatch(updateError({ visible: true }));
-        dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' }));
+        dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
       }
     }
   }
@@ -853,6 +856,7 @@ export function qtlsGWASCalculation(params) {
         } = Object.keys(response.data['gwas']['data'][0]).length > 0 ? drawLocusAlignmentGWAS(response) : drawLocusAlignment(response);
 
         dispatch(updateQTLsGWAS({
+              request: response.data['info']['inputs']['request'][0],
               openSidebar: false,
               select_qtls_samples: response.data['info']['select_qtls_samples'][0] === 'true' ? true : false,
               select_gwas_sample: response.data['info']['select_gwas_sample'][0] === 'true' ? true : false,
@@ -909,11 +913,151 @@ export function qtlsGWASCalculation(params) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-alignment' }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
         }
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoading: false }));
+      });
+  };
+}
+
+const getBoxplotsYData = (boxplotData) => {
+  let a0a0 = [];
+  let a0a1 = [];
+  let a1a1 = [];
+  for (var i = 0; i < boxplotData.length; i++) {
+    if (boxplotData[i]['Genotype'] === "0/0") {
+      a0a0.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
+    } 
+    if (boxplotData[i]['Genotype'] === "0/1") {
+      a0a1.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
+    } 
+    if (boxplotData[i]['Genotype'] === "1/1") {
+      a1a1.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
+    } 
+}
+  var yData = [a0a0, a0a1, a1a1];
+  return yData;
+}
+
+const drawLocusAlignmentBoxplots = (params, response) => {
+  const locus_alignment_boxplots_plot_layout = {
+    font: {
+      color: 'black'
+    },
+    width: 660,
+    height: 600,
+    xaxis: {
+      title: params.info['rsnum'] + " genotype: " + params.info['ref'] + "->" + params.info['alt'],
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    yaxis: {
+      title: params.info['gene_symbol'] + " Quantification (log2)",
+      autorange: true,
+      showgrid: true,
+      zeroline: true,
+      dtick: 4,
+      gridwidth: 1,
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    margin: {
+      l: 40,
+      r: 10,
+      b: 80,
+      t: 40
+    },
+    showlegend: true,
+    legend: { "orientation": "h" }
+  };
+
+  let pdata = [];
+
+  const xData = ["0/0", "0/1", "1/1"];
+  const yData = getBoxplotsYData(response.data['locus_alignment_boxplots']['data'][0]);
+
+  for ( var i = 0; i < xData.length; i++ ) {
+    const result = {
+      type: 'box',
+      y: yData[i],
+      name: xData[i],
+      boxpoints: 'all',
+      jitter: 0.5,
+      pointpos: 0,
+      whiskerwidth: 0.2,
+      fillcolor: 'cls',
+      marker: {
+        size: 4
+      },
+      line: {
+        width: 1
+      }
+    };
+    pdata.push(result);
+  }
+
+  return {
+    pdata,
+    locus_alignment_boxplots_plot_layout
+  }
+}
+
+export function qtlsGWASBoxplotsCalculation(params) {
+  return async function (dispatch, getState) {
+    // const qtlsGWASState = getState();
+
+    dispatch(updateQTLsGWAS({
+          locus_alignment_boxplots: {
+            isLoading: true,
+            visible: true,
+            data: null,
+            layout: null
+          }
+        })
+    );
+
+    axios
+      .post('api/qtls-locus-alignment-boxplots', params)
+      .then(function (response) {
+        
+        console.log('api/qtls-locus-alignment-boxplots response.data', response.data);
+
+        const {
+          pdata,
+          locus_alignment_boxplots_plot_layout
+        } = drawLocusAlignmentBoxplots(params, response);
+
+        dispatch(updateQTLsGWAS({
+              locus_alignment_boxplots: {
+                ...getState().qtlsGWAS.locus_alignment_boxplots,
+                data: pdata,
+                layout: locus_alignment_boxplots_plot_layout
+              }
+            })
+        );
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+        }
+      })
+      .then(function () {
+        dispatch(updateQTLsGWAS({ locus_alignment_boxplots: {
+          ...getState().qtlsGWAS.locus_alignment_boxplots,
+          isLoading: false
+        }}));
       });
   };
 }
