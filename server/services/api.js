@@ -3,7 +3,10 @@ const compression = require('compression');
 const config = require('../config');
 const logger = require('./logger');
 const path = require('path');
-const { qtlsCalculateMain } = require('./calculate');
+const { 
+    qtlsCalculateMain,
+    qtlsCalculateLocusAlignmentBoxplots
+} = require('./calculate');
 const apiRouter = express.Router();
 const multer  = require('multer');
 const fs = require('fs');
@@ -67,5 +70,7 @@ apiRouter.post('/file-upload', upload.any(), async (req, res) => {
 
 // calculation routes
 apiRouter.post('/qtls-calculate-main', (req, res, next) => qtlsCalculateMain({...req.body, workingDirectory}, res, next));
+
+apiRouter.post('/qtls-locus-alignment-boxplots', (req, res, next) => qtlsCalculateLocusAlignmentBoxplots({...req.body, workingDirectory}, res, next))
 
 module.exports = { apiRouter };
