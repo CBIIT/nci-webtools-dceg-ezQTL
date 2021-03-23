@@ -32,8 +32,8 @@ export function QTLsGWASForm() {
   const [qtlPublic, setQtlSource] = useState(false);
   const [gwasPublic, setGwasSource] = useState(false);
   const [ldPublic, setLdSource] = useState(false);
-  const [allTissues, viewAllTissues] = useState(false);
-  const [allPhenotypes, viewAllPhenotypes] = useState(false);
+  const [tissueOnly, viewTissueOnly] = useState(false);
+  const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
 
   const {
     select_qtls_samples,
@@ -94,10 +94,10 @@ export function QTLsGWASForm() {
   }, [genome]);
   useEffect(() => {
     if (publicGTEx.length) handleQtlProject(qtlProject);
-  }, [allTissues]);
+  }, [tissueOnly]);
   useEffect(() => {
     if (publicGTEx.length) handleLdProject(ldProject);
-  }, [allPhenotypes]);
+  }, [phenotypeOnly]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -132,7 +132,7 @@ export function QTLsGWASForm() {
   }
 
   function getTissueOptions(data, project, xQtl) {
-    return !allTissues
+    return !tissueOnly
       ? [
           ...new Set(
             data
@@ -154,7 +154,7 @@ export function QTLsGWASForm() {
   }
 
   function getPhenotypeOptions(data, project) {
-    return !allPhenotypes
+    return !phenotypeOnly
       ? [
           ...new Set(
             data
@@ -324,6 +324,22 @@ export function QTLsGWASForm() {
     <Form className="py-1 px-2">
       <div>
         <Row>
+          <Col>
+            <Form.Group>
+              <Select
+                disabled={!genomeOptions.length}
+                id="genomeBuild"
+                label="Genome Build"
+                value={genome}
+                options={genomeOptions}
+                onChange={(genome) =>
+                  dispatch(updateQTLsGWAS({ genome: genome }))
+                }
+              />
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
           <div className="col-sm-6">
             <b>QTLs Data Files</b>
           </div>
@@ -391,48 +407,52 @@ export function QTLsGWASForm() {
               <div className="mt-2">
                 <Row>
                   <Col>
-                    <Form.Group>
-                      <Select
-                        disabled={publicLoading || allTissues}
-                        id="genomeBuild"
-                        label="Genome Build"
-                        value={genome}
-                        options={genomeOptions}
-                        onChange={(genome) =>
-                          dispatch(updateQTLsGWAS({ genome: genome }))
-                        }
-                      />
-                    </Form.Group>
+                    <Form.Check
+                      id="tissueOnly"
+                      label="Tissue Only"
+                      type="checkbox"
+                      disabled={
+                        publicLoading || !Object.keys(publicGTEx).length
+                      }
+                      checked={tissueOnly}
+                      onChange={(_) => {
+                        viewTissueOnly(!tissueOnly);
+                      }}
+                    />
                   </Col>
                 </Row>
-                <Row>
-                  <Col>
-                    <Form.Group>
-                      <Select
-                        disabled={publicLoading || allTissues}
-                        id="project"
-                        label="Project"
-                        value={qtlProject}
-                        options={qtlProjectOptions}
-                        onChange={handleQtlProject}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Form.Group>
-                      <Select
-                        disabled={publicLoading || allTissues}
-                        id="qtlType"
-                        label="QTL Type"
-                        value={xQtl}
-                        options={xQtlOptions}
-                        onChange={handleXqtl}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
+                {!tissueOnly && (
+                  <>
+                    <Row>
+                      <Col>
+                        <Form.Group>
+                          <Select
+                            disabled={publicLoading || tissueOnly}
+                            id="project"
+                            label="Project"
+                            value={qtlProject}
+                            options={qtlProjectOptions}
+                            onChange={handleQtlProject}
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <Form.Group>
+                          <Select
+                            disabled={publicLoading || tissueOnly}
+                            id="qtlType"
+                            label="QTL Type"
+                            value={xQtl}
+                            options={xQtlOptions}
+                            onChange={handleXqtl}
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </>
+                )}
                 <Row>
                   <Col>
                     <Form.Group>
@@ -445,23 +465,6 @@ export function QTLsGWASForm() {
                         onChange={handleTissue}
                       />
                     </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Form.Check
-                      id="allTissues"
-                      className="mb-3"
-                      label="All Tissues"
-                      type="checkbox"
-                      disabled={
-                        publicLoading || !Object.keys(publicGTEx).length
-                      }
-                      checked={allTissues}
-                      onChange={(_) => {
-                        viewAllTissues(!allTissues);
-                      }}
-                    />
                   </Col>
                 </Row>
               </div>
@@ -604,45 +607,14 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading || allPhenotypes}
-                        id="gwasProject"
-                        label="Project"
-                        value={gwasProject}
-                        options={gwasProjectOptions}
-                        onChange={handleGwasProject}
-                      />
-                    </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Form.Group>
-                      <Select
                         disabled={publicLoading}
-                        id="gwasPhenotype"
-                        label="Phenotype"
-                        value={phenotype}
-                        options={phenotypeOptions}
-                        onChange={handlePhenotype}
+                        id="ldProject"
+                        label="Project"
+                        value={ldProject}
+                        options={ldProjectOptions}
+                        onChange={handleLdProject}
                       />
                     </Form.Group>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col>
-                    <Form.Check
-                      id="allPhenotypes"
-                      className="mb-3"
-                      label="All Phenotypes"
-                      type="checkbox"
-                      disabled={
-                        publicLoading || !Object.keys(publicGTEx).length
-                      }
-                      checked={allPhenotypes}
-                      onChange={(_) => {
-                        viewAllPhenotypes(!allPhenotypes);
-                      }}
-                    />
                   </Col>
                 </Row>
               </div>
@@ -736,14 +708,47 @@ export function QTLsGWASForm() {
               <div className="mt-2">
                 <Row>
                   <Col>
+                    <Form.Check
+                      id="phenotypeOnly"
+                      label="Phenotype Only"
+                      type="checkbox"
+                      disabled={
+                        publicLoading || !Object.keys(publicGTEx).length
+                      }
+                      checked={phenotypeOnly}
+                      onChange={(_) => {
+                        viewPhenotypeOnly(!phenotypeOnly);
+                      }}
+                    />
+                  </Col>
+                </Row>
+                {!phenotypeOnly && (
+                  <Row>
+                    <Col>
+                      <Form.Group>
+                        <Select
+                          disabled={publicLoading || phenotypeOnly}
+                          id="gwasProject"
+                          label="Project"
+                          value={gwasProject}
+                          options={gwasProjectOptions}
+                          onChange={handleGwasProject}
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                )}
+
+                <Row>
+                  <Col>
                     <Form.Group>
                       <Select
                         disabled={publicLoading}
-                        id="ldProject"
-                        label="Project"
-                        value={ldProject}
-                        options={ldProjectOptions}
-                        onChange={handleLdProject}
+                        id="gwasPhenotype"
+                        label="Phenotype"
+                        value={phenotype}
+                        options={phenotypeOptions}
+                        onChange={handlePhenotype}
                       />
                     </Form.Group>
                   </Col>
@@ -870,10 +875,7 @@ export function QTLsGWASForm() {
               select_dist > 200 ||
               (select_ref &&
                 select_ref.length > 0 &&
-                !/^rs\d+$/.test(select_ref)) ||
-              ldPublic ||
-              gwasPublic ||
-              qtlPublic
+                !/^rs\d+$/.test(select_ref))
             }
           >
             Calculate
