@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+// import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { LocusAlignmentPlot } from './locus-alignment-plot';
 
 export function LocusAlignment() {
@@ -12,7 +12,7 @@ export function LocusAlignment() {
 
   return (
     <div className="px-3 py-2" style={{ minHeight: '250px' }}>
-      {!submitted && (
+      {/* {!submitted && (
         <LoadingOverlay
           active={true}
           content={
@@ -27,7 +27,7 @@ export function LocusAlignment() {
             <b className="text-danger">Please check input files. Reset form to try again.</b>
           }
         />
-      )}
+      )} */}
       {submitted && !isError && locus_alignment.data && (
         <>
           <p>
