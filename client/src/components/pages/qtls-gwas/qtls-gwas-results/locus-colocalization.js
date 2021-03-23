@@ -260,6 +260,7 @@ export function LocusColocalization() {
                 // pagination={locus_table.pagination}
                 mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcoloc: { ...hyprcoloc, ...state }}))}
                 defaultSort={[{ id: 'posterior_prob', desc: true }]}
+                exportFilename={'hyprcoloc_table.csv'}
               />
             </div>
 
@@ -277,6 +278,7 @@ export function LocusColocalization() {
                 // pagination={locus_table.pagination}
                 mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcolocSNPScore: { ...hyprcolocSNPScore, ...state }}))}
                 defaultSort={[{ id: 'snpscore', desc: true }]}
+                exportFilename={'hyprcoloc_snpscores_table.csv'}
               />
             </div>
           </>
@@ -312,6 +314,7 @@ export function LocusColocalization() {
                 // pagination={locus_table.pagination}
                 mergeState={(state) => dispatch(updateQTLsGWAS({ ecaviar: { ...ecaviar, ...state }}))}
                 defaultSort={[{ id: 'posterior_prob', desc: true }]}
+                exportFilename={'ecaviar_table.csv'}
               />
             </div>
           </>
