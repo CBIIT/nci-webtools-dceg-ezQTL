@@ -38,10 +38,10 @@ export const getInitialState = async () => {
       locus_alignment: {
         data: null,
         layout: null,
-        top : {
+        top: {
           chr: null,
-          gene_symbol: null
-        }
+          gene_symbol: null,
+        },
       },
       locus_alignment_boxplots: {
         isLoading: false,
@@ -58,7 +58,7 @@ export const getInitialState = async () => {
       isLoadingHyprcoloc: false,
       ecaviar: null,
       isLoadingECaviar: false,
-      locus_qc: null
+      locus_qc: null,
       // locus_table: {
       //   globalFilter: '',
       //   data: [],
@@ -67,6 +67,22 @@ export const getInitialState = async () => {
       //     pageSize: 0
       //   }
       // }
+      publicGTEx: [],
+      loadingPublic: false,
+      genome: '',
+      genomeOptions: [],
+      qtlProject: '',
+      qtlProjectOptions: [],
+      gwasProject: '',
+      gwasProjectOptions: [],
+      ldProject: '',
+      ldProjectOptions: [],
+      xQtl: '',
+      xQtlOptions: [],
+      tissue: '',
+      tissueOptions: [],
+      phenotype: '',
+      phenotypeOptions: [],
     },
     errorModal: {
       visible: false,
@@ -76,15 +92,16 @@ export const getInitialState = async () => {
   };
 
   return initialState;
-}
+};
 
-export const getStore = async _ => createStore(
-  rootReducer,
-  await getInitialState(),
-  compose(
-    applyMiddleware(ReduxThunk),
-    window.__REDUX_DEVTOOLS_EXTENSION__
-      ? window.__REDUX_DEVTOOLS_EXTENSION__({ trace: true })
-      : e => e
-  )
-);
+export const getStore = async (_) =>
+  createStore(
+    rootReducer,
+    await getInitialState(),
+    compose(
+      applyMiddleware(ReduxThunk),
+      window.__REDUX_DEVTOOLS_EXTENSION__
+        ? window.__REDUX_DEVTOOLS_EXTENSION__({ trace: true })
+        : (e) => e
+    )
+  );
