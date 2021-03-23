@@ -26,7 +26,7 @@ export const getInitialState = async () => {
       submitted: false,
       isLoading: false,
       isError: false,
-      activeResultsTab: 'locus-alignment',
+      activeResultsTab: 'locus-qc',
       activeColocalizationTab: 'hyprcoloc',
       top_gene_variants: null,
       all_gene_variants: null,
@@ -52,6 +52,7 @@ export const getInitialState = async () => {
       isLoadingHyprcoloc: false,
       ecaviar: null,
       isLoadingECaviar: false,
+      locus_qc: null,
       // locus_table: {
       //   globalFilter: '',
       //   data: [],
