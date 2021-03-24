@@ -989,6 +989,96 @@ export function uploadFile(params) {
   };
 }
 
+function qtlsGWASHyprcolocLDCalculation(params) {
+  return async function (dispatch, getState) {
+    console.log("hyprcoloc ld", params);
+    dispatch(updateQTLsGWAS({
+        isLoadingHyprcoloc: true
+      })
+    );
+
+    axios
+      .post('api/qtls-locus-colocalization-hyprcoloc-ld', params)
+      .then(function (response) {
+        
+        console.log('api/qtls-locus-colocalization-hyprcoloc-ld response.data', response.data);
+
+        dispatch(updateQTLsGWAS({
+              hyprcoloc_ld: {
+                filename: response.data['hyprcoloc_ld']['filename'][0]
+              }
+            })
+        );
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+        }
+      })
+      .then(function () {
+        // execute if no error and gwas data exists
+        const qtlsGWAS = getState().qtlsGWAS;
+        if (!qtlsGWAS.isError && qtlsGWAS.hyprcoloc_ld && qtlsGWAS.hyprcoloc_ld.filename) {
+          dispatch(
+            qtlsGWASHyprcolocCalculation({
+              request: qtlsGWAS.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample, 
+              select_qtls_samples: qtlsGWAS.select_qtls_samples, 
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000, 
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum, 
+              gwasfile: qtlsGWAS.inputs.gwas_file[0], 
+              qtlfile: qtlsGWAS.inputs.association_file[0], 
+              ldfile: qtlsGWAS.hyprcoloc_ld.filename, 
+            })
+          );
+        }
+      });
+  };
+}
+
+function qtlsGWASHyprcolocCalculation(params) {
+  return async function (dispatch, getState) {
+    console.log("hyprcoloc", params);
+    // dispatch(updateQTLsGWAS({
+    //     isLoadingHyprcoloc: true
+    //   })
+    // );
+
+    axios
+      .post('api/qtls-locus-colocalization-hyprcoloc', params)
+      .then(function (response) {
+        
+        console.log('api/qtls-locus-colocalization-hyprcoloc response.data', response.data);
+
+        dispatch(updateQTLsGWAS({
+              hyprcoloc_table: {
+                data: response.data['hyprcoloc']['result_hyprcoloc']['data'][0],
+                globalFilter: ''
+              },
+              hyprcolocSNPScore_table: {
+                data: response.data['hyprcoloc']['result_snpscore']['data'][0],
+                globalFilter: ''
+              }
+            })
+        );
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+        }
+      })
+      .then(function () {
+        dispatch(updateQTLsGWAS({ isLoadingHyprcoloc: false }));
+      });
+  };
+}
+
 export function qtlsGWASCalculation(params) {
   return async function (dispatch, getState) {
     // const qtlsGWASState = getState();
@@ -1074,6 +1164,20 @@ export function qtlsGWASCalculation(params) {
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoading: false }));
+        // execute if no error and gwas data exists
+        const qtlsGWAS = getState().qtlsGWAS;
+        if (!qtlsGWAS.isError && qtlsGWAS.gwas && qtlsGWAS.gwas.data && Object.keys(qtlsGWAS.gwas.data).length > 0) {
+          dispatch(
+            qtlsGWASHyprcolocLDCalculation({
+              request: qtlsGWAS.request,
+              ldfile: qtlsGWAS.inputs.ld_file[0], 
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum, 
+              select_chr: qtlsGWAS.locus_alignment.top.chr, 
+              select_pos: qtlsGWAS.locus_alignment.top.pos, 
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000, 
+            })
+          );
+        }
       });
   };
 }
@@ -1170,8 +1274,6 @@ const drawLocusAlignmentBoxplots = (params, response) => {
 
 export function qtlsGWASBoxplotsCalculation(params) {
   return async function (dispatch, getState) {
-    // const qtlsGWASState = getState();
-
     dispatch(updateQTLsGWAS({
           locus_alignment_boxplots: {
             isLoading: true,

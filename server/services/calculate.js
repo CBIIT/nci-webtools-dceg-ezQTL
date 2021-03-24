@@ -187,7 +187,6 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, res, next) {
         LDFile, 
         select_ref,
         select_dist, 
-        request,
         workingDirectory
     } = params;
 

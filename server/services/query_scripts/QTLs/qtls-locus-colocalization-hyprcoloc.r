@@ -11,15 +11,15 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
 ##  prefix <- args[4]
 
   if (identical(select_gwas_sample, 'true')) {
-    gwasfile <- paste0('../static/assets/files/', 'MX2.GWAS.rs.txt')
+    gwasfile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.GWAS.rs.txt')
   } else {
     gwasfile <- paste0('tmp/',request,'/', gwasfile)
   }
   if (identical(select_qtls_samples, 'true')) {
-    qtlfile <- paste0('../static/assets/files/', 'MX2.eQTL.txt') 
-    ldfile <- paste0('../static/assets/files/', 'MX2.LD.gz')
+    qtlfile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.eQTL.txt') 
+    ldfile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.LD.gz')
   } else {
-    qtlfile <- paste0('tmp/',request,'/' qtlfile)
+    qtlfile <- paste0('tmp/',request,'/', qtlfile)
   }
   
   # ldfile <- paste0("tmp/", ldfile)
