@@ -22,6 +22,9 @@ async function qtlsCalculateMain(params, res, next) {
     recalculateDist,
     recalculateRef,
     workingDirectory,
+    qtlKey,
+    ldKey,
+    bucket,
   } = params;
 
   logger.info(`[${request}] Execute /qtls-calculate-main`);
@@ -54,6 +57,9 @@ async function qtlsCalculateMain(params, res, next) {
         recalculateGene.toString(),
         recalculateDist.toString(),
         recalculateRef.toString(),
+        qtlKey.toString(),
+        ldKey.toString(),
+        bucket.toString(),
       ]
     );
     logger.info(`[${request}] Finished /qtls-calculate-main`);

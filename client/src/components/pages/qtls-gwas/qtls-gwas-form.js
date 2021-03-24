@@ -29,9 +29,9 @@ export function QTLsGWASForm() {
     false
   );
   const [showGenotypeTooltip, setShowGenotypeTooltip] = useState(false);
-  const [qtlPublic, setQtlSource] = useState(false);
-  const [gwasPublic, setGwasSource] = useState(false);
-  const [ldPublic, setLdSource] = useState(false);
+  const [qtlPublic, setQtlPublic] = useState(false);
+  const [gwasPublic, setGwasPublic] = useState(false);
+  const [ldPublic, setLdPublic] = useState(false);
   const [tissueOnly, viewTissueOnly] = useState(false);
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
 
@@ -82,21 +82,21 @@ export function QTLsGWASForm() {
   useEffect(() => _setLDFile(LDFile), [LDFile]);
   useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
   useEffect(() => {
-    if (!publicGTEx.length) dispatch(getPublicGTEx());
-  }, []);
+    if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx());
+  }, [publicGTEx]);
   // inital population of public params
   useEffect(() => {
     if (Object.keys(publicGTEx).length && !genomeOptions.length)
       getGenomeOptions();
-  }, [publicGTEx]);
+  }, [publicGTEx, genomeOptions]);
   useEffect(() => {
     if (Object.keys(publicGTEx).length && genome) populatePublicParameters();
   }, [genome]);
   useEffect(() => {
-    if (publicGTEx.length) handleQtlProject(qtlProject);
+    if (Object.keys(publicGTEx).length) handleQtlProject(qtlProject);
   }, [tissueOnly]);
   useEffect(() => {
-    if (publicGTEx.length) handleLdProject(ldProject);
+    if (Object.keys(publicGTEx).length) handleLdProject(ldProject);
   }, [phenotypeOnly]);
 
   function getGenomeOptions() {
@@ -251,12 +251,19 @@ export function QTLsGWASForm() {
   }
 
   const handleReset = () => {
-    dispatch(updateQTLsGWAS(getInitialState().qtlsGWAS));
+    dispatch(
+      updateQTLsGWAS({ ...getInitialState().qtlsGWAS, publicGTEx: publicGTEx })
+    );
     _setAssociationFile('');
     _setQuantificationFile('');
     _setGenotypeFile('');
     _setLDFile('');
     _setGwasFile('');
+    setQtlPublic(false);
+    setLdPublic(false);
+    setGwasPublic(false);
+    viewTissueOnly(false);
+    viewPhenotypeOnly(false);
   };
 
   async function handleSubmit() {
@@ -273,13 +280,13 @@ export function QTLsGWASForm() {
     const request = uuidv1();
     await dispatch(
       uploadFile({
-        dataFiles: [
-          _associationFile,
-          _quantificationFile,
-          _genotypeFile,
-          _LDFile,
-          _gwasFile,
-        ],
+        // dataFiles: [
+        //   _associationFile,
+        //   _quantificationFile,
+        //   _genotypeFile,
+        //   _LDFile,
+        //   _gwasFile,
+        // ],
         associationFile: _associationFile,
         quantificationFile: _quantificationFile,
         genotypeFile: _genotypeFile,
@@ -295,6 +302,29 @@ export function QTLsGWASForm() {
         request,
       })
     );
+
+    // retrieve tabix file key from selected tissue (association qtl), phenotype (gwas), and project(ld)
+    const qtlKey = qtlPublic
+      ? publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) => row.Genome_build == genome && row.Tissue == tissue
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : false;
+
+    const ldKey = ldPublic
+      ? publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) => row.Genome_build == genome && row.Project == ldProject
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : false;
 
     await dispatch(
       qtlsGWASCalculation({
@@ -316,6 +346,8 @@ export function QTLsGWASForm() {
         recalculateGene,
         recalculateDist,
         recalculateRef,
+        qtlKey,
+        ldKey,
       })
     );
   }
@@ -400,7 +432,10 @@ export function QTLsGWASForm() {
                 label="Public"
                 type="checkbox"
                 checked={qtlPublic}
-                onChange={(_) => setQtlSource(!qtlPublic)}
+                onChange={(_) => {
+                  setQtlPublic(!qtlPublic);
+                  _setAssociationFile('');
+                }}
               />
             </div>
             {qtlPublic ? (
@@ -598,7 +633,10 @@ export function QTLsGWASForm() {
                 label="Public"
                 type="checkbox"
                 checked={ldPublic}
-                onChange={(_) => setLdSource(!ldPublic)}
+                onChange={(_) => {
+                  setLdPublic(!ldPublic);
+                  _setLDFile('');
+                }}
               />
             </div>
             {ldPublic ? (
@@ -701,7 +739,10 @@ export function QTLsGWASForm() {
                 label="Public"
                 type="checkbox"
                 checked={gwasPublic}
-                onChange={(_) => setGwasSource(!gwasPublic)}
+                onChange={(_) => {
+                  setGwasPublic(!gwasPublic);
+                  _setGwasFile('');
+                }}
               />
             </div>
             {gwasPublic ? (
@@ -869,7 +910,7 @@ export function QTLsGWASForm() {
             }}
             disabled={
               submitted ||
-              (!_associationFile && !select_qtls_samples) ||
+              (!_associationFile && !select_qtls_samples && !qtlPublic) ||
               select_dist.length <= 0 ||
               select_dist < 1 ||
               select_dist > 200 ||

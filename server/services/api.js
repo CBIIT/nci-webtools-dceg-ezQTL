@@ -77,7 +77,15 @@ apiRouter.post('/file-upload', upload.any(), async (req, res) => {
 
 // calculation routes
 apiRouter.post('/qtls-calculate-main', (req, res, next) =>
-  qtlsCalculateMain({ ...req.body, workingDirectory }, res, next)
+  qtlsCalculateMain(
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data,
+    },
+    res,
+    next
+  )
 );
 
 // get list of public GTEx data
