@@ -97,7 +97,133 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, res, next) {
     }
 }
 
+async function qtlsCalculateLocusColocalizationHyprcolocLD(params, res, next) {
+    const {
+        request,
+        ldfile, 
+        select_ref, 
+        select_chr, 
+        select_pos, 
+        select_dist, 
+        workingDirectory
+    } = params;
+
+    logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
+    logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
+
+    const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls-locus-colocalization-hyprcoloc-ld.r');
+    try {
+        const wrapper = await r(
+            path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+            "qtlsCalculateLocusColocalizationHyprcolocLD",
+            [
+                rfile,
+                workingDirectory.toString(),
+                ldfile.toString(), 
+                select_ref.toString(), 
+                select_chr.toString(), 
+                select_pos.toString(), 
+                select_dist.toString(), 
+                request.toString()
+            ]
+        );
+        logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc-ld`);
+        res.json(JSON.parse(wrapper));
+    } catch (err) {
+        logger.error(`[${request}] Error /qtls-locus-colocalization-hyprcoloc-ld ${err}`);
+        res.status(500).json(err);
+    }
+}
+
+async function qtlsCalculateLocusColocalizationHyprcoloc(params, res, next) {
+    const {
+        request,
+        select_gwas_sample, 
+        select_qtls_samples, 
+        select_dist, 
+        select_ref, 
+        gwasfile, 
+        qtlfile, 
+        ldfile, 
+        workingDirectory
+    } = params;
+
+    logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc`);
+    logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
+
+    const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls-locus-colocalization-hyprcoloc.r');
+    try {
+        const wrapper = await r(
+            path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+            "qtlsCalculateLocusColocalizationHyprcoloc",
+            [
+                rfile,
+                workingDirectory.toString(),
+                select_gwas_sample.toString(),
+                select_qtls_samples.toString(),
+                select_dist.toString(), 
+                select_ref.toString(), 
+                gwasfile.toString(), 
+                qtlfile.toString(), 
+                ldfile.toString(), 
+                request.toString()
+            ]
+        );
+        logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);
+        res.json(JSON.parse(wrapper));
+    } catch (err) {
+        logger.error(`[${request}] Error /qtls-locus-colocalization-hyprcoloc ${err}`);
+        res.status(500).json(err);
+    }
+}
+
+async function qtlsCalculateLocusColocalizationECAVIAR(params, res, next) {
+    const {
+        request,
+        select_gwas_sample, 
+        select_qtls_samples, 
+        gwasFile, 
+        associationFile,
+        LDFile, 
+        select_ref,
+        select_dist, 
+        request,
+        workingDirectory
+    } = params;
+
+    logger.info(`[${request}] Execute /qtls-locus-colocalization-ecaviar`);
+    logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
+
+    const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls-locus-colocalization-ecaviar.r');
+    try {
+        const wrapper = await r(
+            path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+            "qtlsCalculateLocusColocalizationECAVIAR",
+            [
+                rfile,
+                workingDirectory.toString(),
+                select_gwas_sample.toString(), 
+                select_qtls_samples.toString(), 
+                gwasFile.toString(), 
+                associationFile.toString(), 
+                LDFile.toString(), 
+                select_ref.toString(), 
+                select_dist.toString(), 
+                request.toString()
+            ]
+        );
+        logger.info(`[${request}] Finished /qtls-locus-colocalization-ecaviar`);
+        res.json(JSON.parse(wrapper));
+    } catch (err) {
+        logger.error(`[${request}] Error /qtls-locus-colocalization-ecaviar ${err}`);
+        res.status(500).json(err);
+    }
+}
+
 module.exports = {
     qtlsCalculateMain,
-    qtlsCalculateLocusAlignmentBoxplots
+    qtlsCalculateLocusAlignmentBoxplots,
+    qtlsCalculateLocusColocalizationHyprcolocLD,
+    qtlsCalculateLocusColocalizationHyprcoloc,
+    qtlsCalculateLocusColocalizationECAVIAR
 }
