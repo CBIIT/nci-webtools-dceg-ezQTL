@@ -6,6 +6,7 @@ export function LocusQC() {
   const {
     submitted,
     isError,
+    isLoading,
     locus_qc
   } = useSelector((state) => state.qtlsGWAS);
 
@@ -27,9 +28,9 @@ export function LocusQC() {
           }
         />
       )}
-      {submitted && !isError && (
+      {submitted && !isError && !isLoading && (
         <>
-          LocusQC
+          Work in progress...
         </>
       )}
     </div>
