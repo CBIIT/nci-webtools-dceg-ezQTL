@@ -172,7 +172,7 @@ export function LocusTable() {
         </p>
 
         {
-          locus_table && locus_table.data && (
+          locus_table && locus_table.data && locus_table.data.length > 0 && (
             <Table
               title=""
               columns={columns}
@@ -182,6 +182,7 @@ export function LocusTable() {
               // pagination={locus_table.pagination}
               mergeState={(state) => dispatch(updateQTLsGWAS({ locus_table: { ...locus_table, ...state }}))}
               defaultSort={[{ id: 'R2', desc: true }]}
+              exportFilename={'locus_variant_details_table.csv'}
             />
           )
         }

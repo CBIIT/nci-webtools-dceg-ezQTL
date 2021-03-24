@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
+import { RootContext } from '../../../../index';
 import { useDispatch, useSelector } from 'react-redux';
 // import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { LocusAlignmentPlot } from './locus-alignment-plot';
+import { BoxplotsModal } from '../../../controls/boxplots-modal/boxplots-modal';
+import { updateQTLsGWAS } from '../../../../services/actions';
 
 export function LocusAlignment() {
+  const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
+
   const {
     submitted,
     isError,
-    locus_alignment
+    locus_alignment,
+    locus_alignment_boxplots
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
     <div className="px-3 py-2" style={{ minHeight: '250px' }}>
+      <BoxplotsModal 
+        isLoading={locus_alignment_boxplots.isLoading}
+        show={locus_alignment_boxplots.visible} 
+        onHide={() => dispatch(updateQTLsGWAS({ locus_alignment_boxplots: getInitialState().qtlsGWAS.locus_alignment_boxplots }))}
+      />
       {/* {!submitted && (
         <LoadingOverlay
           active={true}

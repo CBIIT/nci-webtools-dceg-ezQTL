@@ -84,7 +84,8 @@ export default function Table({
   globalFilter: globalSearch,
   pagination,
   mergeState,
-  defaultSort
+  defaultSort,
+  exportFilename
 }) {
 
   const defaultColumn = useMemo(
@@ -155,7 +156,7 @@ export default function Table({
         <Col md="auto">
           <CSVLink
             data={csvData}
-            filename={'locus_variant_details_table.csv'}
+            filename={exportFilename}
           >
             Export
           </CSVLink>

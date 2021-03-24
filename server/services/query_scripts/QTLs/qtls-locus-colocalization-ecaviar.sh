@@ -16,7 +16,7 @@ LD_subset_gene="QTLs/LD_subset_gene.r"
 
 
 localpath=$(pwd)
-output=$localpath/tmp/${request}.eCAVIAR.txt
+output=$localpath/tmp/${request}/${request}.eCAVIAR.txt
 rm -rf $output 
 touch $output
 
@@ -26,7 +26,7 @@ touch $output
 # echo $tmpfold >run.log
 # cd $tmpfold
 
-tmpfold=tmp/${request}.ECAVIAR_TMP
+tmpfold=tmp/${request}/${request}.ECAVIAR_TMP
 mkdir $tmpfold
 
 tmpinfo=`grep -m 1 $leadsnp $gwasfile` 
@@ -161,7 +161,7 @@ if [ ! -f "$ldinfo" ]; then
     # cat $poppanel |grep -w $ldinfo |cut -f 1  >${request}.extracted.panel
     # bcftools view -S tmp/${request}.extracted.panel -O v $kgvcfpath ${chr}":"${minpos}"-"${maxpos}|awk -F "\t" -v OFS="\t" 'NR==FNR{a[$4]=1;next;}/^#/ || $3 in a {print $0}' $tmpfold/ecaviar_list.txt -|bcftools sort -O z -o $tmpfold/${request}.input.vcf.gz 
     # bcftools index -t $tmpfold/${request}.input.vcf.gz 
-    emeraLD --matrix -i tmp/${request}.input.vcf.gz --stdout --extra |sed 's/:/\t/' |bgzip > $tmpfold/emerald.LD.gz
+    emeraLD --matrix -i tmp/${request}/${request}.input.vcf.gz --stdout --extra |sed 's/:/\t/' |bgzip > $tmpfold/emerald.LD.gz
     ldinfo=$tmpfold/emerald.LD.gz
     
 fi

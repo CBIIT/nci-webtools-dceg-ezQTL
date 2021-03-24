@@ -3,15 +3,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
 import { Button } from 'react-bootstrap';
+import { updateQTLsGWAS, qtlsGWASBoxplotsCalculation } from '../../../../services/actions';
 
 export function LocusAlignmentPlot(params) {
+  const dispatch = useDispatch();
+
   const plotContainer = useRef(null);
 
   const {
     locus_alignment,
     locus_quantification,
     inputs,
-    gwas
+    gwas,
+    request,
+    select_qtls_samples, 
   } = useSelector((state) => state.qtlsGWAS);
 
   // use local state to reset tooltip when this component unmounts
@@ -49,7 +54,6 @@ export function LocusAlignmentPlot(params) {
     <>
       <div
         className="text-center my-3 position-relative mw-100"
-        // style={{ width: '800px', margin: '1rem auto' }}
         ref={plotContainer}
       >
         {locus_alignment.data && (
@@ -63,16 +67,14 @@ export function LocusAlignmentPlot(params) {
               const { xaxis, yaxis } = point;
               const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
               const yOffset = yaxis.l2p(point.y) + yaxis._offset - 155;
+
               if (point && 
-                point.text && 
+                point.customdata && 
                 (gwas && gwas.data && Object.keys(gwas.data).length > 0 ? point.curveNumber === 3 || point.curveNumber === 6 : point.curveNumber === 2)
               ) {
-                const pointText = point.text.split('<br>');
                 updateTooltip({
                   visible: true,
-                  data: {
-                      text: pointText
-                  },
+                  data: point.customdata,
                   x: xOffset,
                   y: yOffset
                 });
@@ -99,61 +101,59 @@ export function LocusAlignmentPlot(params) {
         className="text-left qq-plot-tooltip">
         <div>
           {/* chr:pos */}
-          {tooltip.data.text && tooltip.data.text[0] && tooltip.data.text[0].length > 0 && (
+          {tooltip.data.chr && tooltip.data.pos && (
             <div>
-              <b>{tooltip.data.text[0]}</b>
+              <b>chr{tooltip.data.chr}:{tooltip.data.pos}</b>
             </div>
           )}
           {/* rsnum */}
-          {tooltip.data.text && tooltip.data.text[1] && tooltip.data.text[1].length > 0 && (
+          {tooltip.data.rsnum && (
             <div>
-              <b>{tooltip.data.text[1]}</b>
+              <b>{tooltip.data.rsnum}</b>
             </div>
           )}
           {/* ref/alt */}
-          {tooltip.data.text && tooltip.data.text[2] && tooltip.data.text[2].length > 0 && (
+          {tooltip.data.ref && tooltip.data.alt && (
             <div>
-              Ref/Alt: <b>{tooltip.data.text[2].split(": ")[1]}</b>
+              Ref/Alt: <b>{tooltip.data.ref}/{tooltip.data.alt}</b>
             </div>
           )}
           {/* p-value */}
-          {tooltip.data.text && tooltip.data.text[3] && tooltip.data.text[3].length > 0 && (
+          {tooltip.data.pval_nominal && (
             <div>
-              <i>P</i>-value: <b>{tooltip.data.text[3].split(": ")[1]}</b>
+              <i>P</i>-value: <b>{tooltip.data.pval_nominal}</b>
             </div>
           )}
           {/* slope */}
-          {tooltip.data.text && tooltip.data.text[4] && tooltip.data.text[4].length > 0 && (
+          {tooltip.data.slope && (
             <div>
-              Slope: <b>{tooltip.data.text[4].split(": ")[1]}</b>
+              Slope: <b>{tooltip.data.slope}</b>
             </div>
           )}
           {/* r2 */}
-          {tooltip.data.text && tooltip.data.text[5] && tooltip.data.text[5].length > 0 && (
+          {tooltip.data.R2 && (
             <div>
-              R<sup>2</sup>: <b>{tooltip.data.text[5].split(": ")[1]}</b>
+              R<sup>2</sup>: <b>{tooltip.data.R2}</b>
             </div>
           )}
           <div className="w-100 border border-top mx-0 my-0"></div>
           {/* make ld reference action */}
-          {tooltip.data.text && tooltip.data.text[1] && tooltip.data.text[1].length > 0 && (
+          {tooltip.data && (
             <div>
               <Button
                 variant="link"
                 onClick={(_) => {
-                  // _setGwasFile('');
                   // dispatch(updateQTLsGWAS({ select_gwas_sample: true }));
                 }}
-                // disabled={submitted}
               >
                 <b>Make LD Reference</b>
               </Button>
             </div>
           )}
           {/* ldpop link */}
-          {tooltip.data.text && tooltip.data.text[1] && tooltip.data.text[1].length > 0 && (
+          {tooltip.data.rsnum && locus_alignment['top']['rsnum'] && (
             <div>
-              <a href={"https://ldlink.nci.nih.gov/?tab=ldpop&var1=" + tooltip.data.text[1] + "&var2=" + locus_alignment['top']['rsnum'] + "&pop=" + inputs['select_pop'][0].split('+').join('%2B') + "&r2_d=r2"} 
+              <a href={"https://ldlink.nci.nih.gov/?tab=ldpop&var1=" + tooltip.data.rsnum + "&var2=" + locus_alignment['top']['rsnum'] + "&pop=" + inputs['select_pop'][0].split('+').join('%2B') + "&r2_d=r2"} 
               target="_blank" 
               rel="noreferrer">
                 <b>LDpop</b>
@@ -161,9 +161,9 @@ export function LocusAlignmentPlot(params) {
             </div>
           )}
           {/* potential gwas link */}
-          {tooltip.data.text && tooltip.data.text[1] && tooltip.data.text[1].length > 0 && (
+          {tooltip.data.rsnum && (
             <div>
-              <a href={'https://www.ebi.ac.uk/gwas/search?query=' + tooltip.data.text[1]} 
+              <a href={'https://www.ebi.ac.uk/gwas/search?query=' + tooltip.data.rsnum} 
               target="_blank" 
               rel="noreferrer">
                 <b>Potential GWAS</b>
@@ -171,9 +171,9 @@ export function LocusAlignmentPlot(params) {
             </div>
           )}
           {/* potential gnomad link */}
-          {tooltip.data.text && tooltip.data.text[0] && tooltip.data.text[0].length > 0 &&  tooltip.data.text[2] && tooltip.data.text[2].length > 0 && (
+          {tooltip.data.chr && tooltip.data.pos && tooltip.data.ref &&  tooltip.data.alt && (
             <div>
-              <a href={"http://gnomad.broadinstitute.org/variant/" + tooltip.data.text[0].split(":")[0].replace(/chr/g,'') + "-" + tooltip.data.text[0].split(":")[1] + "-" + tooltip.data.text[2].split(": ")[1].split("/")[0] + "-" + tooltip.data.text[2].split(": ")[1].split("/")[1]} 
+              <a href={"http://gnomad.broadinstitute.org/variant/" + tooltip.data.chr + "-" + tooltip.data.pos + "-" + tooltip.data.ref + "-" + tooltip.data.alt} 
                 target="_blank" 
                 rel="noreferrer">
                 <b>gnomAD browser</b>
@@ -181,13 +181,21 @@ export function LocusAlignmentPlot(params) {
             </div>
           )}
           {/* show boxplot action */}
-          {tooltip.data.text && tooltip.data.text[0] && tooltip.data.text[0].length > 0 && (
+          {tooltip.data && (
             <div>
               <Button
                 variant="link"
-                onClick={(_) => {
-                  // _setGwasFile('');
-                  // dispatch(updateQTLsGWAS({ select_gwas_sample: true }));
+                onClick={async (_) => {
+                  dispatch(
+                    qtlsGWASBoxplotsCalculation({ 
+                      request,
+                      select_qtls_samples, 
+                      quantificationFile: inputs['quantification_file'][0], 
+                      genotypeFile: inputs['genotype_file'][0],
+                      info: tooltip.data
+                    })
+                  );
+                  updateTooltip({ visible: false });
                 }}
                 disabled={!(locus_quantification && locus_quantification.data && Object.keys(locus_quantification.data).length > 0)}
               >

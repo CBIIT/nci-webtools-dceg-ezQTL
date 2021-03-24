@@ -3,7 +3,7 @@ locus_colocalization_hyprcoloc_ld <- function(workDir, ldfile, select_ref, chr, 
   setwd(workDir)
   if (identical(ldfile, 'false')) {
     ## execute LD calculation: shell script
-    cmd <- paste0('sh QTLs/qtls-locus-colocalization-hyprcoloc-ld.sh ', select_ref, ' ', chr, ' ', pos, ' ', select_dist, ' ', request) 
+    cmd <- paste0('sh server/services/query_scripts/QTLs/qtls-locus-colocalization-hyprcoloc-ld.sh ', select_ref, ' ', chr, ' ', pos, ' ', select_dist, ' ', request, ' ', workDir) 
     system(cmd)
     filename <- paste0('tmp/',request,'/',request, ".LD.gz")
   } else {
