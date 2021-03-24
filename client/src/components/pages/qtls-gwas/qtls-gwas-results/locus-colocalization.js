@@ -11,8 +11,8 @@ export function LocusColocalization() {
 
   const {
     activeColocalizationTab,
-    hyprcoloc,
-    hyprcolocSNPScore,
+    hyprcoloc_table,
+    hyprcolocSNPScore_table,
     isLoadingHyprcoloc,
     ecaviar,
     isLoadingECaviar
@@ -80,7 +80,16 @@ export function LocusColocalization() {
     {
       Header: 'SNP Score',
       accessor: 'snpscore',
-      id: 'snpscore'
+      id: 'snpscore',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
     },
     {
       Header: 'Gene ID',
@@ -254,12 +263,13 @@ export function LocusColocalization() {
               <Table
                 title=""
                 columns={hyprcolocColumns}
-                data={[]}
+                data={hyprcoloc_table.data}
                 hidden={[]}
-                globalFilter={''}
+                globalFilter={hyprcoloc_table.globalFilter}
                 // pagination={locus_table.pagination}
-                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcoloc: { ...hyprcoloc, ...state }}))}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcoloc_table: { ...hyprcoloc_table, ...state }}))}
                 defaultSort={[{ id: 'posterior_prob', desc: true }]}
+                exportFilename={'hyprcoloc_table.csv'}
               />
             </div>
 
@@ -271,12 +281,13 @@ export function LocusColocalization() {
               <Table
                 title=""
                 columns={hyprcolocSNPScoreColumns}
-                data={[]}
+                data={hyprcolocSNPScore_table.data}
                 hidden={[]}
-                globalFilter={''}
+                globalFilter={hyprcolocSNPScore_table.globalFilter}
                 // pagination={locus_table.pagination}
-                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcolocSNPScore: { ...hyprcolocSNPScore, ...state }}))}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcolocSNPScore_table: { ...hyprcolocSNPScore_table, ...state }}))}
                 defaultSort={[{ id: 'snpscore', desc: true }]}
+                exportFilename={'hyprcoloc_snpscores_table.csv'}
               />
             </div>
           </>
@@ -312,6 +323,7 @@ export function LocusColocalization() {
                 // pagination={locus_table.pagination}
                 mergeState={(state) => dispatch(updateQTLsGWAS({ ecaviar: { ...ecaviar, ...state }}))}
                 defaultSort={[{ id: 'posterior_prob', desc: true }]}
+                exportFilename={'ecaviar_table.csv'}
               />
             </div>
           </>

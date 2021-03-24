@@ -3,7 +3,13 @@ const compression = require('compression');
 const config = require('../config');
 const logger = require('./logger');
 const path = require('path');
-const { qtlsCalculateMain } = require('./calculate');
+const { 
+    qtlsCalculateMain,
+    qtlsCalculateLocusAlignmentBoxplots,
+    qtlsCalculateLocusColocalizationHyprcolocLD,
+    qtlsCalculateLocusColocalizationHyprcoloc,
+    qtlsCalculateLocusColocalizationECAVIAR
+} = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
 const fs = require('fs');
@@ -121,5 +127,14 @@ apiRouter.post('/getPublicGTEx', async (req, res, next) => {
     next(error);
   }
 });
+
+apiRouter.post('/qtls-locus-alignment-boxplots', (req, res, next) => qtlsCalculateLocusAlignmentBoxplots({...req.body, workingDirectory}, res, next))
+
+apiRouter.post('/qtls-locus-colocalization-hyprcoloc-ld', (req, res, next) => qtlsCalculateLocusColocalizationHyprcolocLD({...req.body, workingDirectory}, res, next))
+
+apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) => qtlsCalculateLocusColocalizationHyprcoloc({...req.body, workingDirectory}, res, next))
+
+apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => qtlsCalculateLocusColocalizationECAVIAR({...req.body, workingDirectory}, res, next))
+
 
 module.exports = { apiRouter };
