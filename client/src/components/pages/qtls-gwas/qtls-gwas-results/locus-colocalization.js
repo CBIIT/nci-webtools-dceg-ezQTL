@@ -11,8 +11,8 @@ export function LocusColocalization() {
 
   const {
     activeColocalizationTab,
-    hyprcoloc,
-    hyprcolocSNPScore,
+    hyprcoloc_table,
+    hyprcolocSNPScore_table,
     isLoadingHyprcoloc,
     ecaviar,
     isLoadingECaviar
@@ -258,7 +258,7 @@ export function LocusColocalization() {
                 hidden={[]}
                 globalFilter={''}
                 // pagination={locus_table.pagination}
-                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcoloc: { ...hyprcoloc, ...state }}))}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcoloc_table: { ...hyprcoloc_table, ...state }}))}
                 defaultSort={[{ id: 'posterior_prob', desc: true }]}
                 exportFilename={'hyprcoloc_table.csv'}
               />
@@ -276,7 +276,7 @@ export function LocusColocalization() {
                 hidden={[]}
                 globalFilter={''}
                 // pagination={locus_table.pagination}
-                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcolocSNPScore: { ...hyprcolocSNPScore, ...state }}))}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ hyprcolocSNPScore_table: { ...hyprcolocSNPScore_table, ...state }}))}
                 defaultSort={[{ id: 'snpscore', desc: true }]}
                 exportFilename={'hyprcoloc_snpscores_table.csv'}
               />
