@@ -52,9 +52,19 @@ export const getInitialState = async () => {
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
       gwas: null,
-      locus_table: null,
-      hyprcoloc_table: null,
-      hyprcolocSNPScore_table: null,
+      locus_table: {
+        data: [],
+        globalFilter: ''
+      },
+      hyprcoloc_ld: null,
+      hyprcoloc_table: {
+        data: [],
+        globalFilter: ''
+      },
+      hyprcolocSNPScore_table: {
+        data: [],
+        globalFilter: ''
+      },
       isLoadingHyprcoloc: false,
       ecaviar: null,
       isLoadingECaviar: false,

@@ -172,7 +172,7 @@ export function LocusTable() {
         </p>
 
         {
-          locus_table && locus_table.data && (
+          locus_table && locus_table.data && locus_table.data.length > 0 && (
             <Table
               title=""
               columns={columns}
