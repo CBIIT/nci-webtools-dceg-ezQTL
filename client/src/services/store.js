@@ -66,7 +66,10 @@ export const getInitialState = async () => {
         globalFilter: ''
       },
       isLoadingHyprcoloc: false,
-      ecaviar: null,
+      ecaviar_table: {
+        data: [],
+        globalFilter: ''
+      },
       isLoadingECaviar: false,
       locus_qc: null,
       // locus_table: {
