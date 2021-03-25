@@ -325,11 +325,6 @@ const drawLocusAlignment = (response) => {
     yaxis: 'y2',
   };
 
-  // console.log("qDataTopAnnot", qDataTopAnnot);
-  // console.log("xLDRef", qDataTopAnnot['pos'] / 1000000.0);
-  // console.log("yLDRef", Math.log10(qDataTopAnnot['pval_nominal']) * -1.0);
-  // console.log("LDRefHighlight", LDRefHighlight);
-
   // graph scatter where R2 != NA
   const trace1 = {
     x: xData,
@@ -991,7 +986,6 @@ export function uploadFile(params) {
 
 function qtlsGWASHyprcolocLDCalculation(params) {
   return async function (dispatch, getState) {
-    console.log("hyprcoloc ld", params);
     dispatch(updateQTLsGWAS({
         isLoadingHyprcoloc: true
       })
@@ -1041,12 +1035,6 @@ function qtlsGWASHyprcolocLDCalculation(params) {
 
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
-    console.log("hyprcoloc", params);
-    // dispatch(updateQTLsGWAS({
-    //     isLoadingHyprcoloc: true
-    //   })
-    // );
-
     axios
       .post('api/qtls-locus-colocalization-hyprcoloc', params)
       .then(function (response) {
@@ -1075,6 +1063,42 @@ function qtlsGWASHyprcolocCalculation(params) {
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoadingHyprcoloc: false }));
+      });
+  };
+}
+
+export function qtlsGWASECaviarCalculation(params) {
+  return async function (dispatch, getState) {
+    console.log("ecaviar", params);
+    dispatch(updateQTLsGWAS({
+        isLoadingECaviar: true
+      })
+    );
+
+    axios
+      .post('api/qtls-locus-colocalization-ecaviar', params)
+      .then(function (response) {
+        
+        console.log('api/qtls-locus-colocalization-ecaviar response.data', response.data);
+
+        dispatch(updateQTLsGWAS({
+              ecaviar_table: {
+                data: response.data['ecaviar']['data'][0],
+                globalFilter: ''
+              }
+            })
+        );
+        
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+        }
+      })
+      .then(function () {
+        dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
       });
   };
 }

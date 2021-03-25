@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateQTLsGWAS } from '../../../../services/actions';
+import { updateQTLsGWAS, qtlsGWASECaviarCalculation } from '../../../../services/actions';
 import Table from '../../../controls/table/table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 
@@ -14,14 +14,28 @@ export function LocusColocalization() {
     hyprcoloc_table,
     hyprcolocSNPScore_table,
     isLoadingHyprcoloc,
-    ecaviar,
-    isLoadingECaviar
+    ecaviar_table,
+    isLoadingECaviar,
+    isError,
+    request,
+    inputs,
+    select_gwas_sample,
+    select_qtls_samples,
+    locus_alignment
   } = useSelector((state) => state.qtlsGWAS);
 
   const radios = [
     { name: 'HyPrColoc', value: 'hyprcoloc' },
     { name: 'eCAVIAR', value: 'ecaviar' }
   ];
+
+  // useEffect(() => {
+  //   // console.log(activeColocalizationTab);
+  //   // lazy-load ecaviar calculation
+  //   if (activeColocalizationTab === 'ecaviar') {
+      
+  //   }
+  // }, [activeColocalizationTab]);
 
   const hyprcolocColumns = [
     {
@@ -195,22 +209,58 @@ export function LocusColocalization() {
     {
       Header: 'Prob_in_pCausalSet',
       accessor: 'Prob_in_pCausalSet',
-      id: 'Prob_in_pCausalSet'
+      id: 'Prob_in_pCausalSet',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
     },
     {
       Header: 'CLPP',
       accessor: 'CLPP',
-      id: 'CLPP'
+      id: 'CLPP',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
     },
     {
       Header: 'Prob_in_pCausalSet2',
       accessor: 'Prob_in_pCausalSet2',
-      id: 'Prob_in_pCausalSet2'
+      id: 'Prob_in_pCausalSet2',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
     },
     {
       Header: 'CLPP2',
       accessor: 'CLPP2',
-      id: 'CLPP2'
+      id: 'CLPP2',
+      sortType: useMemo(() => (rowA, rowB, columnId) => {
+        const a = Number(rowA.original[columnId]);
+        const b = Number(rowB.original[columnId]);
+        if (a > b) 
+            return 1
+        if (b > a) 
+            return -1
+        return 0
+      })
     },
     {
       Header: 'Lead SNP Included',
@@ -231,9 +281,32 @@ export function LocusColocalization() {
               name="radio"
               value={radio.value}
               checked={activeColocalizationTab === radio.value}
-              onChange={(e) => 
-                dispatch(updateQTLsGWAS({ activeColocalizationTab: e.currentTarget.value }))
-              }
+              onChange={async (e) => {
+                  dispatch(updateQTLsGWAS({ activeColocalizationTab: e.currentTarget.value }))
+                  // lazy-load ecaviar calculation
+                  if (e.currentTarget.value === 'ecaviar' && !isError && ecaviar_table && ecaviar_table.data && ecaviar_table.data.length === 0 && !isLoadingECaviar) {
+                    console.log('run ecaviar');
+                    dispatch(
+                      qtlsGWASECaviarCalculation({
+                        LDFile: inputs['ld_file'][0],
+                        associationFile: inputs['association_file'][0],
+                        gwasFile: inputs['gwas_file'][0],
+                        request,
+                        select_dist: inputs['select_dist'][0] * 1000,
+                        select_gwas_sample,
+                        select_qtls_samples,
+                        select_ref: locus_alignment['top']['rsnum'],
+                      })
+                      // qtlsGWASBoxplotsCalculation({ 
+                      //   request,
+                      //   select_qtls_samples, 
+                      //   quantificationFile: inputs['quantification_file'][0], 
+                      //   genotypeFile: inputs['genotype_file'][0],
+                      //   info: tooltip.data
+                      // })
+                    );
+                  }
+              }}
             >
               {radio.name}
             </ToggleButton>
@@ -317,12 +390,12 @@ export function LocusColocalization() {
               <Table
                 title=""
                 columns={ecaviarColumns}
-                data={[]}
+                data={ecaviar_table.data}
                 hidden={[]}
-                globalFilter={''}
+                globalFilter={ecaviar_table.globalFilter}
                 // pagination={locus_table.pagination}
-                mergeState={(state) => dispatch(updateQTLsGWAS({ ecaviar: { ...ecaviar, ...state }}))}
-                defaultSort={[{ id: 'posterior_prob', desc: true }]}
+                mergeState={(state) => dispatch(updateQTLsGWAS({ ecaviar_table: { ...ecaviar_table, ...state }}))}
+                defaultSort={[{ id: 'CLPP', desc: true }]}
                 exportFilename={'ecaviar_table.csv'}
               />
             </div>
