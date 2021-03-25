@@ -95,10 +95,12 @@ export function QTLsGWASForm() {
     if (Object.keys(publicGTEx).length && genome) populatePublicParameters();
   }, [genome]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length) handleQtlProject(qtlProject);
+    if (Object.keys(publicGTEx).length && qtlProject)
+      handleQtlProject(qtlProject);
   }, [tissueOnly]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length) handleGwasProject(gwasProject);
+    if (Object.keys(publicGTEx).length && gwasProject)
+      handleGwasProject(gwasProject);
   }, [phenotypeOnly]);
 
   function getGenomeOptions() {
@@ -480,7 +482,9 @@ export function QTLsGWASForm() {
                       label="Tissue Only"
                       type="checkbox"
                       disabled={
-                        publicLoading || !Object.keys(publicGTEx).length
+                        submitted ||
+                        publicLoading ||
+                        !Object.keys(publicGTEx).length
                       }
                       checked={tissueOnly}
                       onChange={(_) => {
