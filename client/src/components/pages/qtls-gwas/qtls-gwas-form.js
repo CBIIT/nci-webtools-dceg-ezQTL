@@ -72,6 +72,8 @@ export function QTLsGWASForm() {
     tissueOptions,
     phenotype,
     phenotypeOptions,
+    chromosome,
+    range,
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
@@ -96,12 +98,14 @@ export function QTLsGWASForm() {
     if (Object.keys(publicGTEx).length) handleQtlProject(qtlProject);
   }, [tissueOnly]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length) handleLdProject(ldProject);
+    if (Object.keys(publicGTEx).length) handleGwasProject(gwasProject);
   }, [phenotypeOnly]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
-    const genomeOptions = [...new Set(data.map((row) => row.Genome_build))];
+    const genomeOptions = [
+      ...new Set(data.map((row) => row.Genome_build)),
+    ].map((genome) => ({ value: genome, label: genome }));
 
     dispatch(
       updateQTLsGWAS({
@@ -115,79 +119,71 @@ export function QTLsGWASForm() {
     return [
       ...new Set(
         data
-          .filter((row) => row['Genome_build'] == genome)
+          .filter((row) => row['Genome_build'] == genome.value)
           .map((row) => row['Project'])
       ),
-    ];
+    ].map((project) => ({ value: project, label: project }));
   }
 
   function getXqtlOptions(data, project) {
     return [
       ...new Set(
         data
-          .filter((row) => row.Genome_build == genome && row.Project == project)
-          .map((row) => row.xQTL || '')
+          .filter(
+            (row) => row.Genome_build == genome.value && row.Project == project
+          )
+          .map((row) => row.xQTL)
       ),
-    ];
+    ].map((xQtl) => ({ value: xQtl, label: xQtl }));
   }
 
   function getTissueOptions(data, project, xQtl) {
     return !tissueOnly
-      ? [
-          ...new Set(
-            data
-              .filter(
-                (row) =>
-                  row['Genome_build'] == genome && row['Project'] == project
-                // && row['xQTL'] == xQtl
-              )
-              .map((row) => row['Tissue'])
-          ),
-        ]
-      : [
-          ...new Set(
-            data
-              .filter((row) => row['Genome_build'] == genome)
-              .map((row) => row['Tissue'])
-          ),
-        ];
+      ? data
+          .filter(
+            (row) =>
+              row['Genome_build'] == genome.value &&
+              row['Project'] == project &&
+              row['xQTL'] == xQtl
+          )
+          .map((row) => ({ value: row.Tissue, label: row.Tissue }))
+      : data
+          .filter((row) => row['Genome_build'] == genome.value)
+          .map((row) => ({ value: row.Tissue, label: row.Full_Name }));
   }
 
   function getPhenotypeOptions(data, project) {
     return !phenotypeOnly
-      ? [
-          ...new Set(
-            data
-              .filter(
-                (row) =>
-                  row['Genome_build'] == genome && row['Project'] == project
-                // && row['xQTL'] == xQtl
-              )
-              .map((row) => row['Phenotype'])
-          ),
-        ]
-      : [
-          ...new Set(
-            data
-              .filter((row) => row['Genome_build'] == genome)
-              .map((row) => row['Phenotype'])
-          ),
-        ];
+      ? data
+          .filter(
+            (row) =>
+              row['Genome_build'] == genome.value && row['Project'] == project
+          )
+          .map((row) => ({ value: row.Phenotype, label: row.Phenotype }))
+      : data
+          .filter((row) => row['Genome_build'] == genome.value)
+          .map((row) => ({ value: row.Phenotype, label: row.Full_Name }));
   }
 
   function populatePublicParameters() {
     const qtlData = publicGTEx['cis-QTL dataset'];
     const ldData = publicGTEx['LD dataset'];
+    const gwasData = publicGTEx['GWAS dataset'];
 
     const qtlProjectOptions = getProjectOptions(qtlData);
-    const xQtlOptions = ['']; //getXqtlOptions(qtlData, qtlProjectOptions[0]);
+    const xQtlOptions = getXqtlOptions(qtlData, qtlProjectOptions[0].value);
     const tissueOptions = getTissueOptions(
       qtlData,
-      qtlProjectOptions[0],
-      xQtlOptions[0]
+      qtlProjectOptions[0].value,
+      xQtlOptions[0].value
     );
 
     const ldProjectOptions = getProjectOptions(ldData);
+
+    const gwasProjectOptions = getProjectOptions(gwasData);
+    const phenotypeOptions = gwasProjectOptions.length
+      ? getPhenotypeOptions(gwasData, gwasProjectOptions[0].value)
+      : [];
 
     dispatch(
       updateQTLsGWAS({
@@ -196,20 +192,28 @@ export function QTLsGWASForm() {
         ldProject: ldProjectOptions[0],
         xQtl: xQtlOptions[0],
         tissue: tissueOptions[0],
+        gwasProject: gwasProjectOptions[0],
+        phenotype: phenotypeOptions[0] || '',
 
         qtlProjectOptions: qtlProjectOptions,
         ldProjectOptions: ldProjectOptions,
         xQtlOptions: xQtlOptions,
         tissueOptions: tissueOptions,
+        gwasProjectOptions: gwasProjectOptions,
+        phenotypeOptions: phenotypeOptions || [],
       })
     );
   }
 
   function handleQtlProject(project) {
     const data = publicGTEx['cis-QTL dataset'];
-    const xQtlOptions = ['']; //getXqtlOptions(data, project);
-    const tissueOptions = getTissueOptions(data, project, xQtlOptions[0]);
-    // console.log(tissueOptions);
+    const xQtlOptions = getXqtlOptions(data, project.value);
+    const tissueOptions = getTissueOptions(
+      data,
+      project.value,
+      xQtlOptions[0].value
+    );
+
     dispatch(
       updateQTLsGWAS({
         qtlProject: project,
@@ -220,12 +224,8 @@ export function QTLsGWASForm() {
   }
 
   function handleGwasProject(project) {
-    dispatch(updateQTLsGWAS({ gwasProject: project }));
-  }
-
-  function handleLdProject(project) {
-    const data = publicGTEx['LD dataset'];
-    const phenotypeOptions = getPhenotypeOptions(data, project);
+    const data = publicGTEx['GWAS dataset'];
+    const phenotypeOptions = getPhenotypeOptions(data, project.value);
 
     dispatch(
       updateQTLsGWAS({
@@ -236,10 +236,21 @@ export function QTLsGWASForm() {
     );
   }
 
-  function handleXqtl(xQtl) {
-    const data = publicGTEx['GWAS dataset'];
+  function handleLdProject(project) {
+    dispatch(updateQTLsGWAS({ ldProject: project }));
+  }
 
-    dispatch(updateQTLsGWAS({ xQtl: xQtl }));
+  function handleXqtl(xQtl) {
+    const data = publicGTEx['cis-QTL dataset'];
+    const tissueOptions = getTissueOptions(data, qtlProject.value, xQtl.value);
+
+    dispatch(
+      updateQTLsGWAS({
+        xQtl: xQtl,
+        tissue: tissueOptions[0],
+        tissueOptions: tissueOptions,
+      })
+    );
   }
 
   function handleTissue(tissue) {
@@ -247,7 +258,11 @@ export function QTLsGWASForm() {
   }
 
   function handlePhenotype(phenotype) {
-    dispatch(updateQTLsGWAS({ phenotype: phenotype }));
+    dispatch(
+      updateQTLsGWAS({
+        phenotype: phenotype,
+      })
+    );
   }
 
   const handleReset = () => {
@@ -307,7 +322,8 @@ export function QTLsGWASForm() {
     const qtlKey = qtlPublic
       ? publicGTEx['cis-QTL dataset']
           .filter(
-            (row) => row.Genome_build == genome && row.Tissue == tissue
+            (row) =>
+              row.Genome_build == genome.value && row.Tissue == tissue.value
           )[0]
           .Biowulf_full_path.replace(
             '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
@@ -318,7 +334,21 @@ export function QTLsGWASForm() {
     const ldKey = ldPublic
       ? publicGTEx['cis-QTL dataset']
           .filter(
-            (row) => row.Genome_build == genome && row.Project == ldProject
+            (row) =>
+              row.Genome_build == genome.value && row.Project == ldProject.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : false;
+
+    const gwasKey = gwasPublic
+      ? publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotype.value
           )[0]
           .Biowulf_full_path.replace(
             '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
@@ -348,6 +378,8 @@ export function QTLsGWASForm() {
         recalculateRef,
         qtlKey,
         ldKey,
+        gwasKey,
+        position: `${chromosome.value}:${range}`,
       })
     );
   }
@@ -427,6 +459,7 @@ export function QTLsGWASForm() {
                 Association (QTL) Data <span style={{ color: 'red' }}>*</span>
               </Form.Label>
               <Form.Check
+                disabled={submitted}
                 inline
                 id="qtlSource"
                 label="Public"
@@ -628,6 +661,7 @@ export function QTLsGWASForm() {
                 </small>
               </Form.Label>
               <Form.Check
+                disabled={submitted}
                 inline
                 id="ldSource"
                 label="Public"
@@ -734,6 +768,7 @@ export function QTLsGWASForm() {
             <div className="d-flex">
               <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
               <Form.Check
+                disabled={submitted}
                 inline
                 id="gwasSource"
                 label="Public"
@@ -754,7 +789,9 @@ export function QTLsGWASForm() {
                       label="Phenotype Only"
                       type="checkbox"
                       disabled={
-                        publicLoading || !Object.keys(publicGTEx).length
+                        submitted ||
+                        publicLoading ||
+                        !Object.keys(publicGTEx).length
                       }
                       checked={phenotypeOnly}
                       onChange={(_) => {
@@ -768,7 +805,12 @@ export function QTLsGWASForm() {
                     <Col>
                       <Form.Group>
                         <Select
-                          disabled={publicLoading || phenotypeOnly}
+                          disabled={
+                            submitted ||
+                            publicLoading ||
+                            phenotypeOnly ||
+                            !gwasProjectOptions.length
+                          }
                           id="gwasProject"
                           label="Project"
                           value={gwasProject}
@@ -784,7 +826,9 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading}
+                        disabled={
+                          submitted || publicLoading || !phenotypeOptions.length
+                        }
                         id="gwasPhenotype"
                         label="Phenotype"
                         value={phenotype}
@@ -854,31 +898,77 @@ export function QTLsGWASForm() {
               Enter distance between 1 and 200Kb.
             </Form.Control.Feedback>
           </div>
-          <div className="col-sm-12">
-            <Form.Label className="mb-0">
-              SNP{' '}
-              <small>
-                <i>(Default: lowest GWAS P-value SNP)</i>
-              </small>
-            </Form.Label>
-            <Form.Control
-              id="qtls-snp-input"
-              disabled={submitted}
-              onChange={(e) => {
-                dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
-              }}
-              value={select_ref ? select_ref : ''}
-              isInvalid={
-                select_ref &&
-                select_ref.length > 0 &&
-                !/^rs\d+$/.test(select_ref)
-              }
-              // custom
-            />
-            <Form.Control.Feedback type="invalid">
-              Enter valid RS number. Leave empty for default.
-            </Form.Control.Feedback>
-          </div>
+          {qtlPublic || ldPublic || gwasPublic ? (
+            <Col>
+              <Form.Row>
+                <Col sm="4">
+                  <Form.Group>
+                    <Select
+                      disabled={submitted}
+                      id="chromosome"
+                      label="Chromosome"
+                      value={chromosome}
+                      options={[
+                        ...Array.from({ length: 22 }, (_, i) => ({
+                          value: i + 1,
+                          label: i + 1,
+                        })),
+                        {
+                          value: 'X',
+                          label: 'X',
+                        },
+                        {
+                          value: 'Y',
+                          label: 'Y',
+                        },
+                      ]}
+                      onChange={(chromosome) => {
+                        dispatch(updateQTLsGWAS({ chromosome: chromosome }));
+                      }}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col sm="8">
+                  <Form.Label className="mb-0">Range</Form.Label>
+                  <Form.Control
+                    id="range"
+                    disabled={submitted}
+                    onChange={(e) => {
+                      dispatch(updateQTLsGWAS({ range: e.target.value }));
+                    }}
+                    placeholder="e.g. 10000-100000"
+                    value={range}
+                  />
+                </Col>
+              </Form.Row>
+            </Col>
+          ) : (
+            <Col>
+              <Form.Label className="mb-0">
+                SNP{' '}
+                <small>
+                  <i>(Default: lowest GWAS P-value SNP)</i>
+                </small>
+              </Form.Label>
+              <Form.Control
+                id="qtls-snp-input"
+                disabled={submitted}
+                onChange={(e) => {
+                  dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
+                }}
+                value={select_ref ? select_ref : ''}
+                isInvalid={
+                  select_ref &&
+                  select_ref.length > 0 &&
+                  !/^rs\d+$/.test(select_ref)
+                }
+                // custom
+              />
+              <Form.Control.Feedback type="invalid">
+                Enter valid RS number. Leave empty for default.
+              </Form.Control.Feedback>
+            </Col>
+          )}
         </Row>
         <div className="row mb-4">
           <div className="w-100 border border-top mx-3 my-2"></div>
