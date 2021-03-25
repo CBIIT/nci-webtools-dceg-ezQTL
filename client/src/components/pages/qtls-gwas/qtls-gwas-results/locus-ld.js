@@ -4,7 +4,7 @@ export function LocusLD() {
   return (
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
       <p>
-        Locus LD
+        Work in progress...
       </p>
     </div>
   );

@@ -11,12 +11,13 @@ dist=$4
 #ldfile=$5
 ldinfo=$5
 request=$6
+workdir=$7
 
-LD_subset_gene="QTLs/LD_subset_gene.r"
+LD_subset_gene="${workdir}/server/services/query_scripts/QTLs/LD_subset_gene.r"
 
 
-localpath=$(pwd)
-output=$localpath/tmp/${request}/${request}.eCAVIAR.txt
+# localpath=$(pwd)
+output=$workdir/tmp/${request}/${request}.eCAVIAR.txt
 rm -rf $output 
 touch $output
 
@@ -26,7 +27,7 @@ touch $output
 # echo $tmpfold >run.log
 # cd $tmpfold
 
-tmpfold=tmp/${request}/${request}.ECAVIAR_TMP
+tmpfold=$workdir/tmp/${request}/${request}.ECAVIAR_TMP
 mkdir $tmpfold
 
 tmpinfo=`grep -m 1 $leadsnp $gwasfile` 
@@ -51,7 +52,7 @@ maxpos2=$(( position + dist2 ))
 
 ## define file for LD calculation ##
 # kgpath=${vQTLfolder}"/1kginfo/"
-kgpath="data/1kginfo/"
+kgpath="${workdir}/data/1kginfo/"
 kgvcfpath=${kgpath}"ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
 # poppanel=${kgpath}"integrated_call_samples_v3.20130502.ALL.panel"
 #emerald="/data/zhangt8/NF_eQTL_ALL/vQTL/tools/emeraLD/bin/emeraLD"
