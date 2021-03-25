@@ -47,23 +47,23 @@ export const getInitialState = async () => {
         isLoading: false,
         visible: false,
         data: null,
-        layout: null
+        layout: null,
       },
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
       gwas: null,
       locus_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       hyprcoloc_ld: null,
       hyprcoloc_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       hyprcolocSNPScore_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       isLoadingHyprcoloc: false,
       ecaviar: null,
@@ -93,6 +93,8 @@ export const getInitialState = async () => {
       tissueOptions: [],
       phenotype: '',
       phenotypeOptions: [],
+      chromosome: { value: 1, label: 1 },
+      range: '10000-100000',
     },
     errorModal: {
       visible: false,

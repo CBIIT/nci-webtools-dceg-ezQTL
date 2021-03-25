@@ -355,7 +355,7 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, bucket) {
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, position, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -421,9 +421,9 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
            "AWS_SESSION_TOKEN" = awsConfig$session_token)
       }
       qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
-      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " 1:10000-150000 -Dh", " >", workDir, "/tmp/", request, '/', request, '.', "rc_temp", ".txt")
+      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", position, " -Dh >", workDir, "/tmp/", request, '/', request, ".qtl_temp.txt")
       system(cmd)
-      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'rc_temp', '.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
+      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp', '.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
     }
     if (!identical(LDFile, 'false')) {
