@@ -97,7 +97,7 @@ export const getInitialState = async () => {
       phenotype: '',
       phenotypeOptions: [],
       chromosome: { value: 1, label: 1 },
-      range: '10000-100000',
+      range: '100000-1000000',
     },
     errorModal: {
       visible: false,
