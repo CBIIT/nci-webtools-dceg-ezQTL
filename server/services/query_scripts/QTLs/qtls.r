@@ -153,7 +153,9 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   cmd = paste0("tabix data/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " >tmp/", request, '/', request, '.', "rc_temp", ".txt")
   system(cmd)
   rcdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'rc_temp', '.txt'), delim = "\t", col_names = F)
-  colnames(rcdata) <- c('chr', 'pos', 'rate', 'map', 'filtered')
+  if (ncol(rcdata)) {
+    colnames(rcdata) <- c('chr', 'pos', 'rate', 'map', 'filtered')
+  }
   rcdata$pos <- as.integer(rcdata$pos)
 
   ### main funciton for the LD calculation 
