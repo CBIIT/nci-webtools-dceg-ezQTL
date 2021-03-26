@@ -334,10 +334,12 @@ export function QTLsGWASForm() {
       : false;
 
     const ldKey = ldPublic
-      ? publicGTEx['cis-QTL dataset']
+      ? publicGTEx['LD dataset']
           .filter(
             (row) =>
-              row.Genome_build == genome.value && row.Project == ldProject.value
+              row.Genome_build == genome.value &&
+              row.Project == ldProject.value &&
+              row.Chromosome == chromosome.value
           )[0]
           .Biowulf_full_path.replace(
             '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
