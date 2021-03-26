@@ -418,7 +418,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
         Sys.setenv("AWS_ACCESS_KEY_ID" = awsConfig$key,
            "AWS_SECRET_ACCESS_KEY" = awsConfig$secret,
            "AWS_DEFAULT_REGION" = awsConfig$region,
-           "AWS_SESSION_TOKEN" = awsConfig$session_token)
+           "AWS_SESSION_TOKEN" = ifelse(is.null(awsConfig$session_token), '', awsConfig$session_token))
       }
       qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
       cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", position, " -Dh >", workDir, "/tmp/", request, '/', request, ".qtl_temp.txt")
