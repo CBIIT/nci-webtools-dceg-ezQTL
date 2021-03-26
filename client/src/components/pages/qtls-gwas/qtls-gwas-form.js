@@ -942,7 +942,7 @@ export function QTLsGWASForm() {
                     onChange={(e) => {
                       dispatch(updateQTLsGWAS({ range: e.target.value }));
                     }}
-                    placeholder="e.g. 10000-100000"
+                    placeholder="e.g. 100000-1000000"
                     value={range}
                   />
                 </Col>
