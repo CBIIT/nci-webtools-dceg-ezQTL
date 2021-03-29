@@ -91,7 +91,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants) {
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, gwasKey) {
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -239,7 +239,13 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   ### snp may not found in the LD matrix file, means this snp missing from 1kg ### then use the next one
 
   if (length(index) != 0) {
-    ld_info <- as.data.frame(ld_data$Sigma[, index])
+    # print(index)
+    # print(dim(ld_data$Sigma))
+    # print(dim(ld_data$info))
+    # stop()
+    # print(head(ld_data$Sigma))
+
+    ld_info <- as.data.frame(ld_data$Sigma[index,]) # out of bounds here [12596 x 2508] 
     colnames(ld_info) <- "R2"
     # rownames(ld_info) <- ld_data$info$id
     # qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
@@ -269,7 +275,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   # initialize colocalization data as empty until data file detected
   locus_colocalization_data <- list(c())
   # if GWAS data file is loaded
-  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
+  if (!identical(gwasFile, 'false') || !identical(gwasKey, 'false') || identical(select_gwas_sample, 'true')) {
     ## return relevent gwas data ##
     gwas_example_data <- gwas_example(gwasdata, qdata_region)
     ## return locus alignment gwas scatter data
@@ -428,7 +434,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
       # set aws config when running on ec2
       loadAWS()
       qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
-      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", position, " -Dh >", workDir, "/tmp/", request, '/', request, ".qtl_temp.txt")
+      assocFile = paste0(request, ".qtl_temp.txt")
+      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", position, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
       system(cmd)
       qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp', '.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
@@ -438,7 +445,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     } else if (!identical(ldKey, 'false')) {
       loadAWS()
       ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
-      cmd = paste0("cd data/", dirname(ldKey), "; tabix ", ldPathS3, " ", position, " -D >", workDir, "/tmp/", request, '/', request, ".ld_temp.txt")
+      ldFile = paste0(request, ".ld_temp.txt")
+      cmd = paste0("cd data/", dirname(ldKey), "; tabix ", ldPathS3, " ", position, " -D >", workDir, "/tmp/", request, '/', ldFile)
       system(cmd)
       LDFile <- paste0('tmp/', request, '/', request, '.', 'ld_temp', '.txt')
     }
@@ -512,7 +520,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   } else if (!identical(gwasKey, 'false')) {
     loadAWS()
     gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
-    cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", position, " -Dh >", workDir, "/tmp/", request, '/', request, ".gwas_temp.txt")
+    gwasFile = paste0(request, ".gwas_temp.txt")
+    cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", position, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
     system(cmd)
     gwasdatafile <- paste0('tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
     gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
@@ -567,7 +576,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, gwasKey)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]

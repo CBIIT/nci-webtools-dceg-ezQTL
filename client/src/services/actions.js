@@ -978,7 +978,9 @@ export function uploadFile(params) {
       console.log(error);
       if (error) {
         dispatch(updateError({ visible: true }));
-        dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+        dispatch(
+          updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+        );
       }
     }
   };
@@ -986,46 +988,55 @@ export function uploadFile(params) {
 
 function qtlsGWASHyprcolocLDCalculation(params) {
   return async function (dispatch, getState) {
-    dispatch(updateQTLsGWAS({
-        isLoadingHyprcoloc: true
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingHyprcoloc: true,
       })
     );
 
     axios
       .post('api/qtls-locus-colocalization-hyprcoloc-ld', params)
       .then(function (response) {
-        
-        console.log('api/qtls-locus-colocalization-hyprcoloc-ld response.data', response.data);
-
-        dispatch(updateQTLsGWAS({
-              hyprcoloc_ld: {
-                filename: response.data['hyprcoloc_ld']['filename'][0]
-              }
-            })
+        console.log(
+          'api/qtls-locus-colocalization-hyprcoloc-ld response.data',
+          response.data
         );
-        
+
+        dispatch(
+          updateQTLsGWAS({
+            hyprcoloc_ld: {
+              filename: response.data['hyprcoloc_ld']['filename'][0],
+            },
+          })
+        );
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          );
         }
       })
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (!qtlsGWAS.isError && qtlsGWAS.hyprcoloc_ld && qtlsGWAS.hyprcoloc_ld.filename) {
+        if (
+          !qtlsGWAS.isError &&
+          qtlsGWAS.hyprcoloc_ld &&
+          qtlsGWAS.hyprcoloc_ld.filename
+        ) {
           dispatch(
             qtlsGWASHyprcolocCalculation({
               request: qtlsGWAS.request,
-              select_gwas_sample: qtlsGWAS.select_gwas_sample, 
-              select_qtls_samples: qtlsGWAS.select_qtls_samples, 
-              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000, 
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum, 
-              gwasfile: qtlsGWAS.inputs.gwas_file[0], 
-              qtlfile: qtlsGWAS.inputs.association_file[0], 
-              ldfile: qtlsGWAS.hyprcoloc_ld.filename, 
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_samples: qtlsGWAS.select_qtls_samples,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              gwasfile: qtlsGWAS.inputs.gwas_file[0],
+              qtlfile: qtlsGWAS.inputs.association_file[0],
+              ldfile: qtlsGWAS.hyprcoloc_ld.filename,
             })
           );
         }
@@ -1038,27 +1049,31 @@ function qtlsGWASHyprcolocCalculation(params) {
     axios
       .post('api/qtls-locus-colocalization-hyprcoloc', params)
       .then(function (response) {
-        
-        console.log('api/qtls-locus-colocalization-hyprcoloc response.data', response.data);
-
-        dispatch(updateQTLsGWAS({
-              hyprcoloc_table: {
-                data: response.data['hyprcoloc']['result_hyprcoloc']['data'][0],
-                globalFilter: ''
-              },
-              hyprcolocSNPScore_table: {
-                data: response.data['hyprcoloc']['result_snpscore']['data'][0],
-                globalFilter: ''
-              }
-            })
+        console.log(
+          'api/qtls-locus-colocalization-hyprcoloc response.data',
+          response.data
         );
-        
+
+        dispatch(
+          updateQTLsGWAS({
+            hyprcoloc_table: {
+              data: response.data['hyprcoloc']['result_hyprcoloc']['data'][0],
+              globalFilter: '',
+            },
+            hyprcolocSNPScore_table: {
+              data: response.data['hyprcoloc']['result_snpscore']['data'][0],
+              globalFilter: '',
+            },
+          })
+        );
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          );
         }
       })
       .then(function () {
@@ -1069,32 +1084,37 @@ function qtlsGWASHyprcolocCalculation(params) {
 
 export function qtlsGWASECaviarCalculation(params) {
   return async function (dispatch, getState) {
-    console.log("ecaviar", params);
-    dispatch(updateQTLsGWAS({
-        isLoadingECaviar: true
+    console.log('ecaviar', params);
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingECaviar: true,
       })
     );
 
     axios
       .post('api/qtls-locus-colocalization-ecaviar', params)
       .then(function (response) {
-        
-        console.log('api/qtls-locus-colocalization-ecaviar response.data', response.data);
-
-        dispatch(updateQTLsGWAS({
-              ecaviar_table: {
-                data: response.data['ecaviar']['data'][0],
-                globalFilter: ''
-              }
-            })
+        console.log(
+          'api/qtls-locus-colocalization-ecaviar response.data',
+          response.data
         );
-        
+
+        dispatch(
+          updateQTLsGWAS({
+            ecaviar_table: {
+              data: response.data['ecaviar']['data'][0],
+              globalFilter: '',
+            },
+          })
+        );
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          );
         }
       })
       .then(function () {
@@ -1120,85 +1140,115 @@ export function qtlsGWASCalculation(params) {
       .then(function (response) {
         console.log('api/qtls-calculate-main response.data', response.data);
 
-        const {
-          pdata,
-          locus_alignment_plot_layout
-        } = Object.keys(response.data['gwas']['data'][0]).length > 0 ? drawLocusAlignmentGWAS(response) : drawLocusAlignment(response);
+        const { pdata, locus_alignment_plot_layout } =
+          Object.keys(response.data['gwas']['data'][0]).length > 0
+            ? drawLocusAlignmentGWAS(response)
+            : drawLocusAlignment(response);
 
-        dispatch(updateQTLsGWAS({
-              request: response.data['info']['inputs']['request'][0],
-              openSidebar: false,
-              select_qtls_samples: response.data['info']['select_qtls_samples'][0] === 'true' ? true : false,
-              select_gwas_sample: response.data['info']['select_gwas_sample'][0] === 'true' ? true : false,
-              select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
-              recalculateAttempt: response.data['info']['recalculateAttempt'][0] === 'true' ? true : false,
-              recalculatePop: response.data['info']['recalculatePop'][0] === 'true' ? true : false,
-              recalculateGene: response.data['info']['recalculateGene'][0] === 'true' ? true : false,
-              recalculateDist: response.data['info']['recalculateDist'][0]=== 'true' ? true : false,
-              recalculateRef: response.data['info']['recalculateRef'][0] === 'true' ? true : false,
-              top_gene_variants: {
-                data: response.data['info']['top_gene_variants']['data'][0]
-              },
-              all_gene_variants: {
-                data: response.data['info']['all_gene_variants']['data'][0]
-              },
-              gene_list: { 
-                data: response.data['info']['gene_list']['data'][0]
-              },
-              inputs: response.data['info']['inputs'],
-              messages: response.data['info']['messages'],
-              locus_quantification: {
-                data: response.data['locus_quantification']['data'][0],
-              },
-              locus_quantification_heatmap: {
-                data: response.data['locus_quantification_heatmap']['data'][0]
-              },
-              locus_alignment: {
-                data: pdata,
-                layout: locus_alignment_plot_layout,
-                top: response.data['locus_alignment']['top'][0][0],
-              },
-              locus_alignment_gwas_scatter: {
-                data: response.data['locus_alignment_gwas_scatter']['data'][0],
-                title: response.data['locus_alignment_gwas_scatter']['title'][0]
-              },
-              locus_colocalization_correlation: {
-                data: response.data['locus_colocalization_correlation']['data'][0]
-              },
-              gwas: {
-                data: response.data['gwas']['data'][0]
-              },
-              locus_table: {
-                data: response.data['locus_alignment']['data'][0],
-                globalFilter: '',
-                // pagination: {
-                //   pageIndex: 0,
-                //   pageSize: 0
-                // }
-              }
-            })
+        dispatch(
+          updateQTLsGWAS({
+            request: response.data['info']['inputs']['request'][0],
+            openSidebar: false,
+            select_qtls_samples:
+              response.data['info']['select_qtls_samples'][0] === 'true'
+                ? true
+                : false,
+            select_gwas_sample:
+              response.data['info']['select_gwas_sample'][0] === 'true'
+                ? true
+                : false,
+            select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
+            recalculateAttempt:
+              response.data['info']['recalculateAttempt'][0] === 'true'
+                ? true
+                : false,
+            recalculatePop:
+              response.data['info']['recalculatePop'][0] === 'true'
+                ? true
+                : false,
+            recalculateGene:
+              response.data['info']['recalculateGene'][0] === 'true'
+                ? true
+                : false,
+            recalculateDist:
+              response.data['info']['recalculateDist'][0] === 'true'
+                ? true
+                : false,
+            recalculateRef:
+              response.data['info']['recalculateRef'][0] === 'true'
+                ? true
+                : false,
+            top_gene_variants: {
+              data: response.data['info']['top_gene_variants']['data'][0],
+            },
+            all_gene_variants: {
+              data: response.data['info']['all_gene_variants']['data'][0],
+            },
+            gene_list: {
+              data: response.data['info']['gene_list']['data'][0],
+            },
+            inputs: response.data['info']['inputs'],
+            messages: response.data['info']['messages'],
+            locus_quantification: {
+              data: response.data['locus_quantification']['data'][0],
+            },
+            locus_quantification_heatmap: {
+              data: response.data['locus_quantification_heatmap']['data'][0],
+            },
+            locus_alignment: {
+              data: pdata,
+              layout: locus_alignment_plot_layout,
+              top: response.data['locus_alignment']['top'][0][0],
+            },
+            locus_alignment_gwas_scatter: {
+              data: response.data['locus_alignment_gwas_scatter']['data'][0],
+              title: response.data['locus_alignment_gwas_scatter']['title'][0],
+            },
+            locus_colocalization_correlation: {
+              data:
+                response.data['locus_colocalization_correlation']['data'][0],
+            },
+            gwas: {
+              data: response.data['gwas']['data'][0],
+            },
+            locus_table: {
+              data: response.data['locus_alignment']['data'][0],
+              globalFilter: '',
+              // pagination: {
+              //   pageIndex: 0,
+              //   pageSize: 0
+              // }
+            },
+          })
         );
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          );
         }
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoading: false }));
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (!qtlsGWAS.isError && qtlsGWAS.gwas && qtlsGWAS.gwas.data && Object.keys(qtlsGWAS.gwas.data).length > 0) {
+        if (
+          !qtlsGWAS.isError &&
+          qtlsGWAS.gwas &&
+          qtlsGWAS.gwas.data &&
+          Object.keys(qtlsGWAS.gwas.data).length > 0
+        ) {
           dispatch(
             qtlsGWASHyprcolocLDCalculation({
               request: qtlsGWAS.request,
-              ldfile: qtlsGWAS.inputs.ld_file[0], 
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum, 
-              select_chr: qtlsGWAS.locus_alignment.top.chr, 
-              select_pos: qtlsGWAS.locus_alignment.top.pos, 
-              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000, 
+              ldfile: qtlsGWAS.inputs.ld_file[0],
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              select_chr: qtlsGWAS.locus_alignment.top.chr,
+              select_pos: qtlsGWAS.locus_alignment.top.pos,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
             })
           );
         }
@@ -1211,66 +1261,73 @@ const getBoxplotsYData = (boxplotData) => {
   let a0a1 = [];
   let a1a1 = [];
   for (var i = 0; i < boxplotData.length; i++) {
-    if (boxplotData[i]['Genotype'] === "0/0") {
+    if (boxplotData[i]['Genotype'] === '0/0') {
       a0a0.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
-    } 
-    if (boxplotData[i]['Genotype'] === "0/1") {
+    }
+    if (boxplotData[i]['Genotype'] === '0/1') {
       a0a1.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
-    } 
-    if (boxplotData[i]['Genotype'] === "1/1") {
+    }
+    if (boxplotData[i]['Genotype'] === '1/1') {
       a1a1.push((Math.log2(boxplotData[i]['exp']) + 0.1) * -1.0);
-    } 
-}
+    }
+  }
   var yData = [a0a0, a0a1, a1a1];
   return yData;
-}
+};
 
 const drawLocusAlignmentBoxplots = (params, response) => {
   const locus_alignment_boxplots_plot_layout = {
     font: {
-      color: 'black'
+      color: 'black',
     },
     width: 660,
     height: 600,
     xaxis: {
-      title: params.info['rsnum'] + " genotype: " + params.info['ref'] + "->" + params.info['alt'],
+      title:
+        params.info['rsnum'] +
+        ' genotype: ' +
+        params.info['ref'] +
+        '->' +
+        params.info['alt'],
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     yaxis: {
-      title: params.info['gene_symbol'] + " Quantification (log2)",
+      title: params.info['gene_symbol'] + ' Quantification (log2)',
       autorange: true,
       showgrid: true,
       zeroline: true,
       dtick: 4,
       gridwidth: 1,
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     margin: {
       l: 40,
       r: 10,
       b: 80,
-      t: 40
+      t: 40,
     },
     showlegend: true,
-    legend: { "orientation": "h" }
+    legend: { orientation: 'h' },
   };
 
   let pdata = [];
 
-  const xData = ["0/0", "0/1", "1/1"];
-  const yData = getBoxplotsYData(response.data['locus_alignment_boxplots']['data'][0]);
+  const xData = ['0/0', '0/1', '1/1'];
+  const yData = getBoxplotsYData(
+    response.data['locus_alignment_boxplots']['data'][0]
+  );
 
-  for ( var i = 0; i < xData.length; i++ ) {
+  for (var i = 0; i < xData.length; i++) {
     const result = {
       type: 'box',
       y: yData[i],
@@ -1281,65 +1338,75 @@ const drawLocusAlignmentBoxplots = (params, response) => {
       whiskerwidth: 0.2,
       fillcolor: 'cls',
       marker: {
-        size: 4
+        size: 4,
       },
       line: {
-        width: 1
-      }
+        width: 1,
+      },
     };
     pdata.push(result);
   }
 
   return {
     pdata,
-    locus_alignment_boxplots_plot_layout
-  }
-}
+    locus_alignment_boxplots_plot_layout,
+  };
+};
 
 export function qtlsGWASBoxplotsCalculation(params) {
   return async function (dispatch, getState) {
-    dispatch(updateQTLsGWAS({
-          locus_alignment_boxplots: {
-            isLoading: true,
-            visible: true,
-            data: null,
-            layout: null
-          }
-        })
+    dispatch(
+      updateQTLsGWAS({
+        locus_alignment_boxplots: {
+          isLoading: true,
+          visible: true,
+          data: null,
+          layout: null,
+        },
+      })
     );
 
     axios
       .post('api/qtls-locus-alignment-boxplots', params)
       .then(function (response) {
-        
-        console.log('api/qtls-locus-alignment-boxplots response.data', response.data);
+        console.log(
+          'api/qtls-locus-alignment-boxplots response.data',
+          response.data
+        );
 
         const {
           pdata,
-          locus_alignment_boxplots_plot_layout
+          locus_alignment_boxplots_plot_layout,
         } = drawLocusAlignmentBoxplots(params, response);
 
-        dispatch(updateQTLsGWAS({
-              locus_alignment_boxplots: {
-                ...getState().qtlsGWAS.locus_alignment_boxplots,
-                data: pdata,
-                layout: locus_alignment_boxplots_plot_layout
-              }
-            })
+        dispatch(
+          updateQTLsGWAS({
+            locus_alignment_boxplots: {
+              ...getState().qtlsGWAS.locus_alignment_boxplots,
+              data: pdata,
+              layout: locus_alignment_boxplots_plot_layout,
+            },
+          })
         );
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          );
         }
       })
       .then(function () {
-        dispatch(updateQTLsGWAS({ locus_alignment_boxplots: {
-          ...getState().qtlsGWAS.locus_alignment_boxplots,
-          isLoading: false
-        }}));
+        dispatch(
+          updateQTLsGWAS({
+            locus_alignment_boxplots: {
+              ...getState().qtlsGWAS.locus_alignment_boxplots,
+              isLoading: false,
+            },
+          })
+        );
       });
   };
 }
