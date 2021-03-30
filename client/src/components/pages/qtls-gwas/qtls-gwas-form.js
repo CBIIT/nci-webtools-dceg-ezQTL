@@ -360,6 +360,10 @@ export function QTLsGWASForm() {
           )
       : false;
 
+    dispatch(
+      updateQTLsGWAS({ qtlKey: qtlKey, ldKey: ldKey, gwasKey: gwasKey })
+    );
+
     await dispatch(
       qtlsGWASCalculation({
         request,
@@ -383,7 +387,8 @@ export function QTLsGWASForm() {
         qtlKey,
         ldKey,
         gwasKey,
-        position: `${chromosome.value}:${range}`,
+        chromosome: chromosome.value,
+        range: range,
       })
     );
   }
