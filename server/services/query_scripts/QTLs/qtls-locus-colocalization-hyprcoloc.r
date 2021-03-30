@@ -1,4 +1,4 @@
-locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request) {
+locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, qtlKey, chromosome, range) {
   setwd(workDir)
   .libPaths(c(.libPaths(), "~/R"))
   library(hyprcoloc)

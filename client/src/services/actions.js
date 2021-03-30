@@ -1037,6 +1037,9 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               gwasfile: qtlsGWAS.inputs.gwas_file[0],
               qtlfile: qtlsGWAS.inputs.association_file[0],
               ldfile: qtlsGWAS.hyprcoloc_ld.filename,
+              qtlKey: qtlsGWAS.qtlKey,
+              chromosome: qtlsGWAS.chromosome.value,
+              range: qtlsGWAS.range,
             })
           );
         }
@@ -1072,7 +1075,11 @@ function qtlsGWASHyprcolocCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({
+              isError: true,
+              activeResultsTab: 'locus-qc',
+              isLoadingHyprcoloc: false,
+            })
           );
         }
       })
