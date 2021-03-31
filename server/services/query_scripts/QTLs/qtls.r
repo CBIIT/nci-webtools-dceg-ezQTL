@@ -7,6 +7,31 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
   }
 }
 
+getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos) {
+  ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
+  LDFile = paste0('tmp/', request, '/', request, '.LD.gz')
+  wd = getwd()
+
+  cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
+  system(cmd)
+  cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
+  system(cmd)
+  cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', "--stdout --extra --phased |sed 's/:/\t/' |bgzip > tmp/", request, '/', request, '.LD.gz')
+  system(cmd)
+
+  out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+  info <- out[, 1:5]
+  colnames(info) <- c("chr", "pos", "id", "ref", "alt")
+  if (length(unique(info$chr)) > 1) {
+    errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
+  } else {
+    out <- as.matrix(out[, - (1:5)]);
+    colnames(out) <- NULL
+    ld_data <- list("Sigma" = out, "info" = info)
+  }
+  saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
+}
+
 locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
   if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
     cmd <- paste0('bcftools view -S tmp/', request, '/', request, '.', 'extracted', '.panel -R ', paste0('tmp/', request, '/', request, '.', 'locus.bed'), ' -O z  ', in_path, '|bcftools sort -O z -o tmp/', request, '/', request, '.', 'input', '.vcf.gz')
@@ -91,7 +116,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, chromosome, range, qtlKey, ldKey, gwasKey) {
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, chromosome, range, bucket, qtlKey, ldKey, gwasKey) {
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -238,7 +263,12 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   }
 
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
-    locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
+    if (identical(ldKey, 'false')) {
+      locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
+    } else {
+      getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos)
+      LDFile = paste0(request, '.input.vcf.gz')
+    }
     ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
   }
 
@@ -247,13 +277,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   ### snp may not found in the LD matrix file, means this snp missing from 1kg ### then use the next one
 
   if (length(index) != 0) {
-    # print(index)
-    # print(dim(ld_data$Sigma))
-    # print(dim(ld_data$info))
-    # stop()
-    # print(head(ld_data$Sigma))
-
-    ld_info <- as.data.frame(ld_data$Sigma[index,]) # out of bounds here [12596 x 2508] 
+    ld_info <- as.data.frame(ld_data$Sigma[index,])
     colnames(ld_info) <- "R2"
     # rownames(ld_info) <- ld_data$info$id
     # qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
@@ -451,14 +475,6 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     if (!identical(LDFile, 'false')) {
       LDFile <- paste0('tmp/', request, '/', LDFile)
     }
-    # else if (!identical(ldKey, 'false')) {
-    #   loadAWS()
-    #   ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
-    #   LDFile = paste0(request, ".ld_temp.txt")
-    #   cmd = paste0("cd data/", dirname(ldKey), "; tabix ", ldPathS3, " ", chromosome, ":", range, " -D >", workDir, "/tmp/", request, '/', LDFile)
-    #   system(cmd)
-    #   LDFile <- paste0('tmp/', request, '/', request, '.', 'ld_temp', '.txt')
-    # }
   }
 
   # check if there are multiple chromosomes in the input assoc file
@@ -585,7 +601,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, chromosome, range, qtlKey, ldKey, gwasKey)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, chromosome, range, bucket, qtlKey, ldKey, gwasKey)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
@@ -600,8 +616,13 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_quantification_data <- locus_quantification[[1]]
   locus_quantification_heatmap_data <- locus_quantification[[2]]
 
+  ## Reassign LD file if public LD data is used
+  if (identical(LDFile, 'false') && !identical(ldKey, 'false')) {
+    LDFile = paste0(request, '.LD.gz')
+  }
+
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_quantification = list(data = locus_quantification_data), locus_quantification_heatmap = list(data = locus_quantification_heatmap_data), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = LDFile, select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_quantification = list(data = locus_quantification_data), locus_quantification_heatmap = list(data = locus_quantification_heatmap_data), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
