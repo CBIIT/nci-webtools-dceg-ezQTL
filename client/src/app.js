@@ -20,7 +20,7 @@ export function App() {
     },
     {
       route: '/qtls',
-      title: 'QTLs-GWAS',
+      title: 'Single Loci',
     },
     {
       route: '/help',
