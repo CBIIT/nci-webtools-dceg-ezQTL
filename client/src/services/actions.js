@@ -1033,6 +1033,7 @@ function qtlsGWASHyprcolocLDCalculation(params) {
   };
 }
 
+
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
     axios
@@ -1101,6 +1102,34 @@ export function qtlsGWASECaviarCalculation(params) {
         dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
       });
   };
+}
+
+export function qtlsGWASLocusQCCalculation(params) {
+  return async function (dispatch, getState){
+
+    console.log("locus qc", params);
+    dispatch(updateQTLsGWAS({
+      isLoadingQC : true
+      })
+    );
+
+    axios
+      .post('qtls-locus-colocalization-qc',params)
+      .then(function (response) {
+        console.log('api/qtls-locus-colocalization-qc response.data', response.data);
+      })
+      .catch(function (error){
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+        }
+      })
+      .then(function () {
+        dispatch(updateQTLsGWAS({ isLoadingQC: false }));
+      });
+
+  }
 }
 
 export function qtlsGWASCalculation(params) {
@@ -1201,6 +1230,16 @@ export function qtlsGWASCalculation(params) {
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000, 
             })
           );
+          console.log(qtlsGWAS)
+          /*
+          dispatch(
+            qtlsGWASLocusQCCalculation({
+              request: qtlsGWAS.request,
+              ldfile: qtlsGWAS.inputs.ld_file[0],
+
+
+            })
+          )*/
         }
       });
   };
