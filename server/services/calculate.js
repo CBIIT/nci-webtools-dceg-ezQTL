@@ -186,7 +186,7 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, req, res, next)
 }
 
 async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
-    // req.setTimeout(900000);
+    req.setTimeout(900000);
 
     const {
         request,
