@@ -334,10 +334,12 @@ export function QTLsGWASForm() {
       : false;
 
     const ldKey = ldPublic
-      ? publicGTEx['cis-QTL dataset']
+      ? publicGTEx['LD dataset']
           .filter(
             (row) =>
-              row.Genome_build == genome.value && row.Project == ldProject.value
+              row.Genome_build == genome.value &&
+              row.Project == ldProject.value &&
+              row.Chromosome == chromosome.value
           )[0]
           .Biowulf_full_path.replace(
             '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
@@ -357,6 +359,10 @@ export function QTLsGWASForm() {
             ''
           )
       : false;
+
+    dispatch(
+      updateQTLsGWAS({ qtlKey: qtlKey, ldKey: ldKey, gwasKey: gwasKey })
+    );
 
     await dispatch(
       qtlsGWASCalculation({
@@ -381,7 +387,8 @@ export function QTLsGWASForm() {
         qtlKey,
         ldKey,
         gwasKey,
-        position: `${chromosome.value}:${range}`,
+        chromosome: chromosome.value,
+        range: range,
       })
     );
   }
@@ -571,92 +578,6 @@ export function QTLsGWASForm() {
             )}
           </Form.Group>
           <Form.Group className="col-sm-12">
-            <Form.Label className="mb-0">Quantification Data File</Form.Label>
-            <Form.File
-              ref={quantificationFileControl}
-              id="qtls-quantification-file"
-              disabled={submitted || select_qtls_samples}
-              key={_quantificationFile}
-              label={
-                _quantificationFile
-                  ? _quantificationFile.name ||
-                    _quantificationFile.filename ||
-                    _quantificationFile
-                  : select_qtls_samples
-                  ? 'MX2.quantification.txt'
-                  : 'Choose File'
-              }
-              onChange={(e) => {
-                _setQuantificationFile(e.target.files[0]);
-              }}
-              // accept=".tsv, .txt"
-              // isInvalid={checkValid ? !validFile : false}
-              // feedback="Please upload a data file"
-              // onChange={(e) => {
-              //     setInput(e.target.files[0]);
-              //     mergeVisualize({
-              //     storeFilename: e.target.files[0].name,
-              //     });
-              // }}
-              custom
-            />
-            <Overlay
-              target={quantificationFileControl.current}
-              show={showQuantificationTooltip}
-              placement="bottom"
-            >
-              {(props) => (
-                <Tooltip id="overlay-example" {...props}>
-                  Please input accompanying Quantification Data File with
-                  Genotype Data File.
-                </Tooltip>
-              )}
-            </Overlay>
-          </Form.Group>
-          <Form.Group className="col-sm-12">
-            <Form.Label className="mb-0">Genotype Data File</Form.Label>
-            <Form.File
-              ref={genotypeFileControl}
-              id="qtls-genotype-file"
-              disabled={submitted || select_qtls_samples}
-              key={_genotypeFile}
-              label={
-                _genotypeFile
-                  ? _genotypeFile.name ||
-                    _genotypeFile.filename ||
-                    _genotypeFile
-                  : select_qtls_samples
-                  ? 'MX2.genotyping.txt'
-                  : 'Choose File'
-              }
-              onChange={(e) => {
-                _setGenotypeFile(e.target.files[0]);
-              }}
-              // accept=".tsv, .txt"
-              // isInvalid={checkValid ? !validFile : false}
-              // feedback="Please upload a data file"
-              // onChange={(e) => {
-              //     setInput(e.target.files[0]);
-              //     mergeVisualize({
-              //     storeFilename: e.target.files[0].name,
-              //     });
-              // }}
-              custom
-            />
-            <Overlay
-              target={genotypeFileControl.current}
-              show={showGenotypeTooltip}
-              placement="bottom"
-            >
-              {(props) => (
-                <Tooltip id="overlay-example" {...props}>
-                  Please input accompanying Genotype Data File with
-                  Quantification Data File.
-                </Tooltip>
-              )}
-            </Overlay>
-          </Form.Group>
-          <Form.Group className="col-sm-12">
             <div className="d-flex">
               <Form.Label className="mb-0 mr-auto">
                 LD Data{' '}
@@ -722,6 +643,94 @@ export function QTLsGWASForm() {
               />
             )}
           </Form.Group>
+          <div>
+            <Form.Group className="col-sm-12">
+              <Form.Label className="mb-0">Quantification Data File</Form.Label>
+              <Form.File
+                ref={quantificationFileControl}
+                id="qtls-quantification-file"
+                disabled={submitted || select_qtls_samples}
+                key={_quantificationFile}
+                label={
+                  _quantificationFile
+                    ? _quantificationFile.name ||
+                      _quantificationFile.filename ||
+                      _quantificationFile
+                    : select_qtls_samples
+                    ? 'MX2.quantification.txt'
+                    : 'Choose File'
+                }
+                onChange={(e) => {
+                  _setQuantificationFile(e.target.files[0]);
+                }}
+                // accept=".tsv, .txt"
+                // isInvalid={checkValid ? !validFile : false}
+                // feedback="Please upload a data file"
+                // onChange={(e) => {
+                //     setInput(e.target.files[0]);
+                //     mergeVisualize({
+                //     storeFilename: e.target.files[0].name,
+                //     });
+                // }}
+                custom
+              />
+              <Overlay
+                target={quantificationFileControl.current}
+                show={showQuantificationTooltip}
+                placement="bottom"
+              >
+                {(props) => (
+                  <Tooltip id="overlay-example" {...props}>
+                    Please input accompanying Quantification Data File with
+                    Genotype Data File.
+                  </Tooltip>
+                )}
+              </Overlay>
+            </Form.Group>
+            <Form.Group className="col-sm-12">
+              <Form.Label className="mb-0">Genotype Data File</Form.Label>
+              <Form.File
+                ref={genotypeFileControl}
+                id="qtls-genotype-file"
+                disabled={submitted || select_qtls_samples}
+                key={_genotypeFile}
+                label={
+                  _genotypeFile
+                    ? _genotypeFile.name ||
+                      _genotypeFile.filename ||
+                      _genotypeFile
+                    : select_qtls_samples
+                    ? 'MX2.genotyping.txt'
+                    : 'Choose File'
+                }
+                onChange={(e) => {
+                  _setGenotypeFile(e.target.files[0]);
+                }}
+                // accept=".tsv, .txt"
+                // isInvalid={checkValid ? !validFile : false}
+                // feedback="Please upload a data file"
+                // onChange={(e) => {
+                //     setInput(e.target.files[0]);
+                //     mergeVisualize({
+                //     storeFilename: e.target.files[0].name,
+                //     });
+                // }}
+                custom
+              />
+              <Overlay
+                target={genotypeFileControl.current}
+                show={showGenotypeTooltip}
+                placement="bottom"
+              >
+                {(props) => (
+                  <Tooltip id="overlay-example" {...props}>
+                    Please input accompanying Genotype Data File with
+                    Quantification Data File.
+                  </Tooltip>
+                )}
+              </Overlay>
+            </Form.Group>
+          </div>
         </Row>
         <Row>
           <div className="w-100 border border-top mx-3 my-2"></div>
@@ -940,7 +949,7 @@ export function QTLsGWASForm() {
                     onChange={(e) => {
                       dispatch(updateQTLsGWAS({ range: e.target.value }));
                     }}
-                    placeholder="e.g. 10000-100000"
+                    placeholder="e.g. 100000-1000000"
                     value={range}
                   />
                 </Col>

@@ -25,7 +25,8 @@ async function qtlsCalculateMain(params, res, next) {
     qtlKey,
     ldKey,
     gwasKey,
-    position,
+    chromosome,
+    range,
     bucket,
   } = params;
 
@@ -35,6 +36,33 @@ async function qtlsCalculateMain(params, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
+  logger.debug([
+    rfile,
+    workingDirectory.toString(),
+    select_qtls_samples.toString(),
+    select_gwas_sample.toString(),
+    associationFile.toString(),
+    quantificationFile.toString(),
+    genotypeFile.toString(),
+    gwasFile.toString(),
+    LDFile.toString(),
+    request.toString(),
+    select_pop.toString(),
+    select_gene.toString(),
+    select_dist.toString(),
+    select_ref.toString(),
+    recalculateAttempt.toString(),
+    recalculatePop.toString(),
+    recalculateGene.toString(),
+    recalculateDist.toString(),
+    recalculateRef.toString(),
+    qtlKey.toString(),
+    ldKey.toString(),
+    gwasKey.toString(),
+    chromosome.toString(),
+    range.toString(),
+    bucket.toString(),
+  ]);
   try {
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -62,7 +90,8 @@ async function qtlsCalculateMain(params, res, next) {
         qtlKey.toString(),
         ldKey.toString(),
         gwasKey.toString(),
-        position.toString(),
+        chromosome.toString(),
+        range.toString(),
         bucket.toString(),
       ]
     );
@@ -171,6 +200,9 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, res, next) {
     qtlfile,
     ldfile,
     workingDirectory,
+    qtlKey,
+    chromosome,
+    range,
   } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc`);
@@ -184,6 +216,21 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, res, next) {
     'QTLs',
     'qtls-locus-colocalization-hyprcoloc.r'
   );
+  logger.debug([
+    rfile,
+    workingDirectory.toString(),
+    select_gwas_sample.toString(),
+    select_qtls_samples.toString(),
+    select_dist.toString(),
+    select_ref.toString(),
+    gwasfile.toString(),
+    qtlfile.toString(),
+    ldfile.toString(),
+    request.toString(),
+    qtlKey.toString(),
+    chromosome.toString(),
+    range.toString(),
+  ]);
   try {
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -199,6 +246,9 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, res, next) {
         qtlfile.toString(),
         ldfile.toString(),
         request.toString(),
+        qtlKey.toString(),
+        chromosome.toString(),
+        range.toString(),
       ]
     );
     logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);
