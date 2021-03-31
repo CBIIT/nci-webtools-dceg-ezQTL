@@ -2,7 +2,7 @@ const r = require('r-wrapper').async;
 const path = require('path');
 const logger = require('../services/logger');
 
-async function qtlsCalculateMain(params, res, next) {
+async function qtlsCalculateMain(params, req, res, next) {
   const {
     request,
     select_qtls_samples,
@@ -103,7 +103,7 @@ async function qtlsCalculateMain(params, res, next) {
   }
 }
 
-async function qtlsCalculateLocusAlignmentBoxplots(params, res, next) {
+async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   const {
     request,
     select_qtls_samples,
@@ -140,7 +140,7 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, res, next) {
   }
 }
 
-async function qtlsCalculateLocusColocalizationHyprcolocLD(params, res, next) {
+async function qtlsCalculateLocusColocalizationHyprcolocLD(params, req, res, next) {
   const {
     request,
     ldfile,
@@ -189,7 +189,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(params, res, next) {
   }
 }
 
-async function qtlsCalculateLocusColocalizationHyprcoloc(params, res, next) {
+async function qtlsCalculateLocusColocalizationHyprcoloc(params, req, res, next) {
   const {
     request,
     select_gwas_sample,
@@ -261,7 +261,7 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, res, next) {
   }
 }
 
-async function qtlsCalculateLocusColocalizationECAVIAR(params, res, next) {
+async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
   const {
     request,
     select_gwas_sample,
