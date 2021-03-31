@@ -1,7 +1,8 @@
 import {
     UPDATE_KEY,
     UPDATE_QTLS_GWAS,
-    UPDATE_ERROR
+    UPDATE_ERROR,
+    UPDATE_ALERT
   } from './actions';
   
   export const rootReducer = (state, action) => {
@@ -24,6 +25,14 @@ import {
                 ...state,
                 errorModal: {
                 ...state.errorModal,
+                ...action.data
+                }
+            };
+        case UPDATE_ALERT:
+            return {
+                ...state,
+                alert: {
+                ...state.alert,
                 ...action.data
                 }
             };

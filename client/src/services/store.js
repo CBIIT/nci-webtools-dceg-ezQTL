@@ -104,6 +104,11 @@ export const getInitialState = async () => {
       details: ``,
       message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:FORGE2-TFWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
     },
+    alert: {
+      show: false,
+      message: ``,
+      variant: 'warning',
+    }
   };
 
   return initialState;
