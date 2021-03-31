@@ -245,20 +245,32 @@ async function qtlsCalculateColocalizationQC(params, res, next) {
 
     const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezqTL_ztw.r');
     try {
+
+        if(select_gwas_sample)
+            gwasFile = path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt')
+        else
+            gwasFile = path.resolve('tmp',request,gwasFile)
+        
+        if(select_qtls_samples){
+            associationFile = path.resolve(__dirname,'data','MX2.examples','MX2.eQTL.txt')
+            LDFile = path.resolve(__dirname,'data','MX2.examples','MX2.LD.gz')
+        }
+        else{
+            associationFile = path.resolve('tmp',request,associationFile)
+            LDFile = path.resolve('tmp',request,LDFile)
+        }
+
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
             "qtlsCalculateColocalizationQC",
             [
                 rfile,
-                select_gwas_sample.toString(), 
-                select_qtls_samples.toString(), 
                 gwasFile.toString(), 
                 associationFile.toString(), 
                 LDFile.toString(), 
                 select_ref.toString(),
                 select_dist.toString(),
-                select_gene.toString(), 
-                request.toString()
+                select_gene.toString()
             ]
         );
         logger.info(`[${request}] Finished /ezqTL_ztw`);
