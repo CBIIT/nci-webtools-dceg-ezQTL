@@ -47,23 +47,23 @@ export const getInitialState = async () => {
         isLoading: false,
         visible: false,
         data: null,
-        layout: null
+        layout: null,
       },
       locus_alignment_gwas_scatter: null,
       locus_colocalization_correlation: null,
       gwas: null,
       locus_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       hyprcoloc_ld: null,
       hyprcoloc_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       hyprcolocSNPScore_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       isLoadingHyprcoloc: false,
       ecaviar_table: {
@@ -97,12 +97,19 @@ export const getInitialState = async () => {
       tissueOptions: [],
       phenotype: '',
       phenotypeOptions: [],
+      chromosome: { value: 1, label: 1 },
+      range: '100000-1000000',
     },
     errorModal: {
       visible: false,
       details: ``,
       message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:FORGE2-TFWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
     },
+    alert: {
+      show: false,
+      message: ``,
+      variant: 'warning',
+    }
   };
 
   return initialState;
