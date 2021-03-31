@@ -18,8 +18,6 @@ export default function Select({
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     },
     menuPortalTarget: document.body,
-    getOptionLabel: (option) => (option == 'NA' ? 'N/A' : option),
-    getOptionValue: (option) => option,
     filterOption: createFilter({ ignoreAccents: false }),
   };
 
@@ -29,7 +27,7 @@ export default function Select({
       <ReactSelect
         inputId={id}
         options={options}
-        value={[value] || [options[0]]}
+        value={value}
         onChange={onChange}
         isDisabled={disabled}
         {...props}

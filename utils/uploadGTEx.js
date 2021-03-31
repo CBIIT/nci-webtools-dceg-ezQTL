@@ -1,15 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const AWS = require('aws-sdk');
 const XLSX = require('xlsx');
+const spawn = require('child_process').spawn;
 
 // this script accepts and excel file path containing a mapping of file for GTEx study
-// the excel file is parsed to json so that the file path can be use to progamatically
-// upload each one to s3
+// the excel file is parsed to json so that the file path can be use to progamatically upload each one to s3
 // this script is intended to be copied onto your Biowulf Helix user directory for use
-// be sure to setup configure AWS in your environemnt ahead of time and install the node packages
-// imported above
-// this script only has error output, verify files are uploaded in aws cli or on your browser
+// be sure to setup configure AWS in your environemnt ahead of time and install the node packages imported above
+// verify files are uploaded in aws cli or on your browser
 
 try {
   if (process.argv.length < 3) {
@@ -31,7 +27,7 @@ try {
 
   // add bucket name and aws credentials if necessary
   const config = {
-    bucket: 'dataBucket',
+    bucket: '',
     aws: {
       region: 'us-east-1',
       aws_access_key_id: '',
@@ -39,43 +35,42 @@ try {
     },
   };
 
-  AWS.config.update(config.aws);
-  const s3 = new AWS.S3();
-
   console.log('uploading to s3...');
 
-  Object.keys(fileMap).forEach(async (sheet) => {
-    const uploadAll = await Promise.all(
-      fileMap[sheet].map(async (row) => {
-        try {
-          // remove begining of file path
-          const replacePath = '/data/Brown_lab/ZTW_KB_Datasets/vQTL2';
-          const file = row.Biowulf_full_path;
-          const index = row.Biowulf_full_path_index;
+  let include = [];
+  const root = '/data/Brown_lab/ZTW_KB_Datasets/vQTL2';
 
-          return await Promise.all([
-            s3
-              .upload({
-                Bucket: config.bucket,
-                Key: `ezQTL${file.replace(replacePath, '')}`,
-                Body: fs.createReadStream(path.resolve(file)),
-              })
-              .promise(),
-            s3
-              .upload({
-                Bucket: config.bucket,
-                Key: `ezQTL${index.replace(replacePath, '')}`,
-                Body: fs.createReadStream(path.resolve(index)),
-              })
-              .promise(),
-          ]);
-        } catch (err) {
-          console.log(`Failed to upload ${row.Filename}`);
-          // console.log(err);
-          return [];
-        }
-      })
-    );
+  Object.keys(fileMap).forEach((sheet) => {
+    fileMap[sheet].map((row) => {
+      const file = row.Biowulf_full_path;
+      const index = row.Biowulf_full_path_index;
+
+      include.push(
+        `--include "${file.replace(root, '')}" --include "${index.replace(
+          root,
+          ''
+        )}"`
+      );
+    });
+  });
+
+  const syncCMD = `module load aws; cd ${root}; aws s3 sync . s3://${
+    config.bucket
+  }/ezQTL/ --exclude "*" ${include.join(' ')}`;
+
+  const cmd = spawn(syncCMD, { shell: true });
+
+  cmd.stdout.on('data', function (data) {
+    console.log('stdout: ' + data.toString());
+  });
+
+  cmd.stderr.on('data', function (data) {
+    console.log('stderr: ' + data.toString());
+  });
+
+  cmd.on('exit', function (code) {
+    console.log('Done');
+    console.log('exited with code ' + code.toString());
   });
 } catch (err) {
   console.log(err);
