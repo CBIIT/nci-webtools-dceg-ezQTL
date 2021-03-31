@@ -89,6 +89,7 @@ apiRouter.post('/qtls-calculate-main', (req, res, next) =>
       workingDirectory: workingDirectory,
       bucket: awsInfo.s3.data,
     },
+    req,
     res,
     next
   )
@@ -128,13 +129,16 @@ apiRouter.post('/getPublicGTEx', async (req, res, next) => {
   }
 });
 
-apiRouter.post('/qtls-locus-alignment-boxplots', (req, res, next) => qtlsCalculateLocusAlignmentBoxplots({...req.body, workingDirectory}, res, next))
+apiRouter.post('/qtls-locus-alignment-boxplots', (req, res, next) => qtlsCalculateLocusAlignmentBoxplots({...req.body, workingDirectory}, req, res, next))
 
-apiRouter.post('/qtls-locus-colocalization-hyprcoloc-ld', (req, res, next) => qtlsCalculateLocusColocalizationHyprcolocLD({...req.body, workingDirectory}, res, next))
+apiRouter.post('/qtls-locus-colocalization-hyprcoloc-ld', (req, res, next) => qtlsCalculateLocusColocalizationHyprcolocLD({...req.body, workingDirectory}, req, res, next))
 
-apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) => qtlsCalculateLocusColocalizationHyprcoloc({...req.body, workingDirectory}, res, next))
+apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) => qtlsCalculateLocusColocalizationHyprcoloc({...req.body, workingDirectory}, req, res, next))
 
-apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => qtlsCalculateLocusColocalizationECAVIAR({...req.body, workingDirectory}, res, next))
+apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
+  req.setTimeout(900000);
+  qtlsCalculateLocusColocalizationECAVIAR({...req.body, workingDirectory}, req, res, next);
+})
 
 
 module.exports = { apiRouter };

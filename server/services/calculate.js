@@ -98,8 +98,8 @@ async function qtlsCalculateMain(params, res, next) {
     logger.info(`[${request}] Finished /qtls-calculate-main`);
     res.json(JSON.parse(wrapper));
   } catch (err) {
-    logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
-    res.status(500).json(err);
+      logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
+      res.status(500).json(err);
   }
 }
 

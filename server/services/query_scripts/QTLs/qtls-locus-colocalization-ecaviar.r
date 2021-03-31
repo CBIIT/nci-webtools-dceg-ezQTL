@@ -6,15 +6,15 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.GWAS.rs.txt')
   } else {
-    gwasFile <- paste0('tmp/',request,'/', gwasFile)
+    gwasFile <- paste0(workDir, '/', 'tmp/',request,'/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
     assocFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.eQTL.txt') 
     LDFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.LD.gz')
   } else {
-    assocFile <- paste0('tmp/',request,'/', assocFile)
+    assocFile <- paste0(workDir, '/', 'tmp/',request,'/', assocFile)
     if (!identical(LDFile, 'false')) {
-      LDFile <- paste0('tmp/',request,'/', LDFile)
+      LDFile <- paste0(workDir, '/', 'tmp/',request,'/', LDFile)
     }
   }
 
@@ -33,11 +33,11 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   # system(cmd)
 
   ## remove eCAVIAR temp files folder
-  unlink(paste0('tmp/', request, '/', request,'.','ECAVIAR_TMP'), recursive = TRUE)
+  unlink(paste0(workDir, '/', 'tmp/', request, '/', request,'.','ECAVIAR_TMP'), recursive = TRUE)
   
   ## read output file
   # ecaviarfile <- paste0('../static/output/', request, '.eCAVIAR.txt')
-  ecaviarfile <- paste0('tmp/', request, '/', request, '.eCAVIAR.txt')
+  ecaviarfile <- paste0(workDir, '/', 'tmp/', request, '/', request, '.eCAVIAR.txt')
   ecaviardata <- read_delim(ecaviarfile, delim = "\t", col_names = T)
   ecaviardata_colnames <- colnames(ecaviardata)
   ## cast p-value columns to string to prevent json rounding

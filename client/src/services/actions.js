@@ -1,6 +1,7 @@
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
 export const UPDATE_ERROR = 'UPDATE_ERROR';
+export const UPDATE_ALERT = 'UPDATE_ALERT';
 
 const axios = require('axios');
 const FormData = require('form-data');
@@ -15,6 +16,10 @@ export function updateQTLsGWAS(data) {
 
 export function updateError(data) {
   return { type: UPDATE_ERROR, data };
+}
+
+export function updateAlert(data) {
+  return {type: UPDATE_ALERT, data };
 }
 
 const getPopoverData = (geneData) => {
