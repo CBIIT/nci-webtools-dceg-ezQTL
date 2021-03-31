@@ -887,31 +887,9 @@ export function QTLsGWASForm() {
             <b>Locus Information</b>
           </div>
           <div className="w-100 border border-top mx-3 my-2"></div>
-          <div className="col-sm-12">
-            <Form.Label className="mb-0">
-              cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
-              <small>
-                <i>(+/- Kb up to 5Mb)</i>
-              </small>
-            </Form.Label>
-            <Form.Control
-              type="number"
-              min="1"
-              max="2000"
-              id="qtls-distance-input"
-              disabled={submitted}
-              onChange={(e) => {
-                dispatch(updateQTLsGWAS({ select_dist: e.target.value }));
-              }}
-              value={select_dist}
-              isInvalid={select_dist < 1 || select_dist > 200}
-              // custom
-            />
-            <Form.Control.Feedback type="invalid">
-              Enter distance between 1 and 200Kb.
-            </Form.Control.Feedback>
-          </div>
-          {qtlPublic || ldPublic || gwasPublic ? (
+        </Row>
+        {qtlPublic || ldPublic || gwasPublic ? (
+          <Row>
             <Col>
               <Form.Row>
                 <Col sm="4">
@@ -955,34 +933,64 @@ export function QTLsGWASForm() {
                 </Col>
               </Form.Row>
             </Col>
-          ) : (
-            <Col>
-              <Form.Label className="mb-0">
-                SNP{' '}
-                <small>
-                  <i>(Default: lowest GWAS P-value SNP)</i>
-                </small>
-              </Form.Label>
-              <Form.Control
-                id="qtls-snp-input"
-                disabled={submitted}
-                onChange={(e) => {
-                  dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
-                }}
-                value={select_ref ? select_ref : ''}
-                isInvalid={
-                  select_ref &&
-                  select_ref.length > 0 &&
-                  !/^rs\d+$/.test(select_ref)
-                }
-                // custom
-              />
-              <Form.Control.Feedback type="invalid">
-                Enter valid RS number. Leave empty for default.
-              </Form.Control.Feedback>
-            </Col>
-          )}
-        </Row>
+          </Row>
+        ) : (
+          <>
+            <Row>
+              <Col>
+                <Form.Label className="mb-0">
+                  cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
+                  <small>
+                    <i>(+/- Kb up to 5Mb)</i>
+                  </small>
+                </Form.Label>
+                <Form.Control
+                  type="number"
+                  min="1"
+                  max="2000"
+                  id="qtls-distance-input"
+                  disabled={submitted}
+                  onChange={(e) => {
+                    dispatch(updateQTLsGWAS({ select_dist: e.target.value }));
+                  }}
+                  value={select_dist}
+                  isInvalid={select_dist < 1 || select_dist > 200}
+                  // custom
+                />
+                <Form.Control.Feedback type="invalid">
+                  Enter distance between 1 and 200Kb.
+                </Form.Control.Feedback>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <Form.Label className="mb-0">
+                  SNP{' '}
+                  <small>
+                    <i>(Default: lowest GWAS P-value SNP)</i>
+                  </small>
+                </Form.Label>
+                <Form.Control
+                  id="qtls-snp-input"
+                  disabled={submitted}
+                  onChange={(e) => {
+                    dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
+                  }}
+                  value={select_ref ? select_ref : ''}
+                  isInvalid={
+                    select_ref &&
+                    select_ref.length > 0 &&
+                    !/^rs\d+$/.test(select_ref)
+                  }
+                  // custom
+                />
+                <Form.Control.Feedback type="invalid">
+                  Enter valid RS number. Leave empty for default.
+                </Form.Control.Feedback>
+              </Col>
+            </Row>
+          </>
+        )}
         <div className="row mb-4">
           <div className="w-100 border border-top mx-3 my-2"></div>
           <div className="col-sm-12">
@@ -993,13 +1001,6 @@ export function QTLsGWASForm() {
           </div>
         </div>
       </div>
-
-      {/*
-      
-         
-        </div> 
-        */}
-
       <div className="row">
         <div className="col-sm-6">
           <Button
