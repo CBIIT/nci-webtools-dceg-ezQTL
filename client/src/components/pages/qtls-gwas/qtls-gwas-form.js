@@ -9,6 +9,7 @@ import {
   uploadFile,
   updateQTLsGWAS,
   getPublicGTEx,
+  updateAlert,
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
 const { v1: uuidv1 } = require('uuid');
@@ -271,6 +272,7 @@ export function QTLsGWASForm() {
     dispatch(
       updateQTLsGWAS({ ...getInitialState().qtlsGWAS, publicGTEx: publicGTEx })
     );
+    dispatch(updateAlert(getInitialState().alert));
     _setAssociationFile('');
     _setQuantificationFile('');
     _setGenotypeFile('');
@@ -978,7 +980,9 @@ export function QTLsGWASForm() {
                 // custom
               />
               <Form.Control.Feedback type="invalid">
-                Enter valid RS number. Leave empty for default.
+                Enter valid RS number. 
+                <br />
+                Leave empty for default.
               </Form.Control.Feedback>
             </Col>
           )}
@@ -1009,7 +1013,6 @@ export function QTLsGWASForm() {
             type="button"
             onClick={() => {
               handleSubmit();
-              // if (validateForm()) handleSubmit();
             }}
             disabled={
               submitted ||

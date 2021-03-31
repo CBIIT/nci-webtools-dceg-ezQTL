@@ -162,7 +162,7 @@ if [ ! -f "$ldinfo" ]; then
     # cat $poppanel |grep -w $ldinfo |cut -f 1  >${request}.extracted.panel
     # bcftools view -S tmp/${request}.extracted.panel -O v $kgvcfpath ${chr}":"${minpos}"-"${maxpos}|awk -F "\t" -v OFS="\t" 'NR==FNR{a[$4]=1;next;}/^#/ || $3 in a {print $0}' $tmpfold/ecaviar_list.txt -|bcftools sort -O z -o $tmpfold/${request}.input.vcf.gz 
     # bcftools index -t $tmpfold/${request}.input.vcf.gz 
-    emeraLD --matrix -i tmp/${request}/${request}.input.vcf.gz --stdout --extra |sed 's/:/\t/' |bgzip > $tmpfold/emerald.LD.gz
+    emeraLD --matrix -i ${workdir}/tmp/${request}/${request}.input.vcf.gz --stdout --extra |sed 's/:/\t/' |bgzip > $tmpfold/emerald.LD.gz
     ldinfo=$tmpfold/emerald.LD.gz
     
 fi
@@ -176,7 +176,6 @@ genelist=`cat $tmpfold/ecaviar_list.txt |cut -f 1|uniq `
 cd $tmpfold
 
 while read -r gene; do 
-
   cd $gene
 
   ## make sure GWAS peak snp and gene are in eQTL dataset ## 
