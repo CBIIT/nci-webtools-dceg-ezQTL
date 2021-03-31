@@ -227,10 +227,53 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, res, next) {
     }
 }
 
+async function qtlsCalculateColocalizationQC(params, res, next) {
+    const {
+        request,
+        select_gwas_sample, 
+        select_qtls_samples, 
+        gwasFile, 
+        associationFile,
+        LDFile, 
+        select_ref,
+        select_dist,
+        select_gene,
+    } = params;
+
+    logger.info(`[${request}] Execute /ezqTL_ztw`);
+    logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
+
+    const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezqTL_ztw.r');
+    try {
+        const wrapper = await r(
+            path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+            "qtlsCalculateColocalizationQC",
+            [
+                rfile,
+                select_gwas_sample.toString(), 
+                select_qtls_samples.toString(), 
+                gwasFile.toString(), 
+                associationFile.toString(), 
+                LDFile.toString(), 
+                select_ref.toString(),
+                select_dist.toString(),
+                select_gene.toString(), 
+                request.toString()
+            ]
+        );
+        logger.info(`[${request}] Finished /ezqTL_ztw`);
+        res.json(JSON.parse(wrapper));
+    } catch (err) {
+        logger.error(`[${request}] Error /ezqTL_ztw ${err}`);
+        res.status(500).json(err);
+    }
+}
+
 module.exports = {
     qtlsCalculateMain,
     qtlsCalculateLocusAlignmentBoxplots,
     qtlsCalculateLocusColocalizationHyprcolocLD,
     qtlsCalculateLocusColocalizationHyprcoloc,
-    qtlsCalculateLocusColocalizationECAVIAR
+    qtlsCalculateLocusColocalizationECAVIAR,
+    qtlsCalculateColocalizationQC
 }

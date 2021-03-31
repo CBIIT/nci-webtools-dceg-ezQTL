@@ -22,3 +22,8 @@ qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, s
   source(rfile)
   locus_colocalization_hyprcoloc(workingDirectory, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, ldfile, request)
 }
+
+qtlsCalculateColocalizationQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldfile, ldsnp, distance, zscore_gene, request) {
+  source(rfile)
+  coloc_QC(select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldfile, ldsnp, distance, zscore_gene, request)
+}

@@ -8,7 +8,8 @@ const {
     qtlsCalculateLocusAlignmentBoxplots,
     qtlsCalculateLocusColocalizationHyprcolocLD,
     qtlsCalculateLocusColocalizationHyprcoloc,
-    qtlsCalculateLocusColocalizationECAVIAR
+    qtlsCalculateLocusColocalizationECAVIAR,
+    qtlsCalculateColocalizationQC
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
@@ -136,5 +137,6 @@ apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) => qtlsC
 
 apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => qtlsCalculateLocusColocalizationECAVIAR({...req.body, workingDirectory}, res, next))
 
+apiRouter.post('/qtls-locus-colocalization-qc', (req, res, next) => qtlsCalculateColocalizationQC({...req.body, workingDirectory}, res, next))
 
 module.exports = { apiRouter };
