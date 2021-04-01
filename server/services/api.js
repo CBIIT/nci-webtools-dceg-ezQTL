@@ -9,7 +9,7 @@ const {
     qtlsCalculateLocusColocalizationHyprcolocLD,
     qtlsCalculateLocusColocalizationHyprcoloc,
     qtlsCalculateLocusColocalizationECAVIAR,
-    qtlsCalculateColocalizationQC
+    qtlsCalculateQC
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
