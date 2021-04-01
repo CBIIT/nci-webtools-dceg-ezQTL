@@ -1146,9 +1146,9 @@ export function qtlsGWASLocusQCCalculation(params) {
     );
 
     axios
-      .post('qtls-locus-colocalization-qc',params)
+      .post('qtls-locus-qc',params)
       .then(function (response) {
-        console.log('api/qtls-locus-colocalization-qc response.data', response.data);
+        console.log('api/qtls-locus-qc response.data', response.data);
       })
       .catch(function (error){
         console.log(error);
@@ -1292,16 +1292,20 @@ export function qtlsGWASCalculation(params) {
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
             })
           );
-          console.log(qtlsGWAS)
-          /*
+          
           dispatch(
             qtlsGWASLocusQCCalculation({
               request: qtlsGWAS.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_sample: qtlsGWAS.select_qtls_sample,
+              gwasFile: qtlsGWAS.inputs.gwas_file[0],
+              associationFile: qtlsGWAS.inputs.association_file[0],
               ldfile: qtlsGWAS.inputs.ld_file[0],
-
-
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol
             })
-          )*/
+          )
         }
       });
   };
