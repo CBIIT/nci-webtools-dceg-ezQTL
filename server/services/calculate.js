@@ -329,20 +329,25 @@ async function qtlsCalculateQC(params, res, next) {
     logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
 
     const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezqTL_ztw.r');
+
+    let gwas 
+    let association
+    let ld
+
     try {
 
         if(select_gwas_sample)
-            gwasFile = path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt')
+            gwas = path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt')
         else
-            gwasFile = path.resolve('tmp',request,gwasFile)
+            gwas = path.resolve('tmp',request,gwasFile)
         
         if(select_qtls_samples){
-            associationFile = path.resolve(__dirname,'data','MX2.examples','MX2.eQTL.txt')
-            LDFile = path.resolve(__dirname,'data','MX2.examples','MX2.LD.gz')
+            association = path.resolve(__dirname,'data','MX2.examples','MX2.eQTL.txt')
+            ld = path.resolve(__dirname,'data','MX2.examples','MX2.LD.gz')
         }
         else{
-            associationFile = path.resolve('tmp',request,associationFile)
-            LDFile = path.resolve('tmp',request,LDFile)
+            association = path.resolve('tmp',request,associationFile)
+            ld = path.resolve('tmp',request,LDFile)
         }
 
         const wrapper = await r(
@@ -350,9 +355,9 @@ async function qtlsCalculateQC(params, res, next) {
             "qtlsCalculateQC",
             [
                 rfile,
-                gwasFile.toString(), 
-                associationFile.toString(), 
-                LDFile.toString(), 
+                gwas.toString(), 
+                association.toString(), 
+                ld.toString(), 
                 select_ref.toString(),
                 select_dist.toString(),
                 select_gene.toString()
