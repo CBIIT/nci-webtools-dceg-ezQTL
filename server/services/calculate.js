@@ -1,6 +1,7 @@
 const r = require('r-wrapper').async;
 const path = require('path');
 const logger = require('../services/logger');
+const config = require('../config');
 
 async function qtlsCalculateMain(params, req, res, next) {
   const {
@@ -339,22 +340,25 @@ async function qtlsCalculateQC(params, res, next) {
 
         logger.debug('Before gwas')
         if(select_gwas_sample)
-            gwas = path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt')
+            gwas = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.GWAS.rs.txt')
         else
-            gwas = path.resolve('tmp',request,gwasFile)
+            gwas = path.resolve(config.tmp.folder,request,gwasFile)
 
-        logger.debug(path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt'))
+        logger.debug(path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.GWAS.rs.txt'))
         logger.debug('After gwas: ' + gwas.toString())
 
         if(select_qtls_samples){
-            association = path.resolve(__dirname,'data','MX2.examples','MX2.eQTL.txt')
-            logger.debug('Association: ', association)
-            ld = path.resolve(__dirname,'data','MX2.examples','MX2.LD.gz')
-            logger.debug('LD: ', ld)
+            logger.debug('hey')
+            association = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.eQTL.txt')
+            logger.debug('Association: ' + association)
+            logger.debug('bye')
+            ld = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.LD.gz')
+            logger.debug('LD: ' + ld)
         }
         else{
-            association = path.resolve('tmp',request,associationFile)
-            ld = path.resolve('tmp',request,LDFile)
+          logger.debug('wrong')
+            association = path.resolve(config.tmp.folder,request,associationFile)
+            ld = path.resolve(config.tmp.folder,request,LDFile)
         }
 
         logger.debug(gwas.toString())
