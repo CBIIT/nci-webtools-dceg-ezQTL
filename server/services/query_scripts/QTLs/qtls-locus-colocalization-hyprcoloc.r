@@ -30,6 +30,7 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   trait1 <- read_delim(gwasfile, delim = '\t', col_names = T, col_types = cols('chr' = 'c', 'ref' = 'c', 'alt' = 'c'))
   cedistance <- strtoi(select_dist, base = 0L)
   index1 <- which(trait1$rsnum == select_ref)[1]
+  if (is.na(index1)) return(toJSON(list(error = paste0(select_ref, ' not found in GWAS data'))))
   minpos1 <- trait1$pos[index1] - cedistance
   if (minpos1 < 0) {
     minpos1 = 0
