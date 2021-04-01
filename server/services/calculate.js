@@ -343,7 +343,8 @@ async function qtlsCalculateQC(params, res, next) {
         else
             gwas = path.resolve('tmp',request,gwasFile)
 
-        logger.debug('After gwas: ', gwas)
+        logger.debug(path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt'))
+        logger.debug('After gwas: ' + gwas.toString())
 
         if(select_qtls_samples){
             association = path.resolve(__dirname,'data','MX2.examples','MX2.eQTL.txt')
