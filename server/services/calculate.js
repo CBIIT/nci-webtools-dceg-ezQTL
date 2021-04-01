@@ -326,44 +326,30 @@ async function qtlsCalculateQC(params, res, next) {
         select_gene,
     } = params;
 
-    logger.info(`[${request}] Execute /ezqTL_ztw`);
+    logger.info(`[${request}] Execute /ezQTL_ztw`);
     logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
 
     logger.debug('Before rfile')
-    const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezqTL_ztw.r');
+    const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
     logger.debug('After rfile')
     let gwas = ''
     let association = ''
     let ld = ''
 
     try {
-
-        logger.debug('Before gwas')
         if(select_gwas_sample)
             gwas = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.GWAS.rs.txt')
         else
             gwas = path.resolve(config.tmp.folder,request,gwasFile)
 
-        logger.debug(path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.GWAS.rs.txt'))
-        logger.debug('After gwas: ' + gwas.toString())
-
         if(select_qtls_samples){
-            logger.debug('hey')
             association = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.eQTL.txt')
-            logger.debug('Association: ' + association)
-            logger.debug('bye')
             ld = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.LD.gz')
-            logger.debug('LD: ' + ld)
         }
         else{
-          logger.debug('wrong')
             association = path.resolve(config.tmp.folder,request,associationFile)
             ld = path.resolve(config.tmp.folder,request,LDFile)
         }
-
-        logger.debug(gwas.toString())
-        logger.debug(typeof gwas)
-        logger.debug(association)
 
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
