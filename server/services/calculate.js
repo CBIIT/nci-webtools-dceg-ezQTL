@@ -330,9 +330,9 @@ async function qtlsCalculateQC(params, res, next) {
 
     const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezqTL_ztw.r');
 
-    let gwas 
-    let association
-    let ld
+    let gwas = ''
+    let association = ''
+    let ld = ''
 
     try {
 
@@ -350,6 +350,10 @@ async function qtlsCalculateQC(params, res, next) {
             ld = path.resolve('tmp',request,LDFile)
         }
 
+        logger.debug(gwas.toString())
+        logger.debug(typeof gwas)
+        logger.debug(association)
+        
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
             "qtlsCalculateQC",
