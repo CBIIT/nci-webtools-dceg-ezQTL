@@ -328,19 +328,23 @@ async function qtlsCalculateQC(params, res, next) {
     logger.info(`[${request}] Execute /ezqTL_ztw`);
     logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
 
+    logger.debug('Before rfile')
     const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezqTL_ztw.r');
-
+    logger.debug('After rfile')
     let gwas = ''
     let association = ''
     let ld = ''
 
     try {
 
+        logger.debug('Before gwas')
         if(select_gwas_sample)
             gwas = path.resolve(__dirname,'data','MX2.examples','MX2.GWAS.rs.txt')
         else
             gwas = path.resolve('tmp',request,gwasFile)
-        
+
+        logger.debug('After gwas')
+
         if(select_qtls_samples){
             association = path.resolve(__dirname,'data','MX2.examples','MX2.eQTL.txt')
             ld = path.resolve(__dirname,'data','MX2.examples','MX2.LD.gz')
@@ -353,7 +357,7 @@ async function qtlsCalculateQC(params, res, next) {
         logger.debug(gwas.toString())
         logger.debug(typeof gwas)
         logger.debug(association)
-        
+
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
             "qtlsCalculateQC",
