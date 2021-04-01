@@ -19,7 +19,7 @@ export function updateError(data) {
 }
 
 export function updateAlert(data) {
-  return {type: UPDATE_ALERT, data };
+  return { type: UPDATE_ALERT, data };
 }
 
 const getPopoverData = (geneData) => {
@@ -1063,18 +1063,27 @@ function qtlsGWASHyprcolocCalculation(params) {
           response.data
         );
 
-        dispatch(
-          updateQTLsGWAS({
-            hyprcoloc_table: {
-              data: response.data['hyprcoloc']['result_hyprcoloc']['data'][0],
-              globalFilter: '',
-            },
-            hyprcolocSNPScore_table: {
-              data: response.data['hyprcoloc']['result_snpscore']['data'][0],
-              globalFilter: '',
-            },
-          })
-        );
+        if (response.data.error) {
+          dispatch(
+            updateAlert({
+              show: true,
+              message: response.data.error,
+            })
+          );
+        } else {
+          dispatch(
+            updateQTLsGWAS({
+              hyprcoloc_table: {
+                data: response.data['hyprcoloc']['result_hyprcoloc']['data'][0],
+                globalFilter: '',
+              },
+              hyprcolocSNPScore_table: {
+                data: response.data['hyprcoloc']['result_snpscore']['data'][0],
+                globalFilter: '',
+              },
+            })
+          );
+        }
       })
       .catch(function (error) {
         console.log(error);
