@@ -312,7 +312,7 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
   }
 }
 
-async function qtlsCalculateColocalizationQC(params, res, next) {
+async function qtlsCalculateQC(params, res, next) {
     const {
         request,
         select_gwas_sample, 
@@ -347,7 +347,7 @@ async function qtlsCalculateColocalizationQC(params, res, next) {
 
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-            "qtlsCalculateColocalizationQC",
+            "qtlsCalculateQC",
             [
                 rfile,
                 gwasFile.toString(), 
@@ -359,6 +359,7 @@ async function qtlsCalculateColocalizationQC(params, res, next) {
             ]
         );
         logger.info(`[${request}] Finished /ezqTL_ztw`);
+        logger.info(JSON.parse(wrapper))
         res.json(JSON.parse(wrapper));
     } catch (err) {
         logger.error(`[${request}] Error /ezqTL_ztw ${err}`);
@@ -372,5 +373,5 @@ module.exports = {
     qtlsCalculateLocusColocalizationHyprcolocLD,
     qtlsCalculateLocusColocalizationHyprcoloc,
     qtlsCalculateLocusColocalizationECAVIAR,
-    qtlsCalculateColocalizationQC
+    qtlsCalculateQC
 }

@@ -141,6 +141,6 @@ apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
   qtlsCalculateLocusColocalizationECAVIAR({...req.body, workingDirectory}, req, res, next);
 })
 
-apiRouter.post('/qtls-locus-colocalization-qc', (req, res, next) => qtlsCalculateColocalizationQC({...req.body, workingDirectory}, res, next))
+apiRouter.post('/qtls-locus-qc', (req, res, next) => qtlsCalculateQC({...req.body, workingDirectory}, res, next))
 
 module.exports = { apiRouter };
