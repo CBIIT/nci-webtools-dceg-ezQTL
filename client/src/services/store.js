@@ -68,7 +68,7 @@ export const getInitialState = async () => {
       isLoadingHyprcoloc: false,
       ecaviar_table: {
         data: [],
-        globalFilter: ''
+        globalFilter: '',
       },
       isLoadingECaviar: false,
       locus_qc: null,
@@ -98,17 +98,24 @@ export const getInitialState = async () => {
       phenotypeOptions: [],
       chromosome: { value: 1, label: 1 },
       range: '100000-1000000',
+      isQueue: false,
+      email: '',
     },
     errorModal: {
       visible: false,
       details: ``,
       message: `An error occured when requesting data. If this problem persists, please contact the administrator at <a href="mailto:FORGE2-TFWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
     },
+    successModal: {
+      visible: false,
+      details: ``,
+      message: '',
+    },
     alert: {
       show: false,
       message: ``,
       variant: 'warning',
-    }
+    },
   };
 
   return initialState;
