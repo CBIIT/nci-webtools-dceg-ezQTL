@@ -361,7 +361,8 @@ async function qtlsCalculateQC(params, res, next) {
                 ld.toString(), 
                 select_ref.toString(),
                 select_dist,
-                select_gene.toString()
+                select_gene.toString(),
+                request
             ]
         );
         logger.info(`[${request}] Finished /ezqTL_ztw`);
