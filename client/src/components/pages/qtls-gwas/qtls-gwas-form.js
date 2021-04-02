@@ -10,6 +10,7 @@ import {
   updateQTLsGWAS,
   getPublicGTEx,
   updateAlert,
+  submitQueue,
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
 const { v1: uuidv1 } = require('uuid');
@@ -76,6 +77,8 @@ export function QTLsGWASForm() {
     phenotypeOptions,
     chromosome,
     range,
+    isQueue,
+    email,
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
@@ -298,30 +301,41 @@ export function QTLsGWASForm() {
       return;
     }
     const request = uuidv1();
-    await dispatch(
-      uploadFile({
-        // dataFiles: [
-        //   _associationFile,
-        //   _quantificationFile,
-        //   _genotypeFile,
-        //   _LDFile,
-        //   _gwasFile,
-        // ],
-        associationFile: _associationFile,
-        quantificationFile: _quantificationFile,
-        genotypeFile: _genotypeFile,
-        LDFile: _LDFile,
-        gwasFile: _gwasFile,
-        associationFileName: _associationFile ? _associationFile.name : false,
-        quantificationFileName: _quantificationFile
-          ? _quantificationFile.name
-          : false,
-        genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
-        LDFileName: _LDFile ? _LDFile.name : false,
-        gwasFileName: _gwasFile ? _gwasFile.name : false,
-        request,
-      })
-    );
+
+    if (
+      select_qtls_samples ||
+      select_gwas_sample ||
+      _associationFile ||
+      _quantificationFile ||
+      _LDFile ||
+      _gwasFile ||
+      _genotypeFile
+    ) {
+      dispatch(
+        uploadFile({
+          // dataFiles: [
+          //   _associationFile,
+          //   _quantificationFile,
+          //   _genotypeFile,
+          //   _LDFile,
+          //   _gwasFile,
+          // ],
+          associationFile: _associationFile,
+          quantificationFile: _quantificationFile,
+          genotypeFile: _genotypeFile,
+          LDFile: _LDFile,
+          gwasFile: _gwasFile,
+          associationFileName: _associationFile ? _associationFile.name : false,
+          quantificationFileName: _quantificationFile
+            ? _quantificationFile.name
+            : false,
+          genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
+          LDFileName: _LDFile ? _LDFile.name : false,
+          gwasFileName: _gwasFile ? _gwasFile.name : false,
+          request,
+        })
+      );
+    }
 
     // retrieve tabix file key from selected tissue (association qtl), phenotype (gwas), and project(ld)
     const qtlKey = qtlPublic
@@ -367,33 +381,38 @@ export function QTLsGWASForm() {
       updateQTLsGWAS({ qtlKey: qtlKey, ldKey: ldKey, gwasKey: gwasKey })
     );
 
-    await dispatch(
-      qtlsGWASCalculation({
-        request,
-        select_qtls_samples,
-        select_gwas_sample,
-        associationFile: (_associationFile && _associationFile.name) || false,
-        quantificationFile:
-          (_quantificationFile && _quantificationFile.name) || false,
-        genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
-        gwasFile: (_gwasFile && _gwasFile.name) || false,
-        LDFile: (_LDFile && _LDFile.name) || false,
-        select_pop,
-        select_gene,
-        select_dist,
-        select_ref,
-        recalculateAttempt,
-        recalculatePop,
-        recalculateGene,
-        recalculateDist,
-        recalculateRef,
-        qtlKey,
-        ldKey,
-        gwasKey,
-        chromosome: chromosome.value,
-        range: range,
-      })
-    );
+    const params = {
+      request,
+      select_qtls_samples,
+      select_gwas_sample,
+      associationFile: (_associationFile && _associationFile.name) || false,
+      quantificationFile:
+        (_quantificationFile && _quantificationFile.name) || false,
+      genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
+      gwasFile: (_gwasFile && _gwasFile.name) || false,
+      LDFile: (_LDFile && _LDFile.name) || false,
+      select_pop,
+      select_gene,
+      select_dist,
+      select_ref,
+      recalculateAttempt,
+      recalculatePop,
+      recalculateGene,
+      recalculateDist,
+      recalculateRef,
+      qtlKey,
+      ldKey,
+      gwasKey,
+      chromosome: chromosome.value,
+      range: range,
+      email: email,
+    };
+
+    if (isQueue) {
+      dispatch(submitQueue(params));
+    } else {
+      dispatch(qtlsGWASCalculation(params));
+    }
   }
 
   return (
@@ -485,6 +504,14 @@ export function QTLsGWASForm() {
                   </Button>
                 </>
               )}
+            </Col>
+          </Row>
+          <Row className="mt-2">
+            <Col className="">
+              <i className="fa fa-download mr-1"></i>
+              <a href="assets/files/MX2.examples.gz" download>
+                Download Example Data
+              </a>
             </Col>
           </Row>
         </div>
@@ -1012,15 +1039,52 @@ export function QTLsGWASForm() {
           </>
         )}
         <hr />
-        <div className="row mb-4">
-          <div className="col-sm-12">
-            <i className="fa fa-download mr-1"></i>
-            <a href="assets/files/MX2.examples.gz" download>
-              Download Example Data
-            </a>
-          </div>
-        </div>
       </div>
+      <Row>
+        <Col>
+          <Form.Group controlId="toggleQueue" className="mb-0">
+            <Form.Label className="mr-auto">
+              Submit this job to a Queue
+            </Form.Label>{' '}
+            <Form.Check inline>
+              <Form.Check.Input
+                type="checkbox"
+                disabled={submitted}
+                checked={isQueue}
+                onChange={(_) => {
+                  dispatch(updateQTLsGWAS({ isQueue: !isQueue }));
+                }}
+              />
+            </Form.Check>
+          </Form.Group>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Form.Group controlId="email">
+            <Form.Control
+              placeholder="Enter Email"
+              size="sm"
+              value={email}
+              type="email"
+              onChange={(e) =>
+                dispatch(updateQTLsGWAS({ email: e.target.value }))
+              }
+              disabled={!isQueue || submitted}
+              // isInvalid={isQueue && checkValid ? !validEmail : false}
+            />
+            <Form.Control.Feedback type="invalid">
+              Please provide a valid email
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
+              <i>
+                Note: if sending to queue, when computation is completed, a
+                notification will be sent to the e-mail entered above.
+              </i>
+            </Form.Text>
+          </Form.Group>
+        </Col>
+      </Row>
       <div className="row">
         <div className="col-sm-6">
           <Button
@@ -1042,7 +1106,7 @@ export function QTLsGWASForm() {
                 !/^rs\d+$/.test(select_ref))
             }
           >
-            Calculate
+            {isQueue ? 'Submit' : 'Calculate'}
           </Button>
         </div>
         <div className="col-sm-6">

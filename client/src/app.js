@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { HashRouter as Router, Route, useLocation, NavLink, Redirect } from 'react-router-dom';
+import {
+  HashRouter as Router,
+  Route,
+  useLocation,
+  NavLink,
+  Redirect,
+} from 'react-router-dom';
 import { NCIFooter } from '@cbiitss/react-components';
 import { Home } from './components/pages/home/home';
 import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
@@ -8,13 +14,14 @@ import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
 import 'font-awesome/css/font-awesome.min.css';
 import { ErrorModal } from './components/controls/error-modal/error-modal';
-import Alert from 'react-bootstrap/Alert'
+import Alert from 'react-bootstrap/Alert';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateAlert } from './services/actions';
+import { SuccessModal } from './components/controls/success-modal/success-modal';
 
 export function App() {
   const dispatch = useDispatch();
-  
+
   const alert = useSelector((state) => state.alert);
 
   const links = [
@@ -67,13 +74,19 @@ export function App() {
       </Navbar>
       <div id="main" style={{ backgroundColor: '#EEEEEE' }}>
         <ErrorModal />
-        
+        <SuccessModal />
         <div className="bg-white container py-4 shadow">
-          { alert && 
-            <Alert className="mx-2" variant={alert.variant} show={alert.show} onClose={() => dispatch(updateAlert({ show: false }))} dismissible>
+          {alert && (
+            <Alert
+              className="mx-2"
+              variant={alert.variant}
+              show={alert.show}
+              onClose={() => dispatch(updateAlert({ show: false }))}
+              dismissible
+            >
               {alert.message}
             </Alert>
-          } 
+          )}
           <Route exact path={`/`} render={() => <Redirect to="/home" />} />
           <Route path="/home" exact={true} component={Home} />
           <Route path="/qtls" exact component={QTLsGWAS} />

@@ -3,18 +3,19 @@ const compression = require('compression');
 const config = require('../config');
 const logger = require('./logger');
 const path = require('path');
-const { 
-    qtlsCalculateMain,
-    qtlsCalculateLocusAlignmentBoxplots,
-    qtlsCalculateLocusColocalizationHyprcolocLD,
-    qtlsCalculateLocusColocalizationHyprcoloc,
-    qtlsCalculateLocusColocalizationECAVIAR
+const {
+  qtlsCalculateMain,
+  qtlsCalculateLocusAlignmentBoxplots,
+  qtlsCalculateLocusColocalizationHyprcolocLD,
+  qtlsCalculateLocusColocalizationHyprcoloc,
+  qtlsCalculateLocusColocalizationECAVIAR,
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
 const fs = require('fs');
 const XLSX = require('xlsx');
 const AWS = require('aws-sdk');
+const tar = require('tar');
 
 const dataDir = path.resolve(config.data.folder);
 const tmpDir = path.resolve(config.tmp.folder);
@@ -126,6 +127,51 @@ apiRouter.post('/getPublicGTEx', async (req, res, next) => {
   } catch (error) {
     console.log(error);
     next(error);
+  }
+});
+
+apiRouter.post('/queue', async (req, res, next) => {
+  const params = req.body;
+  const request = params.request;
+  const sqs = new AWS.SQS();
+  const wd = path.join(tmpDir, '/', request);
+
+  if (!fs.existsSync(wd)) {
+    fs.mkdirSync(wd);
+  }
+
+  try {
+    await new AWS.S3()
+      .upload({
+        Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),
+        Bucket: awsInfo.s3.queue,
+        Key: `${awsInfo.s3.subFolder}/${request}/${request}.tgz`,
+      })
+      .promise();
+
+    const { QueueUrl } = await sqs
+      .getQueueUrl({ QueueName: awsInfo.sqs.url })
+      .promise();
+
+    await sqs
+      .sendMessage({
+        QueueUrl: QueueUrl,
+        MessageDeduplicationId: request,
+        MessageGroupId: request,
+        MessageBody: JSON.stringify({
+          ...params,
+          timestamp: new Date().toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+          }),
+        }),
+      })
+      .promise();
+
+    logger.info('Queue submitted ID: ' + request);
+    res.json({ request });
+  } catch (err) {
+    logger.info('Queue failed to submit ID: ' + request);
+    next(err);
   }
 });
 

@@ -1,6 +1,7 @@
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
 export const UPDATE_ERROR = 'UPDATE_ERROR';
+export const UPDATE_SUCCESS = 'UPDATE_SUCCESS';
 export const UPDATE_ALERT = 'UPDATE_ALERT';
 
 const axios = require('axios');
@@ -16,6 +17,10 @@ export function updateQTLsGWAS(data) {
 
 export function updateError(data) {
   return { type: UPDATE_ERROR, data };
+}
+
+export function updateSuccess(data) {
+  return { type: UPDATE_SUCCESS, data };
 }
 
 export function updateAlert(data) {
@@ -1446,6 +1451,43 @@ export function getPublicGTEx() {
           updateQTLsGWAS({
             loadingPublic: false,
             isError: true,
+          })
+        );
+      }
+    }
+  };
+}
+
+export function submitQueue(params) {
+  return async function (dispatch, getState) {
+    dispatch(
+      updateQTLsGWAS({
+        submitted: true,
+        isLoading: true,
+      })
+    );
+
+    try {
+      const response = await axios.post('api/queue', params);
+      console.log('api/queue', response);
+      dispatch(
+        updateSuccess({
+          visible: true,
+          message: `Your job was successfully submitted to the queue. You will recieve an email at ${params.email} with your results.`,
+        })
+      );
+      dispatch(updateQTLsGWAS({ isLoading: false }));
+    } catch (error) {
+      console.log(error);
+      if (error) {
+        dispatch(
+          updateError({ visible: true, message: 'Queue submission failed' })
+        );
+        dispatch(
+          updateQTLsGWAS({
+            isError: true,
+            isLoading: false,
+            activeResultsTab: 'locus-qc',
           })
         );
       }
