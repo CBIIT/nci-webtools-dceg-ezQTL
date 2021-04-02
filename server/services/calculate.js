@@ -360,7 +360,7 @@ async function qtlsCalculateQC(params, res, next) {
                 association.toString(), 
                 ld.toString(), 
                 select_ref.toString(),
-                select_dist.toString(),
+                select_dist,
                 select_gene.toString()
             ]
         );
