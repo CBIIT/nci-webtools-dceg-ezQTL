@@ -1048,8 +1048,8 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               qtlfile: qtlsGWAS.inputs.association_file[0],
               ldfile: qtlsGWAS.hyprcoloc_ld.filename,
               qtlKey: qtlsGWAS.qtlKey,
-              chromosome: qtlsGWAS.chromosome.value,
-              range: qtlsGWAS.range,
+              select_chromosome: qtlsGWAS.select_chromosome.value,
+              select_position: qtlsGWAS.select_position,
             })
           );
         }
