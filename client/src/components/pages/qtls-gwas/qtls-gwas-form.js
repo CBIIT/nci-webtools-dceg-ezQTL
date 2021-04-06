@@ -1092,6 +1092,17 @@ export function QTLsGWASForm() {
       <div className="row">
         <div className="col-sm-6">
           <Button
+            // disabled={loading.active}
+            className="w-100"
+            variant={isError ? 'danger' : 'secondary'}
+            onClick={() => handleReset()}
+            disabled={submitted && isLoading}
+          >
+            Reset
+          </Button>
+        </div>
+        <div className="col-sm-6">
+          <Button
             // disabled={submitted || loading.active}
             className="w-100"
             variant="primary"
@@ -1111,17 +1122,6 @@ export function QTLsGWASForm() {
             }
           >
             {isQueue ? 'Submit' : 'Calculate'}
-          </Button>
-        </div>
-        <div className="col-sm-6">
-          <Button
-            // disabled={loading.active}
-            className="w-100"
-            variant={isError ? 'danger' : 'secondary'}
-            onClick={() => handleReset()}
-            disabled={submitted && isLoading}
-          >
-            Reset
           </Button>
         </div>
       </div>
