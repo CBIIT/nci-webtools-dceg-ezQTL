@@ -116,7 +116,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, chromosome, range, bucket, qtlKey, ldKey, gwasKey) {
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, qtlKey, ldKey, gwasKey) {
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -140,9 +140,9 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     maxpos <- qdata$pos[index] + cedistance
   } else {
     # public data/user-specified position
-    splitRange = strsplit(range, '-')[[1]]
-    minpos = strtoi(splitRange[1], base = 0L)
-    maxpos = strtoi(splitRange[2], base = 0L)
+    chromosome = select_chromosome
+    minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
+    maxpos = select_position + cedistance
   }
   # chromosome <- unique(qdata$chr)
   # minpos <- min(qdata$pos)
@@ -407,7 +407,7 @@ loadAWS <- function() {
   }
 }
 
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, chromosome, range, bucket) {
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -444,6 +444,9 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   } else {
     cedistance <- strtoi(select_dist, base = 0L) * 1000
   }
+  print(select_position)
+  minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
+  maxpos = select_position + cedistance
 
   ## load 1kg pop panel file ##
   kgpanel <- read_delim('data/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', delim = '\t', col_names = T) %>%
@@ -467,7 +470,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
       loadAWS()
       qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
       assocFile = paste0(request, ".qtl_temp.txt")
-      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", chromosome, ":", range, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
+      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
       system(cmd)
       qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp', '.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
@@ -546,7 +549,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     loadAWS()
     gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
     gwasFile = paste0(request, ".gwas_temp.txt")
-    cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", chromosome, ":", range, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
+    cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
     system(cmd)
     gwasdatafile <- paste0('tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
     gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
@@ -601,7 +604,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, chromosome, range, bucket, qtlKey, ldKey, gwasKey)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, qtlKey, ldKey, gwasKey)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
