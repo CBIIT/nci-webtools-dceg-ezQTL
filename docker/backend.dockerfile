@@ -5,13 +5,13 @@ RUN dnf -y update \
         dnf-plugins-core \
         epel-release \
         glibc-langpack-en \
+    && dnf config-manager --set-enabled powertools \
     && dnf -y module enable nodejs:14 \
     && dnf -y install \
         gcc-c++ \
         make \
         nodejs \
         R \
-        python3 \
         bzip2 \
         bzip2-devel \
         libcurl-devel \
@@ -26,6 +26,7 @@ RUN dnf -y update \
         gsl-devel \
         gmp-devel \
         mpfr-devel \
+        # v8-devel \
     && dnf clean all
 
 # install emerald
@@ -56,7 +57,7 @@ RUN cd /tmp \
 RUN cd /tmp \
     && git clone https://github.com/fhormoz/caviar.git \
     && cd caviar/CAVIAR-C++ \
-    && make clean && make \
+    && make \
     && mv ./eCAVIAR /usr/local/bin
 
 # install R packages
