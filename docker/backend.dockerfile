@@ -10,6 +10,7 @@ RUN dnf -y update \
         gcc-c++ \
         make \
         nodejs \
+        R \
         python3 \
         bzip2 \
         bzip2-devel \
