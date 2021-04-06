@@ -1,6 +1,7 @@
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
 export const UPDATE_ERROR = 'UPDATE_ERROR';
+export const UPDATE_SUCCESS = 'UPDATE_SUCCESS';
 export const UPDATE_ALERT = 'UPDATE_ALERT';
 
 const axios = require('axios');
@@ -16,6 +17,10 @@ export function updateQTLsGWAS(data) {
 
 export function updateError(data) {
   return { type: UPDATE_ERROR, data };
+}
+
+export function updateSuccess(data) {
+  return { type: UPDATE_SUCCESS, data };
 }
 
 export function updateAlert(data) {
@@ -1043,8 +1048,8 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               qtlfile: qtlsGWAS.inputs.association_file[0],
               ldfile: qtlsGWAS.hyprcoloc_ld.filename,
               qtlKey: qtlsGWAS.qtlKey,
-              chromosome: qtlsGWAS.chromosome.value,
-              range: qtlsGWAS.range,
+              select_chromosome: qtlsGWAS.select_chromosome.value,
+              select_position: qtlsGWAS.select_position,
             })
           );
         }
@@ -1485,10 +1490,156 @@ export function getPublicGTEx() {
       console.log(error);
       if (error) {
         dispatch(updateError({ visible: true }));
+        dispatch(updateQTLsGWAS({ loadingPublic: false }));
+      }
+    }
+  };
+}
+
+export function submitQueue(params) {
+  return async function (dispatch, getState) {
+    dispatch(
+      updateQTLsGWAS({
+        submitted: true,
+        isLoading: true,
+      })
+    );
+
+    try {
+      const response = await axios.post('api/queue', params);
+      console.log('api/queue', response);
+      dispatch(
+        updateSuccess({
+          visible: true,
+          message: `Your job was successfully submitted to the queue. You will recieve an email at ${params.email} with your results.`,
+        })
+      );
+      dispatch(updateQTLsGWAS({ isLoading: false }));
+    } catch (error) {
+      console.log(error);
+      if (error) {
+        dispatch(
+          updateError({ visible: true, message: 'Queue submission failed' })
+        );
         dispatch(
           updateQTLsGWAS({
-            loadingPublic: false,
             isError: true,
+            isLoading: false,
+            activeResultsTab: 'locus-qc',
+          })
+        );
+      }
+    }
+  };
+}
+
+export function fetchResults(request) {
+  return async function (dispatch, getState) {
+    dispatch(
+      updateQTLsGWAS({
+        isLoading: true,
+        submitted: true,
+      })
+    );
+
+    try {
+      const { data } = await axios.post('api/fetch-results', request);
+      console.log('api/fetch-results', data);
+
+      const { params, main } = data;
+      const { pdata, locus_alignment_plot_layout } =
+        Object.keys(main['gwas']['data'][0]).length > 0
+          ? drawLocusAlignmentGWAS({ data: main })
+          : drawLocusAlignment({ data: main });
+
+      const state = {
+        ...params,
+        select_chromosome: {
+          value: params.select_chromosome,
+          label: params.select_chromosome,
+        },
+        request: main['info']['inputs']['request'][0],
+        openSidebar: false,
+        select_qtls_samples: main['info']['select_qtls_samples'][0] === 'true',
+        select_gwas_sample: main['info']['select_gwas_sample'][0] === 'true',
+        select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
+        recalculateAttempt: main['info']['recalculateAttempt'][0] === 'true',
+        recalculatePop: main['info']['recalculatePop'][0] === 'true',
+        recalculateGene: main['info']['recalculateGene'][0] === 'true',
+        recalculateDist: main['info']['recalculateDist'][0] === 'true',
+        recalculateRef: main['info']['recalculateRef'][0] === 'true',
+        top_gene_variants: {
+          data: main['info']['top_gene_variants']['data'][0],
+        },
+        all_gene_variants: {
+          data: main['info']['all_gene_variants']['data'][0],
+        },
+        gene_list: {
+          data: main['info']['gene_list']['data'][0],
+        },
+        inputs: main['info']['inputs'],
+        messages: main['info']['messages'],
+        locus_quantification: {
+          data: main['locus_quantification']['data'][0],
+        },
+        locus_quantification_heatmap: {
+          data: main['locus_quantification_heatmap']['data'][0],
+        },
+        locus_alignment: {
+          data: pdata,
+          layout: locus_alignment_plot_layout,
+          top: main['locus_alignment']['top'][0][0],
+        },
+        locus_alignment_gwas_scatter: {
+          data: main['locus_alignment_gwas_scatter']['data'][0],
+          title: main['locus_alignment_gwas_scatter']['title'][0],
+        },
+        locus_colocalization_correlation: {
+          data: main['locus_colocalization_correlation']['data'][0],
+        },
+        gwas: {
+          data: main['gwas']['data'][0],
+        },
+        locus_table: {
+          data: main['locus_alignment']['data'][0],
+          globalFilter: '',
+        },
+      };
+
+      dispatch(updateQTLsGWAS({ ...state, isLoading: false }));
+
+      const qtlsGWAS = getState().qtlsGWAS;
+      if (
+        !qtlsGWAS.isError &&
+        qtlsGWAS.gwas &&
+        qtlsGWAS.gwas.data &&
+        Object.keys(qtlsGWAS.gwas.data).length > 0
+      ) {
+        dispatch(
+          qtlsGWASHyprcolocLDCalculation({
+            request: qtlsGWAS.request,
+            ldfile: qtlsGWAS.inputs.ld_file[0],
+            select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+            select_chr: qtlsGWAS.locus_alignment.top.chr,
+            select_pos: qtlsGWAS.locus_alignment.top.pos,
+            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+          })
+        );
+      }
+    } catch (error) {
+      console.log(error);
+      if (error) {
+        dispatch(
+          updateError({
+            visible: true,
+            message: 'Failed to retrieve queue results.',
+          })
+        );
+        dispatch(
+          updateQTLsGWAS({
+            isError: true,
+            isLoading: false,
+            activeResultsTab: 'locus-qc',
           })
         );
       }
