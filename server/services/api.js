@@ -99,7 +99,10 @@ apiRouter.post('/qtls-calculate-main', (req, res, next) =>
 apiRouter.post('/getPublicGTEx', async (req, res, next) => {
   try {
     let buffers = [];
-    const filestream = new AWS.S3()
+    const filestream = new AWS.S3({
+      accessKeyId: awsInfo.aws_access_key_id ? awsInfo.aws_access_key_id : '',
+      secretAccessKey: awsInfo.aws_secret_access_key ? awsInfo.aws_secret_access_key : ''
+    })
       .getObject({
         Bucket: awsInfo.s3.data,
         Key: `${awsInfo.s3.subFolder}/vQTL2_resource.xlsx`,
