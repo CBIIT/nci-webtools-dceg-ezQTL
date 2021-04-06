@@ -1074,6 +1074,8 @@ function qtlsGWASHyprcolocCalculation(params) {
               message: response.data.error,
             })
           );
+
+          dispatch(updateQTLsGWAS({ hyprcolocError: response.data.error }));
         } else {
           dispatch(
             updateQTLsGWAS({
