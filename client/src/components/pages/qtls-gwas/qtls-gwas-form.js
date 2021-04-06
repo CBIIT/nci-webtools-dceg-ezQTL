@@ -10,6 +10,7 @@ import {
   updateQTLsGWAS,
   getPublicGTEx,
   updateAlert,
+  submitQueue,
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
 const { v1: uuidv1 } = require('uuid');
@@ -74,8 +75,10 @@ export function QTLsGWASForm() {
     tissueOptions,
     phenotype,
     phenotypeOptions,
-    chromosome,
-    range,
+    select_chromosome,
+    select_position,
+    isQueue,
+    email,
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
@@ -270,6 +273,8 @@ export function QTLsGWASForm() {
   }
 
   const handleReset = () => {
+    window.location.hash = '#/qtls';
+
     dispatch(
       updateQTLsGWAS({ ...getInitialState().qtlsGWAS, publicGTEx: publicGTEx })
     );
@@ -298,30 +303,41 @@ export function QTLsGWASForm() {
       return;
     }
     const request = uuidv1();
-    await dispatch(
-      uploadFile({
-        // dataFiles: [
-        //   _associationFile,
-        //   _quantificationFile,
-        //   _genotypeFile,
-        //   _LDFile,
-        //   _gwasFile,
-        // ],
-        associationFile: _associationFile,
-        quantificationFile: _quantificationFile,
-        genotypeFile: _genotypeFile,
-        LDFile: _LDFile,
-        gwasFile: _gwasFile,
-        associationFileName: _associationFile ? _associationFile.name : false,
-        quantificationFileName: _quantificationFile
-          ? _quantificationFile.name
-          : false,
-        genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
-        LDFileName: _LDFile ? _LDFile.name : false,
-        gwasFileName: _gwasFile ? _gwasFile.name : false,
-        request,
-      })
-    );
+
+    if (
+      select_qtls_samples ||
+      select_gwas_sample ||
+      _associationFile ||
+      _quantificationFile ||
+      _LDFile ||
+      _gwasFile ||
+      _genotypeFile
+    ) {
+      dispatch(
+        uploadFile({
+          // dataFiles: [
+          //   _associationFile,
+          //   _quantificationFile,
+          //   _genotypeFile,
+          //   _LDFile,
+          //   _gwasFile,
+          // ],
+          associationFile: _associationFile,
+          quantificationFile: _quantificationFile,
+          genotypeFile: _genotypeFile,
+          LDFile: _LDFile,
+          gwasFile: _gwasFile,
+          associationFileName: _associationFile ? _associationFile.name : false,
+          quantificationFileName: _quantificationFile
+            ? _quantificationFile.name
+            : false,
+          genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
+          LDFileName: _LDFile ? _LDFile.name : false,
+          gwasFileName: _gwasFile ? _gwasFile.name : false,
+          request,
+        })
+      );
+    }
 
     // retrieve tabix file key from selected tissue (association qtl), phenotype (gwas), and project(ld)
     const qtlKey = qtlPublic
@@ -342,7 +358,7 @@ export function QTLsGWASForm() {
             (row) =>
               row.Genome_build == genome.value &&
               row.Project == ldProject.value &&
-              row.Chromosome == chromosome.value
+              row.Chromosome == select_chromosome.value
           )[0]
           .Biowulf_full_path.replace(
             '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
@@ -367,33 +383,38 @@ export function QTLsGWASForm() {
       updateQTLsGWAS({ qtlKey: qtlKey, ldKey: ldKey, gwasKey: gwasKey })
     );
 
-    await dispatch(
-      qtlsGWASCalculation({
-        request,
-        select_qtls_samples,
-        select_gwas_sample,
-        associationFile: (_associationFile && _associationFile.name) || false,
-        quantificationFile:
-          (_quantificationFile && _quantificationFile.name) || false,
-        genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
-        gwasFile: (_gwasFile && _gwasFile.name) || false,
-        LDFile: (_LDFile && _LDFile.name) || false,
-        select_pop,
-        select_gene,
-        select_dist,
-        select_ref,
-        recalculateAttempt,
-        recalculatePop,
-        recalculateGene,
-        recalculateDist,
-        recalculateRef,
-        qtlKey,
-        ldKey,
-        gwasKey,
-        chromosome: chromosome.value,
-        range: range,
-      })
-    );
+    const params = {
+      request,
+      select_qtls_samples,
+      select_gwas_sample,
+      associationFile: (_associationFile && _associationFile.name) || false,
+      quantificationFile:
+        (_quantificationFile && _quantificationFile.name) || false,
+      genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
+      gwasFile: (_gwasFile && _gwasFile.name) || false,
+      LDFile: (_LDFile && _LDFile.name) || false,
+      select_pop,
+      select_gene,
+      select_dist,
+      select_ref,
+      recalculateAttempt,
+      recalculatePop,
+      recalculateGene,
+      recalculateDist,
+      recalculateRef,
+      qtlKey,
+      ldKey,
+      gwasKey,
+      select_chromosome: select_chromosome.value,
+      select_position: select_position,
+      email: email,
+    };
+
+    if (isQueue) {
+      dispatch(submitQueue(params));
+    } else {
+      dispatch(qtlsGWASCalculation(params));
+    }
   }
 
   return (
@@ -485,6 +506,14 @@ export function QTLsGWASForm() {
                   </Button>
                 </>
               )}
+            </Col>
+          </Row>
+          <Row className="mt-2">
+            <Col className="">
+              <i className="fa fa-download mr-1"></i>
+              <a href="assets/files/MX2.examples.gz" download>
+                Download Example Data
+              </a>
             </Col>
           </Row>
         </div>
@@ -806,7 +835,7 @@ export function QTLsGWASForm() {
               variant="link"
               onClick={() => setLocusQuant(!locusQuantInput)}
             >
-              Calculate Locus Quantification (optional)...
+              Additional Input
             </Button>
           </Col>
           {locusQuantInput && (
@@ -908,6 +937,32 @@ export function QTLsGWASForm() {
             <b>Locus Information</b>
           </div>
         </Row>
+        <Row>
+          <Col>
+            <Form.Label className="mb-0">
+              cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
+              <small>
+                <i>(+/- Kb up to 5Mb)</i>
+              </small>
+            </Form.Label>
+            <Form.Control
+              type="number"
+              min="1"
+              max="2000"
+              id="qtls-distance-input"
+              disabled={submitted}
+              onChange={(e) => {
+                dispatch(updateQTLsGWAS({ select_dist: e.target.value }));
+              }}
+              value={select_dist}
+              isInvalid={select_dist < 1 || select_dist > 200}
+              // custom
+            />
+            <Form.Control.Feedback type="invalid">
+              Enter distance between 1 and 200Kb.
+            </Form.Control.Feedback>
+          </Col>
+        </Row>
         {qtlPublic || ldPublic || gwasPublic ? (
           <Row>
             <Col>
@@ -918,7 +973,7 @@ export function QTLsGWASForm() {
                       disabled={submitted}
                       id="chromosome"
                       label="Chromosome"
-                      value={chromosome}
+                      value={select_chromosome}
                       options={[
                         ...Array.from({ length: 22 }, (_, i) => ({
                           value: i + 1,
@@ -934,94 +989,118 @@ export function QTLsGWASForm() {
                         },
                       ]}
                       onChange={(chromosome) => {
-                        dispatch(updateQTLsGWAS({ chromosome: chromosome }));
+                        dispatch(
+                          updateQTLsGWAS({ select_chromosome: chromosome })
+                        );
                       }}
                     />
                   </Form.Group>
                 </Col>
                 <Col sm="8">
-                  <Form.Label className="mb-0">Range</Form.Label>
+                  <Form.Label className="mb-0">Position</Form.Label>
                   <Form.Control
-                    id="range"
+                    id="select_position"
                     disabled={submitted}
                     onChange={(e) => {
-                      dispatch(updateQTLsGWAS({ range: e.target.value }));
+                      dispatch(
+                        updateQTLsGWAS({ select_position: e.target.value })
+                      );
                     }}
                     placeholder="e.g. 100000-1000000"
-                    value={range}
+                    value={select_position}
                   />
                 </Col>
               </Form.Row>
             </Col>
           </Row>
         ) : (
-          <>
-            <Row>
-              <Col>
-                <Form.Label className="mb-0">
-                  cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
-                  <small>
-                    <i>(+/- Kb up to 5Mb)</i>
-                  </small>
-                </Form.Label>
-                <Form.Control
-                  type="number"
-                  min="1"
-                  max="2000"
-                  id="qtls-distance-input"
-                  disabled={submitted}
-                  onChange={(e) => {
-                    dispatch(updateQTLsGWAS({ select_dist: e.target.value }));
-                  }}
-                  value={select_dist}
-                  isInvalid={select_dist < 1 || select_dist > 200}
-                  // custom
-                />
-                <Form.Control.Feedback type="invalid">
-                  Enter distance between 1 and 200Kb.
-                </Form.Control.Feedback>
-              </Col>
-            </Row>
-            <Row>
-              <Col>
-                <Form.Label className="mb-0">
-                  SNP{' '}
-                  <small>
-                    <i>(Default: lowest GWAS P-value SNP)</i>
-                  </small>
-                </Form.Label>
-                <Form.Control
-                  id="qtls-snp-input"
-                  disabled={submitted}
-                  onChange={(e) => {
-                    dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
-                  }}
-                  value={select_ref ? select_ref : ''}
-                  isInvalid={
-                    select_ref &&
-                    select_ref.length > 0 &&
-                    !/^rs\d+$/.test(select_ref)
-                  }
-                  // custom
-                />
-                <Form.Control.Feedback type="invalid">
-                  Enter valid RS number. Leave empty for default.
-                </Form.Control.Feedback>
-              </Col>
-            </Row>
-          </>
+          <Row>
+            <Col>
+              <Form.Label className="mb-0">
+                SNP{' '}
+                <small>
+                  <i>(Default: lowest GWAS P-value SNP)</i>
+                </small>
+              </Form.Label>
+              <Form.Control
+                id="qtls-snp-input"
+                disabled={submitted}
+                onChange={(e) => {
+                  dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
+                }}
+                value={select_ref ? select_ref : ''}
+                isInvalid={
+                  select_ref &&
+                  select_ref.length > 0 &&
+                  !/^rs\d+$/.test(select_ref)
+                }
+                // custom
+              />
+              <Form.Control.Feedback type="invalid">
+                Enter valid RS number. Leave empty for default.
+              </Form.Control.Feedback>
+            </Col>
+          </Row>
         )}
         <hr />
-        <div className="row mb-4">
-          <div className="col-sm-12">
-            <i className="fa fa-download mr-1"></i>
-            <a href="assets/files/MX2.examples.gz" download>
-              Download Example Data
-            </a>
-          </div>
-        </div>
       </div>
+      <Row>
+        <Col>
+          <Form.Group controlId="toggleQueue" className="mb-0">
+            <Form.Label className="mr-auto">
+              Submit this job to a Queue
+            </Form.Label>{' '}
+            <Form.Check inline>
+              <Form.Check.Input
+                type="checkbox"
+                disabled={submitted}
+                checked={isQueue}
+                onChange={(_) => {
+                  dispatch(updateQTLsGWAS({ isQueue: !isQueue }));
+                }}
+              />
+            </Form.Check>
+          </Form.Group>
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <Form.Group controlId="email">
+            <Form.Control
+              placeholder="Enter Email"
+              size="sm"
+              value={email}
+              type="email"
+              onChange={(e) =>
+                dispatch(updateQTLsGWAS({ email: e.target.value }))
+              }
+              disabled={!isQueue || submitted}
+              // isInvalid={isQueue && checkValid ? !validEmail : false}
+            />
+            <Form.Control.Feedback type="invalid">
+              Please provide a valid email
+            </Form.Control.Feedback>
+            <Form.Text className="text-muted">
+              <i>
+                Note: if sending to queue, when computation is completed, a
+                notification will be sent to the e-mail entered above.
+              </i>
+            </Form.Text>
+          </Form.Group>
+        </Col>
+      </Row>
       <div className="row">
+        <div className="col-sm-6">
+          <Button
+            // disabled={loading.active}
+            className="w-100"
+            variant={isError ? 'danger' : 'secondary'}
+            onClick={() => handleReset()}
+            disabled={submitted && isLoading}
+          >
+            Reset
+          </Button>
+        </div>
         <div className="col-sm-6">
           <Button
             // disabled={submitted || loading.active}
@@ -1042,18 +1121,7 @@ export function QTLsGWASForm() {
                 !/^rs\d+$/.test(select_ref))
             }
           >
-            Calculate
-          </Button>
-        </div>
-        <div className="col-sm-6">
-          <Button
-            // disabled={loading.active}
-            className="w-100"
-            variant={isError ? 'danger' : 'secondary'}
-            onClick={() => handleReset()}
-            disabled={submitted && isLoading}
-          >
-            Reset
+            {isQueue ? 'Submit' : 'Calculate'}
           </Button>
         </div>
       </div>

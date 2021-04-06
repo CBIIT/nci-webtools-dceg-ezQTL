@@ -3,7 +3,7 @@ const path = require('path');
 const logger = require('../services/logger');
 const config = require('../config');
 
-async function qtlsCalculateMain(params, req, res, next) {
+async function calculateMain(params) {
   const {
     request,
     select_qtls_samples,
@@ -26,81 +26,87 @@ async function qtlsCalculateMain(params, req, res, next) {
     qtlKey,
     ldKey,
     gwasKey,
-    chromosome,
-    range,
+    select_chromosome,
+    select_position,
     bucket,
   } = params;
 
+  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
+  // logger.debug([
+  //   rfile,
+  //   workingDirectory.toString(),
+  //   select_qtls_samples.toString(),
+  //   select_gwas_sample.toString(),
+  //   associationFile.toString(),
+  //   quantificationFile.toString(),
+  //   genotypeFile.toString(),
+  //   gwasFile.toString(),
+  //   LDFile.toString(),
+  //   request.toString(),
+  //   select_pop.toString(),
+  //   select_gene.toString(),
+  //   select_dist.toString(),
+  //   select_ref.toString(),
+  //   recalculateAttempt.toString(),
+  //   recalculatePop.toString(),
+  //   recalculateGene.toString(),
+  //   recalculateDist.toString(),
+  //   recalculateRef.toString(),
+  //   qtlKey.toString(),
+  //   ldKey.toString(),
+  //   gwasKey.toString(),
+  //   select_chromosome.toString(),
+  //   select_position,
+  //   bucket.toString(),
+  // ]);
+
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateMain',
+    [
+      rfile,
+      workingDirectory.toString(),
+      select_qtls_samples.toString(),
+      select_gwas_sample.toString(),
+      associationFile.toString(),
+      quantificationFile.toString(),
+      genotypeFile.toString(),
+      gwasFile.toString(),
+      LDFile.toString(),
+      request.toString(),
+      select_pop.toString(),
+      select_gene.toString(),
+      select_dist.toString(),
+      select_ref.toString(),
+      recalculateAttempt.toString(),
+      recalculatePop.toString(),
+      recalculateGene.toString(),
+      recalculateDist.toString(),
+      recalculateRef.toString(),
+      qtlKey.toString(),
+      ldKey.toString(),
+      gwasKey.toString(),
+      select_chromosome.toString(),
+      parseInt(select_position),
+      bucket.toString(),
+    ]
+  );
+}
+
+async function qtlsCalculateMain(params, req, res, next) {
+  const { request } = params;
   logger.info(`[${request}] Execute /qtls-calculate-main`);
   logger.debug(
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
-  logger.debug([
-    rfile,
-    workingDirectory.toString(),
-    select_qtls_samples.toString(),
-    select_gwas_sample.toString(),
-    associationFile.toString(),
-    quantificationFile.toString(),
-    genotypeFile.toString(),
-    gwasFile.toString(),
-    LDFile.toString(),
-    request.toString(),
-    select_pop.toString(),
-    select_gene.toString(),
-    select_dist.toString(),
-    select_ref.toString(),
-    recalculateAttempt.toString(),
-    recalculatePop.toString(),
-    recalculateGene.toString(),
-    recalculateDist.toString(),
-    recalculateRef.toString(),
-    qtlKey.toString(),
-    ldKey.toString(),
-    gwasKey.toString(),
-    chromosome.toString(),
-    range.toString(),
-    bucket.toString(),
-  ]);
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateMain',
-      [
-        rfile,
-        workingDirectory.toString(),
-        select_qtls_samples.toString(),
-        select_gwas_sample.toString(),
-        associationFile.toString(),
-        quantificationFile.toString(),
-        genotypeFile.toString(),
-        gwasFile.toString(),
-        LDFile.toString(),
-        request.toString(),
-        select_pop.toString(),
-        select_gene.toString(),
-        select_dist.toString(),
-        select_ref.toString(),
-        recalculateAttempt.toString(),
-        recalculatePop.toString(),
-        recalculateGene.toString(),
-        recalculateDist.toString(),
-        recalculateRef.toString(),
-        qtlKey.toString(),
-        ldKey.toString(),
-        gwasKey.toString(),
-        chromosome.toString(),
-        range.toString(),
-        bucket.toString(),
-      ]
-    );
+    const wrapper = await calculateMain(params);
     logger.info(`[${request}] Finished /qtls-calculate-main`);
     res.json(JSON.parse(wrapper));
   } catch (err) {
-      logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
-      res.status(500).json(err);
+    logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
+    res.status(500).json(err);
   }
 }
 
@@ -141,7 +147,12 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   }
 }
 
-async function qtlsCalculateLocusColocalizationHyprcolocLD(params, req, res, next) {
+async function qtlsCalculateLocusColocalizationHyprcolocLD(
+  params,
+  req,
+  res,
+  next
+) {
   const {
     request,
     ldfile,
@@ -190,7 +201,12 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(params, req, res, nex
   }
 }
 
-async function qtlsCalculateLocusColocalizationHyprcoloc(params, req, res, next) {
+async function qtlsCalculateLocusColocalizationHyprcoloc(
+  params,
+  req,
+  res,
+  next
+) {
   const {
     request,
     select_gwas_sample,
@@ -202,8 +218,8 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, req, res, next)
     ldfile,
     workingDirectory,
     qtlKey,
-    chromosome,
-    range,
+    select_chromosome,
+    select_position,
   } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc`);
@@ -229,8 +245,8 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, req, res, next)
     ldfile.toString(),
     request.toString(),
     qtlKey.toString(),
-    chromosome.toString(),
-    range.toString(),
+    select_chromosome.toString(),
+    parseInt(select_position),
   ]);
   try {
     const wrapper = await r(
@@ -248,8 +264,8 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, req, res, next)
         ldfile.toString(),
         request.toString(),
         qtlKey.toString(),
-        chromosome.toString(),
-        range.toString(),
+        select_chromosome.toString(),
+        parseInt(select_position),
       ]
     );
     logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);

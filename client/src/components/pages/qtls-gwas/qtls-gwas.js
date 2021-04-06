@@ -11,15 +11,13 @@ import { QTLsGWASResults } from './qtls-gwas-results/qtls-gwas-results';
 // import { actions } from '../../../services/store';
 import { updateQTLsGWAS } from '../../../services/actions';
 
-export function QTLsGWAS() {
+export function QTLsGWAS({ match }) {
   const dispatch = useDispatch();
   const [_openSidebar, _setOpenSidebar] = useState(true);
-  const {
-    openSidebar
-  } = useSelector((state) => state.qtlsGWAS);
+  const { openSidebar } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => {
-    _setOpenSidebar(openSidebar)
+    _setOpenSidebar(openSidebar);
   }, [openSidebar]);
 
   return (
@@ -27,8 +25,8 @@ export function QTLsGWAS() {
       <SidebarContainer
         className=""
         collapsed={!_openSidebar}
-        onCollapsed={(collapsed) => 
-          dispatch(updateQTLsGWAS({ openSidebar : !collapsed }))
+        onCollapsed={(collapsed) =>
+          dispatch(updateQTLsGWAS({ openSidebar: !collapsed }))
         }
       >
         <SidebarPanel className="col-lg-3">
@@ -42,7 +40,7 @@ export function QTLsGWAS() {
             <QTLsGWASResultsForm />
           </div>
           <div className="border rounded">
-            <QTLsGWASResults />
+            <QTLsGWASResults queueRequest={match.params.request} />
           </div>
         </MainPanel>
       </SidebarContainer>
