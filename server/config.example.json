@@ -1,25 +1,44 @@
 {
-    "server": {
-        "port": 3000,
-        "client": "../www"
+  "server": {
+    "port": 3000,
+    "client": "../www"
+  },
+  "logs": {
+    "folder": "../logs",
+    "level": "debug"
+  },
+  "tmp": {
+    "folder": "../tmp"
+  },
+  "data": {
+    "folder": "../data"
+  },
+  "R": {
+    "workDir": "../"
+  },
+  "aws": {
+    "region": "us-east-1",
+    "aws_access_key_id": "",
+    "aws_secret_access_key": "",
+    "s3": {
+      "data": "dataBucket",
+      "queue": "queueBucket",
+      "subFolder": "ezQTL"
     },
-    "logs": {
-        "folder": "../logs",
-        "level": "debug"
-    },
-    "data": {
-        "folder": "../data"
-    },
-    "R": {
-        "workDir": "../"
-    },
-    "aws": {
-        "region": "us-east-1",
-        "aws_access_key_id": "",
-        "aws_secret_access_key": "",
-        "s3": {
-            "bucket": "nci-cbiit-dceg-dev",
-            "subFolder": "ezQTL"
-          }
+    "sqs": {
+      "url": "sqsURL",
+      "errorUrl": "",
+      "visibilityTimeout": 30,
+      "pollInterval": 60
     }
+  },
+  "email": {
+    "admin": "",
+    "sender": "",
+    "baseUrl": "http://localhost:3001",
+    "smtp": {
+      "host": "host",
+      "port": 25
+    }
+  }
 }
