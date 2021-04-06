@@ -27,7 +27,7 @@ RUN npm install
 COPY client /client/
 
 RUN npm run build \
-    && mv /client/build /var/www/html/mutational-signatures
+    && mv /client/build /var/www/html/ezqtl
 
 WORKDIR /var/www/html
 
