@@ -4,7 +4,7 @@ angular/
 www/
 
 # client
-# client/build/
+client/build/
 
 # misc
 # **/.eslintcache
