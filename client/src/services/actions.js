@@ -1057,7 +1057,6 @@ function qtlsGWASHyprcolocLDCalculation(params) {
   };
 }
 
-
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
     axios
