@@ -273,6 +273,8 @@ export function QTLsGWASForm() {
   }
 
   const handleReset = () => {
+    window.location.hash = '#/qtls';
+
     dispatch(
       updateQTLsGWAS({ ...getInitialState().qtlsGWAS, publicGTEx: publicGTEx })
     );
@@ -987,7 +989,9 @@ export function QTLsGWASForm() {
                         },
                       ]}
                       onChange={(chromosome) => {
-                        dispatch(updateQTLsGWAS({ select_chromosome: chromosome }));
+                        dispatch(
+                          updateQTLsGWAS({ select_chromosome: chromosome })
+                        );
                       }}
                     />
                   </Form.Group>
@@ -998,7 +1002,9 @@ export function QTLsGWASForm() {
                     id="select_position"
                     disabled={submitted}
                     onChange={(e) => {
-                      dispatch(updateQTLsGWAS({ select_position: e.target.value }));
+                      dispatch(
+                        updateQTLsGWAS({ select_position: e.target.value })
+                      );
                     }}
                     placeholder="e.g. 100000-1000000"
                     value={select_position}

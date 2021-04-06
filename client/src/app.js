@@ -89,7 +89,7 @@ export function App() {
           )}
           <Route exact path={`/`} render={() => <Redirect to="/home" />} />
           <Route path="/home" exact={true} component={Home} />
-          <Route path="/qtls" exact component={QTLsGWAS} />
+          <Route path="/qtls/:request?" component={QTLsGWAS} />
           <Route path="/help" component={Help} />
         </div>
       </div>
