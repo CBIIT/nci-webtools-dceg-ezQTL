@@ -329,27 +329,29 @@ async function qtlsCalculateQC(params, res, next) {
     logger.info(`[${request}] Execute /ezQTL_ztw`);
     logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
 
-    logger.debug('Before rfile')
     const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-    logger.debug('After rfile')
     let gwas = ''
     let association = ''
     let ld = ''
+    let requestPath = ''
 
     try {
         if(select_gwas_sample)
-            gwas = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.GWAS.rs.txt')
+            gwas = path.resolve(config.data.folder,'MX2.examples','MX2.GWAS.rs.txt')
+          
         else
             gwas = path.resolve(config.tmp.folder,request,gwasFile)
 
         if(select_qtls_samples){
-            association = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.eQTL.txt')
-            ld = path.resolve(__dirname,config.data.folder,'MX2.examples','MX2.LD.gz')
+            association = path.resolve(config.data.folder,'MX2.examples','MX2.eQTL.txt')
+            ld = path.resolve(config.data.folder,'MX2.examples','MX2.LD.gz')
         }
         else{
             association = path.resolve(config.tmp.folder,request,associationFile)
             ld = path.resolve(config.tmp.folder,request,LDFile)
         }
+
+        requestPath = path.resolve(config.tmp.folder,request,request)
 
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -362,12 +364,11 @@ async function qtlsCalculateQC(params, res, next) {
                 select_ref.toString(),
                 select_dist,
                 select_gene.toString(),
-                request
+                requestPath
             ]
         );
         logger.info(`[${request}] Finished /ezqTL_ztw`);
-        logger.info(JSON.parse(wrapper))
-        res.json(JSON.parse(wrapper));
+        res.json(wrapper);
     } catch (err) {
         logger.error(`[${request}] Error /ezqTL_ztw ${err}`);
         res.status(500).json(err);
