@@ -73,7 +73,7 @@ async function downloadS3(request, savePath) {
     const filename = path.basename(Key);
     const filepath = path.resolve(savePath, filename);
 
-    logger.info(`Downloading: ${Key}`);
+    logger.info(`Downloading: ${Key} to ${savePath}`);
     const object = await s3
       .getObject({
         Bucket: config.aws.s3.queue,
