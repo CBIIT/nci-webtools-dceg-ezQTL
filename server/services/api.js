@@ -102,8 +102,8 @@ apiRouter.post('/getPublicGTEx', async (req, res, next) => {
   try {
     let buffers = [];
     const filestream = new AWS.S3({
-      accessKeyId: awsInfo.aws_access_key_id ? awsInfo.aws_access_key_id : '',
-      secretAccessKey: awsInfo.aws_secret_access_key ? awsInfo.aws_secret_access_key : ''
+      accessKeyId: awsInfo.aws_access_key_id,
+      secretAccessKey: awsInfo.aws_secret_access_key,
     })
       .getObject({
         Bucket: awsInfo.s3.data,
@@ -145,6 +145,7 @@ apiRouter.post('/queue', async (req, res, next) => {
   }
 
   try {
+    logger.info(`Uploading: ${fs.readdirSync(wd)}`);
     await new AWS.S3()
       .upload({
         Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),

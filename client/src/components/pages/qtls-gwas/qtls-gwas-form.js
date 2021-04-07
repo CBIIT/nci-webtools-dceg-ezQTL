@@ -308,40 +308,30 @@ export function QTLsGWASForm() {
     }
     const request = uuidv1();
 
-    if (
-      select_qtls_samples ||
-      select_gwas_sample ||
-      _associationFile ||
-      _quantificationFile ||
-      _LDFile ||
-      _gwasFile ||
-      _genotypeFile
-    ) {
-      dispatch(
-        uploadFile({
-          // dataFiles: [
-          //   _associationFile,
-          //   _quantificationFile,
-          //   _genotypeFile,
-          //   _LDFile,
-          //   _gwasFile,
-          // ],
-          associationFile: _associationFile,
-          quantificationFile: _quantificationFile,
-          genotypeFile: _genotypeFile,
-          LDFile: _LDFile,
-          gwasFile: _gwasFile,
-          associationFileName: _associationFile ? _associationFile.name : false,
-          quantificationFileName: _quantificationFile
-            ? _quantificationFile.name
-            : false,
-          genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
-          LDFileName: _LDFile ? _LDFile.name : false,
-          gwasFileName: _gwasFile ? _gwasFile.name : false,
-          request,
-        })
-      );
-    }
+    dispatch(
+      uploadFile({
+        // dataFiles: [
+        //   _associationFile,
+        //   _quantificationFile,
+        //   _genotypeFile,
+        //   _LDFile,
+        //   _gwasFile,
+        // ],
+        associationFile: _associationFile,
+        quantificationFile: _quantificationFile,
+        genotypeFile: _genotypeFile,
+        LDFile: _LDFile,
+        gwasFile: _gwasFile,
+        associationFileName: _associationFile ? _associationFile.name : false,
+        quantificationFileName: _quantificationFile
+          ? _quantificationFile.name
+          : false,
+        genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
+        LDFileName: _LDFile ? _LDFile.name : false,
+        gwasFileName: _gwasFile ? _gwasFile.name : false,
+        request,
+      })
+    );
 
     // retrieve tabix file key from selected tissue (association qtl), phenotype (gwas), and project(ld)
     const qtlKey = qtlPublic
