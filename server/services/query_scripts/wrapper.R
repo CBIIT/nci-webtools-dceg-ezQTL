@@ -3,9 +3,9 @@ qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, sele
   main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket)
 }
 
-qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info) {
+qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, bucket) {
   source(rfile)
-  locus_alignment_boxplots(workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info)
+  locus_alignment_boxplots(workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, bucket)
 }
 
 qtlsCalculateLocusColocalizationECAVIAR <- function(rfile, workingDirectory, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, select_ref, select_dist, request) {
