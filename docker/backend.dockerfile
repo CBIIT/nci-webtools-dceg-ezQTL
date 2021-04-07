@@ -15,6 +15,8 @@ RUN dnf -y update \
         bzip2 \
         bzip2-devel \
         libcurl-devel \
+        cairo \
+        cairo-devel \
         openssl-devel \
         zlib-devel \
         xz-devel \
