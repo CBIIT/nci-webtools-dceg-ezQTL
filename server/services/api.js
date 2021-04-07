@@ -43,6 +43,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+apiRouter.use('/results', express.static(config.tmp.folder));
+
 // parse json requests
 apiRouter.use(express.json());
 

@@ -336,10 +336,11 @@ async function qtlsCalculateQC(params, res, next) {
         select_qtls_samples, 
         gwasFile, 
         associationFile,
-        LDFile, 
+        ldfile, 
         select_ref,
         select_dist,
         select_gene,
+        workingDirectory
     } = params;
 
     logger.info(`[${request}] Execute /ezQTL_ztw`);
@@ -364,7 +365,7 @@ async function qtlsCalculateQC(params, res, next) {
         }
         else{
             association = path.resolve(config.tmp.folder,request,associationFile)
-            ld = path.resolve(config.tmp.folder,request,LDFile)
+            ld = path.resolve(workingDirectory,ldfile)
         }
 
         requestPath = path.resolve(config.tmp.folder,request,request)

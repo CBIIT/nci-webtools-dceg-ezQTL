@@ -6,8 +6,8 @@ export function LocusQC() {
   const {
     submitted,
     isError,
-    isLoading,
-    locus_qc
+    request,
+    isLoadingQC
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -28,9 +28,11 @@ export function LocusQC() {
           }
         />
       )}
-      {submitted && !isError && !isLoading && (
+      {submitted && !isError && !isLoadingQC && (
         <>
-          Work in progress...
+          <img src={`api/results/${request}/${request}_QC_overlapping.svg`} />
+
+          <img src={`api/results/${request}/${request}_QC_zscore.svg`} />
         </>
       )}
     </div>
