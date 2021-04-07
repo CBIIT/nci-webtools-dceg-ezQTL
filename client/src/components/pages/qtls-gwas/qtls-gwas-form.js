@@ -36,7 +36,7 @@ export function QTLsGWASForm() {
   const [ldPublic, setLdPublic] = useState(false);
   const [tissueOnly, viewTissueOnly] = useState(false);
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
-  const [locusQuantInput, setLocusQuant] = useState(false);
+  const [showAdditionalInput, setAdditionalInput] = useState(false);
 
   const {
     select_qtls_samples,
@@ -88,6 +88,10 @@ export function QTLsGWASForm() {
   useEffect(() => _setGenotypeFile(genotypeFile), [genotypeFile]);
   useEffect(() => _setLDFile(LDFile), [LDFile]);
   useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
+  useEffect(() => {
+    if (select_qtls_samples || select_gwas_sample) setAdditionalInput(true);
+    else setAdditionalInput(false);
+  }, [select_qtls_samples, select_gwas_sample]);
   useEffect(() => {
     if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx());
   }, [publicGTEx]);
@@ -304,40 +308,30 @@ export function QTLsGWASForm() {
     }
     const request = uuidv1();
 
-    if (
-      select_qtls_samples ||
-      select_gwas_sample ||
-      _associationFile ||
-      _quantificationFile ||
-      _LDFile ||
-      _gwasFile ||
-      _genotypeFile
-    ) {
-      dispatch(
-        uploadFile({
-          // dataFiles: [
-          //   _associationFile,
-          //   _quantificationFile,
-          //   _genotypeFile,
-          //   _LDFile,
-          //   _gwasFile,
-          // ],
-          associationFile: _associationFile,
-          quantificationFile: _quantificationFile,
-          genotypeFile: _genotypeFile,
-          LDFile: _LDFile,
-          gwasFile: _gwasFile,
-          associationFileName: _associationFile ? _associationFile.name : false,
-          quantificationFileName: _quantificationFile
-            ? _quantificationFile.name
-            : false,
-          genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
-          LDFileName: _LDFile ? _LDFile.name : false,
-          gwasFileName: _gwasFile ? _gwasFile.name : false,
-          request,
-        })
-      );
-    }
+    dispatch(
+      uploadFile({
+        // dataFiles: [
+        //   _associationFile,
+        //   _quantificationFile,
+        //   _genotypeFile,
+        //   _LDFile,
+        //   _gwasFile,
+        // ],
+        associationFile: _associationFile,
+        quantificationFile: _quantificationFile,
+        genotypeFile: _genotypeFile,
+        LDFile: _LDFile,
+        gwasFile: _gwasFile,
+        associationFileName: _associationFile ? _associationFile.name : false,
+        quantificationFileName: _quantificationFile
+          ? _quantificationFile.name
+          : false,
+        genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
+        LDFileName: _LDFile ? _LDFile.name : false,
+        gwasFileName: _gwasFile ? _gwasFile.name : false,
+        request,
+      })
+    );
 
     // retrieve tabix file key from selected tissue (association qtl), phenotype (gwas), and project(ld)
     const qtlKey = qtlPublic
@@ -427,7 +421,7 @@ export function QTLsGWASForm() {
             </Col>
           </Row>
           <Row>
-            <Col sm="6">
+            <Col sm="5">
               {!select_qtls_samples ? (
                 <>
                   <Button
@@ -445,7 +439,7 @@ export function QTLsGWASForm() {
                       className="fa fa-file mr-1"
                       style={{ color: 'black' }}
                     ></i>
-                    Load QTL
+                    Load QTLs
                   </Button>
                 </>
               ) : (
@@ -465,19 +459,24 @@ export function QTLsGWASForm() {
                       className="fa fa-file-excel-o mr-1"
                       style={{ color: 'black' }}
                     ></i>
-                    Unload QTL
+                    Unload QTLs
                   </Button>
                 </>
               )}
             </Col>
-            <Col sm="6">
+            <Col sm="7">
               {!select_gwas_sample ? (
                 <>
                   <Button
                     variant="link"
                     onClick={(_) => {
                       _setGwasFile('');
-                      dispatch(updateQTLsGWAS({ select_gwas_sample: true }));
+                      dispatch(
+                        updateQTLsGWAS({
+                          select_qtls_samples: true,
+                          select_gwas_sample: true,
+                        })
+                      );
                     }}
                     disabled={submitted}
                   >
@@ -485,7 +484,7 @@ export function QTLsGWASForm() {
                       className="fa fa-file mr-1"
                       style={{ color: 'black' }}
                     ></i>
-                    Load GWAS
+                    Load QTLs + GWAS
                   </Button>
                 </>
               ) : (
@@ -494,7 +493,12 @@ export function QTLsGWASForm() {
                     variant="link"
                     onClick={(_) => {
                       _setGwasFile('');
-                      dispatch(updateQTLsGWAS({ select_gwas_sample: false }));
+                      dispatch(
+                        updateQTLsGWAS({
+                          select_qtls_samples: false,
+                          select_gwas_sample: false,
+                        })
+                      );
                     }}
                     disabled={submitted}
                   >
@@ -502,7 +506,7 @@ export function QTLsGWASForm() {
                       className="fa fa-file-excel-o mr-1"
                       style={{ color: 'black' }}
                     ></i>
-                    Unload GWAS
+                    Unload QTLs + GWAS
                   </Button>
                 </>
               )}
@@ -828,17 +832,16 @@ export function QTLsGWASForm() {
             )}
           </Form.Group>
         </Row>
-        <hr />
         <Row>
           <Col>
             <Button
               variant="link"
-              onClick={() => setLocusQuant(!locusQuantInput)}
+              onClick={() => setAdditionalInput(!showAdditionalInput)}
             >
-              Additional Input
+              {showAdditionalInput ? 'Hide' : 'Show'} Additional Input
             </Button>
           </Col>
-          {locusQuantInput && (
+          {showAdditionalInput && (
             <div>
               <Form.Group className="col-sm-12">
                 <Form.Label className="mb-0">
