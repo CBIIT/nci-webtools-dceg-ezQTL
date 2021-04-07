@@ -2,31 +2,31 @@ FROM centos:8.3.2011
 
 RUN dnf -y update \
     && dnf -y install \
-        dnf-plugins-core \
-        epel-release \
-        glibc-langpack-en \
+    dnf-plugins-core \
+    epel-release \
+    glibc-langpack-en \
     && dnf config-manager --set-enabled powertools \
     && dnf -y module enable nodejs:14 \
     && dnf -y install \
-        gcc-c++ \
-        make \
-        nodejs \
-        R \
-        bzip2 \
-        bzip2-devel \
-        libcurl-devel \
-        openssl-devel \
-        zlib-devel \
-        xz-devel \
-        git \
-        libxml2-devel \
-        readline-devel \
-        lapack-devel \
-        blas-devel \
-        gsl-devel \
-        gmp-devel \
-        mpfr-devel \
-        # v8-devel \
+    gcc-c++ \
+    make \
+    nodejs \
+    R \
+    bzip2 \
+    bzip2-devel \
+    libcurl-devel \
+    openssl-devel \
+    zlib-devel \
+    xz-devel \
+    git \
+    libxml2-devel \
+    readline-devel \
+    lapack-devel \
+    blas-devel \
+    gsl-devel \
+    gmp-devel \
+    mpfr-devel \
+    # v8-devel \
     && dnf clean all
 
 # install emerald
@@ -61,7 +61,7 @@ RUN cd /tmp \
     && mv ./eCAVIAR /usr/local/bin
 
 # install R packages
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.ec2metadata', 'aws.signature'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.s3', 'aws.ec2metadata', 'aws.signature'), repos='https://cloud.r-project.org/')"
 
 # install Hyprcoloc R package
 RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = TRUE);"
