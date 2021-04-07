@@ -61,7 +61,7 @@ RUN cd /tmp \
     && mv ./eCAVIAR /usr/local/bin
 
 # install R packages
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.ec2metadata', 'gdtools', 'cowplot', 'hrbrthemes', 'ggsci', 'svglite'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.ec2metadata', 'gdtools', 'cowplot', 'hrbrthemes', 'ggsci', 'ggrepel', 'svglite'), repos='https://cloud.r-project.org/')"
 
 # install Hyprcoloc R package
 RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = TRUE);"
