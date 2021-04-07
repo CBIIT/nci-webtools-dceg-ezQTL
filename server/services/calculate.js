@@ -117,6 +117,7 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
     genotypeFile,
     info,
     workingDirectory,
+    bucket,
   } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-alignment-boxplots`);
@@ -136,6 +137,7 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
         quantificationFile.toString(),
         genotypeFile.toString(),
         JSON.stringify(info),
+        bucket.toString(),
       ]
     );
     logger.info(`[${request}] Finished /qtls-locus-alignment-boxplots`);

@@ -30,6 +30,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos) {
     ld_data <- list("Sigma" = out, "info" = info)
   }
   saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
+
 }
 
 locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
@@ -141,6 +142,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   } else {
     # public data/user-specified position
     chromosome = select_chromosome
+    select_position = strtoi(select_position, base = 0L)
     minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
     maxpos = select_position + cedistance
   }
@@ -151,7 +153,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   ## subset gene variant with cis-QTL Distance window
   qdata <- subset(qdata, pos > minpos & pos < maxpos)
 
-  kgvcfpath <- paste0(workDir, '/data/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
+  kgvcfpath <- paste0('s3://', bucket, 'ezQTL/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   in_path <- paste0(workDir, '/tmp/', request, '/', request, '.', 'chr', chromosome, '_', minpos, '_', maxpos, '.vcf.gz')
 
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
@@ -183,7 +185,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     }
   }
 
-  cmd = paste0("tabix data/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " >tmp/", request, '/', request, '.', "rc_temp", ".txt")
+  cmd = paste0("cd data/Recombination_Rate; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, "-D > ", workDir, "/tmp/", request, '/', request, ".rc_temp.txt")
   system(cmd)
   rcdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'rc_temp', '.txt'), delim = "\t", col_names = F)
   if (ncol(rcdata)) {
@@ -355,7 +357,7 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
-locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info) {
+locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -367,8 +369,8 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
       gdatafile <- paste0('tmp/', request, '/', genoFile)
       edatafile <- paste0('tmp/', request, '/', exprFile)
     } else {
-      gdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.genotyping.txt')
-      edatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.quantification.txt')
+      gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
+      edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
     }
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
@@ -396,15 +398,24 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
 }
 
 loadAWS <- function() {
-  library(aws.ec2metadata)
+  if (Sys.getenv("AWS_ACCESS_KEY_ID") == '') {
+    library(aws.ec2metadata)
 
-  if (is_ec2()) {
-    awsConfig = aws.signature::locate_credentials()
-    Sys.setenv("AWS_ACCESS_KEY_ID" = awsConfig$key,
+    if (is_ec2()) {
+      awsConfig = aws.signature::locate_credentials()
+      Sys.setenv("AWS_ACCESS_KEY_ID" = awsConfig$key,
            "AWS_SECRET_ACCESS_KEY" = awsConfig$secret,
            "AWS_DEFAULT_REGION" = awsConfig$region,
            "AWS_SESSION_TOKEN" = ifelse(is.null(awsConfig$session_token), '', awsConfig$session_token))
+    }
   }
+}
+
+# get raw s3 object
+getS3File <- function(key, bucket) {
+  loadAWS()
+  library(aws.s3)
+  return(rawToChar(get_object(key, bucket)))
 }
 
 main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
@@ -444,12 +455,14 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   } else {
     cedistance <- strtoi(select_dist, base = 0L) * 1000
   }
-  print(select_position)
+
+  select_position = strtoi(select_position, base = 0L)
   minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
   maxpos = select_position + cedistance
 
   ## load 1kg pop panel file ##
-  kgpanel <- read_delim('data/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', delim = '\t', col_names = T) %>%
+  kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
+  kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
     select(sample:gender)
   popinfo <- kgpanel %>%
     select(pop, super_pop) %>%
@@ -457,16 +470,18 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## read and parse association data file ###
   if (identical(select_qtls_samples, 'true')) {
-    qdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.eQTL.txt')
-    LDFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.LD.gz')
+    # load example data
+    qdatafile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
+
+    LDFile <- 'ezQTL/MX2.examples/MX2.LD.gz'
     qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
   } else {
-    # load association data from user upload or s3
+    # load association data from user upload 
     if (!identical(assocFile, 'false')) {
       qdatafile <- paste0('tmp/', request, '/', assocFile)
       qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
     } else {
-      # set aws config when running on ec2
+      # load assocation data from s3
       loadAWS()
       qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
       assocFile = paste0(request, ".qtl_temp.txt")
@@ -495,8 +510,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
       gdatafile <- paste0('tmp/', request, '/', genoFile)
       edatafile <- paste0('tmp/', request, '/', exprFile)
     } else {
-      gdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.genotyping.txt')
-      edatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.quantification.txt')
+      gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
+      edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
     }
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
@@ -518,7 +533,11 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   ## if LD File is loaded
   ld_data <- 'false'
   if (!identical(LDFile, 'false')) {
-    out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+    if (identical(select_qtls_samples, 'true')) {
+      out = s3read_using(fread, object = LDFile, bucket = bucket)
+    } else {
+      out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+    }
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
     if (length(unique(info$chr)) > 1) {
@@ -536,7 +555,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('tmp/', request, '/', gwasFile)
     } else {
-      gwasdatafile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.GWAS.rs.txt')
+      gwasdatafile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
     }
     gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
     # check if there are multiple chromosomes in the input GWAS file
