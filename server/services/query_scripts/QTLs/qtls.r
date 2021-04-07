@@ -153,7 +153,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   ## subset gene variant with cis-QTL Distance window
   qdata <- subset(qdata, pos > minpos & pos < maxpos)
 
-  kgvcfpath <- paste0('s3://', bucket, 'ezQTL/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
+  kgvcfpath <- paste0('s3://', bucket, '/ezQTL/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
   in_path <- paste0(workDir, '/tmp/', request, '/', request, '.', 'chr', chromosome, '_', minpos, '_', maxpos, '.vcf.gz')
 
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
@@ -185,7 +185,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     }
   }
 
-  cmd = paste0("cd data/Recombination_Rate; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, "-D > ", workDir, "/tmp/", request, '/', request, ".rc_temp.txt")
+  cmd = paste0("cd data/Recombination_Rate; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ", workDir, "/tmp/", request, '/', request, ".rc_temp.txt")
   system(cmd)
   rcdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'rc_temp', '.txt'), delim = "\t", col_names = F)
   if (ncol(rcdata)) {
