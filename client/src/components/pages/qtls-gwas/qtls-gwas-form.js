@@ -308,7 +308,7 @@ export function QTLsGWASForm() {
     }
     const request = uuidv1();
 
-    dispatch(
+    await dispatch(
       uploadFile({
         // dataFiles: [
         //   _associationFile,
@@ -421,49 +421,6 @@ export function QTLsGWASForm() {
             </Col>
           </Row>
           <Row>
-            <Col sm="5">
-              {!select_qtls_samples ? (
-                <>
-                  <Button
-                    variant="link"
-                    onClick={(_) => {
-                      _setAssociationFile('');
-                      _setQuantificationFile('');
-                      _setGenotypeFile('');
-                      _setLDFile('');
-                      dispatch(updateQTLsGWAS({ select_qtls_samples: true }));
-                    }}
-                    disabled={submitted}
-                  >
-                    <i
-                      className="fa fa-file mr-1"
-                      style={{ color: 'black' }}
-                    ></i>
-                    Load QTLs
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="link"
-                    onClick={(_) => {
-                      _setAssociationFile('');
-                      _setQuantificationFile('');
-                      _setGenotypeFile('');
-                      _setLDFile('');
-                      dispatch(updateQTLsGWAS({ select_qtls_samples: false }));
-                    }}
-                    disabled={submitted}
-                  >
-                    <i
-                      className="fa fa-file-excel-o mr-1"
-                      style={{ color: 'black' }}
-                    ></i>
-                    Unload QTLs
-                  </Button>
-                </>
-              )}
-            </Col>
             <Col sm="7">
               {!select_gwas_sample ? (
                 <>
@@ -484,7 +441,7 @@ export function QTLsGWASForm() {
                       className="fa fa-file mr-1"
                       style={{ color: 'black' }}
                     ></i>
-                    Load QTLs + GWAS
+                    Load Sample Data
                   </Button>
                 </>
               ) : (
@@ -506,7 +463,7 @@ export function QTLsGWASForm() {
                       className="fa fa-file-excel-o mr-1"
                       style={{ color: 'black' }}
                     ></i>
-                    Unload QTLs + GWAS
+                    Unload Sample Data
                   </Button>
                 </>
               )}
@@ -516,16 +473,17 @@ export function QTLsGWASForm() {
             <Col className="">
               <i className="fa fa-download mr-1"></i>
               <a href="assets/files/MX2.examples.gz" download>
-                Download Example Data
+                Download Sample Data
               </a>
             </Col>
           </Row>
         </div>
+        <hr />
         <Row>
           <Col>
             <Form.Group>
               <Select
-                disabled={!genomeOptions.length}
+                disabled={!genomeOptions.length || submitted}
                 id="genomeBuild"
                 label="Genome Build"
                 value={genome}
@@ -537,6 +495,7 @@ export function QTLsGWASForm() {
             </Form.Group>
           </Col>
         </Row>
+        <hr />
         <Row>
           <div className="col-sm-6">
             <b>QTLs Data Files</b>
@@ -591,7 +550,7 @@ export function QTLsGWASForm() {
                       <Col>
                         <Form.Group>
                           <Select
-                            disabled={publicLoading || tissueOnly}
+                            disabled={publicLoading || tissueOnly || submitted}
                             id="project"
                             label="Project"
                             value={qtlProject}
@@ -605,7 +564,7 @@ export function QTLsGWASForm() {
                       <Col>
                         <Form.Group>
                           <Select
-                            disabled={publicLoading || tissueOnly}
+                            disabled={publicLoading || tissueOnly || submitted}
                             id="qtlType"
                             label="QTL Type"
                             value={xQtl}
@@ -621,7 +580,7 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading}
+                        disabled={publicLoading || submitted}
                         id="tissue"
                         label="Tissue"
                         value={tissue}
@@ -689,7 +648,7 @@ export function QTLsGWASForm() {
                   <Col>
                     <Form.Group>
                       <Select
-                        disabled={publicLoading}
+                        disabled={publicLoading || submitted}
                         id="ldProject"
                         label="Project"
                         value={ldProject}
