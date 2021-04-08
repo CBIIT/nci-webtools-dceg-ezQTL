@@ -32,33 +32,33 @@ async function calculateMain(params) {
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
-  // logger.debug([
-  //   rfile,
-  //   workingDirectory.toString(),
-  //   select_qtls_samples.toString(),
-  //   select_gwas_sample.toString(),
-  //   associationFile.toString(),
-  //   quantificationFile.toString(),
-  //   genotypeFile.toString(),
-  //   gwasFile.toString(),
-  //   LDFile.toString(),
-  //   request.toString(),
-  //   select_pop.toString(),
-  //   select_gene.toString(),
-  //   select_dist.toString(),
-  //   select_ref.toString(),
-  //   recalculateAttempt.toString(),
-  //   recalculatePop.toString(),
-  //   recalculateGene.toString(),
-  //   recalculateDist.toString(),
-  //   recalculateRef.toString(),
-  //   qtlKey.toString(),
-  //   ldKey.toString(),
-  //   gwasKey.toString(),
-  //   select_chromosome.toString(),
-  //   select_position,
-  //   bucket.toString(),
-  // ]);
+  logger.debug([
+    rfile,
+    workingDirectory.toString(),
+    select_qtls_samples.toString(),
+    select_gwas_sample.toString(),
+    associationFile.toString(),
+    quantificationFile.toString(),
+    genotypeFile.toString(),
+    gwasFile.toString(),
+    LDFile.toString(),
+    request.toString(),
+    select_pop.toString(),
+    select_gene.toString(),
+    select_dist.toString(),
+    select_ref.toString(),
+    recalculateAttempt.toString(),
+    recalculatePop.toString(),
+    recalculateGene.toString(),
+    recalculateDist.toString(),
+    recalculateRef.toString(),
+    qtlKey.toString(),
+    ldKey.toString(),
+    gwasKey.toString(),
+    select_chromosome.toString(),
+    select_position,
+    bucket.toString(),
+  ]);
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -395,6 +395,7 @@ async function qtlsCalculateQC(params, res, next) {
 }
 
 module.exports = {
+    calculateMain,
     qtlsCalculateMain,
     qtlsCalculateLocusAlignmentBoxplots,
     qtlsCalculateLocusColocalizationHyprcolocLD,
