@@ -1174,7 +1174,7 @@ export function qtlsGWASLocusQCCalculation(params) {
         }
       })
       .then(function () {
-        dispatch(updateQTLsGWAS({ isLoadingQC: false }));
+        dispatch(updateQTLsGWAS({ isLoadingQC: false, isLoading: false }));
       });
 
   }
@@ -1289,7 +1289,7 @@ export function qtlsGWASCalculation(params) {
         }
       })
       .then(function () {
-        dispatch(updateQTLsGWAS({ isLoading: false }));
+        
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
         if (
@@ -1298,6 +1298,7 @@ export function qtlsGWASCalculation(params) {
           qtlsGWAS.gwas.data &&
           Object.keys(qtlsGWAS.gwas.data).length > 0
         ) {
+          /*
           dispatch(
             qtlsGWASHyprcolocLDCalculation({
               request: qtlsGWAS.request,
@@ -1308,7 +1309,7 @@ export function qtlsGWASCalculation(params) {
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
             })
           );
-          
+          */
           dispatch(
             qtlsGWASLocusQCCalculation({
               request: qtlsGWAS.request,
@@ -1323,7 +1324,16 @@ export function qtlsGWASCalculation(params) {
             })
           )
         }
-      });
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc', isLoading: false })
+          );
+        }
+      })
   };
 }
 
