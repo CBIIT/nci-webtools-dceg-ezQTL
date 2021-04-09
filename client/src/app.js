@@ -31,7 +31,7 @@ export function App() {
     },
     {
       route: '/qtls',
-      title: 'Single Loci',
+      title: 'Single Locus',
     },
     {
       route: '/help',
