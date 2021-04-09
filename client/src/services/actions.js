@@ -1309,6 +1309,19 @@ export function qtlsGWASCalculation(params) {
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
             })
           );
+          /*
+          dispatch(
+            qtlsGWASECaviarCalculation({
+              request: qtlsGWAS.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_samples: qtlsGWAS.select_qtls_samples,
+              gwasFile: qtlsGWAS.inputs.gwas_file[0],
+              associationFile: qtlsGWAS.inputs.association_file[0],
+              ldfile: qtlsGWAS.inputs.ld_file[0],
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+            })
+          );*/
           
           dispatch(
             qtlsGWASLocusQCCalculation({
