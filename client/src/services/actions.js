@@ -1298,7 +1298,7 @@ export function qtlsGWASCalculation(params) {
           qtlsGWAS.gwas.data &&
           Object.keys(qtlsGWAS.gwas.data).length > 0
         ) {
-          /*
+          
           dispatch(
             qtlsGWASHyprcolocLDCalculation({
               request: qtlsGWAS.request,
@@ -1309,7 +1309,7 @@ export function qtlsGWASCalculation(params) {
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
             })
           );
-          */
+          
           dispatch(
             qtlsGWASLocusQCCalculation({
               request: qtlsGWAS.request,
