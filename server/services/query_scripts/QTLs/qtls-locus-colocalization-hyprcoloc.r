@@ -1,9 +1,11 @@
 locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, qtlKey, select_chromosome, select_position) {
+  source('services/query_scripts/QTLs/ezQTL_ztw.R')
   setwd(workDir)
   .libPaths(c(.libPaths(), "~/R"))
   library(hyprcoloc)
   library(tidyverse)
   library(jsonlite)
+  library(ggrepel)
   ##  args = commandArgs(trailingOnly=TRUE)
   ##  gwasfile <- args[1]
   ##  qtlfile <- args[2]
@@ -113,12 +115,16 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   result_hyprcoloc <- result_hyprcoloc %>% arrange(desc(posterior_explained_by_snp))
   ## parse result_hyprcoloc dataframe to JSON
   result_hyprcoloc_colnames <- colnames(result_hyprcoloc)
-  result_hyprcoloc_data <- list(setNames(as.data.frame(result_hyprcoloc), result_hyprcoloc_colnames))
+  hyprcoloc_data <- setNames(as.data.frame(result_hyprcoloc), result_hyprcoloc_colnames)
+  hycoloc_barplot(hyprcoloc_data, output_plot = paste0('tmp/', request, '/', 'hyprcoloc_table.svg'))
+  result_hyprcoloc_data = list(hyprcoloc_data)
 
   result_snpscore <- result_snpscore %>% arrange(desc(snpscore))
   ## parse result_snpscore dataframe to JSON
   result_snpscore_colnames <- colnames(result_snpscore)
-  result_snpscore_data <- list(setNames(as.data.frame(result_snpscore), result_snpscore_colnames))
+  snpscore_data <- setNames(as.data.frame(result_snpscore), result_snpscore_colnames)
+  hycoloc_boxplot(snpscore_data, output_plot = paste0('tmp/', request, '/', 'hyprcoloc_snpscore_table.svg'))
+  result_snpscore_data = list(snpscore_data)
 
   # result_hyprcoloc_filename <- paste0(request,".hyprcoloc.txt")
   # result_snpscore_filename <- paste0(request,".hyprcoloc_snpscore.txt")

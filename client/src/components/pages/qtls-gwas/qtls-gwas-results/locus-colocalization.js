@@ -8,6 +8,7 @@ import {
 } from '../../../../services/actions';
 import Table from '../../../controls/table/table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plot from '../../../controls/plot/plot';
 
 export function LocusColocalization() {
   const dispatch = useDispatch();
@@ -363,6 +364,7 @@ export function LocusColocalization() {
               active={isLoadingHyprcoloc || hyprcolocError}
               content={hyprcolocError}
             />
+            <Plot plotURL={`api/${request}/hyprcoloc_table.svg`} />
             <Table
               title=""
               columns={hyprcolocColumns}
