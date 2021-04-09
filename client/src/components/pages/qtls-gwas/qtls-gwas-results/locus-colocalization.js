@@ -364,7 +364,14 @@ export function LocusColocalization() {
               active={isLoadingHyprcoloc || hyprcolocError}
               content={hyprcolocError}
             />
-            <Plot plotURL={`api/${request}/hyprcoloc_table.svg`} />
+            {hyprcoloc_table.data.length && (
+              <div className="mb-2">
+                <Plot
+                  plotURL={`api/results/${request}/hyprcoloc_table.svg`}
+                  className="border rounded p-3"
+                />
+              </div>
+            )}
             <Table
               title=""
               columns={hyprcolocColumns}
@@ -402,6 +409,14 @@ export function LocusColocalization() {
               active={isLoadingHyprcoloc || hyprcolocError}
               content={hyprcolocError}
             />
+            {hyprcolocSNPScore_table.data.length && (
+              <div className="mb-2">
+                <Plot
+                  plotURL={`api/results/${request}/hyprcoloc_snpscore_table.svg`}
+                  className="border rounded p-3"
+                />
+              </div>
+            )}
             <Table
               title=""
               columns={hyprcolocSNPScoreColumns}

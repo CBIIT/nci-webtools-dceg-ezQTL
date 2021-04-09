@@ -148,7 +148,7 @@ export default function Plot({
           </TransformWrapper>
         </div>
       ) : (
-        <div className="border rounded">Plot is Unavailable</div>
+        <div className="border rounded p-3">Plot is Unavailable</div>
       )}
     </div>
   );
