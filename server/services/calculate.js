@@ -2,6 +2,11 @@ const r = require('r-wrapper').async;
 const path = require('path');
 const logger = require('../services/logger');
 const config = require('../config');
+const AWS = require('aws-sdk');
+const fs = require('fs');
+
+const awsInfo = config.aws;
+AWS.config.update(awsInfo);
 
 async function calculateMain(params) {
   const {
@@ -345,6 +350,8 @@ async function qtlsCalculateQC(params, res, next) {
         workingDirectory
     } = params;
 
+    const s3 = new AWS.S3()
+
     logger.info(`[${request}] Execute /ezQTL_ztw`);
     logger.debug(`[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`);
 
@@ -355,15 +362,32 @@ async function qtlsCalculateQC(params, res, next) {
     let requestPath = ''
 
     try {
-        if(select_gwas_sample)
-            gwas = path.resolve(config.data.folder,'MX2.examples','MX2.GWAS.rs.txt')
-          
+        
+        if(select_gwas_sample){  
+          gwas = path.resolve(config.tmp.folder,request,'MX2.GWAS.rs.txt')
+          let file = fs.createWriteStream(gwas);
+          await s3.getObject({
+            Bucket: config.aws.s3.data,
+            Key: `${awsInfo.s3.subFolder}/MX2.examples/MX2.GWAS.rs.txt`,
+          }).createReadStream().pipe(file)
+        }
         else
             gwas = path.resolve(config.tmp.folder,request,gwasFile)
 
         if(select_qtls_samples){
-            association = path.resolve(config.data.folder,'MX2.examples','MX2.eQTL.txt')
-            ld = path.resolve(config.data.folder,'MX2.examples','MX2.LD.gz')
+            association = path.resolve(config.tmp.folder,request,'MX2.eQTL.txt')
+            let file = fs.createWriteStream(association);
+            await s3.getObject({
+              Bucket: config.aws.s3.data,
+              Key: `${awsInfo.s3.subFolder}/MX2.examples/MX2.eQTL.txt`,
+            }).createReadStream().pipe(file)
+
+            ld = path.resolve(config.tmp.folder,request,'MX2.LD.gz')
+            file = fs.createWriteStream(ld);
+            await s3.getObject({
+              Bucket: config.aws.s3.data,
+              Key: `${awsInfo.s3.subFolder}/MX2.examples/MX2.LD.gz`,
+            }).createReadStream().pipe(file)
         }
         else{
             association = path.resolve(config.tmp.folder,request,associationFile)
@@ -371,6 +395,10 @@ async function qtlsCalculateQC(params, res, next) {
         }
 
         requestPath = path.resolve(config.tmp.folder,request,request)
+
+        logger.info(gwas)
+        logger.info(association)
+        logger.info(ld)
 
         const wrapper = await r(
             path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
