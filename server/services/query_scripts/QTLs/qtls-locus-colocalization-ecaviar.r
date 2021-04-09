@@ -1,8 +1,9 @@
 locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, LDFile, select_ref, select_dist, request) {
+  source('services/query_scripts/QTLs/ezQTL_ztw.R')
+  setwd(workDir)
   library(jsonlite)
   library(tidyverse)
-  setwd(workDir)
-  source('ezQTL_ztw.R')
+  library(ggrepel)
 
   ## use sample data files or user-uploaded data files
   if (identical(select_gwas_sample, 'true')) {
@@ -47,8 +48,10 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
     ecaviardata[10] <- lapply(ecaviardata[10], as.character)
     ecaviardata[13] <- lapply(ecaviardata[13], as.character)
   }
+  ecdata = setNames(as.data.frame(ecaviardata), ecaviardata_colnames)
+  ecaviar_visualize(ecdata, output_plot_prefix = paste0('tmp/', request, '/', 'ecaviar_table'))
   ## parse outputfile to JSON and return to frontend
-  locus_colocalization_ecaviar_data <- list(setNames(as.data.frame(ecaviardata), ecaviardata_colnames))
+  locus_colocalization_ecaviar_data <- list(ecdata)
   dataSourceJSON <- c(toJSON(list(ecaviar = list(request = request, data = locus_colocalization_ecaviar_data))))
   return(dataSourceJSON)
 }

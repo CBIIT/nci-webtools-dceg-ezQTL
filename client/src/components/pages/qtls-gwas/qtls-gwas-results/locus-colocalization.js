@@ -407,7 +407,9 @@ export function LocusColocalization() {
           <div>
             <LoadingOverlay
               active={isLoadingHyprcoloc || hyprcolocError}
-              content={hyprcolocError}
+              content={
+                !isLoadingHyprcoloc && hyprcolocError ? hyprcolocError : null
+              }
             />
             {hyprcolocSNPScore_table.data.length && (
               <div className="mb-2">
@@ -479,8 +481,24 @@ export function LocusColocalization() {
           <div>
             <LoadingOverlay
               active={isLoadingECaviar || !ecaviar_table.data.length}
-              content={!ecaviar_table.data.length ? 'No data available' : null}
+              content={
+                !isLoadingECaviar && !ecaviar_table.data.length
+                  ? 'No data available'
+                  : null
+              }
             />
+            {ecaviar_table.data.length && (
+              <div className="mb-2">
+                <Plot
+                  plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}
+                  className="border rounded p-3"
+                />
+                <Plot
+                  plotURL={`api/results/${request}/ecaviar_table_boxplot.svg`}
+                  className="border rounded p-3"
+                />
+              </div>
+            )}{' '}
             <Table
               title=""
               columns={ecaviarColumns}
