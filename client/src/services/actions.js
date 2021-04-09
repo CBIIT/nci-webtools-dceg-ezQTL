@@ -1057,7 +1057,6 @@ function qtlsGWASHyprcolocLDCalculation(params) {
   };
 }
 
-
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
     axios
@@ -1153,31 +1152,32 @@ export function qtlsGWASECaviarCalculation(params) {
 }
 
 export function qtlsGWASLocusQCCalculation(params) {
-  return async function (dispatch, getState){
-
-    console.log("locus qc", params);
-    dispatch(updateQTLsGWAS({
-      isLoadingQC : true
+  return async function (dispatch, getState) {
+    console.log('locus qc', params);
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingQC: true,
       })
     );
 
     axios
-      .post('api/qtls-locus-qc',params)
+      .post('api/qtls-locus-qc', params)
       .then(function (response) {
         console.log('api/qtls-locus-qc response.data', response.data);
       })
-      .catch(function (error){
+      .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
-          dispatch(updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' }));
+          dispatch(
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          );
         }
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoadingQC: false, isLoading: false }));
       });
-
-  }
+  };
 }
 
 export function qtlsGWASCalculation(params) {
@@ -1289,7 +1289,6 @@ export function qtlsGWASCalculation(params) {
         }
       })
       .then(function () {
-        
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
         if (
@@ -1333,9 +1332,9 @@ export function qtlsGWASCalculation(params) {
               ldfile: qtlsGWAS.inputs.ld_file[0],
               select_ref: qtlsGWAS.locus_alignment.top.rsnum,
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol
+              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
             })
-          )
+          );
         }
       })
       .catch(function (error) {
@@ -1343,10 +1342,14 @@ export function qtlsGWASCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc', isLoading: false })
+            updateQTLsGWAS({
+              isError: true,
+              activeResultsTab: 'locus-qc',
+              isLoading: false,
+            })
           );
         }
-      })
+      });
   };
 }
 

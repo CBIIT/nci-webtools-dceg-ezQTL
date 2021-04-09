@@ -29,6 +29,7 @@
     "react-scripts": "4.0.3",
     "react-select": "^4.2.1",
     "react-table": "^7.6.3",
+    "react-zoom-pan-pinch": "^1.6.1",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
     "uuid": "^8.3.2",

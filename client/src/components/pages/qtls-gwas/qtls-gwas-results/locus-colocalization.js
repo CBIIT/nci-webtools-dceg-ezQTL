@@ -8,6 +8,7 @@ import {
 } from '../../../../services/actions';
 import Table from '../../../controls/table/table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import Plot from '../../../controls/plot/plot';
 
 export function LocusColocalization() {
   const dispatch = useDispatch();
@@ -363,6 +364,14 @@ export function LocusColocalization() {
               active={isLoadingHyprcoloc || hyprcolocError}
               content={hyprcolocError}
             />
+            {hyprcoloc_table.data.length && (
+              <div className="mb-2">
+                <Plot
+                  plotURL={`api/results/${request}/hyprcoloc_table.svg`}
+                  className="border rounded p-3"
+                />
+              </div>
+            )}
             <Table
               title=""
               columns={hyprcolocColumns}
@@ -398,8 +407,18 @@ export function LocusColocalization() {
           <div>
             <LoadingOverlay
               active={isLoadingHyprcoloc || hyprcolocError}
-              content={hyprcolocError}
+              content={
+                !isLoadingHyprcoloc && hyprcolocError ? hyprcolocError : null
+              }
             />
+            {hyprcolocSNPScore_table.data.length && (
+              <div className="mb-2">
+                <Plot
+                  plotURL={`api/results/${request}/hyprcoloc_snpscore_table.svg`}
+                  className="border rounded p-3"
+                />
+              </div>
+            )}
             <Table
               title=""
               columns={hyprcolocSNPScoreColumns}
@@ -462,8 +481,24 @@ export function LocusColocalization() {
           <div>
             <LoadingOverlay
               active={isLoadingECaviar || !ecaviar_table.data.length}
-              content={!ecaviar_table.data.length ? 'No data available' : null}
+              content={
+                !isLoadingECaviar && !ecaviar_table.data.length
+                  ? 'No data available'
+                  : null
+              }
             />
+            {ecaviar_table.data.length && (
+              <div className="mb-2">
+                <Plot
+                  plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}
+                  className="border rounded p-3"
+                />
+                <Plot
+                  plotURL={`api/results/${request}/ecaviar_table_boxplot.svg`}
+                  className="border rounded p-3"
+                />
+              </div>
+            )}{' '}
             <Table
               title=""
               columns={ecaviarColumns}
