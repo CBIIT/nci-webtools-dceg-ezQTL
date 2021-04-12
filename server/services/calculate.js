@@ -99,6 +99,7 @@ async function calculateMain(params) {
 }
 
 async function qtlsCalculateMain(params, req, res, next) {
+  req.setTimeout(900000);
   const { request } = params;
   logger.info(`[${request}] Execute /qtls-calculate-main`);
   logger.debug(

@@ -11,6 +11,7 @@ client/build/
 # **/.vscode
 # **.gz.tbi
 **/.DS_Store
+Rplots.pdf
 
 # server
 server/config.json
