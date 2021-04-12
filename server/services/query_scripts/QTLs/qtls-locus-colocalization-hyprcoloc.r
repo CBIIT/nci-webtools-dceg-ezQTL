@@ -1,4 +1,4 @@
-locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, qtlKey, select_chromosome, select_position) {
+locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, qtlKey, select_chromosome, select_position, bucket) {
   source('services/query_scripts/QTLs/ezQTL_ztw.R')
   setwd(workDir)
   .libPaths(c(.libPaths(), "~/R"))
@@ -6,6 +6,8 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   library(tidyverse)
   library(jsonlite)
   library(ggrepel)
+  library(aws.s3)
+
   ##  args = commandArgs(trailingOnly=TRUE)
   ##  gwasfile <- args[1]
   ##  qtlfile <- args[2]
@@ -13,18 +15,21 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   ##  prefix <- args[4]
 
   if (identical(select_gwas_sample, 'true')) {
-    gwasfile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.GWAS.rs.txt')
+    gwasfile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
     gwasfile <- paste0('tmp/', request, '/', gwasfile)
   }
   if (identical(select_qtls_samples, 'true')) {
-    qtlfile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.eQTL.txt')
-    ldfile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.LD.gz')
+    qtlfile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
+    ldfile <- 'ezQTL/MX2.examples/MX2.LD.gz'
+
+    ld.matrix <- s3read_using(read_delim, delim = '\t', col_names = F, col_types = cols('X1' = 'c'), object = ldfile, bucket = bucket) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
   } else {
     qtlfile <- paste0('tmp/', request, '/', qtlfile)
-  }
+    ldfile <- paste0('tmp/', request, '/', ldfile)
 
-  # ldfile <- paste0("tmp/", ldfile)
+    ld.matrix <- read_delim(ldfile, delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
+  }
 
 
   ## for jiyeon ##
@@ -52,7 +57,7 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
 
   gene2symbol <- trait2 %>% select(gene_id, gene_symbol) %>% unique()
 
-  ld.matrix <- read_delim(ldfile, delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
+  # ld.matrix <- read_delim(ldfile, delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
   ld.info <- ld.matrix %>% select(chr, pos, rsnum, ref, alt) %>% mutate(Seq = seq_along(chr))
 
   ld.matrix <- ld.matrix %>% select(-c(chr, pos, rsnum, ref, alt)) %>% as.matrix
@@ -133,6 +138,6 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
 
   #save.image(file=paste0(prefix,".hyprcoloc.RData"))
   dataSourceJSON <- c(toJSON(list(hyprcoloc = list(request = request, result_hyprcoloc = list(data = result_hyprcoloc_data), result_snpscore = list(data = result_snpscore_data)))))
-  return(dataSourceJSON)
+    return(dataSourceJSON)
 }
 ### LEAVE EMPTY LINE BELOW ###

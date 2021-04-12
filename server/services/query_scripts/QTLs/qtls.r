@@ -397,27 +397,6 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
-loadAWS <- function() {
-  if (Sys.getenv("AWS_ACCESS_KEY_ID") == '') {
-    library(aws.ec2metadata)
-
-    if (is_ec2()) {
-      awsConfig = aws.signature::locate_credentials()
-      Sys.setenv("AWS_ACCESS_KEY_ID" = awsConfig$key,
-           "AWS_SECRET_ACCESS_KEY" = awsConfig$secret,
-           "AWS_DEFAULT_REGION" = awsConfig$region,
-           "AWS_SESSION_TOKEN" = ifelse(is.null(awsConfig$session_token), '', awsConfig$session_token))
-    }
-  }
-}
-
-# get raw s3 object
-getS3File <- function(key, bucket) {
-  loadAWS()
-  library(aws.s3)
-  return(rawToChar(get_object(key, bucket)))
-}
-
 main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
   setwd(workDir)
   library(tidyverse)
@@ -534,7 +513,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   ld_data <- 'false'
   if (!identical(LDFile, 'false')) {
     if (identical(select_qtls_samples, 'true')) {
-      out = s3read_using(fread, object = LDFile, bucket = bucket)
+      out = s3read_using(fread, header = FALSE, showProgress = FALSE, object = LDFile, bucket = bucket)
     } else {
       out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
     }
@@ -644,7 +623,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   }
 
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = LDFile, select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_quantification = list(data = locus_quantification_data), locus_quantification_heatmap = list(data = locus_quantification_heatmap_data), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_quantification = list(data = locus_quantification_data), locus_quantification_heatmap = list(data = locus_quantification_heatmap_data), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))

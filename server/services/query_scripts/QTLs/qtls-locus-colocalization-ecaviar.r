@@ -1,19 +1,30 @@
-locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, LDFile, select_ref, select_dist, request) {
+locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, LDFile, select_ref, select_dist, request, bucket) {
   source('services/query_scripts/QTLs/ezQTL_ztw.R')
   setwd(workDir)
   library(jsonlite)
   library(tidyverse)
   library(ggrepel)
+  library(aws.s3)
 
   ## use sample data files or user-uploaded data files
   if (identical(select_gwas_sample, 'true')) {
-    gwasFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.GWAS.rs.txt')
+    publicGWASFile = 'ezQTL/MX2.examples/MX2.GWAS.rs.txt'
+    gwasfile <- paste0(workDir, '/tmp/', request, '/MX2.GWAS.rs.txt', bucket)
+
+    # download example files from s3 and save to request dir
+    save_object(publicGWASFile, bucket, file = gwasFile)
   } else {
     gwasFile <- paste0(workDir, '/', 'tmp/', request, '/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
-    assocFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.eQTL.txt')
-    LDFile <- paste0(workDir, '/', 'data/', 'MX2.examples/', 'MX2.LD.gz')
+    publicAssocFile = 'ezQTL/MX2.examples/MX2.eQTL.txt'
+    publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
+    assocFile <- paste0(workDir, '/tmp/', request, '/MX2.eQTL.txt')
+    LDFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
+
+    # download example files from s3 and save to request dir
+    save_object(publicAssocFile, bucket, file = assocFile)
+    save_object(publicLDFile, bucket, file = LDFile)
   } else {
     assocFile <- paste0(workDir, '/', 'tmp/', request, '/', assocFile)
     if (!identical(LDFile, 'false')) {

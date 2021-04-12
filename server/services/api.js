@@ -3,13 +3,13 @@ const compression = require('compression');
 const config = require('../config');
 const logger = require('./logger');
 const path = require('path');
-const { 
-    qtlsCalculateMain,
-    qtlsCalculateLocusAlignmentBoxplots,
-    qtlsCalculateLocusColocalizationHyprcolocLD,
-    qtlsCalculateLocusColocalizationHyprcoloc,
-    qtlsCalculateLocusColocalizationECAVIAR,
-    qtlsCalculateQC
+const {
+  qtlsCalculateMain,
+  qtlsCalculateLocusAlignmentBoxplots,
+  qtlsCalculateLocusColocalizationHyprcolocLD,
+  qtlsCalculateLocusColocalizationHyprcoloc,
+  qtlsCalculateLocusColocalizationECAVIAR,
+  qtlsCalculateQC,
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
@@ -271,23 +271,45 @@ apiRouter.post('/qtls-locus-alignment-boxplots', (req, res, next) =>
 
 apiRouter.post('/qtls-locus-colocalization-hyprcoloc-ld', (req, res, next) =>
   qtlsCalculateLocusColocalizationHyprcolocLD(
-    { ...req.body, workingDirectory },
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+    },
     req,
     res,
     next
   )
 );
 
-apiRouter.post('/qtls-locus-colocalization-hyprcoloc-ld', (req, res, next) => qtlsCalculateLocusColocalizationHyprcolocLD({...req.body, workingDirectory}, req, res, next))
-
-apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) => qtlsCalculateLocusColocalizationHyprcoloc({...req.body, workingDirectory}, req, res, next))
+apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) =>
+  qtlsCalculateLocusColocalizationHyprcoloc(
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data,
+    },
+    req,
+    res,
+    next
+  )
+);
 
 apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
   req.setTimeout(900000);
-  qtlsCalculateLocusColocalizationECAVIAR({...req.body, workingDirectory}, req, res, next);
-})
+  qtlsCalculateLocusColocalizationECAVIAR(
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data,
+    },
+    req,
+    res,
+    next
+  );
+});
 
-apiRouter.post('/qtls-locus-qc', (req, res, next) => qtlsCalculateQC({...req.body, workingDirectory}, res, next))
-
+apiRouter.post('/qtls-locus-qc', (req, res, next) =>
+  qtlsCalculateQC({ ...req.body, workingDirectory }, res, next)
+);
 
 module.exports = { apiRouter };
