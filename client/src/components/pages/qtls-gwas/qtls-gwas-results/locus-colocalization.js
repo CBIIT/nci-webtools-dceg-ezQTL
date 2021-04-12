@@ -364,7 +364,7 @@ export function LocusColocalization() {
               active={isLoadingHyprcoloc || hyprcolocError}
               content={hyprcolocError}
             />
-            {hyprcoloc_table.data.length && (
+            {hyprcoloc_table.data.length > 0 && (
               <div className="mb-2">
                 <Plot
                   plotURL={`api/results/${request}/hyprcoloc_table.svg`}
@@ -487,7 +487,7 @@ export function LocusColocalization() {
                   : null
               }
             />
-            {ecaviar_table.data.length && (
+            {ecaviar_table.data.length > 0 && (
               <div className="mb-2">
                 <Plot
                   plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}

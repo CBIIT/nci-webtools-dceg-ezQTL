@@ -30,7 +30,7 @@ export default function Plot({
     }
 
     if (plotURL) checkExists();
-  }, plotURL);
+  }, [plotURL]);
 
   //   download text results files
   async function downloadData(txtPath) {
