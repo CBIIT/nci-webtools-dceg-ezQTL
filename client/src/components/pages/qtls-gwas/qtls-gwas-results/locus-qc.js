@@ -8,6 +8,7 @@ export function LocusQC() {
     submitted,
     isError,
     request,
+    isLoading,
     isLoadingQC
   } = useSelector((state) => state.qtlsGWAS);
 
@@ -29,11 +30,11 @@ export function LocusQC() {
           }
         />
       )}
-      {submitted && !isError && !isLoadingQC && (
+      {submitted && !isError && !isLoading && !isLoadingQC && (
         <>
           <Plot
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
-            className="border rounded p-3"
+            className="border rounded p-3 mb-2"
           />
 
           <Plot

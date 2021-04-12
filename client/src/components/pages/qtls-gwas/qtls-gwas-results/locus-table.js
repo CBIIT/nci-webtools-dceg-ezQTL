@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import Table from '../../../controls/table/table';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateQTLsGWAS } from '../../../../services/actions';
+import { QTLsGWASResultsForm } from './qtls-gwas-results-form';
 
 export function LocusTable() {
   const dispatch = useDispatch();
@@ -9,7 +10,8 @@ export function LocusTable() {
   const {
     locus_alignment,
     locus_table,
-    inputs
+    inputs,
+    isQueue
   } = useSelector((state) => state.qtlsGWAS);
 
   const columns = [
@@ -166,6 +168,12 @@ export function LocusTable() {
 
   return  (
       <div className="px-3 py-2" style={{ minHeight: '500px' }}>
+        { !isQueue && 
+          <>
+            <QTLsGWASResultsForm />
+            <hr />
+          </>
+        }
         <p>
           QTL results of the locus are annotated with linkage disequilibrium to the LD reference SNP and links to multiple external databases (LDlink, GWAS Catalog, gnomAD). 
           The "R2 to LD reference" column will be updated according to the selected LD reference.

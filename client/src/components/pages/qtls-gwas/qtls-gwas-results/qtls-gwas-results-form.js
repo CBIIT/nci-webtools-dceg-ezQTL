@@ -2,10 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-// import Select from '../../../controls/select/select';
 import ReactSelect, { createFilter } from 'react-select';
 import { updateAlert, updateQTLsGWAS } from '../../../../services/actions';
-// import { Multiselect } from 'multiselect-react-dropdown';
+import { PopulationSelect } from '../../../controls/population-select/population-select';
 
 export function QTLsGWASResultsForm() {
   const dispatch = useDispatch();
@@ -60,19 +59,29 @@ export function QTLsGWASResultsForm() {
 
   async function handleSubmit() {
     console.log("yay!");
+    dispatch(updateQTLsGWAS({ isLoading: false }));
   }
 
   return (
     <>
-      <LoadingOverlay active={isLoading} />
-      <Form className="row py-1 px-2 justify-content-between">
+      {/* <LoadingOverlay active={isLoading} /> */}
+      <Form className="row justify-content-between">
         <div className="col-md-9">
           <Form.Group className="row">
             <div className="col-md-4">
               <Form.Label className="mb-0">
                 Population <span style={{ display: submitted && !isLoading ? 'inline' : 'none', color: 'red' }}>*</span>
               </Form.Label>
-              <Form.Control
+              <PopulationSelect
+                id="qtls-results-population-input"
+                disabled={!submitted}
+                // value={_selectPop}
+                // onChange={(e) => {
+                //   _setSelectPop(e.target.value);
+                // }}
+                // custom
+              />
+              {/* <Form.Control
                 id="qtls-results-population-input"
                 disabled={!submitted}
                 value={_selectPop}
@@ -80,35 +89,12 @@ export function QTLsGWASResultsForm() {
                   _setSelectPop(e.target.value);
                 }}
                 // custom
-              />
-              {/* <Multiselect
-                options={[{name: 'Srigar', id: 1},{name: 'Sam', id: 2}]} // Options to display in the dropdown
-                // selectedValues={this.state.selectedValue} // Preselected value to persist in dropdown
-                // onSelect={this.onSelect} // Function will trigger on select event
-                // onRemove={this.onRemove} // Function will trigger on remove event
-                displayValue="name" // Property name to display in the dropdown options
-                showCheckbox
               /> */}
-                {/* <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option> */}
-              {/* </Form.Control> */}
             </div>
             <div className="col-md-4">
               <Form.Label className="mb-0">
                 Reference Gene <span style={{ display: submitted && !isLoading ? 'inline' : 'none', color: 'red' }}>*</span>
               </Form.Label>
-              {/* <Form.Control
-                id="qtls-results-gene-input"
-                disabled={!submitted}
-                value={_selectGene}
-                onChange={(e) => {
-                  _setSelectGene(e.target.value);
-                }}
-                // custom
-              /> */}
               <ReactSelect
                 isDisabled={!submitted}
                 inputId="qtls-results-gene-input"

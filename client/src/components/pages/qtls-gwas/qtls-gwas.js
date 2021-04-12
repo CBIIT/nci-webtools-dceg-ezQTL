@@ -6,7 +6,7 @@ import {
   MainPanel,
 } from '../../controls/sidebar-container/sidebar-container';
 import { QTLsGWASForm } from './qtls-gwas-form';
-import { QTLsGWASResultsForm } from './qtls-gwas-results/qtls-gwas-results-form';
+// import { QTLsGWASResultsForm } from './qtls-gwas-results/qtls-gwas-results-form';
 import { QTLsGWASResults } from './qtls-gwas-results/qtls-gwas-results';
 // import { actions } from '../../../services/store';
 import { updateQTLsGWAS } from '../../../services/actions';
@@ -36,9 +36,9 @@ export function QTLsGWAS({ match }) {
         </SidebarPanel>
 
         <MainPanel className="col-lg-9">
-          <div className="border rounded mb-3">
+          {/* <div className="border rounded mb-3">
             <QTLsGWASResultsForm />
-          </div>
+          </div> */}
           <div className="border rounded">
             <QTLsGWASResults queueRequest={match.params.request} />
           </div>
