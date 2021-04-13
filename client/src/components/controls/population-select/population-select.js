@@ -24,12 +24,12 @@ export const PopulationSelect = ({
     dispatch(updateQTLsGWAS({ select_pop: _selectPop && _selectPop.length > 0 ? _selectPop.map((item) => item.value).join("+") : false }))
   }, [_selectPop]);
 
-  const allPopulationValues = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
-  const allAfricanValues = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
-  const allMixedAmericanValues = ["MXL", "PUR", "CLM", "PEL"];
-  const allEastAsianValues = ["CHB", "JPT", "CHS", "CDX", "KHV"];
-  const allEuropeanValues = ["CEU", "TSI", "FIN", "GBR", "IBS"];
-  const allSouthAsianValues = ["GIH", "PJL", "BEB", "STU", "ITU"];
+  // const allPopulationValues = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
+  // const allAfricanValues = ["YRI", "LWK", "GWD", "MSL", "ESN", "ASW", "ACB"];
+  // const allMixedAmericanValues = ["MXL", "PUR", "CLM", "PEL"];
+  // const allEastAsianValues = ["CHB", "JPT", "CHS", "CDX", "KHV"];
+  // const allEuropeanValues = ["CEU", "TSI", "FIN", "GBR", "IBS"];
+  // const allSouthAsianValues = ["GIH", "PJL", "BEB", "STU", "ITU"];
   const allPopulations = [
     // { value: "ALL", label: "(ALL) All Populations" },
     { value: "YRI", label: "(YRI) Yoruba in Ibadan, Nigera" },
@@ -60,7 +60,7 @@ export const PopulationSelect = ({
     { value: "ITU", label: "(ITU) Indian Telugu from the UK" },
   ];
   const allPopulationsGrouped = [
-    // { value: "ALL", label: "(ALL) All Populations" },
+    { label: "(ALL) All Populations", options: [ { value: "ALL", label: "(All) All Populations" }] },
     {
       label: "(AFR) African",
       // name: "African",
@@ -135,21 +135,6 @@ export const PopulationSelect = ({
     }),
   }
 
-  // const selectAll = () => {
-  //   console.log("all populations selected");
-  //   if (_selectPop.length >= 26 && _selectPop.filter((pop) => pop.value === 'ALL').length === 0) {
-  //     _setSelectPop(allPopulations);
-  //   } 
-  //   if (_selectPop.length >= 26 && _selectPop.filter((pop) => pop.value === 'ALL').length > 0) {
-  //     console.log("CLEAR ALL POPULATIONS");
-  //     _setSelectPop([]);
-  //   } 
-  //   if (_selectPop.filter((pop) => pop.value === 'ALL').length === 0) {
-  //     console.log("SELECT ALL POPULATIONS");
-  //     _setSelectPop(allPopulations);
-  //   }
-  // };
-
   const removeAll = (arr, removeArr) => {
     return arr.filter(item => !removeArr.includes(item))
   }
@@ -158,6 +143,7 @@ export const PopulationSelect = ({
 
   const Option = props => {
     return (
+      props.data.value !== 'ALL' &&
       <components.Option {...props}>
         <span style={{
           marginLeft: props.data.value === 'ALL' ? '0px' : '15px'
@@ -170,10 +156,18 @@ export const PopulationSelect = ({
 
   const selectHeader = (data) => {
     console.log("population group selected", data);
-    if (containsAll(_selectPop.map((item) => item.value), data.options.map((item) => item.value))) {
-      _setSelectPop(removeAll(_selectPop.map((item) => item.value), data.options.map((item) => item.value)).map((item) => allPopulations.filter((pop) => pop.value === item)[0]));
+    if (data.options[0].value !== 'ALL') {
+      if (containsAll(_selectPop.map((item) => item.value), data.options.map((item) => item.value))) {
+        _setSelectPop(removeAll(_selectPop.map((item) => item.value), data.options.map((item) => item.value)).map((item) => allPopulations.filter((pop) => pop.value === item)[0]));
+      } else {
+        _setSelectPop([...new Set(_selectPop.map((item) => item.value).concat(data.options.map((item) => item.value)))].map((item) => allPopulations.filter((pop) => pop.value === item)[0]));
+      }
     } else {
-      _setSelectPop([...new Set(_selectPop.map((item) => item.value).concat(data.options.map((item) => item.value)))].map((item) => allPopulations.filter((pop) => pop.value === item)[0]));
+      if (_selectPop.length >= 26) {
+        _setSelectPop([]);
+      } else {
+        _setSelectPop(allPopulations);
+      }
     }
   };
 
@@ -189,36 +183,18 @@ export const PopulationSelect = ({
 
   const MultiValueLabel = props => {
     return (
-      // _selectPop.filter((pop) => pop.value === 'ALL').length === 0 ? 
-      // (
-      //     <components.MultiValueLabel {...props}>
-      //       {props.data.value === 'ALL' ? props.data.label : props.data.value}
-      //     </components.MultiValueLabel>
-      // ) : 
       (
-        // props.data.value === 'ALL' && 
+        _selectPop.length >= 26 ? 
+        props.data.value === 'YRI' &&
+        <components.MultiValueLabel {...props}>
+          (ALL) All Populations
+        </components.MultiValueLabel>
+        :
         <components.MultiValueLabel {...props}>
           {props.data.value}
         </components.MultiValueLabel>
       )
     )
-    // return (
-    //   _selectPop.filter((pop) => pop.value === 'ALL').length > 0 ?
-    //   (
-    //     <div style={{
-    //       display: props.data.value === 'ALL' ? 'block' : 'none'
-    //     }}>
-    //       <components.MultiValueLabel {...props}>
-    //         { props.data.label }
-    //       </components.MultiValueLabel>
-    //     </div>
-    //   ) : 
-    //   (
-    //     <components.MultiValueLabel {...props}>
-    //       { props.data.value }
-    //     </components.MultiValueLabel>
-    //   )
-    // )
   };
 
   const MultiValueRemove = props => {
@@ -231,14 +207,8 @@ export const PopulationSelect = ({
     <ReactSelect
       value={_selectPop}
       onChange={(item) => {
-        console.log("onChange", item);
-        // if (item.filter((pop) => pop.value === 'ALL').length > 0) {
-        //   selectAll();
-        // } else if (item.length >= 26) {
-        //   selectAll();
-        // } else {
-          _setSelectPop(item);
-        // }
+        // console.log("onChange", item);
+        _setSelectPop(item);
       }}
       inputId={id}
       isMulti={true}

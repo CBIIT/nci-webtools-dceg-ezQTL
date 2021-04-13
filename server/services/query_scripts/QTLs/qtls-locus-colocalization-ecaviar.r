@@ -9,7 +9,7 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   ## use sample data files or user-uploaded data files
   if (identical(select_gwas_sample, 'true')) {
     publicGWASFile = 'ezQTL/MX2.examples/MX2.GWAS.rs.txt'
-    gwasfile <- paste0(workDir, '/tmp/', request, '/MX2.GWAS.rs.txt', bucket)
+    gwasFile <- paste0(workDir, '/tmp/', request, '/MX2.GWAS.rs.txt')
 
     # download example files from s3 and save to request dir
     save_object(publicGWASFile, bucket, file = gwasFile)
