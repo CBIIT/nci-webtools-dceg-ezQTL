@@ -13,6 +13,7 @@ import {
   submitQueue,
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
+import { PopulationSelect } from '../../controls/population-select/population-select';
 const { v1: uuidv1 } = require('uuid');
 
 export function QTLsGWASForm() {
@@ -512,7 +513,7 @@ export function QTLsGWASForm() {
                 Association (QTL) Data <span style={{ color: 'red' }}>*</span>
               </Form.Label>
               <Form.Check
-                disabled={submitted}
+                disabled={submitted || select_qtls_samples}
                 inline
                 id="qtlSource"
                 label="Public"
@@ -630,7 +631,7 @@ export function QTLsGWASForm() {
                 </small>
               </Form.Label>
               <Form.Check
-                disabled={submitted}
+                disabled={submitted || select_qtls_samples}
                 inline
                 id="ldSource"
                 label="Public"
@@ -691,7 +692,7 @@ export function QTLsGWASForm() {
             <div className="d-flex">
               <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
               <Form.Check
-                disabled={submitted}
+                disabled={submitted || select_qtls_samples}
                 inline
                 id="gwasSource"
                 label="Public"
@@ -899,6 +900,22 @@ export function QTLsGWASForm() {
             <b>Locus Information</b>
           </div>
         </Row>
+        { ldPublic &&
+          <Row>
+            <Col>
+              <Form.Label className="mb-0">
+                Population <span style={{ color: 'red' }}>*</span>{' '}
+              </Form.Label>
+              <PopulationSelect
+                  id="qtls-results-population-input"
+                  disabled={submitted || !ldPublic}
+                />
+              {/* <Form.Control.Feedback type="invalid">
+                Enter distance between 1 and 200Kb.
+              </Form.Control.Feedback> */}
+            </Col>
+          </Row>
+        }
         <Row>
           <Col>
             <Form.Label className="mb-0">
@@ -1080,7 +1097,9 @@ export function QTLsGWASForm() {
               select_dist > 200 ||
               (select_ref &&
                 select_ref.length > 0 &&
-                !/^rs\d+$/.test(select_ref))
+                !/^rs\d+$/.test(select_ref)) 
+              //   ||
+              // (ldPublic && (!select_pop || select_pop.length <= 0))
             }
           >
             {isQueue ? 'Submit' : 'Calculate'}

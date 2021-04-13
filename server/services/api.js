@@ -295,7 +295,6 @@ apiRouter.post('/qtls-locus-colocalization-hyprcoloc', (req, res, next) =>
 );
 
 apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
-  req.setTimeout(900000);
   qtlsCalculateLocusColocalizationECAVIAR(
     {
       ...req.body,

@@ -17,6 +17,7 @@ export function LocusAlignmentPlot(params) {
     gwas,
     request,
     select_qtls_samples, 
+    isQueue
   } = useSelector((state) => state.qtlsGWAS);
 
   // use local state to reset tooltip when this component unmounts
@@ -138,7 +139,7 @@ export function LocusAlignmentPlot(params) {
           )}
           <div className="w-100 border border-top mx-0 my-0"></div>
           {/* make ld reference action */}
-          {tooltip.data && (
+          {tooltip.data && !isQueue && (
             <div>
               <Button
                 variant="link"

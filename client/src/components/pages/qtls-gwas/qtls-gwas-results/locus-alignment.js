@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LocusAlignmentPlot } from './locus-alignment-plot';
 import { BoxplotsModal } from '../../../controls/boxplots-modal/boxplots-modal';
 import { updateQTLsGWAS } from '../../../../services/actions';
+import { QTLsGWASResultsForm } from './qtls-gwas-results-form';
 
 export function LocusAlignment() {
   const dispatch = useDispatch();
@@ -14,7 +15,8 @@ export function LocusAlignment() {
     submitted,
     isError,
     locus_alignment,
-    locus_alignment_boxplots
+    locus_alignment_boxplots,
+    isQueue
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -42,6 +44,12 @@ export function LocusAlignment() {
       )} */}
       {submitted && !isError && locus_alignment.data && (
         <>
+          { !isQueue && 
+            <>
+              <QTLsGWASResultsForm />
+              <hr />
+            </>
+          }
           <p>
             Two{' '}
             <a href="http://locuszoom.org/" target="_blank" rel="noreferrer">

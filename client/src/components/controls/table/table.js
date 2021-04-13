@@ -133,7 +133,14 @@ export default function Table({
 
   const exportCSV = (inData) => {
     const exportColumns = Object.keys(inData[0]);
-    let exportData = inData.map(el => Object.values(el));
+    let exportData = []
+    inData.forEach((item) => {
+      let row = [];
+      exportColumns.forEach((key) => {
+        row.push(item[key]);
+      })
+      exportData.push(row)
+    })
     exportData.unshift(exportColumns);
     return (exportData);
   };
