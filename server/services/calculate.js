@@ -169,6 +169,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
     select_pos,
     select_dist,
     workingDirectory,
+    bucket
   } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
@@ -195,6 +196,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
         select_pos.toString(),
         select_dist.toString(),
         request.toString(),
+        bucket.toString(),
       ]
     );
     logger.info(
