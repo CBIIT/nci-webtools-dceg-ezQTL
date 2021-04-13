@@ -140,7 +140,7 @@ export default function Plot({
                     className="w-100"
                     src={plotURL}
                     style={{ maxHeight: maxHeight || '500px' }}
-                    alt={alt || 'Plot Unavailable'}
+                    alt={alt || 'Plot is unavailable.'}
                   />
                 </TransformComponent>
               </React.Fragment>
@@ -148,7 +148,7 @@ export default function Plot({
           </TransformWrapper>
         </div>
       ) : (
-        <div className="border rounded p-3">Plot is Unavailable</div>
+        <div className="border rounded p-3 mb-2">Plot is unavailable.</div>
       )}
     </div>
   );

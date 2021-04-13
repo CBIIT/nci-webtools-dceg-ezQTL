@@ -21,7 +21,7 @@ export const PopulationSelect = ({
 
   useEffect(() => {
     console.log("USE EFFECT", _selectPop);
-    dispatch(updateQTLsGWAS({ select_pop: _selectPop && _selectPop.length > 0 ? _selectPop.map((item) => item.value).join("+") : [] }))
+    dispatch(updateQTLsGWAS({ select_pop: _selectPop && _selectPop.length > 0 ? _selectPop.map((item) => item.value).join("+") : false }))
   }, [_selectPop]);
 
   const allPopulationValues = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
