@@ -120,9 +120,8 @@ export const PopulationSelect = ({
   ];
 
   useEffect(() => {
-    const wow = inputs ? inputs['select_pop'][0].split('+').map((item) => allPopulations.filter((pop) => pop.value === item)[0]) : [];
-    console.log("wow", wow);
-    _setSelectPop(wow);
+    const parsePopulation = inputs  && inputs['select_pop'][0].length > 0 ? inputs['select_pop'][0].split('+').map((item) => allPopulations.filter((pop) => pop.value === item)[0]) : [];
+    _setSelectPop(parsePopulation);
   }, [inputs]);
 
   const customStyles = {
