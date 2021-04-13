@@ -1052,6 +1052,13 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               select_position: qtlsGWAS.select_position,
             })
           );
+        }
+        if (
+          !qtlsGWAS.isError &&
+          qtlsGWAS.gwas &&
+          qtlsGWAS.gwas.data &&
+          Object.keys(qtlsGWAS.gwas.data).length > 0
+        ) {
           dispatch(
             qtlsGWASLocusQCCalculation({
               request: qtlsGWAS.request,
@@ -1308,23 +1315,27 @@ export function qtlsGWASCalculation(params) {
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        // if (
-        //   !qtlsGWAS.isError &&
-        //   qtlsGWAS.gwas &&
-        //   qtlsGWAS.gwas.data &&
-        //   Object.keys(qtlsGWAS.gwas.data).length > 0
-        // ) {
-          
-        dispatch(
-          qtlsGWASHyprcolocLDCalculation({
-            request: qtlsGWAS.request,
-            ldfile: qtlsGWAS.inputs.ld_file[0],
-            select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-            select_chr: qtlsGWAS.locus_alignment.top.chr,
-            select_pos: qtlsGWAS.locus_alignment.top.pos,
-            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-          })
-        );
+        if (
+          !qtlsGWAS.isError &&
+          qtlsGWAS.gwas &&
+          qtlsGWAS.gwas.data &&
+          Object.keys(qtlsGWAS.gwas.data).length > 0
+        ) {
+          dispatch(
+            qtlsGWASHyprcolocLDCalculation({
+              request: qtlsGWAS.request,
+              ldfile: qtlsGWAS.inputs.ld_file[0],
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              select_chr: qtlsGWAS.locus_alignment.top.chr,
+              select_pos: qtlsGWAS.locus_alignment.top.pos,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+            })
+          );
+        } else {
+          dispatch(
+            updateQTLsGWAS({ isLoading: false })
+          );
+        }
           /*
           dispatch(
             qtlsGWASECaviarCalculation({
@@ -1352,11 +1363,6 @@ export function qtlsGWASCalculation(params) {
         //       select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
         //     })
         //   );
-        // } else {
-        //   dispatch(
-        //     updateQTLsGWAS({ isLoading: false })
-        //   );
-        // }
       })
       .catch(function (error) {
         console.log(error);
