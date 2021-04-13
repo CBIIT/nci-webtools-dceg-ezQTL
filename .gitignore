@@ -13,6 +13,7 @@ client/build/
 **/.DS_Store
 Rplots.pdf
 false
+*.tbi
 
 # server
 server/config.json

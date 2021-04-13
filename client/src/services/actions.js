@@ -1336,6 +1336,9 @@ export function qtlsGWASCalculation(params) {
             })
           );
         }
+        dispatch(
+          updateQTLsGWAS({ isLoading: false })
+        );
       })
       .catch(function (error) {
         console.log(error);
