@@ -21,7 +21,7 @@ export const PopulationSelect = ({
 
   useEffect(() => {
     console.log("USE EFFECT", _selectPop);
-    dispatch(updateQTLsGWAS({ select_pop: _selectPop.map((item) => item.value).join("+") }))
+    dispatch(updateQTLsGWAS({ select_pop: _selectPop && _selectPop.length > 0 ? _selectPop.map((item) => item.value).join("+") : [] }))
   }, [_selectPop]);
 
   const allPopulationValues = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
@@ -120,9 +120,8 @@ export const PopulationSelect = ({
   ];
 
   useEffect(() => {
-    const wow = inputs ? inputs['select_pop'][0].split('+').map((item) => allPopulations.filter((pop) => pop.value === item)[0]) : [];
-    console.log("wow", wow);
-    _setSelectPop(wow);
+    const parsePopulation = inputs  && inputs['select_pop'][0].length > 0 ? inputs['select_pop'][0].split('+').map((item) => allPopulations.filter((pop) => pop.value === item)[0]) : [];
+    _setSelectPop(parsePopulation);
   }, [inputs]);
 
   const customStyles = {
