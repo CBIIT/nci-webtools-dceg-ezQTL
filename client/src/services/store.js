@@ -102,6 +102,9 @@ export const getInitialState = async () => {
       select_position: '42743496',
       isQueue: false,
       email: '',
+      qtlPublic: false,
+      gwasPublic: false,
+      ldPublic: false,
     },
     errorModal: {
       visible: false,

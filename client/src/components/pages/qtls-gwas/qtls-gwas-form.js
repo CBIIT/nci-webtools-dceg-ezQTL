@@ -32,9 +32,6 @@ export function QTLsGWASForm() {
     false
   );
   const [showGenotypeTooltip, setShowGenotypeTooltip] = useState(false);
-  const [qtlPublic, setQtlPublic] = useState(false);
-  const [gwasPublic, setGwasPublic] = useState(false);
-  const [ldPublic, setLdPublic] = useState(false);
   const [tissueOnly, viewTissueOnly] = useState(false);
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
   const [showAdditionalInput, setAdditionalInput] = useState(false);
@@ -80,6 +77,9 @@ export function QTLsGWASForm() {
     select_position,
     isQueue,
     email,
+    qtlPublic,
+    gwasPublic,
+    ldPublic,
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
@@ -289,9 +289,6 @@ export function QTLsGWASForm() {
     _setGenotypeFile('');
     _setLDFile('');
     _setGwasFile('');
-    setQtlPublic(false);
-    setLdPublic(false);
-    setGwasPublic(false);
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
   };
@@ -520,7 +517,7 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={qtlPublic}
                 onChange={(_) => {
-                  setQtlPublic(!qtlPublic);
+                  dispatch(updateQTLsGWAS({ qtlPublic: !qtlPublic }));
                   _setAssociationFile('');
                 }}
               />
@@ -638,7 +635,7 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={ldPublic}
                 onChange={(_) => {
-                  setLdPublic(!ldPublic);
+                  dispatch(updateQTLsGWAS({ ldPublic: !ldPublic }));
                   _setLDFile('');
                 }}
               />
@@ -699,7 +696,7 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={gwasPublic}
                 onChange={(_) => {
-                  setGwasPublic(!gwasPublic);
+                  dispatch(updateQTLsGWAS({ gwasPublic: !gwasPublic }));
                   _setGwasFile('');
                 }}
               />
