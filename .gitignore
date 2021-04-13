@@ -12,6 +12,7 @@ client/build/
 # **.gz.tbi
 **/.DS_Store
 Rplots.pdf
+false
 
 # server
 server/config.json
