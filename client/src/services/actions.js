@@ -1052,6 +1052,23 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               select_position: qtlsGWAS.select_position,
             })
           );
+          dispatch(
+            qtlsGWASLocusQCCalculation({
+              request: qtlsGWAS.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_samples: qtlsGWAS.select_qtls_samples,
+              gwasFile: qtlsGWAS.inputs.gwas_file[0],
+              associationFile: qtlsGWAS.inputs.association_file[0],
+              ldfile: qtlsGWAS.inputs.ld_file[0],
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+            })
+          );
+        } else {
+          dispatch(
+            updateQTLsGWAS({ isLoading: false })
+          );
         }
       });
   };
@@ -1105,21 +1122,7 @@ function qtlsGWASHyprcolocCalculation(params) {
         }
       })
       .then(function () {
-        const qtlsGWAS = getState().qtlsGWAS;
         dispatch(updateQTLsGWAS({ isLoadingHyprcoloc: false }));
-        // dispatch(
-        //   qtlsGWASLocusQCCalculation({
-        //     request: qtlsGWAS.request,
-        //     select_gwas_sample: qtlsGWAS.select_gwas_sample,
-        //     select_qtls_samples: qtlsGWAS.select_qtls_samples,
-        //     gwasFile: qtlsGWAS.inputs.gwas_file[0],
-        //     associationFile: qtlsGWAS.inputs.association_file[0],
-        //     ldfile: qtlsGWAS.inputs.ld_file[0],
-        //     select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-        //     select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-        //     select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
-        //   })
-        // );
       });
   };
 }
@@ -1305,23 +1308,23 @@ export function qtlsGWASCalculation(params) {
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (
-          !qtlsGWAS.isError &&
-          qtlsGWAS.gwas &&
-          qtlsGWAS.gwas.data &&
-          Object.keys(qtlsGWAS.gwas.data).length > 0
-        ) {
+        // if (
+        //   !qtlsGWAS.isError &&
+        //   qtlsGWAS.gwas &&
+        //   qtlsGWAS.gwas.data &&
+        //   Object.keys(qtlsGWAS.gwas.data).length > 0
+        // ) {
           
-          dispatch(
-            qtlsGWASHyprcolocLDCalculation({
-              request: qtlsGWAS.request,
-              ldfile: qtlsGWAS.inputs.ld_file[0],
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-              select_chr: qtlsGWAS.locus_alignment.top.chr,
-              select_pos: qtlsGWAS.locus_alignment.top.pos,
-              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-            })
-          );
+        dispatch(
+          qtlsGWASHyprcolocLDCalculation({
+            request: qtlsGWAS.request,
+            ldfile: qtlsGWAS.inputs.ld_file[0],
+            select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+            select_chr: qtlsGWAS.locus_alignment.top.chr,
+            select_pos: qtlsGWAS.locus_alignment.top.pos,
+            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+          })
+        );
           /*
           dispatch(
             qtlsGWASECaviarCalculation({
@@ -1336,24 +1339,24 @@ export function qtlsGWASCalculation(params) {
             })
           );*/
           
-          dispatch(
-            qtlsGWASLocusQCCalculation({
-              request: qtlsGWAS.request,
-              select_gwas_sample: qtlsGWAS.select_gwas_sample,
-              select_qtls_samples: qtlsGWAS.select_qtls_samples,
-              gwasFile: qtlsGWAS.inputs.gwas_file[0],
-              associationFile: qtlsGWAS.inputs.association_file[0],
-              ldfile: qtlsGWAS.inputs.ld_file[0],
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
-            })
-          );
-        } else {
-          dispatch(
-            updateQTLsGWAS({ isLoading: false })
-          );
-        }
+        //   dispatch(
+        //     qtlsGWASLocusQCCalculation({
+        //       request: qtlsGWAS.request,
+        //       select_gwas_sample: qtlsGWAS.select_gwas_sample,
+        //       select_qtls_samples: qtlsGWAS.select_qtls_samples,
+        //       gwasFile: qtlsGWAS.inputs.gwas_file[0],
+        //       associationFile: qtlsGWAS.inputs.association_file[0],
+        //       ldfile: qtlsGWAS.inputs.ld_file[0],
+        //       select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+        //       select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+        //       select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+        //     })
+        //   );
+        // } else {
+        //   dispatch(
+        //     updateQTLsGWAS({ isLoading: false })
+        //   );
+        // }
       })
       .catch(function (error) {
         console.log(error);

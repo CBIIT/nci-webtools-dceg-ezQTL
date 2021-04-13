@@ -5,9 +5,9 @@ locus_colocalization_hyprcoloc_ld <- function(workDir, ldfile, select_ref, chr, 
     ## execute LD calculation: shell script
     cmd <- paste0('sh server/services/query_scripts/QTLs/qtls-locus-colocalization-hyprcoloc-ld.sh ', select_ref, ' ', chr, ' ', pos, ' ', select_dist, ' ', request, ' ', workDir, ' ', bucket) 
     system(cmd)
-    filename <- paste0('tmp/',request,'/',request, ".LD.gz")
+    filename <- paste0('tmp/', request, '/', request, ".LD.gz")
   } else {
-    filename <- paste0(ldfile)
+    filename <- paste0('tmp/', request, '/', ldfile)
   }
   
   ## return completion message

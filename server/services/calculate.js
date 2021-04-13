@@ -392,7 +392,11 @@ async function qtlsCalculateQC(params, res, next) {
         .pipe(file);
     } else {
       association = path.resolve(config.tmp.folder, request, associationFile);
-      ld = path.resolve(config.tmp.folder, request, ldfile);
+      if (ldfile === 'false') {
+        ld = path.resolve(config.tmp.folder, request, request + '.LD.gz');
+      } else {
+        ld = path.resolve(config.tmp.folder, request, ldfile);
+      }
     }
 
     requestPath = path.resolve(config.tmp.folder, request, request);
