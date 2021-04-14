@@ -17,14 +17,13 @@ export function QTLsGWASResultsForm() {
     inputs,
     select_ref,
     gene_list,
-    select_gene
+    select_gene,
+    select_pop
   } = useSelector((state) => state.qtlsGWAS);
 
-  const [_selectPop, _setSelectPop] = useState([]);
   const [_selectGene, _setSelectGene] = useState([]);
   const [_selectRef, _setSelectRef] = useState('');
 
-  useEffect(() => _setSelectPop(inputs ? inputs['select_pop'][0] : []), [inputs]);
   useEffect(() => {
     if (!select_gene) {
       const option = locus_alignment['top']['gene_symbol'] && gene_list['data'] ? gene_list['data'].filter((item) => item.gene_symbol === locus_alignment['top']['gene_symbol']) : [];
@@ -40,7 +39,7 @@ export function QTLsGWASResultsForm() {
   const validateForm = () => {
     dispatch(updateQTLsGWAS({ isLoading: true }));
     const matchSNP = all_gene_variants['data'].filter((item) => item.rsnum === _selectRef);
-    if (matchSNP.length > 0) {
+    if (_selectRef.length === 0 || (_selectRef.length > 0 && matchSNP.length > 0)) {
       dispatch(updateAlert({
         show: false,
         message: ``
@@ -75,21 +74,7 @@ export function QTLsGWASResultsForm() {
               <PopulationSelect
                 id="qtls-results-population-input"
                 disabled={!submitted}
-                // value={_selectPop}
-                // onChange={(e) => {
-                //   _setSelectPop(e.target.value);
-                // }}
-                // custom
               />
-              {/* <Form.Control
-                id="qtls-results-population-input"
-                disabled={!submitted}
-                value={_selectPop}
-                onChange={(e) => {
-                  _setSelectPop(e.target.value);
-                }}
-                // custom
-              /> */}
             </div>
             <div className="col-md-4">
               <Form.Label className="mb-0">
@@ -139,7 +124,7 @@ export function QTLsGWASResultsForm() {
           <Form.Label className="mb-0"></Form.Label>
           <Button
             disabled={!submitted || 
-              (_selectPop.length <= 0) || 
+              (!select_pop || select_pop.length <= 0) || 
               (_selectRef &&
                 _selectRef.length > 0 &&
                 !/^rs\d+$/.test(_selectRef))

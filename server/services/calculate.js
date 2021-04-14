@@ -144,6 +144,7 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
         quantificationFile.toString(),
         genotypeFile.toString(),
         JSON.stringify(info),
+        request.toString(),
         bucket.toString(),
       ]
     );

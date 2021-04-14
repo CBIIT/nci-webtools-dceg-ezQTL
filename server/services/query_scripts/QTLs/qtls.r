@@ -357,7 +357,7 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
-locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info, bucket) {
+locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info, request, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
