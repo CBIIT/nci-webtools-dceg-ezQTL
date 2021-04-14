@@ -1053,6 +1053,30 @@ function qtlsGWASHyprcolocLDCalculation(params) {
             })
           );
         }
+        if (
+          !qtlsGWAS.isError &&
+          qtlsGWAS.gwas &&
+          qtlsGWAS.gwas.data &&
+          Object.keys(qtlsGWAS.gwas.data).length > 0
+        ) {
+          dispatch(
+            qtlsGWASLocusQCCalculation({
+              request: qtlsGWAS.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_samples: qtlsGWAS.select_qtls_samples,
+              gwasFile: qtlsGWAS.inputs.gwas_file[0],
+              associationFile: qtlsGWAS.inputs.association_file[0],
+              ldfile: qtlsGWAS.inputs.ld_file[0],
+              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+            })
+          );
+        } else {
+          dispatch(
+            updateQTLsGWAS({ isLoading: false })
+          );
+        }
       });
   };
 }
@@ -1219,22 +1243,22 @@ export function qtlsGWASCalculation(params) {
               response.data['info']['recalculateAttempt'][0] === 'true'
                 ? true
                 : false,
-            recalculatePop:
-              response.data['info']['recalculatePop'][0] === 'true'
-                ? true
-                : false,
-            recalculateGene:
-              response.data['info']['recalculateGene'][0] === 'true'
-                ? true
-                : false,
-            recalculateDist:
-              response.data['info']['recalculateDist'][0] === 'true'
-                ? true
-                : false,
-            recalculateRef:
-              response.data['info']['recalculateRef'][0] === 'true'
-                ? true
-                : false,
+            // recalculatePop:
+            //   response.data['info']['recalculatePop'][0] === 'true'
+            //     ? true
+            //     : false,
+            // recalculateGene:
+            //   response.data['info']['recalculateGene'][0] === 'true'
+            //     ? true
+            //     : false,
+            // recalculateDist:
+            //   response.data['info']['recalculateDist'][0] === 'true'
+            //     ? true
+            //     : false,
+            // recalculateRef:
+            //   response.data['info']['recalculateRef'][0] === 'true'
+            //     ? true
+            //     : false,
             top_gene_variants: {
               data: response.data['info']['top_gene_variants']['data'][0],
             },
@@ -1297,7 +1321,6 @@ export function qtlsGWASCalculation(params) {
           qtlsGWAS.gwas.data &&
           Object.keys(qtlsGWAS.gwas.data).length > 0
         ) {
-          
           dispatch(
             qtlsGWASHyprcolocLDCalculation({
               request: qtlsGWAS.request,
@@ -1308,9 +1331,14 @@ export function qtlsGWASCalculation(params) {
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
             })
           );
-          
+        } else {
           dispatch(
-            qtlsGWASLocusQCCalculation({
+            updateQTLsGWAS({ isLoading: false })
+          );
+        }
+          /*
+          dispatch(
+            qtlsGWASECaviarCalculation({
               request: qtlsGWAS.request,
               select_gwas_sample: qtlsGWAS.select_gwas_sample,
               select_qtls_samples: qtlsGWAS.select_qtls_samples,
@@ -1319,13 +1347,22 @@ export function qtlsGWASCalculation(params) {
               ldfile: qtlsGWAS.inputs.ld_file[0],
               select_ref: qtlsGWAS.locus_alignment.top.rsnum,
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-              select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
             })
-          );
-        }
-        dispatch(
-          updateQTLsGWAS({ isLoading: false })
-        );
+          );*/
+          
+        //   dispatch(
+        //     qtlsGWASLocusQCCalculation({
+        //       request: qtlsGWAS.request,
+        //       select_gwas_sample: qtlsGWAS.select_gwas_sample,
+        //       select_qtls_samples: qtlsGWAS.select_qtls_samples,
+        //       gwasFile: qtlsGWAS.inputs.gwas_file[0],
+        //       associationFile: qtlsGWAS.inputs.association_file[0],
+        //       ldfile: qtlsGWAS.inputs.ld_file[0],
+        //       select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+        //       select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+        //       select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+        //     })
+        //   );
       })
       .catch(function (error) {
         console.log(error);
@@ -1582,10 +1619,10 @@ export function fetchResults(request) {
         select_gwas_sample: main['info']['select_gwas_sample'][0] === 'true',
         select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
         recalculateAttempt: main['info']['recalculateAttempt'][0] === 'true',
-        recalculatePop: main['info']['recalculatePop'][0] === 'true',
-        recalculateGene: main['info']['recalculateGene'][0] === 'true',
-        recalculateDist: main['info']['recalculateDist'][0] === 'true',
-        recalculateRef: main['info']['recalculateRef'][0] === 'true',
+        // recalculatePop: main['info']['recalculatePop'][0] === 'true',
+        // recalculateGene: main['info']['recalculateGene'][0] === 'true',
+        // recalculateDist: main['info']['recalculateDist'][0] === 'true',
+        // recalculateRef: main['info']['recalculateRef'][0] === 'true',
         top_gene_variants: {
           data: main['info']['top_gene_variants']['data'][0],
         },

@@ -3,7 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
 import { Button } from 'react-bootstrap';
-import { updateQTLsGWAS, qtlsGWASBoxplotsCalculation } from '../../../../services/actions';
+import { 
+  updateQTLsGWAS, 
+  qtlsGWASBoxplotsCalculation,
+  qtlsGWASCalculation
+} from '../../../../services/actions';
 
 export function LocusAlignmentPlot(params) {
   const dispatch = useDispatch();
@@ -16,8 +20,15 @@ export function LocusAlignmentPlot(params) {
     inputs,
     gwas,
     request,
-    select_qtls_samples, 
-    isQueue
+    select_qtls_samples,
+    select_gwas_sample, 
+    isQueue,
+    qtlKey,
+    ldKey,
+    gwasKey,
+    select_chromosome,
+    select_position,
+    email
   } = useSelector((state) => state.qtlsGWAS);
 
   // use local state to reset tooltip when this component unmounts
@@ -50,6 +61,57 @@ export function LocusAlignmentPlot(params) {
       'lasso2d',
     ],
   };
+
+  async function handleSubmit(recalcRSNum) {
+    const params = {
+      request,
+      select_qtls_samples,
+      select_gwas_sample,
+      associationFile: inputs['association_file'][0] === 'false' ? false : inputs['association_file'][0],
+      quantificationFile: inputs['quantification_file'][0] === 'false' ? false : inputs['quantification_file'][0],
+      genotypeFile: inputs['genotype_file'][0] === 'false' ? false : inputs['genotype_file'][0],
+      gwasFile: inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
+      LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
+      select_pop: inputs['select_pop'][0],
+      select_gene: inputs['select_gene'][0],
+      select_dist: inputs['select_dist'][0],
+      select_ref: recalcRSNum,
+      recalculateAttempt: true,
+      recalculatePop: false,
+      recalculateGene: false,
+      recalculateDist: false,
+      recalculateRef: true,
+      qtlKey,
+      ldKey,
+      gwasKey,
+      select_chromosome: select_chromosome.value,
+      select_position,
+      email: email,
+    };
+
+    // clear all locus colocalization results
+    dispatch(updateQTLsGWAS({ 
+      activeColocalizationTab: 'hyprcoloc',
+      hyprcolocError: '',
+      hyprcoloc_ld: null,
+      hyprcoloc_table: {
+        data: [],
+        globalFilter: '',
+      },
+      hyprcolocSNPScore_table: {
+        data: [],
+        globalFilter: '',
+      },
+      isLoadingHyprcoloc: false,
+      ecaviar_table: {
+        data: [],
+        globalFilter: '',
+      },
+      isLoadingECaviar: false,
+    }));
+
+    dispatch(qtlsGWASCalculation(params));
+  }
 
   return (
     <>
@@ -144,7 +206,8 @@ export function LocusAlignmentPlot(params) {
               <Button
                 variant="link"
                 onClick={(_) => {
-                  // dispatch(updateQTLsGWAS({ select_gwas_sample: true }));
+                  updateTooltip({ visible: false });
+                  handleSubmit(tooltip.data.rsnum);
                 }}
               >
                 <b>Make LD Reference</b>

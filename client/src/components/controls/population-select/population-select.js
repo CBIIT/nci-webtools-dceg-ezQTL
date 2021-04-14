@@ -20,7 +20,7 @@ export const PopulationSelect = ({
   const [_selectPop, _setSelectPop] = useState([]);
 
   useEffect(() => {
-    console.log("USE EFFECT", _selectPop);
+    // console.log("USE EFFECT", _selectPop);
     dispatch(updateQTLsGWAS({ select_pop: _selectPop && _selectPop.length > 0 ? _selectPop.map((item) => item.value).join("+") : false }))
   }, [_selectPop]);
 
@@ -155,7 +155,7 @@ export const PopulationSelect = ({
   };
 
   const selectHeader = (data) => {
-    console.log("population group selected", data);
+    // console.log("population group selected", data);
     if (data.options[0].value !== 'ALL') {
       if (containsAll(_selectPop.map((item) => item.value), data.options.map((item) => item.value))) {
         _setSelectPop(removeAll(_selectPop.map((item) => item.value), data.options.map((item) => item.value)).map((item) => allPopulations.filter((pop) => pop.value === item)[0]));

@@ -144,6 +144,7 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
         quantificationFile.toString(),
         genotypeFile.toString(),
         JSON.stringify(info),
+        request.toString(),
         bucket.toString(),
       ]
     );
@@ -169,6 +170,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
     select_pos,
     select_dist,
     workingDirectory,
+    bucket
   } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
@@ -195,6 +197,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
         select_pos.toString(),
         select_dist.toString(),
         request.toString(),
+        bucket.toString(),
       ]
     );
     logger.info(
@@ -390,7 +393,11 @@ async function qtlsCalculateQC(params, res, next) {
         .pipe(file);
     } else {
       association = path.resolve(config.tmp.folder, request, associationFile);
-      ld = path.resolve(config.tmp.folder, request, ldfile);
+      if (ldfile === 'false') {
+        ld = path.resolve(config.tmp.folder, request, request + '.LD.gz');
+      } else {
+        ld = path.resolve(config.tmp.folder, request, ldfile);
+      }
     }
 
     requestPath = path.resolve(config.tmp.folder, request, request);

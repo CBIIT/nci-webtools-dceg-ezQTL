@@ -274,6 +274,7 @@ apiRouter.post('/qtls-locus-colocalization-hyprcoloc-ld', (req, res, next) =>
     {
       ...req.body,
       workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data,
     },
     req,
     res,

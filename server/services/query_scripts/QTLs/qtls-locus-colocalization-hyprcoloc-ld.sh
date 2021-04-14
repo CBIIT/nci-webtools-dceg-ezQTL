@@ -9,6 +9,7 @@ dist=$4
 # popshort=$5
 request=$5
 workdir=$6
+bucket=$7
 # request=$6
 # envfile=$7
 # source $envfile
@@ -30,9 +31,9 @@ maxpos=$(( position + dist ))
 ## define file for LD calculation ##
 # kgpath=$vQTLfolder"/1kginfo/"
 # echo $(pwd)
-kgpath="${workdir}/data/1kginfo/"
+kgpath="s3://${bucket}/ezQTL/1kginfo/"
 kgvcfpath=${kgpath}"ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
-poppanel=${kgpath}"integrated_call_samples_v3.20130502.ALL.panel"
+# poppanel=${kgpath}"integrated_call_samples_v3.20130502.ALL.panel"
 
 ### LD file from 1kg project ###
 

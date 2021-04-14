@@ -1,13 +1,13 @@
-locus_colocalization_hyprcoloc_ld <- function(workDir, ldfile, select_ref, chr, pos, select_dist, request) {
+locus_colocalization_hyprcoloc_ld <- function(workDir, ldfile, select_ref, chr, pos, select_dist, request, bucket) {
   library(jsonlite)
   setwd(workDir)
   if (identical(ldfile, 'false')) {
     ## execute LD calculation: shell script
-    cmd <- paste0('sh server/services/query_scripts/QTLs/qtls-locus-colocalization-hyprcoloc-ld.sh ', select_ref, ' ', chr, ' ', pos, ' ', select_dist, ' ', request, ' ', workDir) 
+    cmd <- paste0('sh server/services/query_scripts/QTLs/qtls-locus-colocalization-hyprcoloc-ld.sh ', select_ref, ' ', chr, ' ', pos, ' ', select_dist, ' ', request, ' ', workDir, ' ', bucket) 
     system(cmd)
-    filename <- paste0('tmp/',request,'/',request, ".LD.gz")
+    filename <- paste0('tmp/', request, '/', request, ".LD.gz")
   } else {
-    filename <- paste0(ldfile)
+    filename <- paste0('tmp/', request, '/', ldfile)
   }
   
   ## return completion message

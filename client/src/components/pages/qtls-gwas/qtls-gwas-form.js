@@ -430,6 +430,10 @@ export function QTLsGWASForm() {
                         updateQTLsGWAS({
                           select_qtls_samples: true,
                           select_gwas_sample: true,
+                          qtlPublic: false,
+                          gwasPublic: false,
+                          ldPublic: false,
+                          select_pop: false
                         })
                       );
                     }}
@@ -517,7 +521,7 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={qtlPublic}
                 onChange={(_) => {
-                  dispatch(updateQTLsGWAS({ qtlPublic: !qtlPublic }));
+                  dispatch(updateQTLsGWAS({ qtlPublic: !qtlPublic, ...(!qtlPublic && { select_ref: false }) }));
                   _setAssociationFile('');
                 }}
               />
@@ -635,7 +639,7 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={ldPublic}
                 onChange={(_) => {
-                  dispatch(updateQTLsGWAS({ ldPublic: !ldPublic }));
+                  dispatch(updateQTLsGWAS({ ldPublic: !ldPublic, select_pop: false, ...(!ldPublic && { select_ref: false }) }));
                   _setLDFile('');
                 }}
               />
@@ -696,7 +700,7 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={gwasPublic}
                 onChange={(_) => {
-                  dispatch(updateQTLsGWAS({ gwasPublic: !gwasPublic }));
+                  dispatch(updateQTLsGWAS({ gwasPublic: !gwasPublic, ...(!ldPublic && { select_ref: false }) }));
                   _setGwasFile('');
                 }}
               />
