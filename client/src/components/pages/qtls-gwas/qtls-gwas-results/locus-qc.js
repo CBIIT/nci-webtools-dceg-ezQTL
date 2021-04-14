@@ -6,7 +6,7 @@ import Plot from '../../../controls/plot/plot';
 export function LocusQC() {
   const {
     submitted,
-    isError,
+    qcError,
     request,
     isLoading,
     isLoadingQC
@@ -22,15 +22,15 @@ export function LocusQC() {
           }
         />
       )}
-      {submitted && isError && (
+      {submitted && qcError && (
         <LoadingOverlay
           active={true}
           content={
-            <b className="text-danger">Please check input files. Reset form to try again.</b>
+            <b className="text-danger">{qcError}</b>
           }
         />
       )}
-      {submitted && !isError && !isLoading && !isLoadingQC && (
+      {submitted && !qcError && !isLoading && !isLoadingQC && (
         <>
           <Plot
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}

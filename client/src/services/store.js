@@ -57,6 +57,7 @@ export const getInitialState = async () => {
         globalFilter: '',
       },
       hyprcolocError: '',
+      qcError: '',
       hyprcoloc_ld: null,
       hyprcoloc_table: {
         data: [],

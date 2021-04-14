@@ -1194,7 +1194,7 @@ export function qtlsGWASLocusQCCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({ qcError: 'Error occured in QC calculation', activeResultsTab: 'locus-qc' })
           );
         }
       })
@@ -1333,7 +1333,7 @@ export function qtlsGWASCalculation(params) {
           );
         } else {
           dispatch(
-            updateQTLsGWAS({ isLoading: false })
+            updateQTLsGWAS({ qcError: 'No data available for QC plot', isLoading: false })
           );
         }
           /*
