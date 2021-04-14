@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Form, Button } from 'react-bootstrap';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import ReactSelect, { createFilter } from 'react-select';
-import { updateAlert, updateQTLsGWAS } from '../../../../services/actions';
+import { updateAlert, updateQTLsGWAS, qtlsGWASCalculation } from '../../../../services/actions';
 import { PopulationSelect } from '../../../controls/population-select/population-select';
 
 export function QTLsGWASResultsForm() {
@@ -18,7 +18,16 @@ export function QTLsGWASResultsForm() {
     select_ref,
     gene_list,
     select_gene,
-    select_pop
+    select_pop,
+    request,
+    qtlKey,
+    ldKey,
+    gwasKey,
+    select_chromosome,
+    select_position,
+    email,
+    select_qtls_samples,
+    select_gwas_sample,
   } = useSelector((state) => state.qtlsGWAS);
 
   const [_selectGene, _setSelectGene] = useState([]);
@@ -57,8 +66,54 @@ export function QTLsGWASResultsForm() {
   }
 
   async function handleSubmit() {
-    console.log("yay!");
-    dispatch(updateQTLsGWAS({ isLoading: false }));
+    const params = {
+      request,
+      select_qtls_samples,
+      select_gwas_sample,
+      associationFile: inputs['association_file'][0] === 'false' ? false : inputs['association_file'][0],
+      quantificationFile: inputs['quantification_file'][0] === 'false' ? false : inputs['quantification_file'][0],
+      genotypeFile: inputs['genotype_file'][0] === 'false' ? false : inputs['genotype_file'][0],
+      gwasFile: inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
+      LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
+      select_pop: select_pop,
+      select_gene: _selectGene['gene_id'],
+      select_dist: inputs['select_dist'][0],
+      select_ref: _selectRef && _selectRef.length > 0 ? _selectRef : false,
+      recalculateAttempt: true,
+      recalculatePop: true,
+      recalculateGene: true,
+      recalculateDist: false,
+      recalculateRef: true,
+      qtlKey,
+      ldKey,
+      gwasKey,
+      select_chromosome: select_chromosome.value,
+      select_position,
+      email,
+    };
+
+    // clear all locus colocalization results
+    dispatch(updateQTLsGWAS({ 
+      activeColocalizationTab: 'hyprcoloc',
+      hyprcolocError: '',
+      hyprcoloc_ld: null,
+      hyprcoloc_table: {
+        data: [],
+        globalFilter: '',
+      },
+      hyprcolocSNPScore_table: {
+        data: [],
+        globalFilter: '',
+      },
+      isLoadingHyprcoloc: false,
+      ecaviar_table: {
+        data: [],
+        globalFilter: '',
+      },
+      isLoadingECaviar: false,
+    }));
+
+    dispatch(qtlsGWASCalculation(params));
   }
 
   return (

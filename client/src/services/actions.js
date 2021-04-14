@@ -1243,22 +1243,22 @@ export function qtlsGWASCalculation(params) {
               response.data['info']['recalculateAttempt'][0] === 'true'
                 ? true
                 : false,
-            recalculatePop:
-              response.data['info']['recalculatePop'][0] === 'true'
-                ? true
-                : false,
-            recalculateGene:
-              response.data['info']['recalculateGene'][0] === 'true'
-                ? true
-                : false,
-            recalculateDist:
-              response.data['info']['recalculateDist'][0] === 'true'
-                ? true
-                : false,
-            recalculateRef:
-              response.data['info']['recalculateRef'][0] === 'true'
-                ? true
-                : false,
+            // recalculatePop:
+            //   response.data['info']['recalculatePop'][0] === 'true'
+            //     ? true
+            //     : false,
+            // recalculateGene:
+            //   response.data['info']['recalculateGene'][0] === 'true'
+            //     ? true
+            //     : false,
+            // recalculateDist:
+            //   response.data['info']['recalculateDist'][0] === 'true'
+            //     ? true
+            //     : false,
+            // recalculateRef:
+            //   response.data['info']['recalculateRef'][0] === 'true'
+            //     ? true
+            //     : false,
             top_gene_variants: {
               data: response.data['info']['top_gene_variants']['data'][0],
             },
@@ -1619,10 +1619,10 @@ export function fetchResults(request) {
         select_gwas_sample: main['info']['select_gwas_sample'][0] === 'true',
         select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
         recalculateAttempt: main['info']['recalculateAttempt'][0] === 'true',
-        recalculatePop: main['info']['recalculatePop'][0] === 'true',
-        recalculateGene: main['info']['recalculateGene'][0] === 'true',
-        recalculateDist: main['info']['recalculateDist'][0] === 'true',
-        recalculateRef: main['info']['recalculateRef'][0] === 'true',
+        // recalculatePop: main['info']['recalculatePop'][0] === 'true',
+        // recalculateGene: main['info']['recalculateGene'][0] === 'true',
+        // recalculateDist: main['info']['recalculateDist'][0] === 'true',
+        // recalculateRef: main['info']['recalculateRef'][0] === 'true',
         top_gene_variants: {
           data: main['info']['top_gene_variants']['data'][0],
         },
