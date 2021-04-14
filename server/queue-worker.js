@@ -64,7 +64,7 @@ async function downloadS3(request, savePath) {
   const objects = await s3
     .listObjectsV2({
       Bucket: config.aws.s3.queue,
-      Prefix: `${config.aws.s3.subFolder}/${request}/`,
+      Prefix: `${config.aws.s3.inputPrefix}/${request}/`,
     })
     .promise();
 
@@ -139,7 +139,7 @@ async function processMessage(params) {
       .upload({
         Body: JSON.stringify({ params: params, main: main }),
         Bucket: config.aws.s3.queue,
-        Key: `${config.aws.s3.subFolder}/${request}/params.json`,
+        Key: `${config.aws.s3.outputPrefix}/${request}/params.json`,
       })
       .promise();
 
@@ -150,7 +150,7 @@ async function processMessage(params) {
           .c({ sync: true, gzip: true, C: config.tmp.folder }, [request])
           .read(),
         Bucket: config.aws.s3.queue,
-        Key: `${config.aws.s3.subFolder}/${request}/${request}.tgz`,
+        Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
       })
       .promise();
 

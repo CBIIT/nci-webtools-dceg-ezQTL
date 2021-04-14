@@ -23,7 +23,9 @@
     "s3": {
       "data": "dataBucket",
       "queue": "queueBucket",
-      "subFolder": "ezQTL"
+      "subFolder": "ezQTL",
+      "inputPrefix": "ezQTL/input",
+      "outputPrefix": "ezQTL/output"
     },
     "sqs": {
       "url": "sqsURL",
