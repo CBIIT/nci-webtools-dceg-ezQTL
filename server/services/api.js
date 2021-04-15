@@ -155,7 +155,7 @@ apiRouter.post('/queue', async (req, res, next) => {
       .upload({
         Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),
         Bucket: awsInfo.s3.queue,
-        Key: `${awsInfo.s3.subFolder}/${request}/${request}.tgz`,
+        Key: `${awsInfo.s3.inputPrefix}/${request}/${request}.tgz`,
       })
       .promise();
 
@@ -203,7 +203,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
     const objects = await s3
       .listObjectsV2({
         Bucket: config.aws.s3.queue,
-        Prefix: `${config.aws.s3.subFolder}/${request}/`,
+        Prefix: `${config.aws.s3.outputPrefix}/${request}/`,
       })
       .promise();
 

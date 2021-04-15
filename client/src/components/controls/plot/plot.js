@@ -82,7 +82,7 @@ export default function Plot({
                       <a
                         className="ml-auto"
                         href={plotURL}
-                        download={downloadName}
+                        download={downloadName || true}
                       >
                         Download Plot
                       </a>
