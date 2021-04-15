@@ -1204,6 +1204,35 @@ export function qtlsGWASLocusQCCalculation(params) {
   };
 }
 
+export function qtlsGWASColocVisualize(params){
+  return async function (dispatch, getState){
+    console.log('coloc visualize', params);
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingSummary: true,
+      })
+    );
+    
+    axios
+      .post('api/qtls-coloc-visualize', params)
+      .then(function (response) {
+        console.log('api/qtls-locus-qc response.data', response.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(
+            updateQTLsGWAS({ summaryError: true, activeResultsTab: 'locus-qc' })
+          );
+        }
+      })
+      .then(function (){
+        dispatch(updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true }))
+      })
+  }
+}
+
 export function qtlsGWASCalculation(params) {
   return async function (dispatch, getState) {
     // const qtlsGWASState = getState();

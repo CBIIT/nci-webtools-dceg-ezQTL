@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   updateQTLsGWAS,
   qtlsGWASECaviarCalculation,
+  qtlsGWASColocVisualize
 } from '../../../../services/actions';
 import Table from '../../../controls/table/table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -21,6 +22,9 @@ export function LocusColocalization() {
     isLoadingHyprcoloc,
     ecaviar_table,
     isLoadingECaviar,
+    isLoadingSummary,
+    summaryLoaded,
+    summaryError,
     isError,
     request,
     inputs,
@@ -32,6 +36,7 @@ export function LocusColocalization() {
   const radios = [
     { name: 'HyPrColoc', value: 'hyprcoloc' },
     { name: 'eCAVIAR', value: 'ecaviar' },
+    { name: 'Summary', value: 'summary' }
   ];
 
   // useEffect(() => {
@@ -308,6 +313,23 @@ export function LocusColocalization() {
                     // })
                   );
                 }
+                if (
+                  e.target.value === 'summary' &&
+                  !isError &&
+                  !summaryLoaded &&
+                  ecaviar_table.data.length > 0 &&
+                  hyprcoloc_table.data.length > 0 &&
+                  !isLoadingSummary
+                ) {
+                  console.log('run summary')
+                  dispatch(
+                    qtlsGWASColocVisualize({
+                      hydata: hyprcoloc_table.data,
+                      ecdata: ecaviar_table.data,
+                      request: request
+                    })
+                  );
+                }
               }}
             >
               {radio.name}
@@ -517,6 +539,25 @@ export function LocusColocalization() {
               exportFilename={'ecaviar_table.csv'}
             />
           </div>
+        </>
+      )}
+      {activeColocalizationTab === 'summary' && (
+        <>
+          <LoadingOverlay
+            active={isLoadingSummary || ecaviar_table.data.length === 0 || summaryError}
+            content={
+              !isLoadingSummary && (ecaviar_table.data.length === 0 || summaryError) 
+                ? 'No data available'
+                : null
+            }
+          />
+
+          {summaryLoaded && !summaryError && (
+            <Plot
+              plotURL={`api/results/${request}/${request}_Summary.svg`}
+              className="border rounded p-3 mb-2"
+            />
+          )}
         </>
       )}
     </div>

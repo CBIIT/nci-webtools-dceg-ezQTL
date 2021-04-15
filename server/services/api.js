@@ -10,6 +10,7 @@ const {
   qtlsCalculateLocusColocalizationHyprcoloc,
   qtlsCalculateLocusColocalizationECAVIAR,
   qtlsCalculateQC,
+  qtlsColocVisualize
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
@@ -46,7 +47,8 @@ const upload = multer({ storage: storage });
 apiRouter.use('/results', express.static(config.tmp.folder));
 
 // parse json requests
-apiRouter.use(express.json());
+apiRouter.use(express.json({limit: '10mb'}));
+
 
 // compress all responses
 apiRouter.use(compression());
@@ -310,6 +312,10 @@ apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
 
 apiRouter.post('/qtls-locus-qc', (req, res, next) =>
   qtlsCalculateQC({ ...req.body, workingDirectory }, res, next)
+);
+
+apiRouter.post('/qtls-coloc-visualize', (req, res, next) =>
+  qtlsColocVisualize( req.body , res, next)
 );
 
 module.exports = { apiRouter };

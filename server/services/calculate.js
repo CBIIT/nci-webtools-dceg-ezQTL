@@ -331,6 +331,38 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
   }
 }
 
+async function qtlsColocVisualize(params, res, next) {
+
+  const {
+    request,
+    hydata,
+    ecdata
+  } = params;
+
+  logger.info(`[${request}] Execute /coloc-visualize`);
+  
+  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
+  const requestPath = path.resolve(config.tmp.folder, request, request + '_Summary.svg');
+
+  try {
+    const wrapper = await r(
+      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+      'qtlsColocVisualize',
+      [
+        rfile,
+        hydata,
+        ecdata,
+        requestPath
+      ]
+    );
+    logger.info(`[${request}] Finished /colc-visualize`);
+    res.json(wrapper);
+  } catch (err) {
+    logger.error(`[${request}] Error /colc-visualize ${err}`);
+    res.status(500).json(err);
+  }
+}
+
 async function qtlsCalculateQC(params, res, next) {
   const {
     request,
@@ -436,4 +468,5 @@ module.exports = {
   qtlsCalculateLocusColocalizationHyprcoloc,
   qtlsCalculateLocusColocalizationECAVIAR,
   qtlsCalculateQC,
+  qtlsColocVisualize
 };

@@ -303,7 +303,7 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
     geom_hline(yintercept = 0.5,col='#2CA02CFF',size=0.5)+
     geom_col(width = 0.5,col='black',size=0.25)+
     scale_fill_material("deep-purple")+
-    geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = 0.1,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
+    ggrepel::geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = 0.1,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
     scale_y_continuous(limits = c(0,1),breaks = pretty_breaks(),expand = c(0,0))+
     labs(x='QTL Trait',y='HyPrColoc: Posterior Probability\n')+
     theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'Yy',axis = "XY",axis_col = 'black',base_family='Roboto Condensed')+
@@ -331,7 +331,7 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
     geom_hline(yintercept = 0.01,col='#2CA02CFF',size=0.5)+
     geom_col(width = 0.5,col='black',size=0.25)+
     scale_fill_material("deep-purple")+
-    geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = nudge_y,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
+    ggrepel::geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = nudge_y,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
     scale_y_continuous(breaks = pretty_breaks(),expand = c(0,0))+
     labs(x='QTL Trait',y='eCAVIAR: Colocalization Posterior Probability\n')+
     theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'Yy',axis = "XY",axis_col = 'black',base_family='Roboto Condensed')+
