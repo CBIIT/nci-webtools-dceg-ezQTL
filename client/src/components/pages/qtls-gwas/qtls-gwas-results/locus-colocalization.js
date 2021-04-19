@@ -276,6 +276,7 @@ export function LocusColocalization() {
               variant="primary"
               name="radio"
               value={radio.value}
+              disabled={radio.value === 'summary' && ecaviar_table.data.length === 0 ? true : false}
               checked={activeColocalizationTab === radio.value}
               onChange={async (e) => {
                 dispatch(
