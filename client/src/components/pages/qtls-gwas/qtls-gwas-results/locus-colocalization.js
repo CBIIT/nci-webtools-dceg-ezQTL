@@ -9,7 +9,7 @@ import {
 } from '../../../../services/actions';
 import Table from '../../../controls/table/table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
+import Zoom from '../../../controls/zoom/zoom';
 
 export function LocusColocalization() {
   const dispatch = useDispatch();
@@ -393,7 +393,7 @@ export function LocusColocalization() {
             />
             {hyprcoloc_table.data.length > 0 && (
               <div className="mb-2">
-                <Plot
+                <Zoom
                   plotURL={`api/results/${request}/hyprcoloc_table.svg`}
                   className="border rounded p-3"
                   maxHeight="650px"
@@ -441,7 +441,7 @@ export function LocusColocalization() {
             />
             {hyprcolocSNPScore_table.data.length && (
               <div className="mb-2">
-                <Plot
+                <Zoom
                   plotURL={`api/results/${request}/hyprcoloc_snpscore_table.svg`}
                   className="border rounded p-3"
                 />
@@ -517,12 +517,12 @@ export function LocusColocalization() {
             />
             {ecaviar_table.data.length > 0 && (
               <div className="mb-2">
-                <Plot
+                <Zoom
                   plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
                 />
-                <Plot
+                <Zoom
                   plotURL={`api/results/${request}/ecaviar_table_boxplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
@@ -566,7 +566,7 @@ export function LocusColocalization() {
           />
 
           {summaryLoaded && !summaryError && (
-            <Plot
+            <Zoom
               plotURL={`api/results/${request}/${request}_Summary.svg`}
               className="border rounded p-3 mb-2"
               maxHeight="1000px"
