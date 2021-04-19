@@ -377,7 +377,10 @@ async function qtlsCalculateQC(params, res, next) {
     workingDirectory,
   } = params;
 
-  const s3 = new AWS.S3();
+  const s3 = new AWS.S3({
+    accessKeyId: awsInfo.aws_access_key_id,
+    secretAccessKey: awsInfo.aws_secret_access_key,
+  });
 
   logger.info(`[${request}] Execute /ezQTL_ztw`);
   logger.debug(
