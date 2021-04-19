@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   updateQTLsGWAS,
   qtlsGWASECaviarCalculation,
-  qtlsGWASColocVisualize
+  qtlsGWASColocVisualize,
 } from '../../../../services/actions';
 import Table from '../../../controls/table/table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
@@ -36,7 +36,7 @@ export function LocusColocalization() {
   const radios = [
     { name: 'HyPrColoc', value: 'hyprcoloc' },
     { name: 'eCAVIAR', value: 'ecaviar' },
-    { name: 'Summary', value: 'summary' }
+    { name: 'Summary', value: 'summary' },
   ];
 
   // useEffect(() => {
@@ -276,7 +276,11 @@ export function LocusColocalization() {
               variant="primary"
               name="radio"
               value={radio.value}
-              disabled={radio.value === 'summary' && ecaviar_table.data.length === 0 ? true : false}
+              disabled={
+                radio.value === 'summary' && ecaviar_table.data.length === 0
+                  ? true
+                  : false
+              }
               checked={activeColocalizationTab === radio.value}
               onChange={async (e) => {
                 dispatch(
@@ -322,12 +326,12 @@ export function LocusColocalization() {
                   hyprcoloc_table.data.length > 0 &&
                   !isLoadingSummary
                 ) {
-                  console.log('run summary')
+                  console.log('run summary');
                   dispatch(
                     qtlsGWASColocVisualize({
                       hydata: hyprcoloc_table.data,
                       ecdata: ecaviar_table.data,
-                      request: request
+                      request: request,
                     })
                   );
                 }
@@ -392,6 +396,7 @@ export function LocusColocalization() {
                 <Plot
                   plotURL={`api/results/${request}/hyprcoloc_table.svg`}
                   className="border rounded p-3"
+                  maxHeight="650px"
                 />
               </div>
             )}
@@ -515,10 +520,12 @@ export function LocusColocalization() {
                 <Plot
                   plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}
                   className="border rounded p-3"
+                  maxHeight="1000px"
                 />
                 <Plot
                   plotURL={`api/results/${request}/ecaviar_table_boxplot.svg`}
                   className="border rounded p-3"
+                  maxHeight="1000px"
                 />
               </div>
             )}{' '}
@@ -545,9 +552,14 @@ export function LocusColocalization() {
       {activeColocalizationTab === 'summary' && (
         <>
           <LoadingOverlay
-            active={isLoadingSummary || ecaviar_table.data.length === 0 || summaryError}
+            active={
+              isLoadingSummary ||
+              ecaviar_table.data.length === 0 ||
+              summaryError
+            }
             content={
-              !isLoadingSummary && (ecaviar_table.data.length === 0 || summaryError) 
+              !isLoadingSummary &&
+              (ecaviar_table.data.length === 0 || summaryError)
                 ? 'No data available'
                 : null
             }
@@ -557,6 +569,7 @@ export function LocusColocalization() {
             <Plot
               plotURL={`api/results/${request}/${request}_Summary.svg`}
               className="border rounded p-3 mb-2"
+              maxHeight="1000px"
             />
           )}
         </>
