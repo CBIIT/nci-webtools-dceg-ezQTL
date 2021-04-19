@@ -46,7 +46,7 @@ qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, s
 
 qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldfile, ldsnp, distance, zscore_gene, request) {
   source(rfile)
-  coloc_QC(gwasFile, associationFile, ldfile, ldsnp, distance, zscore_gene, request)
+  coloc_QC(gwasFile, FALSE, associationFile, FALSE, ldfile, FALSE, ldsnp, distance, zscore_gene, request)
 }
 
 qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
