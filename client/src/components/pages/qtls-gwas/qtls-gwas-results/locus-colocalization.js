@@ -251,8 +251,8 @@ export function LocusColocalization() {
       accessor: 'CLPP2',
       id: 'CLPP2',
       sortType: useMemo(() => (rowA, rowB, columnId) => {
-        const a = Number(rowA.original[columnId]);
-        const b = Number(rowB.original[columnId]);
+        const a = Number(rowA.original[columnId]) || 0;
+        const b = Number(rowB.original[columnId]) || 0;
         if (a > b) return 1;
         if (b > a) return -1;
         return 0;
