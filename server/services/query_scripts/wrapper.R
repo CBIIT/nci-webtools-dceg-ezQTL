@@ -44,9 +44,10 @@ qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, s
   locus_colocalization_hyprcoloc(workingDirectory, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, ldfile, request, qtlKey, select_chromosome, select_position, bucket)
 }
 
-qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, ldsnp, distance, zscore_gene, request, workDir, bucket) {
+qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, leadsnp, distance, zscore_gene, request, plotPath, inputPath, logPath, workDir, bucket) {
   source(rfile)
-  
+  library(data.table)
+
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
@@ -54,16 +55,20 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   }
   if (identical(select_qtls_samples, 'true')) {
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
-
+    
     publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0('tmp/', request, '/MX2.LD.gz')
+    ldFile <- paste0(workDir,'/tmp/', request, '/MX2.LD.gz')
+    print(ldFile)
     save_object(publicLDFile, bucket, file = ldFile)
+
+    #ldFile <- s3read_using(fread, header = FALSE, showProgress = FALSE, object = 'ezQTL/MX2.examples/MX2.LD.gz', bucket = bucket)
   } else {
     associationFile <- paste0('tmp/', request, '/', associationFile)
     ldFile <- paste0('tmp/', request, '/', ldFile)
   }
 
-  coloc_QC(gwasFile, FALSE, associationFile, FALSE, ldFile, FALSE, ldsnp, distance, zscore_gene, request)
+  coloc_QC(gwasFile, TRUE, associationFile, TRUE, ldFile, TRUE, leadsnp, NULL, distance, zscore_gene, plotPath, inputPath, logPath)
+
 }
 
 qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
