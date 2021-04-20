@@ -10,6 +10,7 @@ import { LocusColocalization } from './locus-colocalization';
 import { LocusQuantifiation } from './locus-quantification';
 import { LocusTable } from './locus-table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
+import { LocusDownload } from './locus-download';
 
 export function QTLsGWASResults({ queueRequest }) {
   const dispatch = useDispatch();
@@ -69,6 +70,12 @@ export function QTLsGWASResults({ queueRequest }) {
           locus_quantification.data &&
           Object.keys(locus_quantification.data).length > 0
         ),
+    },
+    {
+      component: <LocusDownload />,
+      key: 'locus-download',
+      title: 'Locus Download',
+      disabled: !submitted || isError,
     },
   ];
 
