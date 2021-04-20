@@ -1,4 +1,5 @@
 const XLSX = require('xlsx');
+const path = require('path');
 const spawn = require('child_process').spawn;
 
 // this script accepts and excel file path containing a mapping of file for GTEx study
@@ -38,7 +39,7 @@ try {
   console.log('uploading to s3...');
 
   let include = [];
-  const root = '/data/Brown_lab/ZTW_KB_Datasets/vQTL2';
+  const root = '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/';
 
   Object.keys(fileMap).forEach((sheet) => {
     fileMap[sheet].map((row) => {

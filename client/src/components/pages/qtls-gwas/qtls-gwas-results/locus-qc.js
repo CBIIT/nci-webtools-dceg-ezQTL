@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
-import Plot from '../../../controls/plot/plot';
+import Zoom from '../../../controls/zoom/zoom';
 
 export function LocusQC() {
   const {
@@ -32,14 +32,16 @@ export function LocusQC() {
       )}
       {submitted && !qcError && !isLoading && !isLoadingQC && (
         <>
-          <Plot
+          <Zoom
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
             className="border rounded p-3 mb-2"
+            maxHeight="1000px"
           />
 
-          <Plot
+          <Zoom
             plotURL={`api/results/${request}/${request}_QC_zscore.svg`}
             className="border rounded p-3"
+            maxHeight="800px"
           />
         </>
       )}

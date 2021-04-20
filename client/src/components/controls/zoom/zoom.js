@@ -4,9 +4,9 @@ import { LoadingOverlay } from '../loading-overlay/loading-overlay';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faHome } from '@fortawesome/free-solid-svg-icons';
-import './plot.scss';
+import './zoom.scss';
 
-export default function Plot({
+export default function Zoom({
   title,
   downloadName,
   plotURL,
