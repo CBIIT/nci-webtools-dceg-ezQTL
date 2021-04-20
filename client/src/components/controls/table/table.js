@@ -7,7 +7,7 @@ import {
   // useFilters,
   useAsyncDebounce,
   useSortBy,
-  usePagination
+  usePagination,
 } from 'react-table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -15,7 +15,7 @@ import {
   faSortUp,
   faSortDown,
 } from '@fortawesome/free-solid-svg-icons';
-import {CSVLink, CSVDownload} from 'react-csv';
+import { CSVLink, CSVDownload } from 'react-csv';
 
 function GlobalFilter({ globalFilter, setGlobalFilter, handleSearch, title }) {
   const [value, setValue] = React.useState(globalFilter);
@@ -85,9 +85,8 @@ export default function Table({
   pagination,
   mergeState,
   defaultSort,
-  exportFilename
+  exportFilename,
 }) {
-
   const defaultColumn = useMemo(
     () => ({
       Filter: DefaultColumnFilter,
@@ -100,7 +99,7 @@ export default function Table({
     getTableBodyProps,
     headerGroups,
     prepareRow,
-    // setHiddenColumns,
+    setHiddenColumns,
     setGlobalFilter,
     rows,
     page,
@@ -118,7 +117,7 @@ export default function Table({
       data,
       defaultColumn,
       initialState: {
-        hiddenColumns: hidden,
+        hiddenColumns: hidden || [],
         globalFilter: globalSearch,
         // sortBy: [{ id: 'R2', desc: true }],
         sortBy: defaultSort,
@@ -133,23 +132,23 @@ export default function Table({
 
   const exportCSV = (inData) => {
     const exportColumns = Object.keys(inData[0]);
-    let exportData = []
+    let exportData = [];
     inData.forEach((item) => {
       let row = [];
       exportColumns.forEach((key) => {
         row.push(item[key]);
-      })
-      exportData.push(row)
-    })
+      });
+      exportData.push(row);
+    });
     exportData.unshift(exportColumns);
-    return (exportData);
+    return exportData;
   };
 
   const csvData = data && data.length > 0 ? exportCSV(data) : [];
 
   return (
     <div className="mb-5">
-      <Row className="mb-2 justify-content-between">
+      <Row className="mb-2">
         <Col md="8">
           {(globalSearch || globalSearch == '') && (
             <GlobalFilter
@@ -160,13 +159,57 @@ export default function Table({
             />
           )}
         </Col>
+        <Col />
         <Col md="auto">
-          <CSVLink
-            data={csvData}
-            filename={exportFilename}
-          >
+          <CSVLink data={csvData} filename={exportFilename}>
             Export
           </CSVLink>
+        </Col>
+        <Col md="auto">
+          <span>
+            <Dropdown>
+              <Dropdown.Toggle
+                variant="secondary"
+                size="sm"
+                id={`${title.replace(/\s/g, '')}-controls`}
+              >
+                Columns
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Form>
+                  {columns.map(({ id, Header }) => {
+                    return (
+                      <Form.Group
+                        key={`${title.replace(/\s/g, '')}-${id}`}
+                        controlId={`${title.replace(
+                          /\s/g,
+                          ''
+                        )}-${id}-visibility`}
+                        className="my-1 px-2"
+                      >
+                        <Form.Check
+                          type="checkbox"
+                          label={Header}
+                          checked={hiddenColumns.indexOf(id) == -1}
+                          onChange={() =>
+                            setHiddenColumns((hiddenColumns) => {
+                              const index = hiddenColumns.indexOf(id);
+                              const newHidden =
+                                index > -1
+                                  ? hiddenColumns.filter((c) => c != id)
+                                  : [...hiddenColumns, id];
+                              mergeState({ hidden: newHidden });
+                              return newHidden;
+                            })
+                          }
+                        />
+                      </Form.Group>
+                    );
+                  })}
+                </Form>
+              </Dropdown.Menu>
+            </Dropdown>
+          </span>
         </Col>
       </Row>
 
@@ -219,18 +262,14 @@ export default function Table({
           ))}
         </thead>
         <tbody {...getTableBodyProps}>
-          {
-            !data || data.length === 0 && 
-            <tr>
-              {
-                columns.map(() => {
-                  return (
-                    <td style={{height: '200px'}}></td>
-                  )
-                })
-              }
-            </tr>
-          }
+          {!data ||
+            (data.length === 0 && (
+              <tr>
+                {columns.map(() => {
+                  return <td style={{ height: '200px' }}></td>;
+                })}
+              </tr>
+            ))}
           {page.map((row, i) => {
             prepareRow(row);
             return (
