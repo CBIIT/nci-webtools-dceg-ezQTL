@@ -3,6 +3,7 @@ import { RootContext } from '../../../../index';
 import { useDispatch, useSelector } from 'react-redux';
 // import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { LocusAlignmentPlot } from './locus-alignment-plot';
+import { LocusAlignmentScatterPlot } from './locus-alignment-scatter-plot';
 import { BoxplotsModal } from '../../../controls/boxplots-modal/boxplots-modal';
 import { updateQTLsGWAS } from '../../../../services/actions';
 import { QTLsGWASResultsForm } from './qtls-gwas-results-form';
@@ -16,7 +17,8 @@ export function LocusAlignment() {
     isError,
     locus_alignment,
     locus_alignment_boxplots,
-    isQueue
+    isQueue,
+    locus_alignment_gwas_scatter
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -85,20 +87,27 @@ export function LocusAlignment() {
               </small>
             </p>
           </div>
+          {
+            locus_alignment_gwas_scatter && locus_alignment_gwas_scatter.data && locus_alignment_gwas_scatter.data.length > 0 &&
+            <>
+              <div className="w-100 mt-1 mb-2 border"></div>
 
-          <div className="w-100 mt-1 mb-2 border"></div>
+              <div className="mt-3">
+                <p>
+                  The following scatter plot shows the correlation between
+                  -log10(GWAS <i>P</i>-value) and -log10(QTLs <i>P</i>-value). The “
+                  <i>P</i>-value threshold” can be used to filter QTL and GWAS
+                  variants based on their <i>P</i>-values before visualizing the{' '}
+                  <i>P</i>-value correlation. For detailed colocalization analyses,
+                  please check the “Locus Colocalization” sub-module.
+                </p>
 
-          {/* scatter && */}
-          <div className="mt-3">
-            <p>
-              The following scatter plot shows the correlation between
-              -log10(GWAS <i>P</i>-value) and -log10(QTLs <i>P</i>-value). The “
-              <i>P</i>-value threshold” can be used to filter QTL and GWAS
-              variants based on their <i>P</i>-values before visualizing the{' '}
-              <i>P</i>-value correlation. For detailed colocalization analyses,
-              please check the “Locus Colocalization” sub-module.
-            </p>
-          </div>
+                <div style={{overflowX: 'auto'}}>
+                  <LocusAlignmentScatterPlot />
+                </div>
+              </div>
+            </>
+          }
         </>
       )}
     </div>

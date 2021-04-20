@@ -30,7 +30,7 @@ export function updateAlert(data) {
 const getPopoverData = (geneData) => {
   let dataR2 = [];
   for (let i = 0; i < geneData.length; i++) {
-    if ('R2' in geneData[i] && geneData[i]['R2'] != 'NA') {
+    if ('R2' in geneData[i] && geneData[i]['R2'] !== 'NA') {
       dataR2.push(geneData[i]);
     }
   }
@@ -40,7 +40,7 @@ const getPopoverData = (geneData) => {
 const getPopoverDataR2NA = (geneData) => {
   let dataR2NA = [];
   for (let i = 0; i < geneData.length; i++) {
-    if (!('R2' in geneData[i]) || geneData[i]['R2'] == 'NA') {
+    if (!('R2' in geneData[i]) || geneData[i]['R2'] === 'NA') {
       dataR2NA.push(geneData[i]);
     }
   }
@@ -50,7 +50,7 @@ const getPopoverDataR2NA = (geneData) => {
 const getPopoverDataGWAS = (geneData) => {
   let dataGWASR2 = [];
   for (let i = 0; i < geneData.length; i++) {
-    if ('R2' in geneData[i] && geneData[i]['R2'] != 'NA') {
+    if ('R2' in geneData[i] && geneData[i]['R2'] !== 'NA') {
       dataGWASR2.push(geneData[i]);
     }
   }
@@ -60,7 +60,7 @@ const getPopoverDataGWAS = (geneData) => {
 const getPopoverDataGWASR2NA = (geneData) => {
   let dataGWASR2NA = [];
   for (let i = 0; i < geneData.length; i++) {
-    if (!('R2' in geneData[i]) || geneData[i]['R2'] == 'NA') {
+    if (!('R2' in geneData[i]) || geneData[i]['R2'] === 'NA') {
       dataGWASR2NA.push(geneData[i]);
     }
   }
@@ -924,6 +924,270 @@ const drawLocusAlignmentGWAS = (response) => {
   };
 };
 
+const getScatterX = (scatterData, threshold) => {
+  var p_values = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
+      }
+    }
+  }
+  return p_values;
+}
+
+const getScatterXR2NA = (scatterData, threshold) => {
+  var p_values = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if (!("R2" in scatterData[i]) || scatterData[i]["R2"] === "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
+      }
+    }
+  }
+  return p_values;
+}
+
+const getScatterY = (scatterData, threshold) => {
+  var pval_nominals = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
+      }
+    }
+  }
+  return pval_nominals;
+}
+
+const getScatterYR2NA = (scatterData, threshold) => {
+  var pval_nominals = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if (!("R2" in scatterData[i]) || scatterData[i]["R2"] === "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
+      }
+    }
+  }
+  return pval_nominals;
+}
+
+const getScatterColorData = (scatterData, threshold) => {
+  var colorData = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        colorData.push(scatterData[i]['R2']);
+      }
+    }
+  }
+  // normalize R2 color data between 0 and 1 for color spectrum
+  for (var i = 0; i < colorData.length; i++) {
+    colorData[i] = (colorData[i] / (Math.max.apply(null, colorData) / 100) ) / 100.0;
+  }
+  return colorData;
+}
+
+const getScatterHoverData = (scatterData, threshold) => {
+  var hoverData = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        if ('rs' in scatterData[i]) {
+          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+        } else {
+          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+        }
+      }
+    }
+  }
+  return hoverData;
+}
+
+const getScatterHoverDataR2NA = (scatterData, threshold) => {
+  var hoverData = [];
+  for (var i = 0; i < scatterData.length; i++) {
+    if (!("R2" in scatterData[i]) || scatterData[i]["R2"] === "NA") {
+      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+        if ('rs' in scatterData[i]) {
+          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+        } else {
+          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+        }
+      }
+    }
+  }
+  return hoverData;
+}
+
+const getLeastSquaresLine = (valuesXRaw, valuesYRaw) => {
+  if (valuesXRaw.length === 0 || valuesYRaw.length === 0 || (valuesXRaw.length !== valuesYRaw.length)) {
+    return [ [], [] ];
+  }
+  var valuesXY = valuesXRaw.map(function(e, i) {
+    return [e, valuesYRaw[i]];
+  });
+  var valuesXYRemoveInfinities = [];
+  valuesXY.map(function(e) {
+    if (isFinite(e[0]) && isFinite(e[1])) {
+      valuesXYRemoveInfinities.push(e);
+    }
+  });
+  var valuesX = valuesXYRemoveInfinities.map(function(e) {
+    return e[0];
+  });
+  var valuesY = valuesXYRemoveInfinities.map(function(e) {
+    return e[1];
+  });
+  var sumX = 0;
+  var sumY = 0;
+  var sumXY = 0;
+  var sumXX = 0;
+  var count = 0;
+  var x = 0;
+  var y = 0;
+  for (var i = 0; i < valuesX.length; i++) {
+      x = valuesX[i];
+      y = valuesY[i];
+      sumX += x;
+      sumY += y;
+      sumXX += x * x;
+      sumXY += x * y;
+      count++;
+  }
+  var m = (count * sumXY - sumX * sumY) / (count * sumXX - sumX * sumX);
+  var b = (sumY / count) - (m * sumX) / count;
+  var resultX = [];
+  var resultY = [];
+  for (var j = 0; j < valuesX.length; j++) {
+    x = valuesX[j];
+    y = (x * m) + b;
+    resultX.push(x);
+    resultY.push(y);
+  }
+  return [resultX, resultY];
+}
+
+const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus_alignment_top, threshold) => {
+
+  const xData = getScatterX(pdata_scatter_raw, threshold);
+  const yData = getScatterY(pdata_scatter_raw, threshold);
+  const xDataR2NA = getScatterXR2NA(pdata_scatter_raw, threshold);
+  const yDataR2NA = getScatterYR2NA(pdata_scatter_raw, threshold);
+  const scatterColorData = getScatterColorData(pdata_scatter_raw, threshold);
+  const hoverData = getScatterHoverData(pdata_scatter_raw, threshold);
+  const hoverDataR2NA = getScatterHoverDataR2NA(pdata_scatter_raw, threshold);
+
+  const trace1 = {
+    x: xData,
+    y: yData, 
+    text: hoverData,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      color: scatterColorData,
+      colorscale: 'Viridis',
+      reversescale: true,
+      line: {
+        color: 'black',
+        width: 1
+      },
+    }
+  };
+
+  const trace1R2NA = {
+    x: xDataR2NA,
+    y: yDataR2NA,
+    text: hoverDataR2NA,
+    hoverinfo: 'text',
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+      size: 7,
+      color: '#cccccc',
+      line: {
+        color: 'black',
+        width: 1
+      },
+    }
+  };
+
+  const least_sqaures = getLeastSquaresLine(xData, yData);
+
+  const trace2 = {
+    x: least_sqaures[0],
+    y: least_sqaures[1],
+    // hoverinfo: 'x+y',
+    mode: 'lines',
+    type: 'scatter',
+    name: "lines",
+    line: {
+      color: "blue",
+    }
+  };
+
+  const pdata_scatter = [
+    trace1, 
+    trace1R2NA, 
+    trace2
+  ];
+
+  // var pdata = [trace1];
+  const locus_alignment_scatter_plot_layout = {
+    title: {
+      // text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
+      text: "QTL-GWAS <i>P</i>-value Correlation: " + "Spearman " + (pdata_scatter_title ? pdata_scatter_title.split(', ')[0] : 'N/A') + ", Pearson's " + (pdata_scatter_title ? pdata_scatter_title.split(', ')[1] : 'N/A'),
+      xref: 'paper'
+    },
+    font: {
+      color: 'black'
+    },
+    width: 700,
+    height: 700,
+    yaxis: {
+      autorange: true,
+      automargin: true,
+      title: 
+        "-log10(QTL <i>P</i>-value), " +
+        locus_alignment_top['gene_symbol'],
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    xaxis: {
+      autorange: true,
+      automargin: true,
+      title: "-log10(GWAS <i>P</i>-value)",
+      font: {
+        color: 'black'
+      },
+      tickfont: {
+        color: 'black'
+      }
+    },
+    // margin: {
+    //   l: 40,
+    //   r: 40,
+    //   b: 40,
+    //   t: 40
+    // },
+    showlegend: false,
+    clickmode: 'none',
+    hovermode: 'closest'
+  };
+
+  return {
+    pdata_scatter_raw,
+    pdata_scatter,
+    locus_alignment_scatter_plot_layout,
+  };
+}
+
 export function uploadFile(params) {
   return async function (dispatch, getState) {
     const form = new FormData();
@@ -1255,6 +1519,20 @@ export function qtlsGWASCalculation(params) {
             ? drawLocusAlignmentGWAS(response)
             : drawLocusAlignment(response);
 
+        const { 
+          pdata_scatter_raw, 
+          pdata_scatter, 
+          locus_alignment_scatter_plot_layout 
+        } = 
+          Object.keys(response.data['gwas']['data'][0]).length > 0
+              ? drawLocusAlignmentScatter(response.data['locus_alignment_gwas_scatter']['data'][0], response.data['locus_alignment_gwas_scatter']['title'][0], response.data['locus_alignment']['top'][0][0], 1.0)
+              : 
+              {
+                pdata_scatter_raw: null,
+                pdata_scatter: null, 
+                locus_alignment_scatter_plot_layout: null
+              }
+
         dispatch(
           updateQTLsGWAS({
             request: response.data['info']['inputs']['request'][0],
@@ -1311,9 +1589,11 @@ export function qtlsGWASCalculation(params) {
               top: response.data['locus_alignment']['top'][0][0],
             },
             locus_alignment_gwas_scatter: {
-              data: response.data['locus_alignment_gwas_scatter']['data'][0],
-              title: response.data['locus_alignment_gwas_scatter']['title'][0],
+              raw: pdata_scatter_raw,
+              data: pdata_scatter,
+              layout: locus_alignment_scatter_plot_layout,
             },
+            locus_alignment_gwas_scatter_threshold: 1.0,
             locus_colocalization_correlation: {
               data:
                 response.data['locus_colocalization_correlation']['data'][0],
