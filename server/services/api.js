@@ -260,7 +260,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
 // download work session
 apiRouter.post('/locus-download', (req, res, next) => {
   const { request } = req.body;
-  console.log(tmpDir, req.body);
+
   try {
     tar.c({ sync: true, gzip: true, cwd: tmpDir }, [request]).pipe(res);
   } catch (err) {
