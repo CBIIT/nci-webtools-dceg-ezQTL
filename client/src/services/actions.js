@@ -1068,6 +1068,73 @@ const getLeastSquaresLine = (valuesXRaw, valuesYRaw) => {
   return [resultX, resultY];
 }
 
+const getSum = (arr) => {
+  var sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    if (isFinite(arr[i])) {
+      sum += arr[i];
+    } else {
+      // console.log("NOT FINITE", arr[i]);
+    }
+  }
+  return sum;
+}
+
+const getSumDiffAbsSquared = (arr1, arr2) => {
+  var d = [];
+  for (var i = 0; i < arr1.length; i++) {
+    d.push(Math.pow(Math.abs(arr1[i] - arr2[i]), 2));
+  }
+  var sum = getSum(d);
+  return sum;
+}
+
+const multiplyArrays = (x, y) => {
+  var xy = [];
+  for (var i = 0; i < x.length; i++) {
+    xy.push(x[i] * y[i]);
+  }
+  return xy;
+}
+
+const recalculateSpearmanCorrelationTitle = (xData, yData) => {
+  if (xData.length > 0 && yData.length > 0) {
+    var sortedX = xData.slice().sort(function(a, b){ return b - a })
+    var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
+    var sortedY = yData.slice().sort(function(a, b){ return b - a })
+    var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
+    var sumSquaredDiffRanks = getSumDiffAbsSquared(xRank, yRank);
+    var numer = 6.0 * sumSquaredDiffRanks;
+    var denom = xData.length * (Math.pow(xData.length, 2) - 1)
+    var rho = 1 - (numer / denom);
+    return "Spearman rho=" + rho.toFixed(3);
+  } else {
+    return "Spearman rho=NA"
+  }
+}
+
+const recalculatePearsonCorrelationTitle = (xData, yData) => {
+  if (xData.length > 0 && yData.length > 0) {
+    var xDataFinites = removeInfinities(xData);
+    var yDataFinites = removeInfinities(yData);
+    var xMean = xDataFinites.reduce(function(a, b){ return a + b }) / xDataFinites.length;
+    var yMean = yDataFinites.reduce(function(a, b){ return a + b }) / yDataFinites.length;
+    var xDataMinusMean = xData.map(function(i){ return i - xMean });
+    var yDataMinusMean = yData.map(function(i){ return i - yMean });
+    var xy = multiplyArrays(xDataMinusMean, yDataMinusMean);
+    var xDataMinusMeanSquared = xDataMinusMean.map(function(i){ return Math.pow(i, 2) })
+    var yDataMinusMeanSquared = yDataMinusMean.map(function(i){ return Math.pow(i, 2) })
+    var numer = getSum(xy);
+    var xSumDataMinusMeanSquared = getSum(xDataMinusMeanSquared);
+    var ySumDataMinusMeanSquared = getSum(yDataMinusMeanSquared);
+    var denom = Math.sqrt(xSumDataMinusMeanSquared * ySumDataMinusMeanSquared);
+    var r = numer / denom;
+    return "Pearson's r=" + r.toFixed(3);
+  } else {
+    return "Pearson's r=NA";
+  }
+}
+
 const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus_alignment_top, threshold) => {
 
   const xData = getScatterX(pdata_scatter_raw, threshold);
@@ -1138,7 +1205,7 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
   const locus_alignment_scatter_plot_layout = {
     title: {
       // text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
-      text: "QTL-GWAS <i>P</i>-value Correlation: " + "Spearman " + (pdata_scatter_title ? pdata_scatter_title.split(', ')[0] : 'N/A') + ", Pearson's " + (pdata_scatter_title ? pdata_scatter_title.split(', ')[1] : 'N/A'),
+      text: "QTL-GWAS <i>P</i>-value Correlation: " + (pdata_scatter_title ? "Spearman " + pdata_scatter_title.split(', ')[0] : recalculateSpearmanCorrelationTitle(xData, yData)) + ", " + (pdata_scatter_title ? "Pearson's " + pdata_scatter_title.split(', ')[1] : recalculatePearsonCorrelationTitle(xData, yData)),
       xref: 'paper'
     },
     font: {
