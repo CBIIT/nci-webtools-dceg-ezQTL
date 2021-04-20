@@ -407,7 +407,7 @@ export function LocusColocalization() {
               title=""
               columns={hyprcolocColumns}
               data={hyprcoloc_table.data}
-              hidden={[]}
+              hidden={hyprcoloc_table.hidden}
               globalFilter={hyprcoloc_table.globalFilter}
               // pagination={locus_table.pagination}
               mergeState={(state) =>
@@ -454,7 +454,7 @@ export function LocusColocalization() {
               title=""
               columns={hyprcolocSNPScoreColumns}
               data={hyprcolocSNPScore_table.data}
-              hidden={[]}
+              hidden={hyprcolocSNPScore_table.hidden}
               globalFilter={hyprcolocSNPScore_table.globalFilter}
               // pagination={locus_table.pagination}
               mergeState={(state) =>
@@ -536,7 +536,7 @@ export function LocusColocalization() {
               title=""
               columns={ecaviarColumns}
               data={ecaviar_table.data}
-              hidden={[]}
+              hidden={ecaviar_table.hidden}
               globalFilter={ecaviar_table.globalFilter}
               // pagination={locus_table.pagination}
               mergeState={(state) =>
