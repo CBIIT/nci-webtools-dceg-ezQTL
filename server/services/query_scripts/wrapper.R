@@ -54,7 +54,10 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   }
   if (identical(select_qtls_samples, 'true')) {
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
-    ldFile <- getS3File('ezQTL/MX2.examples/MX2.LD.gz', bucket)
+
+    publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
+    ldFile <- paste0('tmp/', request, '/MX2.LD.gz')
+    save_object(publicLDFile, bucket, file = ldFile)
   } else {
     associationFile <- paste0('tmp/', request, '/', associationFile)
     ldFile <- paste0('tmp/', request, '/', ldFile)
