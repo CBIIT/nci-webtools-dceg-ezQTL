@@ -311,7 +311,7 @@ apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
 });
 
 apiRouter.post('/qtls-locus-qc', (req, res, next) =>
-  qtlsCalculateQC({ ...req.body, workingDirectory }, res, next)
+  qtlsCalculateQC({ ...req.body, workingDirectory: workingDirectory, bucket: awsInfo.s3.data }, res, next)
 );
 
 apiRouter.post('/qtls-coloc-visualize', (req, res, next) =>
