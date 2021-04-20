@@ -58,7 +58,7 @@ export function Help() {
           index the QTL data and can be used as the LD reference variants in
           locuszoom plot.
         </p>
-        <div style={{overflowX: 'auto'}}>
+        <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -157,7 +157,7 @@ export function Help() {
           be raw data, normalized data or log transformed data; each will have
           different visualization for the QTL boxplot and locus quantification.
         </p>
-        <div style={{overflowX: 'auto'}}>
+        <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -232,7 +232,7 @@ export function Help() {
           “CT”) (0=reference allele and 1=alternative allele). The chr, pos, ref
           and alt information are used as index id link to association data.
         </p>
-        <div style={{overflowX: 'auto'}}>
+        <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -307,7 +307,7 @@ export function Help() {
           interest. The remaining columns are the pairwise matrix, representing
           the LD (R value) between two variants.
         </p>
-        <div style={{overflowX: 'auto'}}>
+        <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -385,7 +385,7 @@ export function Help() {
           index id linking to QTL data. “zscore” can be calculated based on the
           effect size (“effect”) and standard error (“se”): zscore=effect/se.
         </p>
-        <div style={{overflowX: 'auto'}}>
+        <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
             <thead>
               <tr>
@@ -531,6 +531,23 @@ export function Help() {
           , a statistical framework that quantifies the probability of the
           variant to be causal both in GWAS and eQTL studies, while allowing the
           arbitrary number of causal variants.
+        </p>
+      </div>
+      <div className="mt-5">
+        <p>
+          <b>Note on Computing Z-scores</b>
+        </p>
+        <p>
+          Check{' '}
+          <a
+            href="https://huwenboshi.github.io/data%20management/2017/11/23/tips-for-formatting-gwas-summary-stats.html"
+            target="_blank"
+            rel="noreferrer"
+          >
+            here
+          </a>{' '}
+          for details about the relationship for Z-score, p-value, effect size
+          or odds ratio for association studies.
         </p>
       </div>
       <div className="mt-5">
