@@ -276,7 +276,6 @@ export function LocusColocalization() {
               variant="primary"
               name="radio"
               value={radio.value}
-              disabled={radio.value === 'summary' && ecaviar_table.data.length === 0}
               checked={activeColocalizationTab === radio.value}
               onChange={async (e) => {
                 dispatch(
@@ -318,16 +317,24 @@ export function LocusColocalization() {
                   e.target.value === 'summary' &&
                   !isError &&
                   !summaryLoaded &&
-                  ecaviar_table.data.length > 0 &&
                   hyprcoloc_table.data.length > 0 &&
                   !isLoadingSummary
                 ) {
+
                   console.log('run summary');
                   dispatch(
                     qtlsGWASColocVisualize({
                       hydata: hyprcoloc_table.data,
                       ecdata: ecaviar_table.data,
                       request: request,
+                      LDFile: inputs['ld_file'][0],
+                      associationFile: inputs['association_file'][0],
+                      gwasFile: inputs['gwas_file'][0],
+                      select_dist: inputs['select_dist'][0] * 1000,
+                      select_gwas_sample,
+                      select_qtls_samples,
+                      select_ref: locus_alignment['top']['rsnum'],
+                      calcEcaviar: ecaviar_table.data.length === 0
                     })
                   );
                 }
