@@ -5,6 +5,15 @@ import {
   UPDATE_SUCCESS,
   UPDATE_ALERT,
 } from './actions';
+import _ from 'lodash';
+
+function mergeObject(state, action) {
+  return _.mergeWith(state, action.data, (obj, src) => {
+    if (_.isArray(obj)) {
+      return src;
+    }
+  });
+}
 
 export const rootReducer = (state, action) => {
   switch (action.type) {
@@ -16,10 +25,11 @@ export const rootReducer = (state, action) => {
     case UPDATE_QTLS_GWAS:
       return {
         ...state,
-        qtlsGWAS: {
-          ...state.qtlsGWAS,
-          ...action.data,
-        },
+        qtlsGWAS: { ...mergeObject(state.qtlsGWAS, action) },
+        // {
+        //   ...state.qtlsGWAS,
+        //   ...action.data,
+        // },
       };
     case UPDATE_ERROR:
       return {

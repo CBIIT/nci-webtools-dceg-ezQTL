@@ -251,8 +251,8 @@ export function LocusColocalization() {
       accessor: 'CLPP2',
       id: 'CLPP2',
       sortType: useMemo(() => (rowA, rowB, columnId) => {
-        const a = Number(rowA.original[columnId]);
-        const b = Number(rowB.original[columnId]);
+        const a = Number(rowA.original[columnId]) || 0;
+        const b = Number(rowB.original[columnId]) || 0;
         if (a > b) return 1;
         if (b > a) return -1;
         return 0;
@@ -276,11 +276,6 @@ export function LocusColocalization() {
               variant="primary"
               name="radio"
               value={radio.value}
-              disabled={
-                radio.value === 'summary' && ecaviar_table.data.length === 0
-                  ? true
-                  : false
-              }
               checked={activeColocalizationTab === radio.value}
               onChange={async (e) => {
                 dispatch(
@@ -322,16 +317,24 @@ export function LocusColocalization() {
                   e.target.value === 'summary' &&
                   !isError &&
                   !summaryLoaded &&
-                  ecaviar_table.data.length > 0 &&
                   hyprcoloc_table.data.length > 0 &&
                   !isLoadingSummary
                 ) {
+
                   console.log('run summary');
                   dispatch(
                     qtlsGWASColocVisualize({
                       hydata: hyprcoloc_table.data,
                       ecdata: ecaviar_table.data,
                       request: request,
+                      LDFile: inputs['ld_file'][0],
+                      associationFile: inputs['association_file'][0],
+                      gwasFile: inputs['gwas_file'][0],
+                      select_dist: inputs['select_dist'][0] * 1000,
+                      select_gwas_sample,
+                      select_qtls_samples,
+                      select_ref: locus_alignment['top']['rsnum'],
+                      calcEcaviar: ecaviar_table.data.length === 0
                     })
                   );
                 }
@@ -404,7 +407,7 @@ export function LocusColocalization() {
               title=""
               columns={hyprcolocColumns}
               data={hyprcoloc_table.data}
-              hidden={[]}
+              hidden={hyprcoloc_table.hidden}
               globalFilter={hyprcoloc_table.globalFilter}
               // pagination={locus_table.pagination}
               mergeState={(state) =>
@@ -451,7 +454,7 @@ export function LocusColocalization() {
               title=""
               columns={hyprcolocSNPScoreColumns}
               data={hyprcolocSNPScore_table.data}
-              hidden={[]}
+              hidden={hyprcolocSNPScore_table.hidden}
               globalFilter={hyprcolocSNPScore_table.globalFilter}
               // pagination={locus_table.pagination}
               mergeState={(state) =>
@@ -533,7 +536,7 @@ export function LocusColocalization() {
               title=""
               columns={ecaviarColumns}
               data={ecaviar_table.data}
-              hidden={[]}
+              hidden={ecaviar_table.hidden}
               globalFilter={ecaviar_table.globalFilter}
               // pagination={locus_table.pagination}
               mergeState={(state) =>

@@ -10,7 +10,7 @@ const {
   qtlsCalculateLocusColocalizationHyprcoloc,
   qtlsCalculateLocusColocalizationECAVIAR,
   qtlsCalculateQC,
-  qtlsColocVisualize
+  qtlsColocVisualize,
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
@@ -47,8 +47,7 @@ const upload = multer({ storage: storage });
 apiRouter.use('/results', express.static(config.tmp.folder));
 
 // parse json requests
-apiRouter.use(express.json({limit: '10mb'}));
-
+apiRouter.use(express.json({ limit: '10mb' }));
 
 // compress all responses
 apiRouter.use(compression());
@@ -258,6 +257,17 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
   }
 });
 
+// download work session
+apiRouter.post('/locus-download', (req, res, next) => {
+  const { request } = req.body;
+
+  try {
+    tar.c({ sync: true, gzip: true, cwd: tmpDir }, [request]).pipe(res);
+  } catch (err) {
+    next(err);
+  }
+});
+
 apiRouter.post('/qtls-locus-alignment-boxplots', (req, res, next) =>
   qtlsCalculateLocusAlignmentBoxplots(
     {
@@ -311,11 +321,11 @@ apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
 });
 
 apiRouter.post('/qtls-locus-qc', (req, res, next) =>
-  qtlsCalculateQC({ ...req.body, workingDirectory }, res, next)
+  qtlsCalculateQC({ ...req.body, workingDirectory: workingDirectory, bucket: awsInfo.s3.data }, res, next)
 );
 
 apiRouter.post('/qtls-coloc-visualize', (req, res, next) =>
-  qtlsColocVisualize( req.body , res, next)
+  qtlsColocVisualize(req.body, res, next)
 );
 
 module.exports = { apiRouter };

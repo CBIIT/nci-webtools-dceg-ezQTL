@@ -375,6 +375,7 @@ async function qtlsCalculateQC(params, res, next) {
     select_dist,
     select_gene,
     workingDirectory,
+    bucket,
   } = params;
 
   const s3 = new AWS.S3({
@@ -388,71 +389,26 @@ async function qtlsCalculateQC(params, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  let gwas = '';
-  let association = '';
-  let ld = '';
+
   let requestPath = '';
 
   try {
-    if (select_gwas_sample) {
-      gwas = path.resolve(config.tmp.folder, request, 'MX2.GWAS.rs.txt');
-      let file = fs.createWriteStream(gwas);
-      await s3
-        .getObject({
-          Bucket: config.aws.s3.data,
-          Key: `${awsInfo.s3.subFolder}/MX2.examples/MX2.GWAS.rs.txt`,
-        })
-        .createReadStream()
-        .pipe(file);
-    } else gwas = path.resolve(config.tmp.folder, request, gwasFile);
-
-    if (select_qtls_samples) {
-      association = path.resolve(config.tmp.folder, request, 'MX2.eQTL.txt');
-      let file = fs.createWriteStream(association);
-      await s3
-        .getObject({
-          Bucket: config.aws.s3.data,
-          Key: `${awsInfo.s3.subFolder}/MX2.examples/MX2.eQTL.txt`,
-        })
-        .createReadStream()
-        .pipe(file);
-
-      ld = path.resolve(config.tmp.folder, request, 'MX2.LD.gz');
-      file = fs.createWriteStream(ld);
-      await s3
-        .getObject({
-          Bucket: config.aws.s3.data,
-          Key: `${awsInfo.s3.subFolder}/MX2.examples/MX2.LD.gz`,
-        })
-        .createReadStream()
-        .pipe(file);
-    } else {
-      association = path.resolve(config.tmp.folder, request, associationFile);
-      if (ldfile === 'false') {
-        ld = path.resolve(config.tmp.folder, request, request + '.LD.gz');
-      } else {
-        ld = path.resolve(config.tmp.folder, request, ldfile);
-      }
-    }
-
-    requestPath = path.resolve(config.tmp.folder, request, request);
-
-    logger.info(gwas);
-    logger.info(association);
-    logger.info(ld);
-
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
       'qtlsCalculateQC',
       [
         rfile,
-        gwas.toString(),
-        association.toString(),
-        ld.toString(),
+        select_gwas_sample.toString(),
+        select_qtls_samples.toString(),
+        gwasFile.toString(),
+        associationFile.toString(),
+        ldfile.toString(),
         select_ref.toString(),
         select_dist,
         select_gene.toString(),
         requestPath,
+        workingDirectory,
+        bucket
       ]
     );
     logger.info(`[${request}] Finished /ezqTL_ztw`);

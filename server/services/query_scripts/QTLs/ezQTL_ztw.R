@@ -4,127 +4,381 @@ library(cowplot)
 library(hrbrthemes)
 library(scales)
 library(ggsci)
+library(ggrepel)
 
-coloc_QC <- function(gwasfile,qtlfile,ldfile,leadsnp=NULL,distance=100000,zscore_gene=NULL,output_plot_prefix=NULL){
-  gwas <- read_delim(gwasfile,delim = '\t',col_names = T)
-  eqtl <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = cols('variant_id'='c'))
-  ld.matrix <- read_delim(ldfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
-  ld.info <- ld.matrix %>% select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
-  ld.matrix <- ld.matrix %>% select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
+# sed Delete / Remove ^M Carriage Return
+formatM_input<- function(tfile){
+  filetype <- summary(file(tfile))$class
+  if(filetype == "gzfile"){
+    cmd1=paste0("bgzip -d -c ",tfile,' > ',tfile,'.txt')  
+    cmd2=paste0("sed -i '' 's/\r//' ",tfile,'.txt')
+    cmd3=paste0('cat ',tfile,'.txt |bgzip > ',tfile,' &&  rm -rf ',tfile,'.txt')
+    system(cmd1)
+    system(cmd2)
+    system(cmd3)
+  }else {
+    cmd=paste0("sed -i '' 's/\r//' ",tfile)  
+    system(cmd)
+    
+  }
+}
+
+
+
+coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub=FALSE, ldfile=NULL,ldfile_pub=FALSE, leadsnp=NULL,leadpos=NULL, distance=100000,zscore_gene=NULL,output_plot_prefix=NULL, output_prefix="./ezQTL_input", logfile="ezQTL.log"){
+  
+  ainfo <- paste0("ezQTL Analysis Starting QC at ",Sys.time())
+  cat(ainfo,file=logfile,sep="\n",append = FALSE)
+  
+  if(is.null(gwasfile) & is.null(qtlfile) & is.null(ldfile)){
+    errinfo <- "ezQTL need at least one of the following files: QTL association file, GWAS association file, and LD matrix file;"
+    cat(errinfo,file=logfile,sep="\n",append = T)
+    stop("ezQTL QC failed: no file input")
+  }
+  
+  # check gwas file
+  if(!is.null(gwasfile)){
+    # format file, remove the CR/^M characters from windows 
+    if(!gwasfile_pub){ formatM_input(gwasfile) }
+    # read orignal file 
+    gwas <- read_delim(gwasfile,delim = '\t',col_names = T)
+    # check file format, and select only requeired columns
+    gwas_colnames <- c('chr','pos','ref','alt','rsnum','pvalue','zscore','effect','se')
+    gwas_colname_diff <- gwas_colnames[!gwas_colnames %in% colnames(gwas)]
+    if(length(gwas_colname_diff)!=0){
+      errinfo <- paste0("ERROR: The following GWAS column names for ezQTL are not existed: ",paste0(gwas_colname_diff,collapse = ', '))
+      cat(errinfo,file=logfile,sep="\n",append = T)
+      stop("ezQTL QC failed: GWAS data format")
+    }else{
+      gwas <-gwas %>% select(one_of(gwas_colnames))
+      gwas_nchr <- gwas %>% count(chr) %>% dim() %>% .[[1]]
+      if(gwas_nchr!=1){
+        errinfo <- "ERROR: Number of chromosome in GWAS file large than 1"
+        cat(errinfo,file=logfile,sep="\n",append = T)
+        stop("ezQTL QC failed: GWAS data format")
+      }
+      
+      cat("\nGWAS summary",file=logfile,sep="\n",append = T)
+      gwastmp <- gwas %>% select(rsnum,chr,pos,ref,alt) %>% unique() 
+      cat(paste0('# number of variants included: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
+      gwastmp <- gwastmp %>% filter(str_detect(rsnum,'^rs'))
+      cat(paste0('# number of variants with rsnum: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
+      gwastmp <- gwastmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
+      cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
+    }
+    
+  }
+  
+  # check qtl file
+  if(!is.null(qtlfile)){
+    # format file, remove the CR/^M characters from windows 
+    if(!qtlfile_pub){ formatM_input(qtlfile) }
+    # read orignal file 
+    qtl <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = cols('variant_id'='c'))
+    # check file format, and select only requeired columns
+    qtl_colnames <- c('gene_id','gene_symbol','variant_id','rsnum','chr','pos','ref','alt','tss_distance','pval_nominal','slope','slope_se')
+    qtl_colname_diff <- qtl_colnames[!qtl_colnames %in% colnames(qtl)]
+    if(length(qtl_colname_diff)!=0){
+      errinfo <- paste0("ERROR: The following QTL column names for ezQTL are not existed: ",paste0(qtl_colname_diff,collapse = ', '))
+      cat(errinfo,file=logfile,sep="\n",append = T)
+      stop("ezQTL QC failed: QTL data format")
+    }else{
+      qtl <-qtl %>% select(one_of(qtl_colnames))
+      
+      qtl_nchr <- qtl %>% count(chr) %>% dim() %>% .[[1]]
+      if(qtl_nchr!=1){
+        errinfo <- "ERROR: Number of chromosome in QTL file large than 1"
+        cat(errinfo,file=logfile,sep="\n",append = T)
+        stop("ezQTL QC failed: QTL data format")
+      }
+      
+      cat("\nQTL summary",file=logfile,sep="\n",append = T)
+      ntraits <- qtl %>% count(gene_id) %>% dim() %>% .[[1]]
+      cat(paste0('# number of QTL traits: ',ntraits),file=logfile,sep="\n",append = T)
+      qtltmp <- qtl %>% select(variant_id,rsnum,chr,pos,ref,alt) %>% unique() 
+      cat(paste0('# number of variants included: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
+      qtltmp <- qtltmp %>% filter(str_detect(rsnum,'^rs'))
+      cat(paste0('# number of variants with rsnum: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
+      qtltmp <- qtltmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
+      cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
+      
+    }
+    
+  }
+  
+  # check ld file
+  if(!is.null(ldfile)){
+    # format file, remove the CR/^M characters from windows 
+    if(!ldfile_pub){ formatM_input(ldfile) }
+    # read orignal file 
+    ld.matrix <- read_delim(ldfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
+    # check file format, and select only requeired columns
+    ld.matrix.size=dim(ld.matrix)
+    if(ld.matrix.size[1]<7 | ld.matrix.size[2]<7 | (ld.matrix.size[2]-ld.matrix.size[1])!=5){
+      errinfo <- paste0("ERROR: The dimensions of the LD matrix file are not correct. Please check the help page for the detail.")
+      cat(errinfo,file=logfile,sep="\n",append = T)
+      stop("ezQTL QC failed: LD data format")
+    }else{
+      # pre-porcessing data
+      ld.info <- ld.matrix %>% select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
+      ld.matrix <- ld.matrix %>% select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
+      
+      cat("\nLD summary",file=logfile,sep="\n",append = T)
+      ldinfotmp <- ld.info %>% select(rsnum,chr,pos,ref,alt) %>% unique() 
+      cat(paste0('# number of variants included: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+      ldinfotmp <- ldinfotmp %>% filter(str_detect(rsnum,'^rs'))
+      cat(paste0('# number of variants with rsnum: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+      ldinfotmp <- ldinfotmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
+      cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+    }
+  }
+  
+  
+  if(!is.null(leadpos)){
+    if(!is.null(gwasfile)){
+      leadsnp <- gwas %>% filter(pos==leadpos)%>% pull(rsnum) %>% unique() 
+    }else{
+      if(!is.null(qtlfile)){
+        leadsnp <- qtl %>% filter(pos==leadpos) %>% pull(rsnum) %>% unique()
+      }
+    }
+  }
   
   if(is.null(leadsnp)){
-    leadsnp <- gwas %>% arrange(pvalue) %>% slice(1) %>% pull(rsnum)  
+    # default, using the most significant GWAS variant as the leadsnp
+    if(!is.null(gwasfile)){
+      leadsnp <- gwas %>% arrange(pvalue) %>% slice(1) %>% pull(rsnum)  
+    }else{
+      if(!is.null(qtlfile)){
+        leadsnp <- qtl %>% arrange(pval_nominal) %>% slice(1) %>% pull(rsnum)  
+      }
+    }
   }
   
-  leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
-  leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)
-  leadpos1 <- leadpos - distance
-  leadpos2 <- leadpos + distance
-  
-  gwas <- gwas %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
-  eqtl <- eqtl %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
-  #ld.info <- ld.info %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
-  leadindex <- ld.info %>% filter(rsnum==leadsnp) %>% pull(Seq)
-  
-  ld.data <- bind_cols(
-    ld.info,
-    tibble(LD=ld.matrix[,leadindex])
-  ) %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
-  
-  ## overlap
-  orsnum <- gwas %>% filter(rsnum %in% eqtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
-  eqtl2 <- eqtl %>% group_by(rsnum,pos) %>% arrange(pval_nominal) %>% summarise(pvalue=min(pval_nominal),n=n()) %>% ungroup()
-  
-  
-  ndifgene <- eqtl %>% count(gene_id) %>% count(n) %>% dim() %>% .[[1]]
-  
-  
-  pcol <- c('#cccccc','#1a9850')
-  p1 <- eqtl2 %>% mutate(tmp=rsnum %in% orsnum) %>% arrange(tmp) %>% 
-    ggplot(aes(pos/1000000,-log10(pvalue),fill=rsnum %in% orsnum))+
-    geom_point(aes(size=n),pch=21,stroke=0.3,col="black")+
-    theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-    labs(fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
-    theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank())+
-    scale_fill_manual(values = pcol)+
-    scale_x_continuous(breaks = pretty_breaks())+
-    panel_border(color = 'black')+
-    ggrepel::geom_text_repel(data = eqtl2 %>% filter(rsnum==leadsnp),aes(label=rsnum))+
-    geom_point(data = eqtl2 %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,fill=NA,stroke=1)
-  
-  if(ndifgene > 1 ){
-    p1 <- p1 +  scale_size_binned(breaks = pretty_breaks())
+  if(!is.null(leadsnp))  {
+    cat(paste0("\nReference SNP using for filtering SNPs based on the distance: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
+    leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
+    if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
+    leadpos1 <- leadpos - distance
+    leadpos2 <- leadpos + distance
+    
+    if(!is.null(gwasfile)) {gwas <- gwas %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)}
+    if(!is.null(qtlfile)) {qtl <- qtl %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)}
+    
+    #ld.info <- ld.info %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
+    if(!is.null(ldfile)){
+      leadindex <- ld.info %>% filter(rsnum==leadsnp) %>% pull(Seq)
+      if(!is.na(leadindex)){
+        ldtmp <- tibble(LD=ld.matrix[,leadindex])
+      }else{
+        ldtmp <- tibble(LD=rep(NA,dim(ld.matrix)[1]))
+      }
+      
+      ld.data <- bind_cols(
+        ld.info,
+        ldtmp
+      ) %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
+    }
+    
+  }else {
+    cat("No Reference SNP using for filtering SNPs based on the distance",file=logfile,sep="\n",append = T)
   }
   
-  p2 <- gwas %>% 
-    ggplot(aes(pos/1000000,-log10(pvalue),fill=rsnum %in% orsnum))+
-    geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
-    theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-    labs(fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
-    theme(legend.position = 'none',panel.background = element_blank())+
-    scale_fill_manual(values = pcol)+
-    scale_x_continuous(breaks = pretty_breaks())+
-    panel_border(color = 'black')+
-    ggrepel::geom_text_repel(data = gwas %>% filter(rsnum==leadsnp),aes(label=rsnum) )+
-    geom_point(data = gwas %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
   
-  
-  p3 <- ld.data %>% mutate(tmp=rsnum %in% orsnum) %>% arrange(tmp) %>% 
-    ggplot(aes(pos/1000000,(LD)^2,fill=rsnum %in% orsnum))+
-    geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
-    theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-    labs(fill="Overlapped Variants",x=paste0('Chromosome ',leadchr,'\n'),y="LD Matrix (R^2)")+
-    theme(legend.position = 'none',panel.background = element_blank())+
-    scale_fill_manual(values = pcol)+
-    scale_x_continuous(breaks = pretty_breaks())+
-    panel_border(color = 'black')+
-    ggrepel::geom_text_repel(data = ld.data %>% filter(rsnum==leadsnp),aes(label=rsnum))+
-    geom_point(data = ld.data %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
-  
-  pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p2+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.3,1,1))
-  
-  # effect size plot # 
-  
-  if(is.null(zscore_gene)){
-    gene_ids <- eqtl %>% arrange(pval_nominal) %>% select(gene_symbol) %>% slice(1) %>% pull(gene_symbol)  
+  ## QTL plots
+  if(!is.null(qtlfile)){
+    # qtl minmal p-visualize
+    qtl_min <- qtl %>% 
+      group_by(gene_id,gene_symbol) %>%
+      arrange(pval_nominal) %>%
+      slice(1) %>%
+      ungroup() %>% 
+      arrange(desc(pval_nominal)) 
+    
+    pall0 <- qtl %>% 
+      mutate(gene_symbol=factor(gene_symbol,levels = qtl_min$gene_symbol)) %>% 
+      ggplot(aes(-log10(pval_nominal),gene_symbol,fill=-log10(pval_nominal)))+
+      geom_point(pch=21,stroke=0.2,col="black",size=3)+
+      geom_point(data = qtl_min,pch=21,stroke=0.5,col="red",size=3)+
+      theme_ipsum_rc(axis_title_just = 'm',grid = "XYx",axis = F,ticks = T,axis_title_size= 14)+
+      labs(fill="minmal p-value",y='',x='QTL P-value (-log10)')+
+      theme(legend.position = 'none',panel.background = element_blank())+
+      scale_fill_viridis_c(direction = -1)+
+      scale_x_continuous(breaks = pretty_breaks(),expand = expansion(mult = c(0.01, .12)))+
+      ggrepel::geom_text_repel(data=qtl_min,aes(label=rsnum),hjust=0,vjust=1,nudge_y = -0.1,segment.size=0.2,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 30)+
+      #coord_cartesian(clip = 'off')+
+      panel_border(color = 'black')
+    
+    xleng <- 2+dim(qtl_min)[1]*0.5
+    xleng <- if_else(xleng>12,12,xleng)
+    ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = xleng)
   }else{
-    gene_ids <- zscore_gene
+    pall0 <- ggplot()
+    ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = 4)
   }
   
   
-  qdata <- left_join(
-    eqtl %>% filter(rsnum %in% orsnum,gene_symbol %in% gene_ids) %>% mutate(Z=slope/slope_se) %>% mutate(Gene=paste0(gene_id,'/',gene_symbol)) %>% select(rsnum, pos, Z,Gene),
-    gwas %>% filter(rsnum %in% orsnum) %>% select(rsnum,pos,zscore)
-  ) %>% 
-    left_join(
-      ld.data %>% select(rsnum,pos,LD)
+  # Summary of the dataset --------------------------------------------------
+  
+  # The following function work for all three major inputs ------------------
+  if(!is.null(gwasfile) & !is.null(qtlfile) & !is.null(ldfile)){
+    
+    gwas <- gwas %>% mutate(chr=as.character(chr))
+    qtl <- qtl %>% mutate(chr=as.character(chr))
+    ld.info <- ld.info %>% mutate(chr=as.character(chr))
+    
+    snpall <- inner_join(
+      gwas %>% select(rsnum,chr,pos_gwas=pos,ref_gwas=ref,alt_gwas=alt) %>% unique(),
+      qtl %>% select(rsnum,chr,pos_qtl=pos,ref_qtl=ref,alt_qtl=alt) %>% unique()
     ) %>% 
-    mutate(label=if_else(rsnum==leadsnp,rsnum,''))
-  
-  unique(qdata$Gene)
-  
-  pall2 <- qdata %>% ggplot(aes(zscore,Z,fill=LD))+
-    facet_wrap(~Gene,ncol = 1)+
-    geom_abline(slope = 1,col='#cccccc',linetype=2)+
-    geom_hline(yintercept = 0,col='#cccccc')+
-    geom_vline(xintercept = 0,col='#cccccc')+
-    geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
-    # theme_ipsum_rc(axis_title_just = 'm',grid = F,axis = F,ticks = T,axis_title_size= 14)+
-    labs(fill="LD to GWAS Leadsnp\n",x='GWAS-Zscore',y='QTL-Zscore')+
-    theme(legend.position = 'top',legend.key.width = unit(2,'cm'),panel.spacing = unit(0.5, "lines"),panel.background = element_blank(),panel.grid = element_blank(),strip.background = element_blank())+
-    scale_fill_gsea(limits=c(-1,1))+
-    panel_border(color = 'black')+
-    geom_point(data = qdata %>% filter(rsnum==leadsnp),pch=2,col="black",size=2,stroke=0.5)+
-    ggrepel::geom_text_repel(aes(label=label))
-  
-  if(is.null(output_plot_prefix)){
-    return(list(pall1,pall2))
-  }else{
-    ggsave(filename = paste0(output_plot_prefix,"_QC_overlapping.svg"),plot = pall1,width = 12,height = 12)
-    ggsave(filename = paste0(output_plot_prefix,"_QC_zscore.svg"),plot = pall2,width = 10,height = 8)
+      inner_join(
+        ld.info %>% select(rsnum,chr,pos_ld=pos,ref_ld=ref,alt_ld=alt) %>% unique()
+      )
+    
+    cat("\nOverlapped SNPs",file=logfile,sep="\n",append = T)
+    cat(paste0('# number of overlapped snps by rsnum: ',dim(snpall)[1]),file=logfile,sep="\n",append = T)
+    snpalltmp <- snpall %>% filter(pos_gwas!=pos_ld|pos_gwas!=pos_qtl|pos_qtl!=pos_ld | ref_gwas!=ref_ld|ref_gwas!=ref_qtl|ref_qtl!=ref_ld|alt_gwas!=alt_ld|alt_gwas!=alt_qtl|alt_qtl!=alt_ld)
+    cat(paste0('# number of overlapped snps by rsnum, but have differnt pos, ref, or alt:  ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    if(dim(snpalltmp)[1]>0){
+      cat('Warning: found SNPs with same rsnum, but differnt information. Check the SNP Match file for detail. However, ezQTL still use the rsnum as the ID for colocalization analyses.',file=logfile,sep="\n",append = T)
+      snpalltmp %>% write_delim('snp_match.txt',delim = '\t',col_names = T)
+    }
+    
+    cat("\nFinal Set of SNPs for ezQTL analyses",file=logfile,sep="\n",append = T)
+    snpall <- snpall %>% filter(!(pos_gwas!=pos_ld|pos_gwas!=pos_qtl|pos_qtl!=pos_ld | ref_gwas!=ref_ld|ref_gwas!=ref_qtl|ref_qtl!=ref_ld|alt_gwas!=alt_ld|alt_gwas!=alt_qtl|alt_qtl!=alt_ld))
+    cat(paste0('# number of variants included: ',dim(snpall)[1]),file=logfile,sep="\n",append = T)
+    snpalltmp <- snpall %>% filter(str_detect(rsnum,'^rs'))
+    cat(paste0('# number of variants with rsnum: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    snpalltmp <- snpalltmp  %>% filter((ref_qtl %in% c('A','T') & alt_qtl %in% c('A','T'))|(ref_qtl %in% c('C','G') & alt_qtl %in% c('C','G')))
+    cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    
+    
+    ## additional filter for the QTL traits
+    
+    
+    # output the final dataset ------------------------------------------------
+    #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
+    orsnum <- snpall %>% pull(rsnum)
+    
+    ## overlap plot 1
+    qtl2 <- qtl %>% group_by(rsnum,pos) %>% arrange(pval_nominal) %>% summarise(pvalue=min(pval_nominal),n=n()) %>% ungroup()
+    ndifgene <- qtl %>% count(gene_id) %>% count(n) %>% dim() %>% .[[1]]
+    
+    pcol <- c('#cccccc','#1a9850')
+    p1 <- qtl2 %>% mutate(tmp=rsnum %in% orsnum) %>% arrange(tmp) %>% 
+      ggplot(aes(pos/1000000,-log10(pvalue),fill=rsnum %in% orsnum))+
+      geom_point(aes(size=n),pch=21,stroke=0.3,col="black")+
+      theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
+      labs(fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
+      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank())+
+      scale_fill_manual(values = pcol)+
+      scale_x_continuous(breaks = pretty_breaks())+
+      panel_border(color = 'black')+
+      ggrepel::geom_text_repel(data = qtl2 %>% filter(rsnum==leadsnp),aes(label=rsnum))+
+      geom_point(data = qtl2 %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,fill=NA,stroke=1)
+    
+    if(ndifgene > 1 ){
+      p1 <- p1 +  scale_size_binned(breaks = pretty_breaks())
+    }
+    
+    p2 <- gwas %>% 
+      ggplot(aes(pos/1000000,-log10(pvalue),fill=rsnum %in% orsnum))+
+      geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
+      theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
+      labs(fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
+      theme(legend.position = 'none',panel.background = element_blank())+
+      scale_fill_manual(values = pcol)+
+      scale_x_continuous(breaks = pretty_breaks())+
+      panel_border(color = 'black')+
+      ggrepel::geom_text_repel(data = gwas %>% filter(rsnum==leadsnp),aes(label=rsnum) )+
+      geom_point(data = gwas %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
+    
+    
+    p3 <- ld.data %>% mutate(tmp=rsnum %in% orsnum) %>% arrange(tmp) %>% 
+      ggplot(aes(pos/1000000,(LD)^2,fill=rsnum %in% orsnum))+
+      geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
+      theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
+      labs(fill="Overlapped Variants",x=paste0('Chromosome ',leadchr,'\n'),y="LD Matrix (R^2)")+
+      theme(legend.position = 'none',panel.background = element_blank())+
+      scale_fill_manual(values = pcol)+
+      scale_x_continuous(breaks = pretty_breaks())+
+      panel_border(color = 'black')+
+      ggrepel::geom_text_repel(data = ld.data %>% filter(rsnum==leadsnp),aes(label=rsnum))+
+      geom_point(data = ld.data %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
+    
+    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p2+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.3,1,1))
+    
+    # effect size plot # 
+    
+    if(is.null(zscore_gene)){
+      gene_ids <- qtl %>% arrange(pval_nominal) %>% select(gene_symbol) %>% slice(1) %>% pull(gene_symbol)  
+    }else{
+      gene_ids <- zscore_gene
+    }
+    
+    qdata <- left_join(
+      qtl %>% filter(rsnum %in% orsnum,gene_symbol %in% gene_ids) %>% mutate(Z=slope/slope_se) %>% mutate(Gene=paste0(gene_id,'/',gene_symbol)) %>% select(rsnum, pos, ref,alt, Z,Gene),
+      gwas %>% filter(rsnum %in% orsnum) %>% select(rsnum,pos,zscore)
+    ) %>% 
+      left_join(
+        ld.data %>% select(rsnum,pos,LD)
+      ) %>% 
+      mutate(label=if_else(rsnum==leadsnp,rsnum,'')) %>% 
+      mutate(ambiguous_snp=ifelse((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')), "Y","N"))
+      
+    
+    #unique(qdata$Gene)
+    
+    pall2 <- qdata %>% ggplot(aes(zscore,Z,fill=LD))+
+      facet_wrap(~Gene,ncol = 1)+
+      geom_abline(slope = 1,col='#cccccc',linetype=2)+
+      geom_hline(yintercept = 0,col='#cccccc')+
+      geom_vline(xintercept = 0,col='#cccccc')+
+      geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
+      geom_point(data=qdata %>% filter(ambiguous_snp=="Y"),pch=4,stroke=0.5,col="black",size=1)+
+      # theme_ipsum_rc(axis_title_just = 'm',grid = F,axis = F,ticks = T,axis_title_size= 14)+
+      labs(fill="LD to GWAS Leadsnp\n",x='GWAS-Zscore',y='QTL-Zscore')+
+      theme(legend.position = 'top',legend.key.width = unit(2,'cm'),panel.spacing = unit(0.5, "lines"),panel.background = element_blank(),panel.grid = element_blank(),strip.background = element_blank())+
+      scale_fill_gsea(limits=c(-1,1))+
+      panel_border(color = 'black')+
+      geom_point(data = qdata %>% filter(rsnum==leadsnp),pch=2,col="black",size=2,stroke=0.5)+
+      ggrepel::geom_text_repel(aes(label=label))
+    
+    if(is.null(output_plot_prefix)){
+      return(list(pall1,pall2))
+    }else{
+      ggsave(filename = paste0(output_plot_prefix,"_QC_overlapping.svg"),plot = pall1,width = 12,height = 12)
+      ggsave(filename = paste0(output_plot_prefix,"_QC_zscore.svg"),plot = pall2,width = 10,height = 8)
+    }
+    
+    
+    ## output final dataset
+    qtl <- qtl %>% filter(rsnum %in% orsnum)
+    qtl_rm <- qtl %>% mutate(diff=abs(pos-leadpos),direction=if_else(pos>leadpos,"+","-")) %>%
+      filter(diff!=0) %>% 
+      group_by(gene_symbol,gene_id,direction) %>%
+      arrange(diff) %>% 
+      slice(1:50) %>% 
+      ungroup() %>% 
+      count(gene_id,gene_symbol) %>% 
+      filter(n<100) 
+    
+    if(dim(qtl_rm)[1]>0){
+      qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
+      cat(paste0('# number of QTL traits are removed due to low number of SNPs: ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+    }
+    
+    qtl %>% write_delim(file=paste0(output_prefix,"_qtl.txt"),delim = '\t',col_names = T)
+    
+    gwas <- gwas %>% filter(rsnum %in% orsnum)
+    gwas %>% write_delim(file=paste0(output_prefix,"_gwas.txt"),delim = '\t',col_names = T)
+    
+    ld.info <- ld.info %>% filter(rsnum %in% orsnum)
+    ld.matrix <- ld.matrix[ld.info$Seq, ld.info$Seq]
+    bind_cols(ld.info %>% select(-Seq),as_tibble(ld.matrix)) %>% write_delim(file=paste0(output_prefix,"_ld.gz"),delim = '\t',col_names = FALSE)
   }
-  
 }
+
 
 
 hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
@@ -303,7 +557,7 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
     geom_hline(yintercept = 0.5,col='#2CA02CFF',size=0.5)+
     geom_col(width = 0.5,col='black',size=0.25)+
     scale_fill_material("deep-purple")+
-    ggrepel::geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = 0.1,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
+    geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = 0.1,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
     scale_y_continuous(limits = c(0,1),breaks = pretty_breaks(),expand = c(0,0))+
     labs(x='QTL Trait',y='HyPrColoc: Posterior Probability\n')+
     theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'Yy',axis = "XY",axis_col = 'black',base_family='Roboto Condensed')+
@@ -331,7 +585,7 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
     geom_hline(yintercept = 0.01,col='#2CA02CFF',size=0.5)+
     geom_col(width = 0.5,col='black',size=0.25)+
     scale_fill_material("deep-purple")+
-    ggrepel::geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = nudge_y,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
+    geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = nudge_y,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
     scale_y_continuous(breaks = pretty_breaks(),expand = c(0,0))+
     labs(x='QTL Trait',y='eCAVIAR: Colocalization Posterior Probability\n')+
     theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'Yy',axis = "XY",axis_col = 'black',base_family='Roboto Condensed')+
@@ -467,4 +721,426 @@ locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL
     ggsave(filename = output_plot,plot = p,width = plot_width,height = plot_height)
   }
 }
+
+
+
+
+# Locus LD ----------------------------------------------------------------
+
+IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_file, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_folder, Distance = 50000, output_file,
+                            slide_length = -1, threadN = 1, ldstatistics = "rsquare", leadsnp = NULL, threshold = NULL, 
+                            link2gene = NULL, triangleLD = TRUE, link2LD = NULL, leadsnpLD = TRUE, label_gene_name = FALSE, 
+                            colour02 = "gray", colour04 = "cyan", colour06 = "green", colour08 = "yellow", 
+                            colour10 = "red", leadsnp_shape = 23, leadsnp_colour = "black", leadsnp_fill = "purple", 
+                            leadsnp_size = 1.5, marker2highlight = NULL, marker2label = NULL, marker2label_angle = 60, 
+                            marker2label_size = 1) {
+  
+  association <- read_delim(association_file,delim = '\t',col_names = T)
+  
+  if('pvalue' %in% colnames(association)){  association <- association %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pvalue) }
+  if('pval_nominal' %in% colnames(association)){  
+    if(is.null(trait)){
+      trait <- association %>% arrange(pval_nominal) %>% select(1) %>% pull(gene_id)
+    }
+    association <- association %>% filter(gene_id == trait) %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pval_nominal) 
+  }
+  
+  
+  if(any(is.null(chr),is.null(left),is.null(right))){
+    tmplocus <- association %>% arrange(p) %>% slice(1) 
+    chr <- tmplocus$Locus
+    left <- tmplocus$Site - Distance
+    right <- tmplocus$Site + Distance
+  }
+  
+  # limmit to 100k
+  
+  if((right - left)  > 100000){
+    middle <- (right-left)/2
+    left <- middle - 50000
+    right <- middle + 50000
+  }
+  
+  chromosome_association <- association[association$Locus == chr, ]
+  transcript_min <- left
+  transcript_max <- right
+  transcript_association <- chromosome_association[chromosome_association$Site >= 
+                                                     transcript_min & chromosome_association$Site <= transcript_max, ]
+  transcript_association <- transcript_association[order(transcript_association$Site), 
+  ]
+  if (dim(transcript_association)[1] < 2) {
+    stop("Less than 2 markers, can not compute LD")
+  } else {
+    
+    ## tabix gtf file
+    if(genome_build == "GRCh37") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v19.annotation.gtf.gz')}
+    if(genome_build == "GRCh38") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v37.annotation.gtf.gz')}
+    regionfile=paste0(chr,":",left,"-",right,'.gtf_tmp')
+    cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' > ',regionfile)
+    system(cmd_ztw)
+    gtf <- read_delim(regionfile,delim = '\t',col_names = FALSE)
+    colnames(gtf) <- paste0('V',1:9)
+    
+    R2 <- Site <- Site2 <- V4 <- V5 <- V9 <- group <- p <- NULL
+    x <- xend <- y <- yend <- aggregate <- NULL
+    pvalue_range <- pretty(-log10(transcript_association$p))
+    fold <- ((transcript_max - transcript_min) * 2/3)/max(pvalue_range)
+    n_pvalue_range <- length(pvalue_range)
+    gene_list <- gtf[gtf$V1 == chr & grepl("exon",gtf$V3,ignore.case = TRUE),]
+    gene_list$V9 <- gsub("\"|;", "", gene_list$V9)
+    gene_list$V9 <- sub(".*gene_name (\\S+) .+", "\\1", gene_list$V9)
+    gene_list_start <- aggregate(V4 ~ V9, data = gene_list, FUN = min)
+    gene_list_end <- aggregate(V5 ~ V9, data = gene_list, FUN = max)
+    gene_list$V4 <- NULL
+    gene_list$V5 <- NULL
+    gene_list <- merge(gene_list, gene_list_start, by = "V9")
+    gene_list <- merge(gene_list, gene_list_end, by = "V9")
+    gene_list <- gene_list[!duplicated(gene_list$V9), ]
+    gene_list <- gene_list[gene_list$V4 >= transcript_min & gene_list$V5 <= 
+                             transcript_max, ]
+    gene_for <- gene_list[gene_list$V7 == "+", ]
+    gene_rev <- gene_list[gene_list$V7 == "-", ]
+    if (nrow(gene_for) >= 1) {
+      # plot forward strand gene
+      gene_for_seg <- list(geom_segment(data = gene_for, aes(x = V4, y = -(transcript_max -  transcript_min)/30, xend = V5, yend = -(transcript_max - transcript_min)/30), arrow = arrow(length = unit(0.1, "cm"))))
+    } else {
+      gene_for_seg <- NULL
+    }
+    if (nrow(gene_rev) >= 1) {
+      # plot forward strand gene
+      gene_rev_seg <- list(geom_segment(data = gene_rev, aes(x = V5, y = -(transcript_max -  transcript_min)/15, xend = V4, yend = -(transcript_max - transcript_min)/15),   arrow = arrow(length = unit(0.1, "cm"))))
+    } else {
+      gene_rev_seg <- NULL
+    }
+    
+    if (isTRUE(label_gene_name) & nrow(gene_for) >= 1) {
+      gene_for_seg_name <- list(geom_text_repel(data = gene_for, aes(x = V4,  y = -(transcript_max - transcript_min)/25, label = V9), size = 2, angle = 25))
+      
+    } else {
+      gene_for_seg_name <- NULL
+    }
+    
+    if (isTRUE(label_gene_name) & nrow(gene_rev) >= 1) {
+      gene_rev_seg_name <- list(geom_text_repel(data = gene_rev, aes(x = V4,   y = -(transcript_max - transcript_min)/12, label = V9), size = 2,   angle = 25))
+    } else {
+      gene_rev_seg_name <- NULL
+    }
+    if (any(nrow(gene_rev) >= 1, nrow(gene_for) >= 1)) {
+      gene_box <- list(
+        geom_segment(aes(x = rep(transcript_min, 2), xend = rep(transcript_max,   2), y = c(-(transcript_max - transcript_min)/12.5, -(transcript_max -  transcript_min)/45), yend = c(-(transcript_max - transcript_min)/12.5,  -(transcript_max - transcript_min)/45))),
+        geom_segment(aes(x = c(transcript_min,  transcript_max), xend = c(transcript_min, transcript_max), y = c(-(transcript_max -  transcript_min)/12.5, -(transcript_max - transcript_min)/12.5),   yend = c(-(transcript_max - transcript_min)/45, -(transcript_max -  transcript_min)/45))),
+        geom_segment(aes(x = c(transcript_min,  transcript_max), xend = c(transcript_min, transcript_max), y = c(-(transcript_max -  transcript_min)/12.5, -(transcript_max - transcript_min)/12.5),  yend = c(-(transcript_max - transcript_min)/11.5, -(transcript_max - transcript_min)/11.5))),
+        geom_text(aes(x = c(transcript_min,  transcript_max), y = rep(-(transcript_max - transcript_min)/10.2,   2)), label = c(transcript_min, transcript_max)))
+    } else {
+      gene_box <- list(NULL)
+    }
+    # decide whether to rotate x axis
+    scale_x <- list(
+      scale_x_continuous(limits = c(transcript_min - (transcript_max - transcript_min)/6, transcript_max), breaks = seq(transcript_min, transcript_max, (transcript_max - transcript_min)/4)))
+    # label the yaxis
+    scale_y_line <- list(
+      geom_segment(aes(x = transcript_min - (transcript_max - transcript_min)/30, y = min(pvalue_range), xend = transcript_min -  (transcript_max - transcript_min)/30, yend = max(pvalue_range) * fold)))
+    scale_y_ticks <- list(
+      geom_segment(aes(x = rep(transcript_min - (transcript_max - transcript_min)/15, n_pvalue_range), y = pvalue_range * fold, xend = rep(transcript_min -  (transcript_max - transcript_min)/30, n_pvalue_range), yend = pvalue_range * fold)))
+    scale_y_text <- list(
+      geom_text(aes(x = rep(transcript_min - (transcript_max -  transcript_min)/12, n_pvalue_range), y = pvalue_range * fold, label = pvalue_range)))
+    # add threshold line
+    if (is.null(threshold)) {
+      threshold_line <- list(NULL)
+    }
+    if (all(length(threshold) > 0, threshold <= max(pvalue_range))) {
+      threshold_line <- list(geom_segment(aes(x = transcript_min, xend = transcript_max, 
+                                              y = threshold * fold, yend = threshold * fold), linetype = "longdash", 
+                                          colour = "gray"))
+    }
+    if (all(length(threshold) > 0, threshold > max(pvalue_range))) {
+      threshold_line <- list(NULL)
+      print("no -log10(p) pass the threshold, will not draw threshold line")
+    }
+    
+    ld_leadsnp_colour <- list(NULL)
+    bottom_trianglLD <- list(NULL)
+    # link association and LD for the significant loci link between LD and genic
+    # structure
+    if (any(isTRUE(leadsnpLD), isTRUE(triangleLD))) {
+      
+      ld.matrix <- read_delim(LDfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
+      ld.info <- ld.matrix %>% dplyr::select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
+      ld.matrix <- ld.matrix %>% dplyr::select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
+      rownames(ld.matrix) <- ld.info$Seq
+      colnames(ld.matrix) <- ld.info$Seq
+      
+      ld.info <- ld.info[ld.info$chr==chr & ld.info$pos >= transcript_min & ld.info$pos <= transcript_max,]
+      ld.matrix <- ld.matrix[ld.info$Seq,ld.info$Seq]
+      
+      ## reindex 
+      ld.info <- ld.info %>% dplyr::select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
+      rownames(ld.matrix) <- ld.info$Seq
+      colnames(ld.matrix) <- ld.info$Seq
+      
+      ld <- ld.matrix
+      
+      if (ldstatistics == "rsquare") 
+        ld <- ld^2
+      names(ld) <- ld.info$rsnum
+      ld <- reshape2::melt(ld)
+      marker_info <- data.frame(index =ld.info$Seq, marker_name = ld.info$rsnum)
+      ld$Var1 <- marker_info$marker[match(ld$Var1, marker_info$index)]
+      ld$Var2 <- marker_info$marker[match(ld$Var2, marker_info$index)]
+      if (ldstatistics == "rsquare") {
+        lengend_name = expression(italic(r)^2)
+      } else if (ldstatistics == "dprime") {
+        lengend_name = expression(D * {
+          "'"
+        })
+      }
+      ld <- ld[!is.na(ld$value), ]
+      ld <- data.frame(Var1 = c(as.character(ld$Var1), as.character(ld$Var2)), 
+                       Var2 = c(as.character(ld$Var2), as.character(ld$Var1)), 
+                       value = rep(ld$value, 2), stringsAsFactors = FALSE)
+      ld0 <- ld
+      marker_pos <- transcript_association[, c("Marker", "Site")]
+      ld$Site1 <- marker_pos$Site[match(ld$Var1, marker_pos$Marker)]
+      ld$Site2 <- marker_pos$Site[match(ld$Var2, marker_pos$Marker)]
+      
+      if (isTRUE(leadsnpLD)) {
+        if (!is.null(leadsnp)) {
+          leadsnp <- leadsnp
+        }
+        if (is.null(leadsnp)) {
+          leadsnp <- as.character(transcript_association[which.min(transcript_association$p), "Marker"])
+        }
+        ld_leadsnp <- ld[ld$Var1 == leadsnp, ]
+        ld_leadsnp <- merge(ld_leadsnp, transcript_association, by.x = "Var2", by.y = "Marker")
+        if (length(which(ld_leadsnp$Var1 == leadsnp & ld_leadsnp$Var2 ==  leadsnp)) >= 1) {
+          ld_leadsnp <- ld_leadsnp[!(ld_leadsnp$Var1 == leadsnp & ld_leadsnp$Var2 ==  leadsnp), ]
+        }
+        ld_leadsnp$R2 <- 0.2 * (ld_leadsnp$value%/%0.2 + as.logical(ld_leadsnp$value%/%0.2))
+        ld_leadsnp$R2 <- as.character(ld_leadsnp$R2)
+        ld_leadsnp$R2[ld_leadsnp$R2 == "0"] = "0.2"
+        ld_leadsnp$R2[ld_leadsnp$R2 == "1.2"] = "1"
+        ld_leadsnp_colour <- list(
+          geom_point(data = ld_leadsnp, aes(Site2, -log10(p) * fold, fill = R2), shape = 21, colour = "black"), 
+          scale_fill_manual(values = c(`0.2` = colour02, `0.4` = colour04, `0.6` = colour06, `0.8` = colour08, `1` = colour10), labels = c("0-0.2","0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0"), name = lengend_name))
+      }
+      if (!isTRUE(leadsnpLD)) {
+        ld_leadsnp_colour <- list(NULL)
+      }
+      
+      marker_number = dim(ld.info)[1]
+      length = (transcript_max - transcript_min)
+      distance = 0.5 * length/(marker_number - 1)
+      
+      ld <- ld0
+      locib <- rep(1:(marker_number - 1), (marker_number - 1):1)
+      locia <- sequence((marker_number - 1):1)
+      marker_pair <- 1:length(locia)
+      center_x <- distance * (locia + locia + locib - 2)
+      center_y <- -locib * distance
+      upper_center_x <- center_x
+      upper_center_y <- center_y + distance
+      lower_center_x <- center_x
+      lower_center_y <- center_y - distance
+      left_center_x <- center_x - distance
+      left_center_y <- center_y
+      right_center_x <- center_x + distance
+      right_center_y <- center_y
+      poly_data <- data.frame(
+        group = rep(marker_pair, 4), 
+        x = c(upper_center_x,right_center_x, lower_center_x, left_center_x) + transcript_min, 
+        y = c(upper_center_y, right_center_y, lower_center_y, left_center_y) - 4 * max(pvalue_range) * fold/30, 
+        label = rep(c(1, 2, 3, 4), each = length(upper_center_x)),stringsAsFactors = FALSE)
+      
+      
+      poly_data$marker1 <- rep(locia, 4)
+      poly_data$marker2 <- rep(locia + locib, 4)
+      
+      
+      marker_index <- data.frame(rs=ld.info$rsnum, marker_number =ld.info$Seq)
+      
+      poly_data$Var1 <- marker_index$rs[match(poly_data$marker1, marker_index$marker_number)]
+      poly_data$Var2 <- marker_index$rs[match(poly_data$marker2, marker_index$marker_number)]
+      
+      
+      poly_data$value <- ld$value[match(paste0(poly_data$Var1, "/", poly_data$Var2), 
+                                        paste0(ld$Var1, "/", ld$Var2))]
+      
+      poly_data$R2 <- 0.2 * (poly_data$value%/%0.2 + as.logical(poly_data$value%/%0.2))
+      poly_data$R2 <- as.character(poly_data$R2)
+      poly_data$R2[poly_data$R2 == "0"] = "0.2"
+      poly_data$R2[poly_data$R2 == "1.2"] = "1"
+      
+      if (!isTRUE(leadsnpLD)) {
+        bottom_trianglLD = list(
+          geom_polygon(data = poly_data, aes(group = group, x = x, y = y - (transcript_max - transcript_min)/50, fill = R2)),  
+          scale_fill_manual(
+            values = c(`0.2` = colour02, `0.4` = colour04,  `0.6` = colour06, `0.8` = colour08, `1` = colour10),
+            labels = c("0-0.2", "0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0"), name = lengend_name))
+      }
+      if (isTRUE(leadsnpLD)) {
+        bottom_trianglLD = list(geom_polygon(data = poly_data, aes(group = group, x = x, y = y - (transcript_max - transcript_min)/50, fill = R2)))
+      }
+    }
+    if (!isTRUE(triangleLD)) {
+      bottom_trianglLD <- list(NULL)
+    }
+  }
+  # link line from significant loci to the strucuture
+  if (!is.null(link2gene) & any(!is.null(threshold), is.null(threshold))) {
+    link_association_structure <- transcript_association[transcript_association$Marker %in% link2gene$rs, ]
+    if (dim(link_association_structure)[1] == 0) {
+      print("no matched locis, will not draw linking line")
+      link_asso_gene <- list(NULL)
+      threshold_line <- list(NULL)
+    }
+    if (dim(link_association_structure)[1] > 0) {
+      link_number <- dim(link_association_structure)[1]
+      link_asso_gene <- list(geom_segment(data = link_association_structure, aes(x = Site, xend = Site, y = rep(-max(pvalue_range) * fold/30,  link_number), yend = -log10(p) * fold), linetype = "longdash",  colour = "red"))
+    }
+  }
+  if (is.null(link2gene) & is.null(threshold)) {
+    print("threshold acquired")
+    link_asso_gene <- list(NULL)
+  }
+  if (is.null(link2gene) & !is.null(threshold)) {
+    link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]
+    link_association_structure <- link_association_structure[!duplicated(link_association_structure$p), 
+    ]
+    if (dim(link_association_structure)[1] == 0) {
+      print("no -log10(p) pass the threshold, will not draw link")
+      link_asso_gene <- list(NULL)
+      threshold_line <- list(NULL)
+    }
+    if (dim(link_association_structure)[1] > 0) {
+      link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]
+      link_association_structure <- link_association_structure[!duplicated(link_association_structure$p), ]
+      link_number <- dim(link_association_structure)[1]
+      link_asso_gene <- list(geom_segment(data = link_association_structure,  aes(x = Site, xend = Site, y = rep(-max(pvalue_range) * fold/30,  link_number), yend = -log10(p) * fold), linetype = "longdash", colour = "red"))
+    }
+  }
+  # add linking line to link gene structure and LD matrix
+  if (isTRUE(triangleLD)) {
+    if (is.null(link2gene) & is.null(link2LD)) {
+      link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]
+      link_association_structure <- link_association_structure[!duplicated(link_association_structure$p), ]
+      link_number <- dim(link_association_structure)[1]
+      link_asso_gene <- list(
+        geom_segment(
+          data = link_association_structure, 
+          aes(x = Site, xend = Site, y = rep(-max(pvalue_range) * fold/30, link_number), yend = -log10(p) * fold),
+          linetype = "longdash", colour = "red"))
+      marker_axis_LD_x <- transcript_min + (seq(1:marker_number) - 1) * 2 * distance
+      marker_axis_genic_x <- ld.info$pos
+      marker_axis_LD_y <- rep(-5 * max(pvalue_range) * fold/30, marker_number)
+      marker_axis_genic_y <- rep(-max(pvalue_range) * fold/30, marker_number)
+      link_ld_data <- data.frame(x = marker_axis_LD_x, xend = marker_axis_genic_x, 
+                                 y = marker_axis_LD_y, yend = marker_axis_genic_y)
+      link_ld_data <- link_ld_data[link_ld_data$xend %in% link_association_structure$Site, ]
+      link_LD_genic_structure <- geom_segment(data = link_ld_data, aes(x = x,  xend = xend, y = y, yend = yend), colour = "red", linetype = "longdash")
+    }
+    if (!is.null(link2gene) & !is.null(link2LD)) {
+      link_association_structure <- transcript_association[transcript_association$Marker %in%  link2LD$rs, ]
+      link_number <- dim(link_association_structure)[1]
+      link_asso_gene <- list(geom_segment(data = link_association_structure,  aes(x = Site, xend = Site, y = rep(-max(pvalue_range) * fold/30, link_number), yend = -log10(p) * fold), linetype = "longdash",  colour = "red"))
+      marker_axis_LD_x <- transcript_min + (seq(1:marker_number) - 1) * 2 * distance
+      marker_axis_genic_x <- hapmap_ld$pos
+      marker_axis_LD_y <- rep(-4.5 * max(pvalue_range) * fold/30, marker_number)
+      marker_axis_genic_y <- rep(-max(pvalue_range) * fold/30, marker_number)
+      link_ld_data <- data.frame(x = marker_axis_LD_x, xend = marker_axis_genic_x, 
+                                 y = marker_axis_LD_y, yend = marker_axis_genic_y)
+      link_ld_data <- link_ld_data[link_ld_data$xend %in% link_association_structure$Site, ]
+      link_LD_genic_structure <- geom_segment(data = link_ld_data, aes(x = x, xend = xend, y = y, yend = yend), colour = "red", linetype = "longdash")
+    }
+  }
+  if (!is.null(link2gene) & is.null(link2LD)) {
+    link_LD_genic_structure <- list(NULL)
+  }
+  if (is.null(link2gene) & !is.null(link2LD)) {
+    link_LD_genic_structure <- list(NULL)
+  }
+  if (!isTRUE(triangleLD)) {
+    link_LD_genic_structure <- list(NULL)
+  }
+  
+  if(is.null(trait)){
+    labelx = "atop(-log[10]*italic(P))"
+  }else{
+    #labelx = paste0("atop(-log[10]*italic(P)), Trait=",trait)
+    labelx = "atop(-log[10]*italic(P))"
+  }
+  y_axis_text <- list(geom_text(aes(x = transcript_min - (transcript_max - transcript_min)/6.5, y = mean(pvalue_range) * fold), label = labelx,  parse = TRUE, angle = 90))
+  #"atop(-log[10]*italic(P)[observed])"
+  if (isTRUE(triangleLD)) {
+    xtext <- list(geom_text(aes(x = (transcript_max + transcript_min)/2,  y = min(poly_data$y) - 10 * distance, label = paste0("Position on chr.",  chr, " (bp)"))))
+  } else {
+    xtext <- list(geom_text(aes(x = (transcript_max + transcript_min)/2,  y = -(transcript_max - transcript_min)/10, label = paste0("Position on chr.", chr, " (bp)"))))
+  }
+  # add shape for the points of leadsnp
+  leadsnp2highlight <- transcript_association[transcript_association$Marker == leadsnp, ]
+  leadsnp2highlight_list <- list(geom_point(data = leadsnp2highlight, aes(x = Site,  y = -log10(p) * fold), shape = leadsnp_shape, colour = leadsnp_colour, fill = leadsnp_fill, size = leadsnp_size))
+  # change the shape,size,colour, and fill for highlighted marker
+  if (is.null(marker2highlight)) {
+    marker2highlight_list = list(NULL)
+  } else {
+    marker2highlight <- merge(marker2highlight, transcript_association, by.x = "rs", by.y = "Marker")
+    # marker2highlight_list = list(geom_point(data=marker2highlight, aes(Site,
+    # -log10(p) * fold, shape=factor(shape), colour=factor(colour),
+    # fill=factor(fill), size=factor(size))))
+    
+    marker2highlight_list = list(
+      annotate("point", 
+               x = marker2highlight$Site,
+               y = -log10(marker2highlight$p) * fold, 
+               shape = marker2highlight$shape, 
+               colour = marker2highlight$colour, size = marker2highlight$size, 
+               fill = marker2highlight$fill))
+  }
+  if (!is.null(marker2label)) {
+    marker2label <- merge(marker2label, transcript_association, by.x = "rs", by.y = "Marker")
+    # marker2label_list <-
+    # list(annotate('text',x=marker2label$Site,y=-log10(marker2label$p) *
+    # fold,label=marker2label$rs,angle=marker2label_angle))
+    marker2label_list <- list(
+      geom_text_repel(aes(x = marker2label$Site, y = -log10(marker2label$p) * fold, label = marker2label$rs), angle = marker2label_angle,  size = marker2label_size))
+  } else {
+    marker2label_list <- list(NULL)
+  }
+  # plot the reduced point if highlighted marker exited
+  if (is.null(marker2highlight)) {
+    transcript_association = transcript_association
+  } else {
+    transcript_association = transcript_association[!(transcript_association$Marker %in%  marker2highlight$rs), ]
+  }
+  
+  plot <- ggplot() + 
+    threshold_line +
+    link_asso_gene + 
+    link_LD_genic_structure + 
+    geom_point(data = transcript_association, aes(Site, -log10(p) * fold), 
+               shape = 21, colour = "black", fill = "black") +
+    ld_leadsnp_colour + 
+    gene_box + 
+    bottom_trianglLD +
+    gene_for_seg_name + 
+    gene_rev_seg_name + 
+    gene_for_seg + 
+    gene_rev_seg +
+    scale_x + 
+    scale_y_line +
+    scale_y_ticks + 
+    scale_y_text + 
+    y_axis_text + 
+    xtext + 
+    leadsnp2highlight_list + 
+    marker2highlight_list + 
+    marker2label_list +
+    theme_bw() + 
+    theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
+  return(plot)
+  
+  ggsave(filename = output_file,plot = plot,width = 16,height = 16)
+}
+
+
+
 

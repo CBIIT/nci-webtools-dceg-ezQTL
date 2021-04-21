@@ -89,46 +89,46 @@ const getHoverData = (geneData) => {
     if ('rsnum' in geneData[i]) {
       hoverData.push(
         'chr' +
-          geneData[i]['chr'] +
-          ':' +
-          geneData[i]['pos'] +
-          '<br>' +
-          geneData[i]['rsnum'] +
-          '<br>' +
-          'Ref/Alt: ' +
-          geneData[i]['ref'] +
-          '/' +
-          geneData[i]['alt'] +
-          '<br>' +
-          '<i>P</i>-value: ' +
-          geneData[i]['pval_nominal'] +
-          '<br>' +
-          'Slope: ' +
-          geneData[i]['slope'] +
-          '<br>' +
-          'R2: ' +
-          (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
+        geneData[i]['chr'] +
+        ':' +
+        geneData[i]['pos'] +
+        '<br>' +
+        geneData[i]['rsnum'] +
+        '<br>' +
+        'Ref/Alt: ' +
+        geneData[i]['ref'] +
+        '/' +
+        geneData[i]['alt'] +
+        '<br>' +
+        '<i>P</i>-value: ' +
+        geneData[i]['pval_nominal'] +
+        '<br>' +
+        'Slope: ' +
+        geneData[i]['slope'] +
+        '<br>' +
+        'R2: ' +
+        (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
       );
     } else {
       hoverData.push(
         'chr' +
-          geneData[i]['chr'] +
-          ':' +
-          geneData[i]['pos'] +
-          '<br>' +
-          'Ref/Alt: ' +
-          geneData[i]['ref'] +
-          '/' +
-          geneData[i]['alt'] +
-          '<br>' +
-          '<i>P</i>-value: ' +
-          geneData[i]['pval_nominal'] +
-          '<br>' +
-          'Slope: ' +
-          geneData[i]['slope'] +
-          '<br>' +
-          'R2: ' +
-          (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
+        geneData[i]['chr'] +
+        ':' +
+        geneData[i]['pos'] +
+        '<br>' +
+        'Ref/Alt: ' +
+        geneData[i]['ref'] +
+        '/' +
+        geneData[i]['alt'] +
+        '<br>' +
+        '<i>P</i>-value: ' +
+        geneData[i]['pval_nominal'] +
+        '<br>' +
+        'Slope: ' +
+        geneData[i]['slope'] +
+        '<br>' +
+        'R2: ' +
+        (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
       );
     }
   }
@@ -141,46 +141,46 @@ const getHoverDataGWAS = (geneGWASData) => {
     if ('rsnum' in geneGWASData[i]) {
       hoverData.push(
         'chr' +
-          geneGWASData[i]['chr'] +
-          ':' +
-          geneGWASData[i]['pos'] +
-          '<br>' +
-          geneGWASData[i]['rsnum'] +
-          '<br>' +
-          'Ref/Alt: ' +
-          geneGWASData[i]['ref'] +
-          '/' +
-          geneGWASData[i]['alt'] +
-          '<br>' +
-          '<i>P</i>-value: ' +
-          geneGWASData[i]['pvalue'] +
-          '<br>' +
-          'Slope: ' +
-          geneGWASData[i]['slope'] +
-          '<br>' +
-          'R2: ' +
-          (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
+        geneGWASData[i]['chr'] +
+        ':' +
+        geneGWASData[i]['pos'] +
+        '<br>' +
+        geneGWASData[i]['rsnum'] +
+        '<br>' +
+        'Ref/Alt: ' +
+        geneGWASData[i]['ref'] +
+        '/' +
+        geneGWASData[i]['alt'] +
+        '<br>' +
+        '<i>P</i>-value: ' +
+        geneGWASData[i]['pvalue'] +
+        '<br>' +
+        'Slope: ' +
+        geneGWASData[i]['slope'] +
+        '<br>' +
+        'R2: ' +
+        (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
       );
     } else {
       hoverData.push(
         'chr' +
-          geneGWASData[i]['chr'] +
-          ':' +
-          geneGWASData[i]['pos'] +
-          '<br>' +
-          'Ref/Alt: ' +
-          geneGWASData[i]['ref'] +
-          '/' +
-          geneGWASData[i]['alt'] +
-          '<br>' +
-          '<i>P</i>-value: ' +
-          geneGWASData[i]['pvalue'] +
-          '<br>' +
-          'Slope: ' +
-          geneGWASData[i]['slope'] +
-          '<br>' +
-          'R2: ' +
-          (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
+        geneGWASData[i]['chr'] +
+        ':' +
+        geneGWASData[i]['pos'] +
+        '<br>' +
+        'Ref/Alt: ' +
+        geneGWASData[i]['ref'] +
+        '/' +
+        geneGWASData[i]['alt'] +
+        '<br>' +
+        '<i>P</i>-value: ' +
+        geneGWASData[i]['pvalue'] +
+        '<br>' +
+        'Slope: ' +
+        geneGWASData[i]['slope'] +
+        '<br>' +
+        'R2: ' +
+        (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
       );
     }
   }
@@ -192,12 +192,12 @@ const getHoverDataRC = (geneDataRC) => {
   for (let i = 0; i < geneDataRC.length; i++) {
     hoverDataRC.push(
       'chr' +
-        geneDataRC[i]['chr'] +
-        ':' +
-        geneDataRC[i]['pos'] +
-        '<br>' +
-        'Rate: ' +
-        geneDataRC[i]['rate']
+      geneDataRC[i]['chr'] +
+      ':' +
+      geneDataRC[i]['pos'] +
+      '<br>' +
+      'Rate: ' +
+      geneDataRC[i]['rate']
     );
   }
   return hoverDataRC;
@@ -1283,34 +1283,34 @@ export function uploadFile(params) {
             associationFile:
               res.data.body.associationFileName !== 'false'
                 ? res.data.files.filter(
-                    (item) =>
-                      item.filename === res.data.body.associationFileName
-                  )[0].filename
+                  (item) =>
+                    item.filename === res.data.body.associationFileName
+                )[0].filename
                 : false,
             quantificationFile:
               res.data.body.quantificationFileName !== 'false'
                 ? res.data.files.filter(
-                    (item) =>
-                      item.filename === res.data.body.quantificationFileName
-                  )[0].filename
+                  (item) =>
+                    item.filename === res.data.body.quantificationFileName
+                )[0].filename
                 : false,
             genotypeFile:
               res.data.body.genotypeFileName !== 'false'
                 ? res.data.files.filter(
-                    (item) => item.filename === res.data.body.genotypeFileName
-                  )[0].filename
+                  (item) => item.filename === res.data.body.genotypeFileName
+                )[0].filename
                 : false,
             gwasFile:
               res.data.body.gwasFileName !== 'false'
                 ? res.data.files.filter(
-                    (item) => item.filename === res.data.body.gwasFileName
-                  )[0].filename
+                  (item) => item.filename === res.data.body.gwasFileName
+                )[0].filename
                 : false,
             LDFile:
               res.data.body.LDFileName !== 'false'
                 ? res.data.files.filter(
-                    (item) => item.filename === res.data.body.LDFileName
-                  )[0].filename
+                  (item) => item.filename === res.data.body.LDFileName
+                )[0].filename
                 : false,
           })
         );
@@ -1535,32 +1535,97 @@ export function qtlsGWASLocusQCCalculation(params) {
   };
 }
 
-export function qtlsGWASColocVisualize(params){
-  return async function (dispatch, getState){
+export function qtlsGWASColocVisualize(params) {
+  return async function (dispatch, getState) {
     console.log('coloc visualize', params);
     dispatch(
       updateQTLsGWAS({
         isLoadingSummary: true,
       })
     );
-    
-    axios
-      .post('api/qtls-coloc-visualize', params)
-      .then(function (response) {
-        console.log('api/qtls-locus-qc response.data', response.data);
-      })
-      .catch(function (error) {
-        console.log(error);
-        if (error) {
-          dispatch(updateError({ visible: true }));
-          dispatch(
-            updateQTLsGWAS({ summaryError: true, activeResultsTab: 'locus-qc' })
+
+    var ecaviarData;
+
+    if (params.calcEcaviar) {
+      console.log('ecaviar', params);
+      dispatch(
+        updateQTLsGWAS({
+          isLoadingECaviar: true,
+        })
+      );
+
+      axios
+        .post('api/qtls-locus-colocalization-ecaviar', params)
+        .then(function (response) {
+          console.log(
+            'api/qtls-locus-colocalization-ecaviar response.data',
+            response.data
           );
-        }
-      })
-      .then(function (){
-        dispatch(updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true }))
-      })
+
+          ecaviarData = response.data['ecaviar']['data'][0]
+
+          dispatch(
+            updateQTLsGWAS({
+              ecaviar_table: {
+                data: response.data['ecaviar']['data'][0],
+                globalFilter: '',
+              },
+            })
+          );
+        })
+        .catch(function (error) {
+          console.log(error);
+          if (error) {
+            dispatch(updateError({ visible: true }));
+            dispatch(
+              updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+            );
+          }
+        })
+        .then(function () {
+          dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
+
+          const newParams = {...params, ecdata: ecaviarData}
+          console.log(newParams)
+
+          axios
+            .post('api/qtls-coloc-visualize', newParams)
+            .then(function (response) {
+              console.log('api/qtls-locus-qc response.data', response.data);
+            })
+            .catch(function (error) {
+              console.log(error);
+              if (error) {
+                dispatch(updateError({ visible: true }));
+                dispatch(
+                  updateQTLsGWAS({ summaryError: true, activeResultsTab: 'locus-qc' })
+                );
+              }
+            })
+            .then(function () {
+              dispatch(updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true }))
+            })
+        });
+    }
+    else {
+      axios
+        .post('api/qtls-coloc-visualize', params)
+        .then(function (response) {
+          console.log('api/qtls-locus-qc response.data', response.data);
+        })
+        .catch(function (error) {
+          console.log(error);
+          if (error) {
+            dispatch(updateError({ visible: true }));
+            dispatch(
+              updateQTLsGWAS({ summaryError: true, activeResultsTab: 'locus-qc' })
+            );
+          }
+        })
+        .then(function () {
+          dispatch(updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true }))
+        })
+    }
   }
 }
 
@@ -1712,20 +1777,20 @@ export function qtlsGWASCalculation(params) {
             updateQTLsGWAS({ qcError: 'No data available for QC plot', isLoading: false })
           );
         }
-          /*
-          dispatch(
-            qtlsGWASECaviarCalculation({
-              request: qtlsGWAS.request,
-              select_gwas_sample: qtlsGWAS.select_gwas_sample,
-              select_qtls_samples: qtlsGWAS.select_qtls_samples,
-              gwasFile: qtlsGWAS.inputs.gwas_file[0],
-              associationFile: qtlsGWAS.inputs.association_file[0],
-              ldfile: qtlsGWAS.inputs.ld_file[0],
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-            })
-          );*/
-          
+        /*
+        dispatch(
+          qtlsGWASECaviarCalculation({
+            request: qtlsGWAS.request,
+            select_gwas_sample: qtlsGWAS.select_gwas_sample,
+            select_qtls_samples: qtlsGWAS.select_qtls_samples,
+            gwasFile: qtlsGWAS.inputs.gwas_file[0],
+            associationFile: qtlsGWAS.inputs.association_file[0],
+            ldfile: qtlsGWAS.inputs.ld_file[0],
+            select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+          })
+        );*/
+
         //   dispatch(
         //     qtlsGWASLocusQCCalculation({
         //       request: qtlsGWAS.request,

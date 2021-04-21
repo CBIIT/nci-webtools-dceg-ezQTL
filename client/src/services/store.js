@@ -60,6 +60,7 @@ export const getInitialState = async () => {
       locus_table: {
         data: [],
         globalFilter: '',
+        hidden: ['gene_id', 'tss_distance', 'slope_se'],
       },
       hyprcolocError: '',
       qcError: '',
@@ -67,15 +68,26 @@ export const getInitialState = async () => {
       hyprcoloc_table: {
         data: [],
         globalFilter: '',
+        hidden: [],
       },
       hyprcolocSNPScore_table: {
         data: [],
         globalFilter: '',
+        hidden: [],
       },
       isLoadingHyprcoloc: false,
       ecaviar_table: {
         data: [],
         globalFilter: '',
+        hidden: [
+          'Prob_in_pCausalSet',
+          'Prob_in_pCausalSet2',
+          'tss_distance',
+          'gene_id',
+          'slope',
+          'slope_se',
+          'gwas_z',
+        ],
       },
       isLoadingECaviar: false,
       isLoadingSummary: false,
