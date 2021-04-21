@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import Zoom from '../../../controls/zoom/zoom';
@@ -9,6 +9,7 @@ export function LocusQC() {
     qcError,
     request,
     isLoading,
+    locus_qc,
     isLoadingQC
   } = useSelector((state) => state.qtlsGWAS);
 
@@ -32,6 +33,10 @@ export function LocusQC() {
       )}
       {submitted && !qcError && !isLoading && !isLoadingQC && (
         <>
+          <div style={{whiteSpace: 'pre-wrap'}}>
+            {locus_qc}
+          </div>
+          
           <Zoom
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
             className="border rounded p-3 mb-2"
