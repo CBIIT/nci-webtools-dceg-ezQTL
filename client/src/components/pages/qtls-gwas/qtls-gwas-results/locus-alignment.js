@@ -7,6 +7,7 @@ import { LocusAlignmentScatterPlot } from './locus-alignment-scatter-plot';
 import { BoxplotsModal } from '../../../controls/boxplots-modal/boxplots-modal';
 import { updateQTLsGWAS } from '../../../../services/actions';
 import { QTLsGWASResultsForm } from './qtls-gwas-results-form';
+// import { Form } from 'react-bootstrap';
 
 export function LocusAlignment() {
   const dispatch = useDispatch();
@@ -101,6 +102,30 @@ export function LocusAlignment() {
                   <i>P</i>-value correlation. For detailed colocalization analyses,
                   please check the “Locus Colocalization” sub-module.
                 </p>
+
+                {/* <Form className="row justify-content-center">
+                  <div className="col-md-2">
+                    <Form.Label className="mb-0"><i>P</i>-value Threshold</Form.Label>
+                    <Form.Control
+                      id="locus-alignment-scatter-threshold-input"
+                      disabled={!submitted}
+                      // value={_selectRef ? _selectRef : ''}
+                      onChange={(e) => {
+                        console.log("threshold", e.target.value)
+                        // _setSelectRef(e.target.value);
+                      }}
+                      // isInvalid={
+                      //   _selectRef &&
+                      //   _selectRef.length > 0 &&
+                      //   !/^rs\d+$/.test(_selectRef)
+                      // }
+                      // custom
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      Enter valid threshold.
+                    </Form.Control.Feedback>
+                  </div>
+                </Form> */}
 
                 <div style={{overflowX: 'auto'}}>
                   <LocusAlignmentScatterPlot />
