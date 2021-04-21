@@ -1518,7 +1518,8 @@ export function qtlsGWASLocusQCCalculation(params) {
     axios
       .post('api/qtls-locus-qc', params)
       .then(function (response) {
-        console.log('api/qtls-locus-qc response.data', response.data);
+        console.log('api/qtls-locus-qc response.data', response);
+        dispatch(updateQTLsGWAS({ locus_qc: response.data }))
       })
       .catch(function (error) {
         console.log(error);

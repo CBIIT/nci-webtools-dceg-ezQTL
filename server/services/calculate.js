@@ -411,8 +411,13 @@ async function qtlsCalculateQC(params, res, next) {
         bucket
       ]
     );
+    
+    let summary = '';
+    if (fs.existsSync(logPath)) {
+      summary =  String(await fs.promises.readFile(logPath));
+    }
     logger.info(`[${request}] Finished /ezqTL_ztw`);
-    res.json(wrapper);
+    res.json(summary);
   } catch (err) {
     logger.error(`[${request}] Error /ezqTL_ztw ${err}`);
     res.status(500).json(err);
