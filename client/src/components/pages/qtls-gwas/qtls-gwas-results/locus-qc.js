@@ -43,6 +43,12 @@ export function LocusQC() {
             className="border rounded p-3"
             maxHeight="800px"
           />
+
+          <Zoom
+            plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
+            className="border rounded p-3"
+            maxHeight="800px"
+          />
         </>
       )}
     </div>

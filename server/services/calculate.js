@@ -371,17 +371,13 @@ async function qtlsCalculateQC(params, res, next) {
     gwasFile,
     associationFile,
     ldfile,
-    select_ref,
+    leadsnp,
     select_dist,
     select_gene,
     workingDirectory,
     bucket,
   } = params;
 
-  const s3 = new AWS.S3({
-    accessKeyId: awsInfo.aws_access_key_id,
-    secretAccessKey: awsInfo.aws_secret_access_key,
-  });
 
   logger.info(`[${request}] Execute /ezQTL_ztw`);
   logger.debug(
@@ -389,9 +385,10 @@ async function qtlsCalculateQC(params, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-
-  let requestPath = '';
-
+  
+  const plotPath = path.resolve(workingDirectory, 'tmp', request, request)
+  const inputPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL_input')
+  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log')
   try {
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -403,10 +400,13 @@ async function qtlsCalculateQC(params, res, next) {
         gwasFile.toString(),
         associationFile.toString(),
         ldfile.toString(),
-        select_ref.toString(),
+        leadsnp.toString(),
         select_dist,
         select_gene.toString(),
-        requestPath,
+        request,
+        plotPath,
+        inputPath,
+        logPath,
         workingDirectory,
         bucket
       ]

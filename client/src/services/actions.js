@@ -1398,7 +1398,7 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               gwasFile: qtlsGWAS.inputs.gwas_file[0],
               associationFile: qtlsGWAS.inputs.association_file[0],
               ldfile: qtlsGWAS.inputs.ld_file[0],
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
               select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
               select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
             })
