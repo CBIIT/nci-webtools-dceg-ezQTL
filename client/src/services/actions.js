@@ -1135,124 +1135,128 @@ const recalculatePearsonCorrelationTitle = (xData, yData) => {
   }
 }
 
-const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus_alignment_top, threshold) => {
+export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, gene_symbol, threshold) => {
+  return async function (dispatch, getState) {
+    const xData = getScatterX(pdata_scatter_raw, threshold);
+    const yData = getScatterY(pdata_scatter_raw, threshold);
+    const xDataR2NA = getScatterXR2NA(pdata_scatter_raw, threshold);
+    const yDataR2NA = getScatterYR2NA(pdata_scatter_raw, threshold);
+    const scatterColorData = getScatterColorData(pdata_scatter_raw, threshold);
+    const hoverData = getScatterHoverData(pdata_scatter_raw, threshold);
+    const hoverDataR2NA = getScatterHoverDataR2NA(pdata_scatter_raw, threshold);
 
-  const xData = getScatterX(pdata_scatter_raw, threshold);
-  const yData = getScatterY(pdata_scatter_raw, threshold);
-  const xDataR2NA = getScatterXR2NA(pdata_scatter_raw, threshold);
-  const yDataR2NA = getScatterYR2NA(pdata_scatter_raw, threshold);
-  const scatterColorData = getScatterColorData(pdata_scatter_raw, threshold);
-  const hoverData = getScatterHoverData(pdata_scatter_raw, threshold);
-  const hoverDataR2NA = getScatterHoverDataR2NA(pdata_scatter_raw, threshold);
+    const trace1 = {
+      x: xData,
+      y: yData, 
+      text: hoverData,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        color: scatterColorData,
+        colorscale: 'Viridis',
+        reversescale: true,
+        line: {
+          color: 'black',
+          width: 1
+        },
+      }
+    };
 
-  const trace1 = {
-    x: xData,
-    y: yData, 
-    text: hoverData,
-    hoverinfo: 'text',
-    mode: 'markers',
-    type: 'scatter',
-    marker: {
-      size: 7,
-      color: scatterColorData,
-      colorscale: 'Viridis',
-      reversescale: true,
+    const trace1R2NA = {
+      x: xDataR2NA,
+      y: yDataR2NA,
+      text: hoverDataR2NA,
+      hoverinfo: 'text',
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        size: 7,
+        color: '#cccccc',
+        line: {
+          color: 'black',
+          width: 1
+        },
+      }
+    };
+
+    const least_sqaures = getLeastSquaresLine(xData, yData);
+
+    const trace2 = {
+      x: least_sqaures[0],
+      y: least_sqaures[1],
+      // hoverinfo: 'x+y',
+      mode: 'lines',
+      type: 'scatter',
+      name: "lines",
       line: {
-        color: 'black',
-        width: 1
+        color: "blue",
+      }
+    };
+
+    const pdata_scatter = [
+      trace1, 
+      trace1R2NA, 
+      trace2
+    ];
+
+    // var pdata = [trace1];
+    const locus_alignment_scatter_plot_layout = {
+      title: {
+        // text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
+        text: "QTL-GWAS <i>P</i>-value Correlation: " + (pdata_scatter_title ? "Spearman " + pdata_scatter_title.split(', ')[0] : recalculateSpearmanCorrelationTitle(xData, yData)) + ", " + (pdata_scatter_title ? "Pearson's " + pdata_scatter_title.split(', ')[1] : recalculatePearsonCorrelationTitle(xData, yData)),
+        xref: 'paper'
       },
-    }
-  };
-
-  const trace1R2NA = {
-    x: xDataR2NA,
-    y: yDataR2NA,
-    text: hoverDataR2NA,
-    hoverinfo: 'text',
-    mode: 'markers',
-    type: 'scatter',
-    marker: {
-      size: 7,
-      color: '#cccccc',
-      line: {
-        color: 'black',
-        width: 1
-      },
-    }
-  };
-
-  const least_sqaures = getLeastSquaresLine(xData, yData);
-
-  const trace2 = {
-    x: least_sqaures[0],
-    y: least_sqaures[1],
-    // hoverinfo: 'x+y',
-    mode: 'lines',
-    type: 'scatter',
-    name: "lines",
-    line: {
-      color: "blue",
-    }
-  };
-
-  const pdata_scatter = [
-    trace1, 
-    trace1R2NA, 
-    trace2
-  ];
-
-  // var pdata = [trace1];
-  const locus_alignment_scatter_plot_layout = {
-    title: {
-      // text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
-      text: "QTL-GWAS <i>P</i>-value Correlation: " + (pdata_scatter_title ? "Spearman " + pdata_scatter_title.split(', ')[0] : recalculateSpearmanCorrelationTitle(xData, yData)) + ", " + (pdata_scatter_title ? "Pearson's " + pdata_scatter_title.split(', ')[1] : recalculatePearsonCorrelationTitle(xData, yData)),
-      xref: 'paper'
-    },
-    font: {
-      color: 'black'
-    },
-    width: 700,
-    height: 700,
-    yaxis: {
-      autorange: true,
-      automargin: true,
-      title: 
-        "-log10(QTL <i>P</i>-value), " +
-        locus_alignment_top['gene_symbol'],
       font: {
         color: 'black'
       },
-      tickfont: {
-        color: 'black'
-      }
-    },
-    xaxis: {
-      autorange: true,
-      automargin: true,
-      title: "-log10(GWAS <i>P</i>-value)",
-      font: {
-        color: 'black'
+      width: 700,
+      height: 700,
+      yaxis: {
+        autorange: true,
+        automargin: true,
+        title: 
+          "-log10(QTL <i>P</i>-value), " + gene_symbol,
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
       },
-      tickfont: {
-        color: 'black'
-      }
-    },
-    // margin: {
-    //   l: 40,
-    //   r: 40,
-    //   b: 40,
-    //   t: 40
-    // },
-    showlegend: false,
-    clickmode: 'none',
-    hovermode: 'closest'
-  };
+      xaxis: {
+        autorange: true,
+        automargin: true,
+        title: "-log10(GWAS <i>P</i>-value)",
+        font: {
+          color: 'black'
+        },
+        tickfont: {
+          color: 'black'
+        }
+      },
+      // margin: {
+      //   l: 40,
+      //   r: 40,
+      //   b: 40,
+      //   t: 40
+      // },
+      showlegend: false,
+      clickmode: 'none',
+      hovermode: 'closest'
+    };
 
-  return {
-    pdata_scatter_raw,
-    pdata_scatter,
-    locus_alignment_scatter_plot_layout,
-  };
+    dispatch(
+      updateQTLsGWAS({
+        locus_alignment_gwas_scatter: {
+          raw: pdata_scatter_raw,
+          data: pdata_scatter,
+          layout: locus_alignment_scatter_plot_layout,
+        },
+      })
+    );
+  }
 }
 
 export function uploadFile(params) {
@@ -1652,19 +1656,9 @@ export function qtlsGWASCalculation(params) {
             ? drawLocusAlignmentGWAS(response)
             : drawLocusAlignment(response);
 
-        const { 
-          pdata_scatter_raw, 
-          pdata_scatter, 
-          locus_alignment_scatter_plot_layout 
-        } = 
-          Object.keys(response.data['gwas']['data'][0]).length > 0
-              ? drawLocusAlignmentScatter(response.data['locus_alignment_gwas_scatter']['data'][0], response.data['locus_alignment_gwas_scatter']['title'][0], response.data['locus_alignment']['top'][0][0], 1.0)
-              : 
-              {
-                pdata_scatter_raw: null,
-                pdata_scatter: null, 
-                locus_alignment_scatter_plot_layout: null
-              }
+        if (Object.keys(response.data['gwas']['data'][0]).length > 0) {
+          dispatch(drawLocusAlignmentScatter(response.data['locus_alignment_gwas_scatter']['data'][0], response.data['locus_alignment_gwas_scatter']['title'][0], response.data['locus_alignment']['top'][0][0]['gene_symbol'], 1.0));
+        }
 
         dispatch(
           updateQTLsGWAS({
@@ -1720,11 +1714,6 @@ export function qtlsGWASCalculation(params) {
               data: pdata,
               layout: locus_alignment_plot_layout,
               top: response.data['locus_alignment']['top'][0][0],
-            },
-            locus_alignment_gwas_scatter: {
-              raw: pdata_scatter_raw,
-              data: pdata_scatter,
-              layout: locus_alignment_scatter_plot_layout,
             },
             locus_alignment_gwas_scatter_threshold: 1.0,
             locus_colocalization_correlation: {
@@ -2049,6 +2038,10 @@ export function fetchResults(request) {
           ? drawLocusAlignmentGWAS({ data: main })
           : drawLocusAlignment({ data: main });
 
+      if (Object.keys(main['gwas']['data'][0]).length > 0) {
+        dispatch(drawLocusAlignmentScatter(main['locus_alignment_gwas_scatter']['data'][0], main['locus_alignment_gwas_scatter']['title'][0], main['locus_alignment']['top'][0][0]['gene_symbol'], 1.0));
+      }
+
       const state = {
         ...params,
         select_chromosome: {
@@ -2086,10 +2079,6 @@ export function fetchResults(request) {
           data: pdata,
           layout: locus_alignment_plot_layout,
           top: main['locus_alignment']['top'][0][0],
-        },
-        locus_alignment_gwas_scatter: {
-          data: main['locus_alignment_gwas_scatter']['data'][0],
-          title: main['locus_alignment_gwas_scatter']['title'][0],
         },
         locus_colocalization_correlation: {
           data: main['locus_colocalization_correlation']['data'][0],

@@ -51,10 +51,10 @@ export const getInitialState = async () => {
       },
       locus_alignment_gwas_scatter: {
         raw: null,
-        title: null,
         data: null,
         layout: null,
       },
+      locus_alignment_gwas_scatter_threshold: 1.0,
       locus_colocalization_correlation: null,
       gwas: null,
       locus_table: {
