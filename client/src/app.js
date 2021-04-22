@@ -9,6 +9,7 @@ import {
 import { NCIFooter } from '@cbiitss/react-components';
 import { Home } from './components/pages/home/home';
 import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
+import { QTLsMulti } from './components/pages/qtls-gwas/qtls-multi';
 import { Help } from './components/pages/help/help';
 import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
@@ -32,6 +33,10 @@ export function App() {
     {
       route: '/qtls',
       title: 'Single Locus',
+    },
+    {
+      route: '/qtls-multi',
+      title: 'Multiple Loci',
     },
     {
       route: '/help',
@@ -90,6 +95,7 @@ export function App() {
           <Route exact path={`/`} render={() => <Redirect to="/home" />} />
           <Route path="/home" exact={true} component={Home} />
           <Route path="/qtls/:request?" component={QTLsGWAS} />
+          <Route path="/qtls-multi" component={QTLsMulti} />
           <Route path="/help" component={Help} />
         </div>
       </div>

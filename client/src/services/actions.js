@@ -1,5 +1,6 @@
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
+export const UPDATE_MULTI_LOCI = 'UPDATE_MULTI_LOCI';
 export const UPDATE_ERROR = 'UPDATE_ERROR';
 export const UPDATE_SUCCESS = 'UPDATE_SUCCESS';
 export const UPDATE_ALERT = 'UPDATE_ALERT';
@@ -13,6 +14,10 @@ export function updateKey(key, data) {
 
 export function updateQTLsGWAS(data) {
   return { type: UPDATE_QTLS_GWAS, data };
+}
+
+export function updateMultiLoci(data) {
+  return { type: UPDATE_MULTI_LOCI, data };
 }
 
 export function updateError(data) {
@@ -89,46 +94,46 @@ const getHoverData = (geneData) => {
     if ('rsnum' in geneData[i]) {
       hoverData.push(
         'chr' +
-        geneData[i]['chr'] +
-        ':' +
-        geneData[i]['pos'] +
-        '<br>' +
-        geneData[i]['rsnum'] +
-        '<br>' +
-        'Ref/Alt: ' +
-        geneData[i]['ref'] +
-        '/' +
-        geneData[i]['alt'] +
-        '<br>' +
-        '<i>P</i>-value: ' +
-        geneData[i]['pval_nominal'] +
-        '<br>' +
-        'Slope: ' +
-        geneData[i]['slope'] +
-        '<br>' +
-        'R2: ' +
-        (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
+          geneData[i]['chr'] +
+          ':' +
+          geneData[i]['pos'] +
+          '<br>' +
+          geneData[i]['rsnum'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneData[i]['ref'] +
+          '/' +
+          geneData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneData[i]['pval_nominal'] +
+          '<br>' +
+          'Slope: ' +
+          geneData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
       );
     } else {
       hoverData.push(
         'chr' +
-        geneData[i]['chr'] +
-        ':' +
-        geneData[i]['pos'] +
-        '<br>' +
-        'Ref/Alt: ' +
-        geneData[i]['ref'] +
-        '/' +
-        geneData[i]['alt'] +
-        '<br>' +
-        '<i>P</i>-value: ' +
-        geneData[i]['pval_nominal'] +
-        '<br>' +
-        'Slope: ' +
-        geneData[i]['slope'] +
-        '<br>' +
-        'R2: ' +
-        (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
+          geneData[i]['chr'] +
+          ':' +
+          geneData[i]['pos'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneData[i]['ref'] +
+          '/' +
+          geneData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneData[i]['pval_nominal'] +
+          '<br>' +
+          'Slope: ' +
+          geneData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneData[i]['R2'] ? geneData[i]['R2'] : 'NA').toString()
       );
     }
   }
@@ -141,46 +146,46 @@ const getHoverDataGWAS = (geneGWASData) => {
     if ('rsnum' in geneGWASData[i]) {
       hoverData.push(
         'chr' +
-        geneGWASData[i]['chr'] +
-        ':' +
-        geneGWASData[i]['pos'] +
-        '<br>' +
-        geneGWASData[i]['rsnum'] +
-        '<br>' +
-        'Ref/Alt: ' +
-        geneGWASData[i]['ref'] +
-        '/' +
-        geneGWASData[i]['alt'] +
-        '<br>' +
-        '<i>P</i>-value: ' +
-        geneGWASData[i]['pvalue'] +
-        '<br>' +
-        'Slope: ' +
-        geneGWASData[i]['slope'] +
-        '<br>' +
-        'R2: ' +
-        (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
+          geneGWASData[i]['chr'] +
+          ':' +
+          geneGWASData[i]['pos'] +
+          '<br>' +
+          geneGWASData[i]['rsnum'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneGWASData[i]['ref'] +
+          '/' +
+          geneGWASData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneGWASData[i]['pvalue'] +
+          '<br>' +
+          'Slope: ' +
+          geneGWASData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
       );
     } else {
       hoverData.push(
         'chr' +
-        geneGWASData[i]['chr'] +
-        ':' +
-        geneGWASData[i]['pos'] +
-        '<br>' +
-        'Ref/Alt: ' +
-        geneGWASData[i]['ref'] +
-        '/' +
-        geneGWASData[i]['alt'] +
-        '<br>' +
-        '<i>P</i>-value: ' +
-        geneGWASData[i]['pvalue'] +
-        '<br>' +
-        'Slope: ' +
-        geneGWASData[i]['slope'] +
-        '<br>' +
-        'R2: ' +
-        (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
+          geneGWASData[i]['chr'] +
+          ':' +
+          geneGWASData[i]['pos'] +
+          '<br>' +
+          'Ref/Alt: ' +
+          geneGWASData[i]['ref'] +
+          '/' +
+          geneGWASData[i]['alt'] +
+          '<br>' +
+          '<i>P</i>-value: ' +
+          geneGWASData[i]['pvalue'] +
+          '<br>' +
+          'Slope: ' +
+          geneGWASData[i]['slope'] +
+          '<br>' +
+          'R2: ' +
+          (geneGWASData[i]['R2'] ? geneGWASData[i]['R2'] : 'NA').toString()
       );
     }
   }
@@ -192,12 +197,12 @@ const getHoverDataRC = (geneDataRC) => {
   for (let i = 0; i < geneDataRC.length; i++) {
     hoverDataRC.push(
       'chr' +
-      geneDataRC[i]['chr'] +
-      ':' +
-      geneDataRC[i]['pos'] +
-      '<br>' +
-      'Rate: ' +
-      geneDataRC[i]['rate']
+        geneDataRC[i]['chr'] +
+        ':' +
+        geneDataRC[i]['pos'] +
+        '<br>' +
+        'Rate: ' +
+        geneDataRC[i]['rate']
     );
   }
   return hoverDataRC;
@@ -927,116 +932,190 @@ const drawLocusAlignmentGWAS = (response) => {
 const getScatterX = (scatterData, threshold) => {
   var p_values = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if ('R2' in scatterData[i] && scatterData[i]['R2'] !== 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
       }
     }
   }
   return p_values;
-}
+};
 
 const getScatterXR2NA = (scatterData, threshold) => {
   var p_values = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if (!("R2" in scatterData[i]) || scatterData[i]["R2"] === "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if (!('R2' in scatterData[i]) || scatterData[i]['R2'] === 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         p_values.push(Math.log10(scatterData[i]['pvalue']) * -1.0);
       }
     }
   }
   return p_values;
-}
+};
 
 const getScatterY = (scatterData, threshold) => {
   var pval_nominals = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if ('R2' in scatterData[i] && scatterData[i]['R2'] !== 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
       }
     }
   }
   return pval_nominals;
-}
+};
 
 const getScatterYR2NA = (scatterData, threshold) => {
   var pval_nominals = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if (!("R2" in scatterData[i]) || scatterData[i]["R2"] === "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if (!('R2' in scatterData[i]) || scatterData[i]['R2'] === 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         pval_nominals.push(Math.log10(scatterData[i]['pval_nominal']) * -1.0);
       }
     }
   }
   return pval_nominals;
-}
+};
 
 const getScatterColorData = (scatterData, threshold) => {
   var colorData = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if ('R2' in scatterData[i] && scatterData[i]['R2'] !== 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         colorData.push(scatterData[i]['R2']);
       }
     }
   }
   // normalize R2 color data between 0 and 1 for color spectrum
   for (var i = 0; i < colorData.length; i++) {
-    colorData[i] = (colorData[i] / (Math.max.apply(null, colorData) / 100) ) / 100.0;
+    colorData[i] =
+      colorData[i] / (Math.max.apply(null, colorData) / 100) / 100.0;
   }
   return colorData;
-}
+};
 
 const getScatterHoverData = (scatterData, threshold) => {
   var hoverData = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if ("R2" in scatterData[i] && scatterData[i]["R2"] !== "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if ('R2' in scatterData[i] && scatterData[i]['R2'] !== 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         if ('rs' in scatterData[i]) {
-          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          hoverData.push(
+            'chr' +
+              scatterData[i]['chr'] +
+              ':' +
+              scatterData[i]['pos'] +
+              '<br>' +
+              scatterData[i]['rs'] +
+              '<br>' +
+              '<i>P</i>-value: ' +
+              scatterData[i]['pval_nominal'] +
+              '<br>' +
+              'R2: ' +
+              (scatterData[i]['R2'] ? scatterData[i]['R2'] : 'NA').toString()
+          );
         } else {
-          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          hoverData.push(
+            'chr' +
+              scatterData[i]['chr'] +
+              ':' +
+              scatterData[i]['pos'] +
+              '<br>' +
+              '<i>P</i>-value: ' +
+              scatterData[i]['pval_nominal'] +
+              '<br>' +
+              'R2: ' +
+              (scatterData[i]['R2'] ? scatterData[i]['R2'] : 'NA').toString()
+          );
         }
       }
     }
   }
   return hoverData;
-}
+};
 
 const getScatterHoverDataR2NA = (scatterData, threshold) => {
   var hoverData = [];
   for (var i = 0; i < scatterData.length; i++) {
-    if (!("R2" in scatterData[i]) || scatterData[i]["R2"] === "NA") {
-      if (scatterData[i]['pvalue'] <= parseFloat(threshold) && scatterData[i]['pval_nominal'] <= parseFloat(threshold)) {
+    if (!('R2' in scatterData[i]) || scatterData[i]['R2'] === 'NA') {
+      if (
+        scatterData[i]['pvalue'] <= parseFloat(threshold) &&
+        scatterData[i]['pval_nominal'] <= parseFloat(threshold)
+      ) {
         if ('rs' in scatterData[i]) {
-          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + scatterData[i]['rs'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          hoverData.push(
+            'chr' +
+              scatterData[i]['chr'] +
+              ':' +
+              scatterData[i]['pos'] +
+              '<br>' +
+              scatterData[i]['rs'] +
+              '<br>' +
+              '<i>P</i>-value: ' +
+              scatterData[i]['pval_nominal'] +
+              '<br>' +
+              'R2: ' +
+              (scatterData[i]['R2'] ? scatterData[i]['R2'] : 'NA').toString()
+          );
         } else {
-          hoverData.push('chr' + scatterData[i]['chr'] + ':' + scatterData[i]['pos'] + '<br>' + '<i>P</i>-value: ' + scatterData[i]['pval_nominal'] + '<br>' + "R2: " + (scatterData[i]['R2'] ? scatterData[i]['R2'] : "NA").toString());
+          hoverData.push(
+            'chr' +
+              scatterData[i]['chr'] +
+              ':' +
+              scatterData[i]['pos'] +
+              '<br>' +
+              '<i>P</i>-value: ' +
+              scatterData[i]['pval_nominal'] +
+              '<br>' +
+              'R2: ' +
+              (scatterData[i]['R2'] ? scatterData[i]['R2'] : 'NA').toString()
+          );
         }
       }
     }
   }
   return hoverData;
-}
+};
 
 const getLeastSquaresLine = (valuesXRaw, valuesYRaw) => {
-  if (valuesXRaw.length === 0 || valuesYRaw.length === 0 || (valuesXRaw.length !== valuesYRaw.length)) {
-    return [ [], [] ];
+  if (
+    valuesXRaw.length === 0 ||
+    valuesYRaw.length === 0 ||
+    valuesXRaw.length !== valuesYRaw.length
+  ) {
+    return [[], []];
   }
-  var valuesXY = valuesXRaw.map(function(e, i) {
+  var valuesXY = valuesXRaw.map(function (e, i) {
     return [e, valuesYRaw[i]];
   });
   var valuesXYRemoveInfinities = [];
-  valuesXY.map(function(e) {
+  valuesXY.map(function (e) {
     if (isFinite(e[0]) && isFinite(e[1])) {
       valuesXYRemoveInfinities.push(e);
     }
   });
-  var valuesX = valuesXYRemoveInfinities.map(function(e) {
+  var valuesX = valuesXYRemoveInfinities.map(function (e) {
     return e[0];
   });
-  var valuesY = valuesXYRemoveInfinities.map(function(e) {
+  var valuesY = valuesXYRemoveInfinities.map(function (e) {
     return e[1];
   });
   var sumX = 0;
@@ -1047,26 +1126,26 @@ const getLeastSquaresLine = (valuesXRaw, valuesYRaw) => {
   var x = 0;
   var y = 0;
   for (var i = 0; i < valuesX.length; i++) {
-      x = valuesX[i];
-      y = valuesY[i];
-      sumX += x;
-      sumY += y;
-      sumXX += x * x;
-      sumXY += x * y;
-      count++;
+    x = valuesX[i];
+    y = valuesY[i];
+    sumX += x;
+    sumY += y;
+    sumXX += x * x;
+    sumXY += x * y;
+    count++;
   }
   var m = (count * sumXY - sumX * sumY) / (count * sumXX - sumX * sumX);
-  var b = (sumY / count) - (m * sumX) / count;
+  var b = sumY / count - (m * sumX) / count;
   var resultX = [];
   var resultY = [];
   for (var j = 0; j < valuesX.length; j++) {
     x = valuesX[j];
-    y = (x * m) + b;
+    y = x * m + b;
     resultX.push(x);
     resultY.push(y);
   }
   return [resultX, resultY];
-}
+};
 
 const getSum = (arr) => {
   var sum = 0;
@@ -1078,7 +1157,7 @@ const getSum = (arr) => {
     }
   }
   return sum;
-}
+};
 
 const getSumDiffAbsSquared = (arr1, arr2) => {
   var d = [];
@@ -1087,7 +1166,7 @@ const getSumDiffAbsSquared = (arr1, arr2) => {
   }
   var sum = getSum(d);
   return sum;
-}
+};
 
 const multiplyArrays = (x, y) => {
   var xy = [];
@@ -1095,35 +1174,57 @@ const multiplyArrays = (x, y) => {
     xy.push(x[i] * y[i]);
   }
   return xy;
-}
+};
 
 const recalculateSpearmanCorrelationTitle = (xData, yData) => {
   if (xData.length > 0 && yData.length > 0) {
-    var sortedX = xData.slice().sort(function(a, b){ return b - a })
-    var xRank = xData.slice().map(function(p){ return sortedX.indexOf(p) + 1 });
-    var sortedY = yData.slice().sort(function(a, b){ return b - a })
-    var yRank = yData.slice().map(function(p){ return sortedY.indexOf(p) + 1 });
+    var sortedX = xData.slice().sort(function (a, b) {
+      return b - a;
+    });
+    var xRank = xData.slice().map(function (p) {
+      return sortedX.indexOf(p) + 1;
+    });
+    var sortedY = yData.slice().sort(function (a, b) {
+      return b - a;
+    });
+    var yRank = yData.slice().map(function (p) {
+      return sortedY.indexOf(p) + 1;
+    });
     var sumSquaredDiffRanks = getSumDiffAbsSquared(xRank, yRank);
     var numer = 6.0 * sumSquaredDiffRanks;
-    var denom = xData.length * (Math.pow(xData.length, 2) - 1)
-    var rho = 1 - (numer / denom);
-    return "Spearman rho=" + rho.toFixed(3);
+    var denom = xData.length * (Math.pow(xData.length, 2) - 1);
+    var rho = 1 - numer / denom;
+    return 'Spearman rho=' + rho.toFixed(3);
   } else {
-    return "Spearman rho=NA"
+    return 'Spearman rho=NA';
   }
-}
+};
 
 const recalculatePearsonCorrelationTitle = (xData, yData) => {
   if (xData.length > 0 && yData.length > 0) {
     var xDataFinites = removeInfinities(xData);
     var yDataFinites = removeInfinities(yData);
-    var xMean = xDataFinites.reduce(function(a, b){ return a + b }) / xDataFinites.length;
-    var yMean = yDataFinites.reduce(function(a, b){ return a + b }) / yDataFinites.length;
-    var xDataMinusMean = xData.map(function(i){ return i - xMean });
-    var yDataMinusMean = yData.map(function(i){ return i - yMean });
+    var xMean =
+      xDataFinites.reduce(function (a, b) {
+        return a + b;
+      }) / xDataFinites.length;
+    var yMean =
+      yDataFinites.reduce(function (a, b) {
+        return a + b;
+      }) / yDataFinites.length;
+    var xDataMinusMean = xData.map(function (i) {
+      return i - xMean;
+    });
+    var yDataMinusMean = yData.map(function (i) {
+      return i - yMean;
+    });
     var xy = multiplyArrays(xDataMinusMean, yDataMinusMean);
-    var xDataMinusMeanSquared = xDataMinusMean.map(function(i){ return Math.pow(i, 2) })
-    var yDataMinusMeanSquared = yDataMinusMean.map(function(i){ return Math.pow(i, 2) })
+    var xDataMinusMeanSquared = xDataMinusMean.map(function (i) {
+      return Math.pow(i, 2);
+    });
+    var yDataMinusMeanSquared = yDataMinusMean.map(function (i) {
+      return Math.pow(i, 2);
+    });
     var numer = getSum(xy);
     var xSumDataMinusMeanSquared = getSum(xDataMinusMeanSquared);
     var ySumDataMinusMeanSquared = getSum(yDataMinusMeanSquared);
@@ -1133,10 +1234,14 @@ const recalculatePearsonCorrelationTitle = (xData, yData) => {
   } else {
     return "Pearson's r=NA";
   }
-}
+};
 
-const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus_alignment_top, threshold) => {
-
+const drawLocusAlignmentScatter = (
+  pdata_scatter_raw,
+  pdata_scatter_title,
+  locus_alignment_top,
+  threshold
+) => {
   const xData = getScatterX(pdata_scatter_raw, threshold);
   const yData = getScatterY(pdata_scatter_raw, threshold);
   const xDataR2NA = getScatterXR2NA(pdata_scatter_raw, threshold);
@@ -1147,7 +1252,7 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
 
   const trace1 = {
     x: xData,
-    y: yData, 
+    y: yData,
     text: hoverData,
     hoverinfo: 'text',
     mode: 'markers',
@@ -1159,9 +1264,9 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
       reversescale: true,
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
-    }
+    },
   };
 
   const trace1R2NA = {
@@ -1176,9 +1281,9 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
       color: '#cccccc',
       line: {
         color: 'black',
-        width: 1
+        width: 1,
       },
-    }
+    },
   };
 
   const least_sqaures = getLeastSquaresLine(xData, yData);
@@ -1189,53 +1294,56 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
     // hoverinfo: 'x+y',
     mode: 'lines',
     type: 'scatter',
-    name: "lines",
+    name: 'lines',
     line: {
-      color: "blue",
-    }
+      color: 'blue',
+    },
   };
 
-  const pdata_scatter = [
-    trace1, 
-    trace1R2NA, 
-    trace2
-  ];
+  const pdata_scatter = [trace1, trace1R2NA, trace2];
 
   // var pdata = [trace1];
   const locus_alignment_scatter_plot_layout = {
     title: {
       // text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
-      text: "QTL-GWAS <i>P</i>-value Correlation: " + (pdata_scatter_title ? "Spearman " + pdata_scatter_title.split(', ')[0] : recalculateSpearmanCorrelationTitle(xData, yData)) + ", " + (pdata_scatter_title ? "Pearson's " + pdata_scatter_title.split(', ')[1] : recalculatePearsonCorrelationTitle(xData, yData)),
-      xref: 'paper'
+      text:
+        'QTL-GWAS <i>P</i>-value Correlation: ' +
+        (pdata_scatter_title
+          ? 'Spearman ' + pdata_scatter_title.split(', ')[0]
+          : recalculateSpearmanCorrelationTitle(xData, yData)) +
+        ', ' +
+        (pdata_scatter_title
+          ? "Pearson's " + pdata_scatter_title.split(', ')[1]
+          : recalculatePearsonCorrelationTitle(xData, yData)),
+      xref: 'paper',
     },
     font: {
-      color: 'black'
+      color: 'black',
     },
     width: 700,
     height: 700,
     yaxis: {
       autorange: true,
       automargin: true,
-      title: 
-        "-log10(QTL <i>P</i>-value), " +
-        locus_alignment_top['gene_symbol'],
+      title:
+        '-log10(QTL <i>P</i>-value), ' + locus_alignment_top['gene_symbol'],
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     xaxis: {
       autorange: true,
       automargin: true,
-      title: "-log10(GWAS <i>P</i>-value)",
+      title: '-log10(GWAS <i>P</i>-value)',
       font: {
-        color: 'black'
+        color: 'black',
       },
       tickfont: {
-        color: 'black'
-      }
+        color: 'black',
+      },
     },
     // margin: {
     //   l: 40,
@@ -1245,7 +1353,7 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
     // },
     showlegend: false,
     clickmode: 'none',
-    hovermode: 'closest'
+    hovermode: 'closest',
   };
 
   return {
@@ -1253,7 +1361,7 @@ const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, locus
     pdata_scatter,
     locus_alignment_scatter_plot_layout,
   };
-}
+};
 
 export function uploadFile(params) {
   return async function (dispatch, getState) {
@@ -1283,34 +1391,34 @@ export function uploadFile(params) {
             associationFile:
               res.data.body.associationFileName !== 'false'
                 ? res.data.files.filter(
-                  (item) =>
-                    item.filename === res.data.body.associationFileName
-                )[0].filename
+                    (item) =>
+                      item.filename === res.data.body.associationFileName
+                  )[0].filename
                 : false,
             quantificationFile:
               res.data.body.quantificationFileName !== 'false'
                 ? res.data.files.filter(
-                  (item) =>
-                    item.filename === res.data.body.quantificationFileName
-                )[0].filename
+                    (item) =>
+                      item.filename === res.data.body.quantificationFileName
+                  )[0].filename
                 : false,
             genotypeFile:
               res.data.body.genotypeFileName !== 'false'
                 ? res.data.files.filter(
-                  (item) => item.filename === res.data.body.genotypeFileName
-                )[0].filename
+                    (item) => item.filename === res.data.body.genotypeFileName
+                  )[0].filename
                 : false,
             gwasFile:
               res.data.body.gwasFileName !== 'false'
                 ? res.data.files.filter(
-                  (item) => item.filename === res.data.body.gwasFileName
-                )[0].filename
+                    (item) => item.filename === res.data.body.gwasFileName
+                  )[0].filename
                 : false,
             LDFile:
               res.data.body.LDFileName !== 'false'
                 ? res.data.files.filter(
-                  (item) => item.filename === res.data.body.LDFileName
-                )[0].filename
+                    (item) => item.filename === res.data.body.LDFileName
+                  )[0].filename
                 : false,
           })
         );
@@ -1404,9 +1512,7 @@ function qtlsGWASHyprcolocLDCalculation(params) {
             })
           );
         } else {
-          dispatch(
-            updateQTLsGWAS({ isLoading: false })
-          );
+          dispatch(updateQTLsGWAS({ isLoading: false }));
         }
       });
   };
@@ -1519,14 +1625,17 @@ export function qtlsGWASLocusQCCalculation(params) {
       .post('api/qtls-locus-qc', params)
       .then(function (response) {
         console.log('api/qtls-locus-qc response.data', response);
-        dispatch(updateQTLsGWAS({ locus_qc: response.data }))
+        dispatch(updateQTLsGWAS({ locus_qc: response.data }));
       })
       .catch(function (error) {
         console.log(error);
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ qcError: 'Error occured in QC calculation', activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({
+              qcError: 'Error occured in QC calculation',
+              activeResultsTab: 'locus-qc',
+            })
           );
         }
       })
@@ -1563,7 +1672,7 @@ export function qtlsGWASColocVisualize(params) {
             response.data
           );
 
-          ecaviarData = response.data['ecaviar']['data'][0]
+          ecaviarData = response.data['ecaviar']['data'][0];
 
           dispatch(
             updateQTLsGWAS({
@@ -1586,8 +1695,8 @@ export function qtlsGWASColocVisualize(params) {
         .then(function () {
           dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
 
-          const newParams = {...params, ecdata: ecaviarData}
-          console.log(newParams)
+          const newParams = { ...params, ecdata: ecaviarData };
+          console.log(newParams);
 
           axios
             .post('api/qtls-coloc-visualize', newParams)
@@ -1599,16 +1708,20 @@ export function qtlsGWASColocVisualize(params) {
               if (error) {
                 dispatch(updateError({ visible: true }));
                 dispatch(
-                  updateQTLsGWAS({ summaryError: true, activeResultsTab: 'locus-qc' })
+                  updateQTLsGWAS({
+                    summaryError: true,
+                    activeResultsTab: 'locus-qc',
+                  })
                 );
               }
             })
             .then(function () {
-              dispatch(updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true }))
-            })
+              dispatch(
+                updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true })
+              );
+            });
         });
-    }
-    else {
+    } else {
       axios
         .post('api/qtls-coloc-visualize', params)
         .then(function (response) {
@@ -1619,15 +1732,20 @@ export function qtlsGWASColocVisualize(params) {
           if (error) {
             dispatch(updateError({ visible: true }));
             dispatch(
-              updateQTLsGWAS({ summaryError: true, activeResultsTab: 'locus-qc' })
+              updateQTLsGWAS({
+                summaryError: true,
+                activeResultsTab: 'locus-qc',
+              })
             );
           }
         })
         .then(function () {
-          dispatch(updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true }))
-        })
+          dispatch(
+            updateQTLsGWAS({ isLoadingSummary: false, summaryLoaded: true })
+          );
+        });
     }
-  }
+  };
 }
 
 export function qtlsGWASCalculation(params) {
@@ -1652,19 +1770,23 @@ export function qtlsGWASCalculation(params) {
             ? drawLocusAlignmentGWAS(response)
             : drawLocusAlignment(response);
 
-        const { 
-          pdata_scatter_raw, 
-          pdata_scatter, 
-          locus_alignment_scatter_plot_layout 
-        } = 
+        const {
+          pdata_scatter_raw,
+          pdata_scatter,
+          locus_alignment_scatter_plot_layout,
+        } =
           Object.keys(response.data['gwas']['data'][0]).length > 0
-              ? drawLocusAlignmentScatter(response.data['locus_alignment_gwas_scatter']['data'][0], response.data['locus_alignment_gwas_scatter']['title'][0], response.data['locus_alignment']['top'][0][0], 1.0)
-              : 
-              {
+            ? drawLocusAlignmentScatter(
+                response.data['locus_alignment_gwas_scatter']['data'][0],
+                response.data['locus_alignment_gwas_scatter']['title'][0],
+                response.data['locus_alignment']['top'][0][0],
+                1.0
+              )
+            : {
                 pdata_scatter_raw: null,
-                pdata_scatter: null, 
-                locus_alignment_scatter_plot_layout: null
-              }
+                pdata_scatter: null,
+                locus_alignment_scatter_plot_layout: null,
+              };
 
         dispatch(
           updateQTLsGWAS({
@@ -1775,7 +1897,10 @@ export function qtlsGWASCalculation(params) {
           );
         } else {
           dispatch(
-            updateQTLsGWAS({ qcError: 'No data available for QC plot', isLoading: false })
+            updateQTLsGWAS({
+              qcError: 'No data available for QC plot',
+              isLoading: false,
+            })
           );
         }
         /*
@@ -1977,17 +2102,31 @@ export function qtlsGWASBoxplotsCalculation(params) {
   };
 }
 
-export function getPublicGTEx() {
+export function getPublicGTEx(store = 'single') {
   return async function (dispatch, getState) {
     try {
-      dispatch(updateQTLsGWAS({ loadingPublic: true }));
+      if (store == 'single') {
+        dispatch(updateQTLsGWAS({ loadingPublic: true }));
+      } else if (store == 'multi') {
+        dispatch(updateMultiLoci({ isLoading: false }));
+      }
       const { data } = await axios.post('api/getPublicGTEx');
-      dispatch(updateQTLsGWAS({ publicGTEx: data, loadingPublic: false }));
+
+      if (store == 'single') {
+        dispatch(updateQTLsGWAS({ publicGTEx: data, loadingPublic: false }));
+      } else if (store == 'multi') {
+        dispatch(updateMultiLoci({ publicGTEx: data, isLoading: false }));
+      }
     } catch (error) {
       console.log(error);
       if (error) {
+        if (store == 'single') {
+          dispatch(updateQTLsGWAS({ loadingPublic: false }));
+        } else if (store == 'multi') {
+          dispatch(updateMultiLoci({ isLoading: false }));
+        }
+
         dispatch(updateError({ visible: true }));
-        dispatch(updateQTLsGWAS({ loadingPublic: false }));
       }
     }
   };
