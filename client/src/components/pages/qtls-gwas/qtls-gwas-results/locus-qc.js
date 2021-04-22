@@ -36,6 +36,12 @@ export function LocusQC() {
           <div style={{whiteSpace: 'pre-wrap'}}>
             {locus_qc}
           </div>
+
+          <Zoom
+            plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
+            className="border rounded p-3"
+            maxHeight="800px"
+          />
           
           <Zoom
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
@@ -45,12 +51,6 @@ export function LocusQC() {
 
           <Zoom
             plotURL={`api/results/${request}/${request}_QC_zscore.svg`}
-            className="border rounded p-3"
-            maxHeight="800px"
-          />
-
-          <Zoom
-            plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
             className="border rounded p-3"
             maxHeight="800px"
           />
