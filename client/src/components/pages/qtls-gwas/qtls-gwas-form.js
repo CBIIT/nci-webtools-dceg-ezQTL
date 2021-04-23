@@ -80,6 +80,9 @@ export function QTLsGWASForm() {
     qtlPublic,
     gwasPublic,
     ldPublic,
+    qtlKey,
+    ldKey,
+    gwasKey,
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
@@ -105,13 +108,17 @@ export function QTLsGWASForm() {
     if (Object.keys(publicGTEx).length && genome) populatePublicParameters();
   }, [genome]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length && qtlProject)
+    if (Object.keys(publicGTEx).length && qtlProject && qtlPublic)
       handleQtlProject(qtlProject);
-  }, [tissueOnly]);
+  }, [qtlPublic, tissueOnly]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length && gwasProject)
+    if (Object.keys(publicGTEx).length && gwasProject && gwasPublic)
       handleGwasProject(gwasProject);
-  }, [phenotypeOnly]);
+  }, [gwasPublic, phenotypeOnly]);
+  useEffect(() => {
+    if (Object.keys(publicGTEx).length && ldProject && ldPublic)
+      handleLdProject(ldProject);
+  }, [ldPublic]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -225,12 +232,24 @@ export function QTLsGWASForm() {
       project.value,
       xQtlOptions[0].value
     );
+    const qtlKey = data
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == project.value &&
+          row.xQTL == xQtlOptions[0].value &&
+          row.Tissue == tissueOptions[0].value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     dispatch(
       updateQTLsGWAS({
         qtlProject: project,
+        xQtl: xQtlOptions[0],
+        xQtlOptions: xQtlOptions,
         tissue: tissueOptions[0],
         tissueOptions: tissueOptions,
+        qtlKey: qtlKey,
       })
     );
   }
@@ -238,41 +257,89 @@ export function QTLsGWASForm() {
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
+    const gwasKey = data
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == project.value &&
+          row.Phenotype == phenotypeOptions[0].value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     dispatch(
       updateQTLsGWAS({
         gwasProject: project,
         phenotype: phenotypeOptions[0],
         phenotypeOptions: phenotypeOptions,
+        gwasKey: gwasKey,
       })
     );
   }
 
   function handleLdProject(project) {
-    dispatch(updateQTLsGWAS({ ldProject: project }));
+    const ldKey = publicGTEx['LD dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == project.value &&
+          row.Chromosome == select_chromosome.value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    console.log(ldKey);
+    dispatch(updateQTLsGWAS({ ldProject: project, ldKey: ldKey }));
   }
 
+  // qtl type
   function handleXqtl(xQtl) {
     const data = publicGTEx['cis-QTL dataset'];
     const tissueOptions = getTissueOptions(data, qtlProject.value, xQtl.value);
+    const qtlKey = data
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == qtlProject.value &&
+          row.xQTL == xQtl.value &&
+          row.Tissue == tissueOptions[0].value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     dispatch(
       updateQTLsGWAS({
         xQtl: xQtl,
         tissue: tissueOptions[0],
         tissueOptions: tissueOptions,
+        qtlKey: qtlKey,
       })
     );
   }
 
   function handleTissue(tissue) {
-    dispatch(updateQTLsGWAS({ tissue: tissue }));
+    const qtlKey = publicGTEx['cis-QTL dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == qtlProject.value &&
+          row.xQTL == xQtl.value &&
+          row.Tissue == tissue.value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    dispatch(updateQTLsGWAS({ tissue: tissue, qtlKey: qtlKey }));
   }
 
   function handlePhenotype(phenotype) {
+    const gwasKey = publicGTEx['GWAS dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == gwasProject.value &&
+          row.Phenotype == phenotype.value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+
     dispatch(
       updateQTLsGWAS({
         phenotype: phenotype,
+        gwasKey: gwasKey,
       })
     );
   }
@@ -331,50 +398,6 @@ export function QTLsGWASForm() {
       })
     );
 
-    // retrieve tabix file key from selected tissue (association qtl), phenotype (gwas), and project(ld)
-    const qtlKey = qtlPublic
-      ? publicGTEx['cis-QTL dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value && row.Tissue == tissue.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : false;
-
-    const ldKey = ldPublic
-      ? publicGTEx['LD dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Project == ldProject.value &&
-              row.Chromosome == select_chromosome.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : false;
-
-    const gwasKey = gwasPublic
-      ? publicGTEx['GWAS dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Phenotype == phenotype.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : false;
-
-    dispatch(
-      updateQTLsGWAS({ qtlKey: qtlKey, ldKey: ldKey, gwasKey: gwasKey })
-    );
-
     const params = {
       request,
       select_qtls_samples,
@@ -394,9 +417,9 @@ export function QTLsGWASForm() {
       recalculateGene,
       recalculateDist,
       recalculateRef,
-      qtlKey,
-      ldKey,
-      gwasKey,
+      qtlKey: qtlPublic ? qtlKey : false,
+      ldKey: ldPublic ? ldKey : false,
+      gwasKey: gwasPublic ? gwasKey : false,
       select_chromosome: select_chromosome.value,
       select_position: select_position,
       email: email,
@@ -433,7 +456,7 @@ export function QTLsGWASForm() {
                           qtlPublic: false,
                           gwasPublic: false,
                           ldPublic: false,
-                          select_pop: false
+                          select_pop: false,
                         })
                       );
                     }}
@@ -521,7 +544,12 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={qtlPublic}
                 onChange={(_) => {
-                  dispatch(updateQTLsGWAS({ qtlPublic: !qtlPublic, ...(!qtlPublic && { select_ref: false }) }));
+                  dispatch(
+                    updateQTLsGWAS({
+                      qtlPublic: !qtlPublic,
+                      ...(!qtlPublic && { select_ref: false }),
+                    })
+                  );
                   _setAssociationFile('');
                 }}
               />
@@ -639,7 +667,13 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={ldPublic}
                 onChange={(_) => {
-                  dispatch(updateQTLsGWAS({ ldPublic: !ldPublic, select_pop: false, ...(!ldPublic && { select_ref: false }) }));
+                  dispatch(
+                    updateQTLsGWAS({
+                      ldPublic: !ldPublic,
+                      select_pop: false,
+                      ...(!ldPublic && { select_ref: false }),
+                    })
+                  );
                   _setLDFile('');
                 }}
               />
@@ -700,7 +734,12 @@ export function QTLsGWASForm() {
                 type="checkbox"
                 checked={gwasPublic}
                 onChange={(_) => {
-                  dispatch(updateQTLsGWAS({ gwasPublic: !gwasPublic, ...(!ldPublic && { select_ref: false }) }));
+                  dispatch(
+                    updateQTLsGWAS({
+                      gwasPublic: !gwasPublic,
+                      ...(!ldPublic && { select_ref: false }),
+                    })
+                  );
                   _setGwasFile('');
                 }}
               />
@@ -901,22 +940,22 @@ export function QTLsGWASForm() {
             <b>Locus Information</b>
           </div>
         </Row>
-        { ldPublic &&
+        {ldPublic && (
           <Row>
             <Col>
               <Form.Label className="mb-0">
                 Population <span style={{ color: 'red' }}>*</span>{' '}
               </Form.Label>
               <PopulationSelect
-                  id="qtls-results-population-input"
-                  disabled={submitted || !ldPublic}
-                />
+                id="qtls-results-population-input"
+                disabled={submitted || !ldPublic}
+              />
               {/* <Form.Control.Feedback type="invalid">
                 Enter distance between 1 and 200Kb.
               </Form.Control.Feedback> */}
             </Col>
           </Row>
-        }
+        )}
         <Row>
           <Col>
             <Form.Label className="mb-0">
@@ -1098,7 +1137,7 @@ export function QTLsGWASForm() {
               select_dist > 200 ||
               (select_ref &&
                 select_ref.length > 0 &&
-                !/^rs\d+$/.test(select_ref)) 
+                !/^rs\d+$/.test(select_ref))
               //   ||
               // (ldPublic && (!select_pop || select_pop.length <= 0))
             }
