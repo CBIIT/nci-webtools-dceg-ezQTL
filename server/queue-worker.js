@@ -222,8 +222,8 @@ async function processSingleLocus(params) {
   }
 }
 
-async function processMultiLoci(params) {
-  const { states, requests, email, timestamp } = params;
+async function processMultiLoci(data) {
+  const { paramsArr, requests, email, timestamp } = data;
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
 
@@ -231,9 +231,9 @@ async function processMultiLoci(params) {
   try {
     // Setup folders
     const calculations = await Promise.all(
-      states.map(async (state, i) => {
+      paramsArr.map(async (params, i) => {
         try {
-          const { request } = state;
+          const { request } = params;
 
           const directory = path.resolve(config.tmp.folder, request);
           await fs.promises.mkdir(directory, { recursive: true });
@@ -247,7 +247,7 @@ async function processMultiLoci(params) {
             await calculateMain({
               workingDirectory: workingDirectory,
               bucket: config.aws.s3.data,
-              ...state,
+              ...params,
             })
           );
           const end = new Date().getTime();
@@ -264,7 +264,7 @@ async function processMultiLoci(params) {
           // upload parameters
           await s3
             .upload({
-              Body: JSON.stringify({ params: state, main: main }),
+              Body: JSON.stringify({ params: params, main: main }),
               Bucket: config.aws.s3.queue,
               Key: `${config.aws.s3.outputPrefix}/${request}/params.json`,
             })
@@ -319,7 +319,7 @@ async function processMultiLoci(params) {
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.sender,
-      to: params.email,
+      to: email,
       subject: `ezQTL Results - ${timestamp} EST`,
       html: await readTemplate(
         __dirname + '/templates/user-multi-email.html',
@@ -336,7 +336,7 @@ async function processMultiLoci(params) {
 
     // template variables
     const templateData = {
-      request: request,
+      request: requests[0],
       parameters: JSON.stringify(params, null, 4),
       originalTimestamp: timestamp,
       exception: err.toString(),

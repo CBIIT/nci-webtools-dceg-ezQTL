@@ -165,16 +165,60 @@ export function QTLsMulti() {
         )
     );
 
-    let newStates = states.map((state, i) => ({
-      ...state,
-      request: requests[i],
-      email: email,
-      isQueue: true,
-      submitted: true,
-    }));
+    let paramsArr = states.map((state, i) => {
+      const {
+        select_qtls_samples,
+        select_gwas_sample,
+        select_pop,
+        select_gene,
+        select_dist,
+        select_ref,
+        recalculateAttempt,
+        recalculatePop,
+        recalculateGene,
+        recalculateDist,
+        recalculateRef,
+        qtlKey,
+        ldKey,
+        gwasKey,
+        select_chromosome,
+        select_position,
+      } = state;
+
+      return {
+        request: requests[i],
+        email: email,
+        isQueue: true,
+        submitted: true,
+        associationFile:
+          (_associationFile[i] && _associationFile[i].name) || false,
+        quantificationFile:
+          (_quantificationFile[i] && _quantificationFile[i].name) || false,
+        genotypeFile: (_genotypeFile[i] && _genotypeFile[i].name) || false,
+        gwasFile: (_gwasFile[i] && _gwasFile[i].name) || false,
+        LDFile: (_LDFile[i] && _LDFile[i].name) || false,
+
+        select_qtls_samples,
+        select_gwas_sample,
+        select_pop,
+        select_gene,
+        select_dist,
+        select_ref,
+        recalculateAttempt,
+        recalculatePop,
+        recalculateGene,
+        recalculateDist,
+        recalculateRef,
+        qtlKey: qtlKey || false,
+        ldKey: ldKey || false,
+        gwasKey: gwasKey || false,
+        select_chromosome: select_chromosome.value,
+        select_position: select_position,
+      };
+    });
 
     dispatch(
-      submitQueueMulti({ states: newStates, requests: requests, email: email })
+      submitQueueMulti({ paramsArr: paramsArr, requests: requests, email: email })
     );
   }
 

@@ -186,7 +186,7 @@ apiRouter.post('/queue', async (req, res, next) => {
 });
 
 apiRouter.post('/queue-multi', async (req, res, next) => {
-  const { states, requests, email } = req.body;
+  const { paramsArr, requests, email } = req.body;
   const sqs = new AWS.SQS();
 
   // upload each request and accompanying data
