@@ -318,7 +318,8 @@ export function LocusColocalization() {
                   !isError &&
                   !summaryLoaded &&
                   hyprcoloc_table.data.length > 0 &&
-                  !isLoadingSummary
+                  !isLoadingSummary &&
+                  !isLoadingECaviar
                 ) {
 
                   console.log('run summary');
@@ -554,27 +555,29 @@ export function LocusColocalization() {
       )}
       {activeColocalizationTab === 'summary' && (
         <>
-          <LoadingOverlay
-            active={
-              isLoadingSummary ||
-              ecaviar_table.data.length === 0 ||
-              summaryError
-            }
-            content={
-              !isLoadingSummary &&
-              (ecaviar_table.data.length === 0 || summaryError)
-                ? 'No data available'
-                : null
-            }
-          />
-
-          {summaryLoaded && !summaryError && (
-            <Zoom
-              plotURL={`api/results/${request}/${request}_Summary.svg`}
-              className="border rounded p-3 mb-2"
-              maxHeight="1000px"
+          <div style={{minHeight: '10rem'}}>
+            <LoadingOverlay
+              active={
+                isLoadingSummary ||
+                ecaviar_table.data.length === 0 ||
+                summaryError
+              }
+              content={
+                !isLoadingSummary &&
+                  (ecaviar_table.data.length === 0 || summaryError)
+                  ? 'No data available'
+                  : null
+              }
             />
-          )}
+
+            {summaryLoaded && !summaryError && (
+              <Zoom
+                plotURL={`api/results/${request}/${request}_Summary.svg`}
+                className="border rounded p-3 mb-2"
+                maxHeight="1000px"
+              />
+            )}
+          </div>
         </>
       )}
     </div>
