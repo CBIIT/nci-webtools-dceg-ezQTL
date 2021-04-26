@@ -1,8 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button, Row, Col } from 'react-bootstrap';
-import Overlay from 'react-bootstrap/Overlay';
-import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   qtlsGWASCalculation,
@@ -15,8 +13,6 @@ import {
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
 import { PopulationSelect } from '../../controls/population-select/population-select';
-
-const { v1: uuidv1 } = require('uuid');
 
 export default function MultiForm({
   index,
@@ -35,15 +31,18 @@ export default function MultiForm({
   const quantificationFileControl = useRef(null);
   const genotypeFileControl = useRef(null);
 
-  const [showQuantificationTooltip, setShowQuantificationTooltip] = useState(
-    false
-  );
-  const [showGenotypeTooltip, setShowGenotypeTooltip] = useState(false);
+  // toggle visible input
   const [tissueOnly, viewTissueOnly] = useState(false);
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
   const [showAdditionalInput, setAdditionalInput] = useState(false);
 
-  const { states, valid, publicGTEx } = useSelector((state) => state.multiLoci);
+  // additional input error message
+  const [quantificationFeedback, setQuantificationFeedback] = useState(false);
+  const [genotypeFeedback, setGenotypeFeedback] = useState(false);
+
+  const { states, valid, publicGTEx, submitted, attempt } = useSelector(
+    (state) => state.multiLoci
+  );
   const state = states[index];
   const {
     select_qtls_samples,
@@ -53,17 +52,10 @@ export default function MultiForm({
     genotypeFile,
     gwasFile,
     LDFile,
-    request,
     select_pop,
     select_gene,
     select_dist,
     select_ref,
-    recalculateAttempt,
-    recalculatePop,
-    recalculateGene,
-    recalculateDist,
-    recalculateRef,
-    submitted,
     isLoading,
     isError,
     publicLoading,
@@ -83,12 +75,15 @@ export default function MultiForm({
     phenotypeOptions,
     select_chromosome,
     select_position,
-    email,
     qtlPublic,
     gwasPublic,
     ldPublic,
+    qtlKey,
+    ldKey,
+    gwasKey,
   } = state;
 
+  // handle files
   useEffect(() => setFile('qtl', associationFile || ''), [associationFile]);
   useEffect(() => setFile('quantification', quantificationFile || ''), [
     quantificationFile,
@@ -108,15 +103,59 @@ export default function MultiForm({
   }, [publicGTEx, genomeOptions]);
   useEffect(() => {
     if (Object.keys(publicGTEx).length && genome) populatePublicParameters();
-  }, [publicGTEx, genome]);
+  }, [genome]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length && qtlProject)
+    if (Object.keys(publicGTEx).length && qtlProject && qtlPublic)
       handleQtlProject(qtlProject);
-  }, [tissueOnly]);
+  }, [qtlPublic, tissueOnly]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length && gwasProject)
+    if (Object.keys(publicGTEx).length && gwasProject && gwasPublic)
       handleGwasProject(gwasProject);
-  }, [phenotypeOnly]);
+  }, [gwasPublic, phenotypeOnly]);
+  useEffect(() => {
+    if (Object.keys(publicGTEx).length && ldProject && ldPublic)
+      handleLdProject(ldProject);
+  }, [ldPublic]);
+
+  // check form validity
+  useEffect(() => {
+    if (
+      (!_associationFile && !select_qtls_samples && !qtlPublic) ||
+      select_dist.length <= 0 ||
+      select_dist < 1 ||
+      select_dist > 200 ||
+      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref)) ||
+      (ldPublic && (!select_pop || select_pop.length <= 0)) ||
+      (_quantificationFile && !_genotypeFile) ||
+      (!_quantificationFile && _genotypeFile)
+    ) {
+      dispatch(updateMultiLoci({ valid: false }));
+    } else {
+      dispatch(updateMultiLoci({ valid: true }));
+    }
+  }, [
+    _associationFile,
+    ldPublic,
+    qtlPublic,
+    select_dist,
+    select_pop,
+    select_qtls_samples,
+    select_ref,
+  ]);
+  useEffect(() => {
+    if (attempt) {
+      if (_quantificationFile && !_genotypeFile) {
+        setGenotypeFeedback(true);
+      }
+      if (!_quantificationFile && _genotypeFile) {
+        setQuantificationFeedback(true);
+      }
+    }
+    if (_quantificationFile && _genotypeFile) {
+      setGenotypeFeedback(false);
+      setQuantificationFeedback(false);
+    }
+  }, [attempt]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -226,47 +265,107 @@ export default function MultiForm({
       project.value,
       xQtlOptions[0].value
     );
+    const qtlKey = data
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == project.value &&
+          row.xQTL == xQtlOptions[0].value &&
+          row.Tissue == tissueOptions[0].value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     mergeState({
       qtlProject: project,
+      xQtl: xQtlOptions[0],
+      xQtlOptions: xQtlOptions,
       tissue: tissueOptions[0],
       tissueOptions: tissueOptions,
+      qtlKey: qtlKey,
     });
   }
 
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
+    const gwasKey = data
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == project.value &&
+          row.Phenotype == phenotypeOptions[0].value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     mergeState({
       gwasProject: project,
       phenotype: phenotypeOptions[0],
       phenotypeOptions: phenotypeOptions,
+      gwasKey: gwasKey,
     });
   }
 
   function handleLdProject(project) {
-    mergeState({ ldProject: project });
+    const ldKey = publicGTEx['LD dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == project.value &&
+          row.Chromosome == select_chromosome.value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    console.log(ldKey);
+    mergeState({ ldProject: project, ldKey: ldKey });
   }
 
+  // qtl type
   function handleXqtl(xQtl) {
     const data = publicGTEx['cis-QTL dataset'];
     const tissueOptions = getTissueOptions(data, qtlProject.value, xQtl.value);
+    const qtlKey = data
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == qtlProject.value &&
+          row.xQTL == xQtl.value &&
+          row.Tissue == tissueOptions[0].value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     mergeState({
       xQtl: xQtl,
       tissue: tissueOptions[0],
       tissueOptions: tissueOptions,
+      qtlKey: qtlKey,
     });
   }
 
   function handleTissue(tissue) {
-    mergeState({ tissue: tissue });
+    const qtlKey = publicGTEx['cis-QTL dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == qtlProject.value &&
+          row.xQTL == xQtl.value &&
+          row.Tissue == tissue.value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    mergeState({ tissue: tissue, qtlKey: qtlKey });
   }
 
   function handlePhenotype(phenotype) {
+    const gwasKey = publicGTEx['GWAS dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == gwasProject.value &&
+          row.Phenotype == phenotype.value
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+
     mergeState({
       phenotype: phenotype,
+      gwasKey: gwasKey,
     });
   }
 
@@ -281,6 +380,8 @@ export default function MultiForm({
     setFile('genotype', '');
     setFile('ld', '');
     setFile('gwas', '');
+    setQuantificationFeedback(false);
+    setGenotypeFeedback(false);
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
   }
@@ -711,8 +812,6 @@ export default function MultiForm({
                   setFile('quantification', e.target.files[0]);
                 }}
                 // accept=".tsv, .txt"
-                // isInvalid={checkValid ? !validFile : false}
-                // feedback="Please upload a data file"
                 // onChange={(e) => {
                 //     setInput(e.target.files[0]);
                 //     mergeVisualize({
@@ -720,19 +819,10 @@ export default function MultiForm({
                 //     });
                 // }}
                 custom
+                isInvalid={quantificationFeedback}
+                feedback="Please input accompanying Quantification Data File with
+                Genotype Data File."
               />
-              <Overlay
-                target={quantificationFileControl.current}
-                show={showQuantificationTooltip}
-                placement="bottom"
-              >
-                {(props) => (
-                  <Tooltip id="overlay-example" {...props}>
-                    Please input accompanying Quantification Data File with
-                    Genotype Data File.
-                  </Tooltip>
-                )}
-              </Overlay>
             </Form.Group>
             <Form.Group className="col-md-4">
               <Form.Label className="mb-0">Genotype Data File</Form.Label>
@@ -754,8 +844,6 @@ export default function MultiForm({
                   setFile('genotype', e.target.files[0]);
                 }}
                 // accept=".tsv, .txt"
-                // isInvalid={checkValid ? !validFile : false}
-                // feedback="Please upload a data file"
                 // onChange={(e) => {
                 //     setInput(e.target.files[0]);
                 //     mergeVisualize({
@@ -763,19 +851,10 @@ export default function MultiForm({
                 //     });
                 // }}
                 custom
+                isInvalid={genotypeFeedback}
+                feedback="Please input accompanying Genotype Data File with
+                Quantification Data File."
               />
-              <Overlay
-                target={genotypeFileControl.current}
-                show={showGenotypeTooltip}
-                placement="bottom"
-              >
-                {(props) => (
-                  <Tooltip id="overlay-example" {...props}>
-                    Please input accompanying Genotype Data File with
-                    Quantification Data File.
-                  </Tooltip>
-                )}
-              </Overlay>
             </Form.Group>
           </>
         )}

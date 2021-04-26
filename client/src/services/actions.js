@@ -2168,6 +2168,41 @@ export function submitQueue(params) {
     }
   };
 }
+export function submitQueueMulti(params) {
+  return async function (dispatch, getState) {
+    dispatch(
+      updateMultiLoci({
+        submitted: true,
+        isLoading: true,
+      })
+    );
+
+    try {
+      const response = await axios.post('api/queue-multi', params);
+      console.log('api/queue-multi', response);
+      dispatch(
+        updateSuccess({
+          visible: true,
+          message: `Your job was successfully submitted to the queue. You will recieve an email at ${params.email} with your results.`,
+        })
+      );
+      dispatch(updateMultiLoci({ isLoading: false }));
+    } catch (error) {
+      console.log(error);
+      if (error) {
+        dispatch(
+          updateError({ visible: true, message: 'Queue submission failed' })
+        );
+        dispatch(
+          updateMultiLoci({
+            isError: true,
+            isLoading: false,
+          })
+        );
+      }
+    }
+  };
+}
 
 export function fetchResults(request) {
   return async function (dispatch, getState) {

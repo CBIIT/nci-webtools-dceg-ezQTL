@@ -9,11 +9,12 @@ import {
   updateQTLsGWAS,
   getPublicGTEx,
   updateAlert,
-  submitQueue,
+  submitQueueMulti,
   updateMultiLoci,
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
 import MultiForm from './qtls-multi-form';
+const { v1: uuidv1 } = require('uuid');
 
 export function QTLsMulti() {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ export function QTLsMulti() {
     submitted,
     isLoading,
     publicGTEx,
+    attempt,
   } = useSelector((state) => state.multiLoci);
   const { getInitialState } = useContext(RootContext);
 
@@ -32,11 +34,14 @@ export function QTLsMulti() {
     if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx('multi'));
   }, [publicGTEx]);
 
+  // handle files
   const [_associationFile, _setAssociationFile] = useState(['']);
   const [_quantificationFile, _setQuantificationFile] = useState(['']);
   const [_genotypeFile, _setGenotypeFile] = useState(['']);
   const [_LDFile, _setLDFile] = useState(['']);
   const [_gwasFile, _setGwasFile] = useState(['']);
+
+  const [emailValid, setEmailValid] = useState(false);
 
   function mergeState(data, index) {
     let newStates = states.slice();
@@ -108,29 +113,76 @@ export function QTLsMulti() {
   }
 
   function addForm() {
+    // add file placeholders
+    setFile('qtl', '', states.length);
+    setFile('ld', '', states.length);
+    setFile('gwas', '', states.length);
+    setFile('quantification', '', states.length);
+    setFile('genotype', '', states.length);
+
+    // add state
     dispatch(
       updateMultiLoci({
-        states: [...states, getInitialState().qtlsGWAS],
+        states: [...states, getInitialState().multiLoci.states[0]],
       })
     );
   }
 
   async function handleSubmit() {
+    dispatch(updateMultiLoci({ attempt: true }));
+    const re = new RegExp(
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    );
+    // setEmailValid(re.test(email));
     if (!valid) {
+      dispatch(updateMultiLoci({ attempt: false }));
       return;
     }
-    // const request = uuidv1();
+    // generate request ids
+    const requests = states.map((_, i) => uuidv1());
+
+    // upload files
+    states.map(
+      async (_, i) =>
+        await dispatch(
+          uploadFile({
+            associationFile: _associationFile[i],
+            quantificationFile: _quantificationFile[i],
+            genotypeFile: _genotypeFile[i],
+            LDFile: _LDFile[i],
+            gwasFile: _gwasFile[i],
+            associationFileName: _associationFile[i]
+              ? _associationFile[i].name
+              : false,
+            quantificationFileName: _quantificationFile[i]
+              ? _quantificationFile[i].name
+              : false,
+            genotypeFileName: _genotypeFile[i] ? _genotypeFile[i].name : false,
+            LDFileName: _LDFile[i] ? _LDFile[i].name : false,
+            gwasFileName: _gwasFile[i] ? _gwasFile[i].name : false,
+            request: requests[i],
+          })
+        )
+    );
+
+    let newStates = states.map((state, i) => ({
+      ...state,
+      request: requests[i],
+      email: email,
+      isQueue: true,
+      submitted: true,
+    }));
+
+    dispatch(
+      submitQueueMulti({ states: newStates, requests: requests, email: email })
+    );
   }
 
   return (
     <div className="px-2">
-      {JSON.stringify([
-        _associationFile,
-        _LDFile,
-        _gwasFile,
-      ])}
+      {JSON.stringify([_associationFile, _LDFile, _gwasFile])}
       {states.map((_, index) => (
-        <div className="mb-3">
+        <div className="mb-3" key={`multi-form-${index}`}>
           <MultiForm
             index={index}
             mergeState={(data) => mergeState(data, index)}
@@ -169,7 +221,7 @@ export function QTLsMulti() {
                     dispatch(updateMultiLoci({ email: e.target.value }))
                   }
                   disabled={submitted}
-                  // isInvalid={isQueue && checkValid ? !validEmail : false}
+                  isInvalid={attempt ? !emailValid : false}
                 />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid email
@@ -185,18 +237,7 @@ export function QTLsMulti() {
                 onClick={() => {
                   handleSubmit();
                 }}
-                // disabled={
-                // submitted ||
-                // (!_associationFile && !select_qtls_samples && !qtlPublic) ||
-                // select_dist.length <= 0 ||
-                // select_dist < 1 ||
-                // select_dist > 200 ||
-                // (select_ref &&
-                //   select_ref.length > 0 &&
-                //   !/^rs\d+$/.test(select_ref))
-                //   ||
-                // (ldPublic && (!select_pop || select_pop.length <= 0))
-                // }
+                disabled={submitted}
               >
                 Submit
               </Button>
@@ -208,7 +249,12 @@ export function QTLsMulti() {
                 variant="secondary"
                 type="button"
                 onClick={() => {
-                  dispatch(updateMultiLoci({ ...getInitialState().multiLoci }));
+                  dispatch(
+                    updateMultiLoci({
+                      ...getInitialState().multiLoci,
+                      publicGTEx: publicGTEx,
+                    })
+                  );
                 }}
               >
                 Reset All

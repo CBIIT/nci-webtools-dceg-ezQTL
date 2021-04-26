@@ -99,12 +99,12 @@ async function downloadS3(request, savePath) {
  * Processes a message and sends emails when finished
  * @param {object} params
  */
-async function processMessage(params) {
+async function processSingleLocus(params) {
   const { request, timestamp } = params;
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
 
-  logger.debug(params);
+  // logger.debug(params);
   try {
     // Setup folders
     const directory = path.resolve(config.tmp.folder, request);
@@ -222,6 +222,158 @@ async function processMessage(params) {
   }
 }
 
+async function processMultiLoci(params) {
+  const { states, requests, email, timestamp } = params;
+  const s3 = new AWS.S3();
+  const mailer = nodemailer.createTransport(config.email.smtp);
+
+  // logger.debug(params);
+  try {
+    // Setup folders
+    const calculations = await Promise.all(
+      states.map(async (state, i) => {
+        try {
+          const { request } = state;
+
+          const directory = path.resolve(config.tmp.folder, request);
+          await fs.promises.mkdir(directory, { recursive: true });
+
+          logger.info('Start Calculation');
+
+          const start = new Date().getTime();
+          await downloadS3(request, directory);
+
+          const main = JSON.parse(
+            await calculateMain({
+              workingDirectory: workingDirectory,
+              bucket: config.aws.s3.data,
+              ...state,
+            })
+          );
+          const end = new Date().getTime();
+
+          logger.info('Calculation Done');
+
+          const time = end - start;
+          const minutes = Math.floor(time / 60000);
+          var seconds = ((time % 60000) / 1000).toFixed(0);
+
+          const runtime =
+            (minutes > 0 ? minutes + ' min ' : '') + seconds + ' secs';
+
+          // upload parameters
+          await s3
+            .upload({
+              Body: JSON.stringify({ params: state, main: main }),
+              Bucket: config.aws.s3.queue,
+              Key: `${config.aws.s3.outputPrefix}/${request}/params.json`,
+            })
+            .promise();
+
+          // upload archived project directory
+          await s3
+            .upload({
+              Body: tar
+                .c({ sync: true, gzip: true, C: config.tmp.folder }, [request])
+                .read(),
+              Bucket: config.aws.s3.queue,
+              Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
+            })
+            .promise();
+
+          return Promise.resolve({
+            runtime: runtime,
+            request: request,
+            index: i,
+          });
+        } catch (error) {
+          logger.error(error);
+          return Promise.resolve({ error: error, index: i });
+        }
+      })
+    );
+
+    const template = calculations.map((data, i) => {
+      if (data.error) {
+        return `<ul style="list-style-type: none">
+                  <li>Job Name: ${i}</li>
+                  <li>Error: ${data.error}</li>
+                </ul>`;
+      } else {
+        const resultsUrl = `${config.email.baseUrl}/#/qtls/${data.request}`;
+        return `<ul style="list-style-type: none">
+                  <li>Job Name: ${i}</li>
+                  <li>Execution Time: ${data.runtime}</li>
+                  <li>Results: <a href="${resultsUrl}">${resultsUrl}</a></li><br />
+                </ul>`;
+      }
+    });
+
+    // specify email template variables
+    const templateData = {
+      results: template.join(''),
+      supportEmail: config.email.admin,
+    };
+
+    // send user success email
+    logger.info(`Sending user success email`);
+    const userEmailResults = await mailer.sendMail({
+      from: config.email.sender,
+      to: params.email,
+      subject: `ezQTL Results - ${timestamp} EST`,
+      html: await readTemplate(
+        __dirname + '/templates/user-multi-email.html',
+        templateData
+      ),
+    });
+
+    return true;
+  } catch (err) {
+    logger.error(err);
+
+    const stdout = err.stdout ? err.stdout.toString() : '';
+    const stderr = err.stderr ? err.stderr.toString() : '';
+
+    // template variables
+    const templateData = {
+      request: request,
+      parameters: JSON.stringify(params, null, 4),
+      originalTimestamp: timestamp,
+      exception: err.toString(),
+      processOutput: !stdout && !stderr ? null : stdout + stderr,
+      supportEmail: config.email.admin,
+    };
+
+    // send admin error email
+    logger.info(`Sending admin error email`);
+    const adminEmailResults = await mailer.sendMail({
+      from: config.email.sender,
+      to: config.email.admin,
+      subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
+      html: await readTemplate(
+        __dirname + '/templates/admin-failure-email.html',
+        templateData
+      ),
+    });
+
+    // send user error email
+    if (params.email) {
+      logger.info(`Sending user error email`);
+      const userEmailResults = await mailer.sendMail({
+        from: config.email.sender,
+        to: params.email,
+        subject: 'ezQTL Error',
+        html: await readTemplate(
+          __dirname + '/templates/user-failure-email.html',
+          templateData
+        ),
+      });
+    }
+
+    return false;
+  }
+}
+
 /**
  * Receives messages from the queue at regular intervals,
  * specified by config.pollInterval
@@ -265,8 +417,11 @@ async function receiveMessage() {
         1000 * (config.aws.sqs.visibilityTimeout - 1)
       );
 
-      // processMessage should return a boolean status indicating success or failure
-      const status = await processMessage(params);
+      // processSingleLocus should return a boolean status indicating success or failure
+
+      const status = params.multi
+        ? await processMultiLoci(params)
+        : await processSingleLocus(params);
       clearInterval(intervalId);
 
       // if message was not processed successfully, send it to the
