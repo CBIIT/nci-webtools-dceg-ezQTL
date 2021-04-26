@@ -401,7 +401,7 @@ async function receiveMessage() {
       const message = data.Messages[0];
       const params = JSON.parse(message.Body);
 
-      logger.info(`Received Message ${params.request}`);
+      logger.info(`Received Message ${params.request || params.requests[0]}`);
       // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout

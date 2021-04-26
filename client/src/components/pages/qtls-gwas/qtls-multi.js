@@ -184,6 +184,9 @@ export function QTLsMulti() {
         gwasKey,
         select_chromosome,
         select_position,
+        qtlPublic,
+        gwasPublic,
+        ldPublic,
       } = state;
 
       return {
@@ -210,6 +213,9 @@ export function QTLsMulti() {
         recalculateGene,
         recalculateDist,
         recalculateRef,
+        qtlPublic,
+        gwasPublic,
+        ldPublic,
         qtlKey: qtlKey || false,
         ldKey: ldKey || false,
         gwasKey: gwasKey || false,
@@ -229,7 +235,6 @@ export function QTLsMulti() {
 
   return (
     <div className="px-2">
-      {JSON.stringify([_associationFile, _LDFile, _gwasFile])}
       {states.map((_, index) => (
         <div className="mb-3" key={`multi-form-${index}`}>
           <MultiForm
