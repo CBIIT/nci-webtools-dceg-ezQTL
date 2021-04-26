@@ -142,9 +142,9 @@ export function QTLsMulti() {
     const requests = states.map((_, i) => uuidv1());
 
     // upload files
-    states.map(
-      async (_, i) =>
-        await dispatch(
+    await Promise.all(
+      states.map((_, i) =>
+        dispatch(
           uploadFile({
             associationFile: _associationFile[i],
             quantificationFile: _quantificationFile[i],
@@ -163,6 +163,7 @@ export function QTLsMulti() {
             request: requests[i],
           })
         )
+      )
     );
 
     let paramsArr = states.map((state, i) => {
@@ -218,7 +219,11 @@ export function QTLsMulti() {
     });
 
     dispatch(
-      submitQueueMulti({ paramsArr: paramsArr, requests: requests, email: email })
+      submitQueueMulti({
+        paramsArr: paramsArr,
+        requests: requests,
+        email: email,
+      })
     );
   }
 
