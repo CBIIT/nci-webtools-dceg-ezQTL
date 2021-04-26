@@ -51,20 +51,20 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
-    gwasFile <- paste0('tmp/', request, '/', gwasFile)
+    gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
-    
+
     publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0(workDir,'/tmp/', request, '/MX2.LD.gz')
+    ldFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
     print(ldFile)
     save_object(publicLDFile, bucket, file = ldFile)
 
     #ldFile <- s3read_using(fread, header = FALSE, showProgress = FALSE, object = 'ezQTL/MX2.examples/MX2.LD.gz', bucket = bucket)
   } else {
-    associationFile <- paste0('tmp/', request, '/', associationFile)
-    ldFile <- paste0('tmp/', request, '/', ldFile)
+    associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
+    ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
   }
 
   coloc_QC(gwasFile, TRUE, associationFile, TRUE, ldFile, TRUE, leadsnp, NULL, distance, zscore_gene, plotPath, inputPath, logPath)
