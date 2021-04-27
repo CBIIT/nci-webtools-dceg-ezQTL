@@ -2,15 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  qtlsGWASCalculation,
-  uploadFile,
-  mergeState,
-  getPublicGTEx,
-  updateAlert,
-  submitQueue,
-  updateMultiLoci,
-} from '../../../services/actions';
+import { updateAlert, updateMultiLoci } from '../../../services/actions';
 import Select from '../../controls/select/select';
 import { PopulationSelect } from '../../controls/population-select/population-select';
 
@@ -36,15 +28,12 @@ export default function MultiForm({
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
   const [showAdditionalInput, setAdditionalInput] = useState(false);
 
-  // additional input error message
-  const [quantificationFeedback, setQuantificationFeedback] = useState(false);
-  const [genotypeFeedback, setGenotypeFeedback] = useState(false);
-
   const { states, valid, publicGTEx, submitted, attempt } = useSelector(
     (state) => state.multiLoci
   );
   const state = states[index];
   const {
+    jobName,
     select_qtls_samples,
     select_gwas_sample,
     associationFile,
@@ -58,7 +47,7 @@ export default function MultiForm({
     select_ref,
     isLoading,
     isError,
-    publicLoading,
+    loadingPublic,
     genome,
     genomeOptions,
     qtlProject,
@@ -78,9 +67,6 @@ export default function MultiForm({
     qtlPublic,
     gwasPublic,
     ldPublic,
-    qtlKey,
-    ldKey,
-    gwasKey,
   } = state;
 
   // handle files
@@ -135,6 +121,8 @@ export default function MultiForm({
     }
   }, [
     _associationFile,
+    _quantificationFile,
+    _genotypeFile,
     ldPublic,
     qtlPublic,
     select_dist,
@@ -142,20 +130,6 @@ export default function MultiForm({
     select_qtls_samples,
     select_ref,
   ]);
-  useEffect(() => {
-    if (attempt) {
-      if (_quantificationFile && !_genotypeFile) {
-        setGenotypeFeedback(true);
-      }
-      if (!_quantificationFile && _genotypeFile) {
-        setQuantificationFeedback(true);
-      }
-    }
-    if (_quantificationFile && _genotypeFile) {
-      setGenotypeFeedback(false);
-      setQuantificationFeedback(false);
-    }
-  }, [attempt]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -380,8 +354,6 @@ export default function MultiForm({
     setFile('genotype', '');
     setFile('ld', '');
     setFile('gwas', '');
-    setQuantificationFeedback(false);
-    setGenotypeFeedback(false);
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
   }
@@ -399,7 +371,7 @@ export default function MultiForm({
   }
 
   return (
-    <Form className="border rounded py-1 px-2">
+    <Form className="border rounded py-1 px-2 bg-light">
       <Form.Row>
         <Col md="2">
           <Form.Group>
@@ -413,62 +385,79 @@ export default function MultiForm({
             />
           </Form.Group>
         </Col>
-        <Col md="1" />
         <Col md="auto">
-          <b>Sample Data</b>
+          <Form.Group>
+            <Form.Label className="mb-0">Job Name</Form.Label>
+            <Form.Control
+              placeholder={`ezQTL ${index + 1}`}
+              value={jobName}
+              type="text"
+              onChange={(e) => mergeState({ jobName: e.target.value })}
+              disabled={submitted}
+            />
+          </Form.Group>
         </Col>
         <Col md="1" />
         <Col md="auto">
-          {!select_gwas_sample ? (
-            <>
-              <Button
-                variant="link"
-                onClick={(_) => {
-                  setFile('gwas', '');
-                  mergeState({
-                    select_qtls_samples: true,
-                    select_gwas_sample: true,
-                    qtlPublic: false,
-                    gwasPublic: false,
-                    ldPublic: false,
-                    select_pop: false,
-                  });
-                }}
-                disabled={submitted}
-              >
-                <i className="fa fa-file mr-1" style={{ color: 'black' }}></i>
-                Load Sample Data
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="link"
-                onClick={(_) => {
-                  setFile('gwas', '');
+          <div>
+            <p style={{ 'font-weight': '500' }}>Sample Data</p>
+            <div>
+              <span className="mr-3">
+                {!select_gwas_sample ? (
+                  <>
+                    <Button
+                      variant="link"
+                      onClick={(_) => {
+                        setFile('gwas', '');
+                        mergeState({
+                          select_qtls_samples: true,
+                          select_gwas_sample: true,
+                          qtlPublic: false,
+                          gwasPublic: false,
+                          ldPublic: false,
+                          select_pop: false,
+                        });
+                      }}
+                      disabled={submitted}
+                    >
+                      <i
+                        className="fa fa-file mr-1"
+                        style={{ color: 'black' }}
+                      ></i>
+                      Load Sample Data
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="link"
+                      onClick={(_) => {
+                        setFile('gwas', '');
 
-                  mergeState({
-                    select_qtls_samples: false,
-                    select_gwas_sample: false,
-                  });
-                }}
-                disabled={submitted}
-              >
-                <i
-                  className="fa fa-file-excel-o mr-1"
-                  style={{ color: 'black' }}
-                ></i>
-                Unload Sample Data
-              </Button>
-            </>
-          )}
-        </Col>
-        <Col md="1" />
-        <Col md="auto">
-          <i className="fa fa-download mr-1"></i>
-          <a href="assets/files/MX2.examples.gz" download>
-            Download Sample Data
-          </a>
+                        mergeState({
+                          select_qtls_samples: false,
+                          select_gwas_sample: false,
+                        });
+                      }}
+                      disabled={submitted}
+                    >
+                      <i
+                        className="fa fa-file-excel-o mr-1"
+                        style={{ color: 'black' }}
+                      ></i>
+                      Unload Sample Data
+                    </Button>
+                  </>
+                )}
+              </span>
+              <span>
+                <i className="fa fa-download mr-1"></i>
+                <a href="assets/files/MX2.examples.gz" download>
+                  Download Sample Data
+                </a>
+              </span>
+            </div>
+          </div>
         </Col>
       </Form.Row>
       <hr className="mt-0" />
@@ -514,7 +503,7 @@ export default function MultiForm({
                     type="checkbox"
                     disabled={
                       submitted ||
-                      publicLoading ||
+                      loadingPublic ||
                       !Object.keys(publicGTEx).length
                     }
                     checked={tissueOnly}
@@ -530,7 +519,7 @@ export default function MultiForm({
                     <Col>
                       <Form.Group>
                         <Select
-                          disabled={publicLoading || tissueOnly || submitted}
+                          disabled={loadingPublic || tissueOnly || submitted}
                           id="project"
                           label="Project"
                           value={qtlProject}
@@ -544,7 +533,7 @@ export default function MultiForm({
                     <Col>
                       <Form.Group>
                         <Select
-                          disabled={publicLoading || tissueOnly || submitted}
+                          disabled={loadingPublic || tissueOnly || submitted}
                           id="qtlType"
                           label="QTL Type"
                           value={xQtl}
@@ -560,7 +549,7 @@ export default function MultiForm({
                 <Col>
                   <Form.Group>
                     <Select
-                      disabled={publicLoading || submitted}
+                      disabled={loadingPublic || submitted}
                       id="tissue"
                       label="Tissue"
                       value={tissue}
@@ -589,14 +578,8 @@ export default function MultiForm({
                 setFile('qtl', e.target.files[0]);
               }}
               // accept=".tsv, .txt"
-              // isInvalid={checkValid ? !validFile : false}
-              // feedback="Please upload a data file"
-              // onChange={(e) => {
-              //     setInput(e.target.files[0]);
-              //     mergeVisualize({
-              //     storeFilename: e.target.files[0].name,
-              //     });
-              // }}
+              isInvalid={attempt ? !_associationFile : false}
+              feedback="Please upload a data file"
               custom
             />
           )}
@@ -633,7 +616,7 @@ export default function MultiForm({
                 <Col>
                   <Form.Group>
                     <Select
-                      disabled={publicLoading || submitted}
+                      disabled={loadingPublic || submitted}
                       id="ldProject"
                       label="Project"
                       value={ldProject}
@@ -662,12 +645,6 @@ export default function MultiForm({
               // accept=".tsv, .txt"
               // isInvalid={checkValid ? !validFile : false}
               // feedback="Please upload a data file"
-              // onChange={(e) => {
-              //     setInput(e.target.files[0]);
-              //     mergeVisualize({
-              //     storeFilename: e.target.files[0].name,
-              //     });
-              // }}
               custom
             />
           )}
@@ -703,7 +680,7 @@ export default function MultiForm({
                     type="checkbox"
                     disabled={
                       submitted ||
-                      publicLoading ||
+                      loadingPublic ||
                       !Object.keys(publicGTEx).length
                     }
                     checked={phenotypeOnly}
@@ -720,7 +697,7 @@ export default function MultiForm({
                       <Select
                         disabled={
                           submitted ||
-                          publicLoading ||
+                          loadingPublic ||
                           phenotypeOnly ||
                           !gwasProjectOptions.length
                         }
@@ -740,7 +717,7 @@ export default function MultiForm({
                   <Form.Group>
                     <Select
                       disabled={
-                        submitted || publicLoading || !phenotypeOptions.length
+                        submitted || loadingPublic || !phenotypeOptions.length
                       }
                       id="gwasPhenotype"
                       label="Phenotype"
@@ -764,18 +741,10 @@ export default function MultiForm({
                   ? 'MX2.GWAS.rs.txt'
                   : 'Choose File'
               }
-              onChange={(e) => {
-                setFile('gwas', e.target.files[0]);
-              }}
+              onChange={(e) => setFile('gwas', e.target.files[0])}
               // accept=".tsv, .txt"
               // isInvalid={checkValid ? !validFile : false}
               // feedback="Please upload a data file"
-              // onChange={(e) => {
-              //     setInput(e.target.files[0]);
-              //     mergeVisualize({
-              //     storeFilename: e.target.files[0].name,
-              //     });
-              // }}
               custom
             />
           )}
@@ -812,14 +781,12 @@ export default function MultiForm({
                   setFile('quantification', e.target.files[0]);
                 }}
                 // accept=".tsv, .txt"
-                // onChange={(e) => {
-                //     setInput(e.target.files[0]);
-                //     mergeVisualize({
-                //     storeFilename: e.target.files[0].name,
-                //     });
-                // }}
                 custom
-                isInvalid={quantificationFeedback}
+                isInvalid={
+                  attempt && !_quantificationFile && _genotypeFile
+                    ? true
+                    : false
+                }
                 feedback="Please input accompanying Quantification Data File with
                 Genotype Data File."
               />
@@ -844,14 +811,12 @@ export default function MultiForm({
                   setFile('genotype', e.target.files[0]);
                 }}
                 // accept=".tsv, .txt"
-                // onChange={(e) => {
-                //     setInput(e.target.files[0]);
-                //     mergeVisualize({
-                //     storeFilename: e.target.files[0].name,
-                //     });
-                // }}
                 custom
-                isInvalid={genotypeFeedback}
+                isInvalid={
+                  attempt && _quantificationFile && !_genotypeFile
+                    ? true
+                    : false
+                }
                 feedback="Please input accompanying Genotype Data File with
                 Quantification Data File."
               />

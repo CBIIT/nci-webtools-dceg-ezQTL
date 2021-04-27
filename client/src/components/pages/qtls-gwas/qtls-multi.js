@@ -41,7 +41,7 @@ export function QTLsMulti() {
   const [_LDFile, _setLDFile] = useState(['']);
   const [_gwasFile, _setGwasFile] = useState(['']);
 
-  const [emailValid, setEmailValid] = useState(false);
+  const [validEmail, setValidEmail] = useState(false);
 
   function mergeState(data, index) {
     let newStates = states.slice();
@@ -128,14 +128,19 @@ export function QTLsMulti() {
     );
   }
 
-  async function handleSubmit() {
-    dispatch(updateMultiLoci({ attempt: true }));
+  function validateForm() {
     const re = new RegExp(
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
     );
-    // setEmailValid(re.test(email));
+
+    setValidEmail(re.test(email));
+    dispatch(updateMultiLoci({ attempt: true }));
+
+    return re.test(email);
+  }
+
+  async function handleSubmit() {
     if (!valid) {
-      dispatch(updateMultiLoci({ attempt: false }));
       return;
     }
     // generate request ids
@@ -187,9 +192,11 @@ export function QTLsMulti() {
         qtlPublic,
         gwasPublic,
         ldPublic,
+        jobName,
       } = state;
 
       return {
+        jobName: jobName || `ezQTL ${i + 1}`,
         request: requests[i],
         email: email,
         isQueue: true,
@@ -275,7 +282,7 @@ export function QTLsMulti() {
                     dispatch(updateMultiLoci({ email: e.target.value }))
                   }
                   disabled={submitted}
-                  isInvalid={attempt ? !emailValid : false}
+                  isInvalid={attempt ? !validEmail : false}
                 />
                 <Form.Control.Feedback type="invalid">
                   Please provide a valid email
@@ -289,7 +296,7 @@ export function QTLsMulti() {
                 variant="primary"
                 type="button"
                 onClick={() => {
-                  handleSubmit();
+                  if (validateForm()) handleSubmit();
                 }}
                 disabled={submitted}
               >

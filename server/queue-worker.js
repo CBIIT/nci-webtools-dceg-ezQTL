@@ -233,12 +233,12 @@ async function processMultiLoci(data) {
     const calculations = await Promise.all(
       paramsArr.map(async (params, i) => {
         try {
-          const { request } = params;
+          const { request, jobName } = params;
 
           const directory = path.resolve(config.tmp.folder, request);
           await fs.promises.mkdir(directory, { recursive: true });
 
-          logger.info('Start Calculation');
+          logger.info(`Calculating: ${jobName} ${request}`);
 
           const start = new Date().getTime();
           await downloadS3(request, directory);
@@ -282,13 +282,14 @@ async function processMultiLoci(data) {
             .promise();
 
           return Promise.resolve({
+            jobName: jobName,
             runtime: runtime,
             request: request,
             index: i,
           });
         } catch (error) {
           logger.error(error);
-          return Promise.resolve({ error: error, index: i });
+          return Promise.resolve({ jobName: jobName, error: error, index: i });
         }
       })
     );
@@ -296,13 +297,13 @@ async function processMultiLoci(data) {
     const template = calculations.map((data, i) => {
       if (data.error) {
         return `<ul style="list-style-type: none">
-                  <li>Job Name: ${i}</li>
+                  <li>Job Name: ${data.jobName}</li>
                   <li>Error: ${data.error}</li>
                 </ul>`;
       } else {
         const resultsUrl = `${config.email.baseUrl}/#/qtls/${data.request}`;
         return `<ul style="list-style-type: none">
-                  <li>Job Name: ${i}</li>
+                  <li>Job Name: ${data.jobName}</li>
                   <li>Execution Time: ${data.runtime}</li>
                   <li>Results: <a href="${resultsUrl}">${resultsUrl}</a></li><br />
                 </ul>`;
