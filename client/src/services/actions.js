@@ -1234,9 +1234,14 @@ const recalculatePearsonCorrelationTitle = (xData, yData) => {
   } else {
     return "Pearson's r=NA";
   }
-}
+};
 
-export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title, gene_symbol, threshold) => {
+export const drawLocusAlignmentScatter = (
+  pdata_scatter_raw,
+  pdata_scatter_title,
+  gene_symbol,
+  threshold
+) => {
   return async function (dispatch, getState) {
     const xData = getScatterX(pdata_scatter_raw, threshold);
     const yData = getScatterY(pdata_scatter_raw, threshold);
@@ -1248,7 +1253,7 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
 
     const trace1 = {
       x: xData,
-      y: yData, 
+      y: yData,
       text: hoverData,
       hoverinfo: 'text',
       mode: 'markers',
@@ -1260,9 +1265,9 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
         reversescale: true,
         line: {
           color: 'black',
-          width: 1
+          width: 1,
         },
-      }
+      },
     };
 
     const trace1R2NA = {
@@ -1277,9 +1282,9 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
         color: '#cccccc',
         line: {
           color: 'black',
-          width: 1
+          width: 1,
         },
-      }
+      },
     };
 
     const least_sqaures = getLeastSquaresLine(xData, yData);
@@ -1290,24 +1295,28 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
       // hoverinfo: 'x+y',
       mode: 'lines',
       type: 'scatter',
-      name: "lines",
+      name: 'lines',
       line: {
-        color: "blue",
-      }
+        color: 'blue',
+      },
     };
 
-    const pdata_scatter = [
-      trace1, 
-      trace1R2NA, 
-      trace2
-    ];
+    const pdata_scatter = [trace1, trace1R2NA, trace2];
 
     // var pdata = [trace1];
     const locus_alignment_scatter_plot_layout = {
       title: {
         // text: "QTL-GWAS <i>P</i>-value Correlation: " + ((scatterTitle == "RECALCULATE") ? this.recalculateSpearmanCorrelationTitle(xData, yData) + ", " + this.recalculatePearsonCorrelationTitle(xData, yData) : "Spearman " + scatterTitle.split(', ')[0] + ", Pearson's " + scatterTitle.split(', ')[1]),
-        text: "QTL-GWAS <i>P</i>-value Correlation: " + (pdata_scatter_title ? "Spearman " + pdata_scatter_title.split(', ')[0] : recalculateSpearmanCorrelationTitle(xData, yData)) + ", " + (pdata_scatter_title ? "Pearson's " + pdata_scatter_title.split(', ')[1] : recalculatePearsonCorrelationTitle(xData, yData)),
-        xref: 'paper'
+        text:
+          'QTL-GWAS <i>P</i>-value Correlation: ' +
+          (pdata_scatter_title
+            ? 'Spearman ' + pdata_scatter_title.split(', ')[0]
+            : recalculateSpearmanCorrelationTitle(xData, yData)) +
+          ', ' +
+          (pdata_scatter_title
+            ? "Pearson's " + pdata_scatter_title.split(', ')[1]
+            : recalculatePearsonCorrelationTitle(xData, yData)),
+        xref: 'paper',
       },
       font: {
         color: 'black',
@@ -1317,25 +1326,24 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
       yaxis: {
         autorange: true,
         automargin: true,
-        title: 
-          "-log10(QTL <i>P</i>-value), " + gene_symbol,
+        title: '-log10(QTL <i>P</i>-value), ' + gene_symbol,
         font: {
-          color: 'black'
+          color: 'black',
         },
         tickfont: {
-          color: 'black'
-        }
+          color: 'black',
+        },
       },
       xaxis: {
         autorange: true,
         automargin: true,
-        title: "-log10(GWAS <i>P</i>-value)",
+        title: '-log10(GWAS <i>P</i>-value)',
         font: {
-          color: 'black'
+          color: 'black',
         },
         tickfont: {
-          color: 'black'
-        }
+          color: 'black',
+        },
       },
       // margin: {
       //   l: 40,
@@ -1345,7 +1353,7 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
       // },
       showlegend: false,
       clickmode: 'none',
-      hovermode: 'closest'
+      hovermode: 'closest',
     };
 
     dispatch(
@@ -1357,8 +1365,8 @@ export const drawLocusAlignmentScatter = (pdata_scatter_raw, pdata_scatter_title
         },
       })
     );
-  }
-}
+  };
+};
 
 export function uploadFile(params) {
   return async function (dispatch, getState) {
@@ -1685,7 +1693,11 @@ export function qtlsGWASColocVisualize(params) {
           if (error) {
             dispatch(updateError({ visible: true }));
             dispatch(
-              updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+              updateQTLsGWAS({
+                isError: true,
+                activeResultsTab: 'locus-qc',
+                isLoadingECaviar: false,
+              })
             );
           }
         })
@@ -1732,6 +1744,7 @@ export function qtlsGWASColocVisualize(params) {
               updateQTLsGWAS({
                 summaryError: true,
                 activeResultsTab: 'locus-qc',
+                isLoadingSummary: false,
               })
             );
           }
@@ -1768,7 +1781,14 @@ export function qtlsGWASCalculation(params) {
             : drawLocusAlignment(response);
 
         if (Object.keys(response.data['gwas']['data'][0]).length > 0) {
-          dispatch(drawLocusAlignmentScatter(response.data['locus_alignment_gwas_scatter']['data'][0], response.data['locus_alignment_gwas_scatter']['title'][0], response.data['locus_alignment']['top'][0][0]['gene_symbol'], 1.0));
+          dispatch(
+            drawLocusAlignmentScatter(
+              response.data['locus_alignment_gwas_scatter']['data'][0],
+              response.data['locus_alignment_gwas_scatter']['title'][0],
+              response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+              1.0
+            )
+          );
         }
 
         dispatch(
@@ -2202,7 +2222,14 @@ export function fetchResults(request) {
           : drawLocusAlignment({ data: main });
 
       if (Object.keys(main['gwas']['data'][0]).length > 0) {
-        dispatch(drawLocusAlignmentScatter(main['locus_alignment_gwas_scatter']['data'][0], main['locus_alignment_gwas_scatter']['title'][0], main['locus_alignment']['top'][0][0]['gene_symbol'], 1.0));
+        dispatch(
+          drawLocusAlignmentScatter(
+            main['locus_alignment_gwas_scatter']['data'][0],
+            main['locus_alignment_gwas_scatter']['title'][0],
+            main['locus_alignment']['top'][0][0]['gene_symbol'],
+            1.0
+          )
+        );
       }
 
       const state = {
