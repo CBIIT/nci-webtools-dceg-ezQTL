@@ -245,7 +245,7 @@ export function QTLsMulti() {
       {states.map((_, index) => (
         <div className="mb-3" key={`multi-form-${index}`}>
           <MultiForm
-            index={index}
+            stateIndex={index}
             mergeState={(data) => mergeState(data, index)}
             setFile={(type, file) => setFile(type, file, index)}
             removeFile={(type) => removeFile(type, index)}
@@ -260,7 +260,12 @@ export function QTLsMulti() {
       <div>
         <Row>
           <Col>
-            <Button variant="success" block onClick={() => addForm()}>
+            <Button
+              variant="success"
+              block
+              disabled={submitted}
+              onClick={() => addForm()}
+            >
               + Add Form
             </Button>
           </Col>

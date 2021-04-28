@@ -7,7 +7,7 @@ import Select from '../../controls/select/select';
 import { PopulationSelect } from '../../controls/population-select/population-select';
 
 export default function MultiForm({
-  index,
+  stateIndex,
   mergeState,
   setFile,
   removeFile,
@@ -31,7 +31,7 @@ export default function MultiForm({
   const { states, valid, publicGTEx, submitted, attempt } = useSelector(
     (state) => state.multiLoci
   );
-  const state = states[index];
+  const state = states[stateIndex];
   const {
     jobName,
     select_qtls_samples,
@@ -107,11 +107,11 @@ export default function MultiForm({
   useEffect(() => {
     if (
       (!_associationFile && !select_qtls_samples && !qtlPublic) ||
-      select_dist.length <= 0 ||
+      !select_dist ||
       select_dist < 1 ||
       select_dist > 200 ||
       (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref)) ||
-      (ldPublic && (!select_pop || select_pop.length <= 0)) ||
+      // (ldPublic && (!select_pop || select_pop.length <= 0)) ||
       (_quantificationFile && !_genotypeFile) ||
       (!_quantificationFile && _genotypeFile)
     ) {
@@ -345,7 +345,7 @@ export default function MultiForm({
 
   function handleReset() {
     let newStates = states.slice();
-    newStates[index] = getInitialState().qtlsGWAS;
+    newStates[stateIndex] = getInitialState().qtlsGWAS;
 
     dispatch(updateMultiLoci({ states: newStates }));
     dispatch(updateAlert(getInitialState().alert));
@@ -358,9 +358,9 @@ export default function MultiForm({
     viewPhenotypeOnly(false);
   }
 
-  function removeForm(index) {
+  function removeForm(stateIndex) {
     let newStates = states.slice();
-    newStates.splice(index, 1);
+    newStates.splice(stateIndex, 1);
 
     dispatch(updateMultiLoci({ states: newStates }));
     removeFile('qtl');
@@ -389,7 +389,7 @@ export default function MultiForm({
           <Form.Group>
             <Form.Label className="mb-0">Job Name</Form.Label>
             <Form.Control
-              placeholder={`ezQTL ${index + 1}`}
+              placeholder={`ezQTL ${stateIndex + 1}`}
               value={jobName}
               type="text"
               onChange={(e) => mergeState({ jobName: e.target.value })}
@@ -470,7 +470,7 @@ export default function MultiForm({
             <i>Upload locus specific region, &le; 5Mb size</i>
           </small>
         </Col>
-        <Form.Group className="col-md-4">
+        <Form.Group className="col-md-4" controlId={`qtlPublic-${stateIndex}`}>
           <div className="d-flex">
             <Form.Label className="mb-0 mr-auto">
               Association (QTL) Data <span style={{ color: 'red' }}>*</span>
@@ -478,7 +478,6 @@ export default function MultiForm({
             <Form.Check
               disabled={submitted || select_qtls_samples}
               inline
-              id="qtlSource"
               label="Public"
               type="checkbox"
               checked={qtlPublic}
@@ -584,7 +583,7 @@ export default function MultiForm({
             />
           )}
         </Form.Group>
-        <Form.Group className="col-md-4">
+        <Form.Group className="col-md-4" controlId={`ldPublic-${stateIndex}`}>
           <div className="d-flex">
             <Form.Label className="mb-0 mr-auto">
               LD Data{' '}
@@ -595,7 +594,6 @@ export default function MultiForm({
             <Form.Check
               disabled={submitted || select_qtls_samples}
               inline
-              id="ldSource"
               label="Public"
               type="checkbox"
               checked={ldPublic}
@@ -649,13 +647,12 @@ export default function MultiForm({
             />
           )}
         </Form.Group>
-        <Form.Group className="col-md-4">
+        <Form.Group className="col-md-4" controlId={`gwasPublic-${stateIndex}`}>
           <div className="d-flex">
             <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
             <Form.Check
               disabled={submitted || select_qtls_samples}
               inline
-              id="gwasSource"
               label="Public"
               type="checkbox"
               checked={gwasPublic}
@@ -838,6 +835,7 @@ export default function MultiForm({
             <PopulationSelect
               id="qtls-results-population-input"
               disabled={submitted || !ldPublic}
+              stateIndex={stateIndex}
             />
             {/* <Form.Control.Feedback type="invalid">
                   Enter distance between 1 and 200Kb.
@@ -956,7 +954,7 @@ export default function MultiForm({
             Reset Form
           </Button>
         </Col>
-        {index != 0 && (
+        {stateIndex != 0 && (
           <Col md="auto">
             <Button
               // disabled={loading.active}
