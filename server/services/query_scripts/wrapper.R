@@ -57,21 +57,42 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
 
     publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
-    print(ldFile)
+    ldFile <- paste0(workDir,'/tmp/', request, '/MX2.LD.gz')
+    
     save_object(publicLDFile, bucket, file = ldFile)
-
-    #ldFile <- s3read_using(fread, header = FALSE, showProgress = FALSE, object = 'ezQTL/MX2.examples/MX2.LD.gz', bucket = bucket)
   } else {
     associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
     ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
   }
 
   coloc_QC(gwasFile, TRUE, associationFile, TRUE, ldFile, TRUE, leadsnp, NULL, distance, zscore_gene, plotPath, inputPath, logPath)
-
 }
 
 qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   source(rfile)
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
+}
+
+qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, tabixPath, outputPath, leadsnp, request, workDir, bucket){
+  source(rfile)
+
+  if (identical(select_gwas_sample, 'true')) {
+    gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
+  } else {
+    gwasFile <- paste0('tmp/', request, '/', gwasFile)
+  }
+
+  if (identical(select_qtls_samples, 'true')) {
+    associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
+    
+    publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
+    ldFile <- paste0(workDir,'/tmp/', request, '/MX2.LD.gz')
+    
+    save_object(publicLDFile, bucket, file = ldFile)
+  } else {
+    associationFile <- paste0('tmp/', request, '/', associationFile)
+    ldFile <- paste0('tmp/', request, '/', ldFile)
+  }
+
+  IntRegionalPlot(genome_build = 'GRCh37',association_file = gwasFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath, trait = 'MX2', leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
 }
