@@ -285,20 +285,28 @@ async function processMultiLoci(data) {
             jobName: jobName,
             runtime: runtime,
             request: request,
-            index: i,
           });
         } catch (error) {
           logger.error(error);
-          return Promise.resolve({ jobName: jobName, error: error, index: i });
+          const stdout = error.stdout ? error.stdout.toString() : '';
+          const stderr = error.stderr ? error.stderr.toString() : '';
+
+          return Promise.resolve({
+            request: params.request,
+            jobName: params.jobName,
+            parameters: JSON.stringify(params, null, 4),
+            exception: error.toString(),
+            processOutput: !stdout && !stderr ? null : stdout + stderr,
+          });
         }
       })
     );
 
     const template = calculations.map((data, i) => {
-      if (data.error) {
+      if (data.exception) {
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
-                  <li>Error: ${data.error}</li>
+                  <li>Error - Failed to Process Job</li>
                 </ul>`;
       } else {
         const resultsUrl = `${config.email.baseUrl}/#/qtls/${data.request}`;
@@ -317,7 +325,7 @@ async function processMultiLoci(data) {
     };
 
     // send user success email
-    logger.info(`Sending user success email`);
+    logger.info(`Sending user multi results email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.sender,
       to: email,
@@ -327,6 +335,34 @@ async function processMultiLoci(data) {
         templateData
       ),
     });
+
+    // send admin failure email if needed
+    const failed = calculations.filter((data) => data.exception);
+    if (failed.length) {
+      const errorsTemplate = failed.map(
+        (data) => `<ul style="list-style-type: none">
+                      <li><b>Request: </b>${data.request}</li>
+                      <li><b>Job Name: </b>${data.jobName}</li>
+                      <li><b>Parameters: </b></li>
+                      <li><pre>${data.parameters}</pre></li>
+                      <li><b>Exception: </b></li>
+                      <li><pre>${data.exception}</pre></li>
+                      <li><b>Process Output: </b></li>
+                      <li><pre>${data.processOutput}</pre></li>
+                    </ul><hr />`
+      );
+
+      logger.info(`Sending admin multi results email`);
+      const adminEmailResults = await mailer.sendMail({
+        from: config.email.sender,
+        to: config.email.admin,
+        subject: `ezQTL Results - ${timestamp} EST`,
+        html: await readTemplate(
+          __dirname + '/templates/admin-multi-failure.html',
+          { errors: errorsTemplate.join(''), request: requests[0] }
+        ),
+      });
+    }
 
     return true;
   } catch (err) {
