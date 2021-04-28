@@ -1643,7 +1643,7 @@ export function qtlsGWASLocusQCCalculation(params) {
           dispatch(
             updateQTLsGWAS({
               qcError: 'Error occured in QC calculation',
-              activeResultsTab: 'locus-qc',
+              // activeResultsTab: 'locus-qc',
             })
           );
         }
