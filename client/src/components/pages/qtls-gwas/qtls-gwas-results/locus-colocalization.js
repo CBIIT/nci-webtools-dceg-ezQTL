@@ -250,12 +250,15 @@ export function LocusColocalization() {
       Header: 'CLPP2',
       accessor: 'CLPP2',
       id: 'CLPP2',
-      sortType: useMemo(() => (rowA, rowB, columnId) => {
-        const a = Number(rowA.original[columnId]) || 0;
-        const b = Number(rowB.original[columnId]) || 0;
-        if (a > b) return 1;
-        if (b > a) return -1;
-        return 0;
+      sortType: useMemo(() => (rowA, rowB, columnId, desc) => {
+        const a = Number(rowA.values[columnId]);
+        const b = Number(rowB.values[columnId]);
+
+        if (a === b) return 0;
+        if (!a) return desc ? -1 : 1;
+        if (!b) return desc ? 1 : -1;
+
+        return a > b ? 1 : -1;
       }),
     },
     {
@@ -321,7 +324,6 @@ export function LocusColocalization() {
                   !isLoadingSummary &&
                   !isLoadingECaviar
                 ) {
-
                   console.log('run summary');
                   dispatch(
                     qtlsGWASColocVisualize({
@@ -335,7 +337,7 @@ export function LocusColocalization() {
                       select_gwas_sample,
                       select_qtls_samples,
                       select_ref: locus_alignment['top']['rsnum'],
-                      calcEcaviar: ecaviar_table.data.length === 0
+                      calcEcaviar: ecaviar_table.data.length === 0,
                     })
                   );
                 }
@@ -555,7 +557,7 @@ export function LocusColocalization() {
       )}
       {activeColocalizationTab === 'summary' && (
         <>
-          <div style={{minHeight: '10rem'}}>
+          <div style={{ minHeight: '10rem' }}>
             <LoadingOverlay
               active={
                 isLoadingSummary ||
@@ -564,7 +566,7 @@ export function LocusColocalization() {
               }
               content={
                 !isLoadingSummary &&
-                  (ecaviar_table.data.length === 0 || summaryError)
+                (ecaviar_table.data.length === 0 || summaryError)
                   ? 'No data available'
                   : null
               }

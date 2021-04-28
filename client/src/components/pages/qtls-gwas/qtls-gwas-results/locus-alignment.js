@@ -5,9 +5,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LocusAlignmentPlot } from './locus-alignment-plot';
 import { LocusAlignmentScatterPlot } from './locus-alignment-scatter-plot';
 import { BoxplotsModal } from '../../../controls/boxplots-modal/boxplots-modal';
-import { updateQTLsGWAS } from '../../../../services/actions';
+import { updateQTLsGWAS, drawLocusAlignmentScatter } from '../../../../services/actions';
 import { QTLsGWASResultsForm } from './qtls-gwas-results-form';
-// import { Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 
 export function LocusAlignment() {
   const dispatch = useDispatch();
@@ -19,7 +19,8 @@ export function LocusAlignment() {
     locus_alignment,
     locus_alignment_boxplots,
     isQueue,
-    locus_alignment_gwas_scatter
+    locus_alignment_gwas_scatter,
+    locus_alignment_gwas_scatter_threshold
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -103,29 +104,35 @@ export function LocusAlignment() {
                   please check the “Locus Colocalization” sub-module.
                 </p>
 
-                {/* <Form className="row justify-content-center">
+                <Form className="row justify-content-center">
                   <div className="col-md-2">
                     <Form.Label className="mb-0"><i>P</i>-value Threshold</Form.Label>
                     <Form.Control
+                      type="number"
+                      min="0.0"
+                      max="1.0"
                       id="locus-alignment-scatter-threshold-input"
                       disabled={!submitted}
-                      // value={_selectRef ? _selectRef : ''}
+                      value={locus_alignment_gwas_scatter_threshold}
                       onChange={(e) => {
-                        console.log("threshold", e.target.value)
-                        // _setSelectRef(e.target.value);
+                        const threshold = isNaN(parseFloat(e.target.value)) ? 0.0 : parseFloat(e.target.value);
+                        // if (e.target.value && parseFloat(e.target.value) && parseFloat(e.target.value) >= 0) {
+                          dispatch(updateQTLsGWAS({locus_alignment_gwas_scatter_threshold: threshold}));
+                          console.log("threshold", threshold, "");
+                          if (threshold >= 0.0 && threshold <= 1.0 ) {
+                            console.log('REDRAW SCATTER?', locus_alignment_gwas_scatter['raw'], null, locus_alignment['top']['gene_symbol'], threshold);
+                            dispatch(drawLocusAlignmentScatter(locus_alignment_gwas_scatter['raw'], null, locus_alignment['top']['gene_symbol'], threshold));
+                          }
+                        // }
                       }}
-                      // isInvalid={
-                      //   _selectRef &&
-                      //   _selectRef.length > 0 &&
-                      //   !/^rs\d+$/.test(_selectRef)
-                      // }
+                      isInvalid={locus_alignment_gwas_scatter_threshold < 0.0 || locus_alignment_gwas_scatter_threshold > 1.0}
                       // custom
                     />
                     <Form.Control.Feedback type="invalid">
-                      Enter valid threshold.
+                      Enter threshold between 0.0 and 1.0.
                     </Form.Control.Feedback>
                   </div>
-                </Form> */}
+                </Form>
 
                 <div style={{overflowX: 'auto'}}>
                   <LocusAlignmentScatterPlot />

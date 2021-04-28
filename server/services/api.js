@@ -169,6 +169,7 @@ apiRouter.post('/queue', async (req, res, next) => {
         MessageGroupId: request,
         MessageBody: JSON.stringify({
           ...params,
+          multi: false,
           timestamp: new Date().toLocaleString('en-US', {
             timeZone: 'America/New_York',
           }),
@@ -180,6 +181,61 @@ apiRouter.post('/queue', async (req, res, next) => {
     res.json({ request });
   } catch (err) {
     logger.info('Queue failed to submit request: ' + request);
+    next(err);
+  }
+});
+
+apiRouter.post('/queue-multi', async (req, res, next) => {
+  const { paramsArr, requests, email } = req.body;
+  const sqs = new AWS.SQS();
+
+  // upload each request and accompanying data
+  requests.forEach(async (request) => {
+    const wd = path.join(tmpDir, '/', request);
+
+    if (!fs.existsSync(wd)) {
+      fs.mkdirSync(wd);
+    }
+
+    try {
+      logger.info(`Uploading: ${fs.readdirSync(wd)}`);
+      await new AWS.S3()
+        .upload({
+          Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),
+          Bucket: awsInfo.s3.queue,
+          Key: `${awsInfo.s3.inputPrefix}/${request}/${request}.tgz`,
+        })
+        .promise();
+    } catch (err) {
+      logger.info('QueueMulti failed to upload request: ' + request);
+      next(err);
+    }
+  });
+
+  try {
+    const { QueueUrl } = await sqs
+      .getQueueUrl({ QueueName: awsInfo.sqs.url })
+      .promise();
+
+    await sqs
+      .sendMessage({
+        QueueUrl: QueueUrl,
+        MessageDeduplicationId: requests[0],
+        MessageGroupId: requests[0],
+        MessageBody: JSON.stringify({
+          ...req.body,
+          multi: true,
+          timestamp: new Date().toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+          }),
+        }),
+      })
+      .promise();
+
+    logger.info('QueueMulti submitted request: ' + requests[0]);
+    res.json({ requests });
+  } catch (err) {
+    logger.info('QueueMulti failed to submit queue request: ' + requests[0]);
     next(err);
   }
 });
@@ -321,7 +377,15 @@ apiRouter.post('/qtls-locus-colocalization-ecaviar', (req, res, next) => {
 });
 
 apiRouter.post('/qtls-locus-qc', (req, res, next) =>
-  qtlsCalculateQC({ ...req.body, workingDirectory: workingDirectory, bucket: awsInfo.s3.data }, res, next)
+  qtlsCalculateQC(
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data,
+    },
+    res,
+    next
+  )
 );
 
 apiRouter.post('/qtls-coloc-visualize', (req, res, next) =>

@@ -1,6 +1,7 @@
 import {
   UPDATE_KEY,
   UPDATE_QTLS_GWAS,
+  UPDATE_MULTI_LOCI,
   UPDATE_ERROR,
   UPDATE_SUCCESS,
   UPDATE_ALERT,
@@ -26,10 +27,11 @@ export const rootReducer = (state, action) => {
       return {
         ...state,
         qtlsGWAS: { ...mergeObject(state.qtlsGWAS, action) },
-        // {
-        //   ...state.qtlsGWAS,
-        //   ...action.data,
-        // },
+      };
+    case UPDATE_MULTI_LOCI:
+      return {
+        ...state,
+        multiLoci: { ...mergeObject(state.multiLoci, action) },
       };
     case UPDATE_ERROR:
       return {
