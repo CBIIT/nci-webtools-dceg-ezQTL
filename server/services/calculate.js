@@ -340,7 +340,7 @@ async function qtlsColocVisualize(params, res, next) {
   } = params;
 
   logger.info(`[${request}] Execute /coloc-visualize`);
-  
+
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
   const requestPath = path.resolve(config.tmp.folder, request, request + '_Summary.svg');
 
@@ -385,7 +385,7 @@ async function qtlsCalculateQC(params, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  
+
   const plotPath = path.resolve(workingDirectory, 'tmp', request, request)
   const inputPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL_input')
   const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log')
@@ -411,15 +411,77 @@ async function qtlsCalculateQC(params, res, next) {
         bucket
       ]
     );
-    
+
     let summary = '';
     if (fs.existsSync(logPath)) {
-      summary =  String(await fs.promises.readFile(logPath));
+      summary = String(await fs.promises.readFile(logPath));
     }
+
+    summary = summary.replace(/#/g,'\u2022')
+    summary = summary.split('\n\n')
+
     logger.info(`[${request}] Finished /ezqTL_ztw`);
     res.json(summary);
   } catch (err) {
     logger.error(`[${request}] Error /ezqTL_ztw ${err}`);
+    res.status(500).json(err);
+  }
+}
+
+async function qtlsCalculateLD(params, res, next) {
+
+  const {
+    request,
+    select_gwas_sample,
+    select_qtls_samples,
+    associationFile,
+    gwasFile,
+    LDFile,
+    leadsnp,
+    workingDirectory,
+    bucket
+  } = params;
+
+  logger.info(`[${request}] Execute /calculateLD`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
+
+  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
+  const tabixPath = path.resolve(workingDirectory, 'data','tabix')
+  const outputPath = path.resolve(workingDirectory, 'tmp', request, 'LD_Output.svg')
+
+  logger.info(tabixPath)
+  logger.info(outputPath)
+
+  try {
+
+    fs.mkdirSync(path.resolve(workingDirectory,'tmp',request,'tabix'))
+
+    const wrapper = await r(
+      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+      'qtlsCalculateLD',
+      [
+        rfile,
+        select_gwas_sample.toString(),
+        select_qtls_samples.toString(),
+        gwasFile.toString(),
+        associationFile.toString(),
+        LDFile.toString(),
+        tabixPath.toString(),
+        outputPath.toString(),
+        leadsnp.toString(),
+        request.toString(),
+        workingDirectory,
+        bucket
+      ]
+    );
+    logger.info(`[${request}] Finished /calculateLD`);
+    res.json(wrapper);
+
+
+  } catch (err) {
+    logger.error(`[${request}] Error /calculateLD ${err}`);
     res.status(500).json(err);
   }
 }
@@ -432,5 +494,6 @@ module.exports = {
   qtlsCalculateLocusColocalizationHyprcoloc,
   qtlsCalculateLocusColocalizationECAVIAR,
   qtlsCalculateQC,
+  qtlsCalculateLD,
   qtlsColocVisualize
 };
