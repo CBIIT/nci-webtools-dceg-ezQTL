@@ -577,7 +577,9 @@ export default function MultiForm({
                 setFile('qtl', e.target.files[0]);
               }}
               // accept=".tsv, .txt"
-              isInvalid={attempt ? !_associationFile : false}
+              isInvalid={
+                attempt ? !_associationFile && !select_qtls_samples : false
+              }
               feedback="Please upload a data file"
               custom
             />
