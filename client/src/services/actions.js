@@ -1563,8 +1563,8 @@ function qtlsGWASHyprcolocCalculation(params) {
           dispatch(updateError({ visible: true }));
           dispatch(
             updateQTLsGWAS({
-              isError: true,
-              activeResultsTab: 'locus-qc',
+              // isError: true,
+              // activeResultsTab: 'locus-qc',
               isLoadingHyprcoloc: false,
             })
           );
@@ -1607,7 +1607,11 @@ export function qtlsGWASECaviarCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({
+              // isError: true,
+              // activeResultsTab: 'locus-qc',
+              isLoadingECaviar: false,
+            })
           );
         }
       })
@@ -1694,8 +1698,8 @@ export function qtlsGWASColocVisualize(params) {
             dispatch(updateError({ visible: true }));
             dispatch(
               updateQTLsGWAS({
-                isError: true,
-                activeResultsTab: 'locus-qc',
+                // isError: true,
+                // activeResultsTab: 'locus-qc',
                 isLoadingECaviar: false,
               })
             );
@@ -1742,8 +1746,8 @@ export function qtlsGWASColocVisualize(params) {
             dispatch(updateError({ visible: true }));
             dispatch(
               updateQTLsGWAS({
-                summaryError: true,
-                activeResultsTab: 'locus-qc',
+                // summaryError: true,
+                // activeResultsTab: 'locus-qc',
                 isLoadingSummary: false,
               })
             );
@@ -1870,7 +1874,11 @@ export function qtlsGWASCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({
+              isError: true,
+              activeResultsTab: 'locus-qc',
+              isLoading: true,
+            })
           );
         }
       })
@@ -1934,11 +1942,7 @@ export function qtlsGWASCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({
-              isError: true,
-              activeResultsTab: 'locus-qc',
-              isLoading: false,
-            })
+            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
           );
         }
       });
