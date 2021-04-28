@@ -33,16 +33,37 @@ export function LocusQC() {
       )}
       {submitted && !qcError && !isLoading && !isLoadingQC && (
         <>
-          <div style={{whiteSpace: 'pre-wrap'}}>
-            {locus_qc}
+          <div className="border mb-2">
+            <div className="p-2 mb-3" style={{ whiteSpace: 'pre-wrap' }}>
+              {locus_qc[0]}
+            </div>
+
+            <div className="row">
+              {locus_qc.slice(1).map((text, i) => {
+                const splitText = text.split('\n')
+                const firstLine = splitText.splice(0,1) + '\n'
+                console.log(splitText)
+
+                return (<div className="col-md-4 px-4 mb-3" key={i} style={{ whiteSpace: 'pre-wrap' }}>
+                  {splitText.length !== 0 ? 
+                  <>
+                    <b>{firstLine}</b>
+                    {splitText.join('\n')}
+                  </> :
+                  <>{firstLine}</>}
+
+                  
+                </div>)
+              })}
+            </div>
           </div>
 
           <Zoom
             plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
-            className="border rounded p-3"
+            className="border rounded p-3 mb-2"
             maxHeight="800px"
           />
-          
+
           <Zoom
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
             className="border rounded p-3 mb-2"
