@@ -75,7 +75,8 @@ export function LocusAlignment() {
             The pink diamond in the LocusZoom plot shows the best (most
             significant) QTL variant for the selected “Reference Gene”. Red
             circle indicates the current LD reference variant, which will be
-            simultaneously updated in both GWAS and QTLs LocusZoom plots.
+            simultaneously updated in both GWAS and QTLs LocusZoom plots. 
+            The circle and pink diamond are overlapped at the beginning.
           </p>
               
           <div style={{overflowX: 'auto'}}>

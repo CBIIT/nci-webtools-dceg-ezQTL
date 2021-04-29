@@ -238,7 +238,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     cat("\nOverlapped SNPs",file=logfile,sep="\n",append = T)
     cat(paste0('# number of overlapped snps by rsnum: ',dim(snpall)[1]),file=logfile,sep="\n",append = T)
     snpalltmp <- snpall %>% filter(pos_gwas!=pos_ld|pos_gwas!=pos_qtl|pos_qtl!=pos_ld | ref_gwas!=ref_ld|ref_gwas!=ref_qtl|ref_qtl!=ref_ld|alt_gwas!=alt_ld|alt_gwas!=alt_qtl|alt_qtl!=alt_ld)
-    cat(paste0('# number of overlapped snps by rsnum, but have differnt pos, ref, or alt:  ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    cat(paste0('# number of overlapped snps by rsnum, but have different pos, ref, or alt:  ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     if(dim(snpalltmp)[1]>0){
       cat('Warning: found SNPs with same rsnum, but differnt information. Check the SNP Match file for detail. However, ezQTL still use the rsnum as the ID for colocalization analyses.',file=logfile,sep="\n",append = T)
       snpalltmp %>% write_delim('snp_match.txt',delim = '\t',col_names = T)
@@ -325,7 +325,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ) %>% 
       mutate(label=if_else(rsnum==leadsnp,rsnum,'')) %>% 
       mutate(ambiguous_snp=ifelse((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')), "Y","N"))
-      
+    
     
     #unique(qdata$Gene)
     
@@ -387,6 +387,7 @@ hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=
   
   if(ngene>20){
     p <- hydata %>% 
+      mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) %>% 
       mutate(label=if_else(is.na(candidate_snp)|posterior_prob<0.5,NA_character_,paste0(gene_symbol,"/",candidate_snp))) %>% 
       #mutate(label=paste0(gene_symbol,"/",candidate_snp)) %>% 
       mutate(gene_symbol=fct_reorder(gene_symbol,posterior_prob)) %>% 
@@ -403,6 +404,7 @@ hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=
   }else{
     
     p <- hydata %>% 
+      mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) %>% 
       mutate(label=if_else(is.na(candidate_snp)|posterior_prob<0.5,NA_character_,candidate_snp)) %>% 
       #mutate(label=paste0(gene_symbol,"/",candidate_snp)) %>% 
       mutate(gene_symbol=fct_reorder(gene_symbol,posterior_prob)) %>% 
@@ -546,6 +548,8 @@ ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plo
 
 
 coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
+  
+  hydata <- hydata %>%  mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) 
   
   genelevel <- hydata %>% arrange(posterior_prob) %>% pull(gene_symbol)
   
