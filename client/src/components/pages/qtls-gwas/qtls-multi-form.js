@@ -5,6 +5,151 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateAlert, updateMultiLoci } from '../../../services/actions';
 import Select from '../../controls/select/select';
 import { PopulationSelect } from '../../controls/population-select/population-select';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+
+function LocusInfo({ locusIndex, state, mergeState }) {
+  const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
+  const {
+    locusInformation,
+    submitted,
+    qtlPublic,
+    ldPublic,
+    gwasPublic,
+  } = state;
+  const { select_dist, select_position, select_ref } = locusInformation[
+    locusIndex
+  ];
+
+  // check form validity
+  useEffect(() => {
+    if (
+      !select_dist ||
+      select_dist < 1 ||
+      select_dist > 200 ||
+      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref))
+    ) {
+      dispatch(updateMultiLoci({ valid: false }));
+    } else {
+      dispatch(updateMultiLoci({ valid: true }));
+    }
+  }, [ldPublic, qtlPublic, select_dist, select_ref]);
+
+  function mergeLocusInfo(data) {
+    let newLocusInfo = locusInformation.slice();
+    newLocusInfo[locusIndex] = { ...newLocusInfo[locusIndex], ...data };
+    mergeState({ locusInformation: newLocusInfo });
+  }
+
+  function addLocusInfo() {
+    let newLocusInfo = state.locusInformation.slice();
+    newLocusInfo = [
+      ...newLocusInfo,
+      ...getInitialState().multiLoci.states[0].locusInformation,
+    ];
+    mergeState({ locusInformation: newLocusInfo });
+  }
+
+  function removeLocusInfo(locusIndex) {
+    let newLocusInfo = state.locusInformation.slice();
+    newLocusInfo.splice(locusIndex, 1);
+    mergeState({ locusInformation: newLocusInfo });
+  }
+
+  return (
+    <Form.Row>
+      <Col md="auto">
+        <Form.Group>
+          <Form.Label className="mb-0">
+            cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
+            <small>
+              <i>(+/- Kb up to 5Mb)</i>
+            </small>
+          </Form.Label>
+          <Form.Control
+            type="number"
+            min="1"
+            max="2000"
+            id="qtls-distance-input"
+            disabled={submitted}
+            onChange={(e) => mergeLocusInfo({ select_dist: e.target.value })}
+            value={select_dist}
+            isInvalid={select_dist < 1 || select_dist > 200}
+            // custom
+          />
+          <Form.Control.Feedback type="invalid">
+            Enter distance between 1 and 200Kb.
+          </Form.Control.Feedback>
+        </Form.Group>
+      </Col>
+      {qtlPublic || ldPublic || gwasPublic ? (
+        <>
+          <Col md="2">
+            <Form.Label className="mb-0">Position</Form.Label>
+            <Form.Control
+              id="select_position"
+              disabled={submitted}
+              onChange={(e) =>
+                mergeLocusInfo({ select_position: e.target.value })
+              }
+              placeholder="e.g. 100000-1000000"
+              value={select_position}
+            />
+          </Col>
+        </>
+      ) : (
+        <Col md="auto">
+          <Form.Group>
+            <Form.Label className="mb-0">
+              SNP{' '}
+              <small>
+                <i>(Default: lowest GWAS P-value SNP)</i>
+              </small>
+            </Form.Label>
+            <Form.Control
+              id="qtls-snp-input"
+              disabled={submitted}
+              onChange={(e) => mergeLocusInfo({ select_ref: e.target.value })}
+              value={select_ref ? select_ref : ''}
+              isInvalid={
+                select_ref &&
+                select_ref.length > 0 &&
+                !/^rs\d+$/.test(select_ref)
+              }
+              // custom
+            />
+            <Form.Control.Feedback type="invalid">
+              Enter valid RS number. Leave empty for default.
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+      )}
+      {locusIndex == locusInformation.length - 1 && (
+        <Col md="auto" className="d-flex">
+          <Button
+            className="my-4"
+            variant="success"
+            onClick={() => addLocusInfo()}
+          >
+            <FontAwesomeIcon icon={faPlus} />
+          </Button>
+        </Col>
+      )}
+      {locusIndex != 0 && (
+        <Col md="auto" className="d-flex">
+          <Button
+            className="my-4"
+            variant="danger"
+            onClick={() => removeLocusInfo(locusIndex)}
+          >
+            <FontAwesomeIcon icon={faMinus} />
+          </Button>
+        </Col>
+      )}
+    </Form.Row>
+  );
+}
 
 export default function MultiForm({
   stateIndex,
@@ -42,9 +187,7 @@ export default function MultiForm({
     gwasFile,
     LDFile,
     select_pop,
-    select_gene,
-    select_dist,
-    select_ref,
+    locusInformation,
     isLoading,
     isError,
     loadingPublic,
@@ -63,7 +206,6 @@ export default function MultiForm({
     phenotype,
     phenotypeOptions,
     select_chromosome,
-    select_position,
     qtlPublic,
     gwasPublic,
     ldPublic,
@@ -107,10 +249,6 @@ export default function MultiForm({
   useEffect(() => {
     if (
       (!_associationFile && !select_qtls_samples && !qtlPublic) ||
-      !select_dist ||
-      select_dist < 1 ||
-      select_dist > 200 ||
-      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref)) ||
       // (ldPublic && (!select_pop || select_pop.length <= 0)) ||
       (_quantificationFile && !_genotypeFile) ||
       (!_quantificationFile && _genotypeFile)
@@ -125,10 +263,8 @@ export default function MultiForm({
     _genotypeFile,
     ldPublic,
     qtlPublic,
-    select_dist,
     select_pop,
     select_qtls_samples,
-    select_ref,
   ]);
 
   function getGenomeOptions() {
@@ -288,8 +424,21 @@ export default function MultiForm({
           row.Chromosome == select_chromosome.value
       )[0]
       .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
-    console.log(ldKey);
+
     mergeState({ ldProject: project, ldKey: ldKey });
+  }
+
+  function handleChromosome(chromosome) {
+    const ldKey = publicGTEx['LD dataset']
+      .filter(
+        (row) =>
+          row.Genome_build == genome.value &&
+          row.Project == ldProject.value &&
+          row.Chromosome == chromosome
+      )[0]
+      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+
+    mergeState({ chromosome: chromosome, ldKey: ldKey });
   }
 
   // qtl type
@@ -400,7 +549,7 @@ export default function MultiForm({
         <Col md="1" />
         <Col md="auto">
           <div>
-            <p style={{ 'font-weight': '500' }}>Sample Data</p>
+            <p style={{ fontWeight: '500' }}>Sample Data</p>
             <div>
               <span className="mr-3">
                 {!select_gwas_sample ? (
@@ -465,17 +614,28 @@ export default function MultiForm({
         <Col md="6">
           <b>QTLs Data Files</b>
         </Col>
+        <Col md="6">
+          <Button
+            variant="link"
+            onClick={() => setAdditionalInput(!showAdditionalInput)}
+          >
+            {showAdditionalInput ? 'Hide' : 'Show'} Additional Input
+          </Button>
+        </Col>
         <Col md="12">
           <small>
             <i>Upload locus specific region, &le; 5Mb size</i>
           </small>
         </Col>
-        <Form.Group className="col-md-4" controlId={`qtlPublic-${stateIndex}`}>
+      </Form.Row>
+      <Form.Row>
+        <Form.Group className="col-md-3" controlId={`qtlPublic-${stateIndex}`}>
           <div className="d-flex">
             <Form.Label className="mb-0 mr-auto">
               Association (QTL) Data <span style={{ color: 'red' }}>*</span>
             </Form.Label>
             <Form.Check
+              className="mr-0"
               disabled={submitted || select_qtls_samples}
               inline
               label="Public"
@@ -486,7 +646,6 @@ export default function MultiForm({
                   qtlPublic: !qtlPublic,
                   ...(!qtlPublic && { select_ref: false }),
                 });
-
                 setFile('qtl', '');
               }}
             />
@@ -495,7 +654,7 @@ export default function MultiForm({
             <div className="mt-2">
               <Form.Row>
                 <Col />
-                <Col md="3">
+                <Col md="auto">
                   <Form.Check
                     id="tissueOnly"
                     label="Tissue Only"
@@ -544,7 +703,7 @@ export default function MultiForm({
                   </Form.Row>
                 </>
               )}
-              <Row>
+              <Form.Row>
                 <Col>
                   <Form.Group>
                     <Select
@@ -557,7 +716,7 @@ export default function MultiForm({
                     />
                   </Form.Group>
                 </Col>
-              </Row>
+              </Form.Row>
             </div>
           ) : (
             <Form.File
@@ -585,74 +744,11 @@ export default function MultiForm({
             />
           )}
         </Form.Group>
-        <Form.Group className="col-md-4" controlId={`ldPublic-${stateIndex}`}>
-          <div className="d-flex">
-            <Form.Label className="mb-0 mr-auto">
-              LD Data{' '}
-              <small>
-                <i>(Default: 1KG Phase 3, EUR)</i>
-              </small>
-            </Form.Label>
-            <Form.Check
-              disabled={submitted || select_qtls_samples}
-              inline
-              label="Public"
-              type="checkbox"
-              checked={ldPublic}
-              onChange={(_) => {
-                mergeState({
-                  ldPublic: !ldPublic,
-                  select_pop: false,
-                  ...(!ldPublic && { select_ref: false }),
-                });
-
-                setFile('ld', '');
-              }}
-            />
-          </div>
-          {ldPublic ? (
-            <div>
-              <Form.Row>
-                <Col>
-                  <Form.Group>
-                    <Select
-                      disabled={loadingPublic || submitted}
-                      id="ldProject"
-                      label="Project"
-                      value={ldProject}
-                      options={ldProjectOptions}
-                      onChange={handleLdProject}
-                    />
-                  </Form.Group>
-                </Col>
-              </Form.Row>
-            </div>
-          ) : (
-            <Form.File
-              id="qtls-ld-file"
-              disabled={submitted || select_qtls_samples}
-              key={_LDFile}
-              label={
-                _LDFile
-                  ? _LDFile.name || _LDFile.filename || _LDFile
-                  : select_qtls_samples
-                  ? 'MX2.LD.gz'
-                  : 'Choose File'
-              }
-              onChange={(e) => {
-                setFile('ld', e.target.files[0]);
-              }}
-              // accept=".tsv, .txt"
-              // isInvalid={checkValid ? !validFile : false}
-              // feedback="Please upload a data file"
-              custom
-            />
-          )}
-        </Form.Group>
-        <Form.Group className="col-md-4" controlId={`gwasPublic-${stateIndex}`}>
+        <Form.Group className="col-md-3" controlId={`gwasPublic-${stateIndex}`}>
           <div className="d-flex">
             <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
             <Form.Check
+              className="mr-0"
               disabled={submitted || select_qtls_samples}
               inline
               label="Public"
@@ -672,7 +768,7 @@ export default function MultiForm({
             <div className="mt-2">
               <Row>
                 <Col />
-                <Col md="4">
+                <Col md="auto">
                   <Form.Check
                     id="phenotypeOnly"
                     label="Phenotype Only"
@@ -710,7 +806,6 @@ export default function MultiForm({
                   </Col>
                 </Row>
               )}
-
               <Row>
                 <Col>
                   <Form.Group>
@@ -748,19 +843,9 @@ export default function MultiForm({
             />
           )}
         </Form.Group>
-      </Form.Row>
-      <Form.Row>
-        <Col md="12">
-          <Button
-            variant="link"
-            onClick={() => setAdditionalInput(!showAdditionalInput)}
-          >
-            {showAdditionalInput ? 'Hide' : 'Show'} Additional Input
-          </Button>
-        </Col>
         {showAdditionalInput && (
           <>
-            <Form.Group className="col-md-4">
+            <Form.Group className="col-md-3">
               <Form.Label className="mb-0">Quantification Data File</Form.Label>
               <Form.File
                 ref={quantificationFileControl}
@@ -790,7 +875,7 @@ export default function MultiForm({
                 Genotype Data File."
               />
             </Form.Group>
-            <Form.Group className="col-md-4">
+            <Form.Group className="col-md-3">
               <Form.Label className="mb-0">Genotype Data File</Form.Label>
               <Form.File
                 ref={genotypeFileControl}
@@ -825,124 +910,128 @@ export default function MultiForm({
       </Form.Row>
       <hr />
       <Form.Row>
+        <Col>
+          <Form.Group controlId={`ldPublic-${stateIndex}`} className="mb-0">
+            <Form.Label className="mr-5">
+              <b>LD Information</b>
+            </Form.Label>
+            <Form.Check
+              disabled={submitted || select_qtls_samples}
+              inline
+              label="Public"
+              type="checkbox"
+              checked={ldPublic}
+              onChange={(_) => {
+                mergeState({
+                  ldPublic: !ldPublic,
+                  select_pop: false,
+                  ...(!ldPublic && { select_ref: false }),
+                });
+                setFile('ld', '');
+              }}
+            />
+          </Form.Group>
+        </Col>
+      </Form.Row>
+      <Form.Row>
+        <Form.Group className="col-md-12">
+          <Form.Label className="mb-0 mr-auto">
+            LD Data{' '}
+            <small>
+              <i>(Default: 1KG Phase 3, EUR)</i>
+            </small>
+          </Form.Label>
+          {ldPublic ? (
+            <div>
+              <Form.Row>
+                <Col md="2">
+                  <Form.Group>
+                    <Select
+                      disabled={loadingPublic || submitted}
+                      id="ldProject"
+                      label="Project"
+                      value={ldProject}
+                      options={ldProjectOptions}
+                      onChange={handleLdProject}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md="auto">
+                  <Form.Group>
+                    <Select
+                      disabled={submitted}
+                      id="chromosome"
+                      label="Chromosome"
+                      value={select_chromosome}
+                      options={[
+                        ...Array.from({ length: 22 }, (_, i) => ({
+                          value: i + 1,
+                          label: i + 1,
+                        })),
+                        {
+                          value: 'X',
+                          label: 'X',
+                        },
+                        {
+                          value: 'Y',
+                          label: 'Y',
+                        },
+                      ]}
+                      onChange={(chromosome) => handleChromosome(chromosome)}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md="3">
+                  <Form.Label className="mb-0">
+                    Population <span style={{ color: 'red' }}>*</span>{' '}
+                  </Form.Label>
+                  <PopulationSelect
+                    id="qtls-results-population-input"
+                    disabled={submitted || !ldPublic}
+                    stateIndex={stateIndex}
+                  />
+                </Col>
+              </Form.Row>
+            </div>
+          ) : (
+            <Col md="3" className="px-0">
+              <Form.File
+                id="qtls-ld-file"
+                disabled={submitted || select_qtls_samples}
+                key={_LDFile}
+                label={
+                  _LDFile
+                    ? _LDFile.name || _LDFile.filename || _LDFile
+                    : select_qtls_samples
+                    ? 'MX2.LD.gz'
+                    : 'Choose File'
+                }
+                onChange={(e) => {
+                  setFile('ld', e.target.files[0]);
+                }}
+                // accept=".tsv, .txt"
+                // isInvalid={checkValid ? !validFile : false}
+                // feedback="Please upload a data file"
+                custom
+              />
+            </Col>
+          )}
+        </Form.Group>
+      </Form.Row>
+      <hr />
+      <Form.Row>
         <Col md="12">
           <b>Locus Information</b>
         </Col>
-
-        {ldPublic && (
-          <Col md="3">
-            <Form.Label className="mb-0">
-              Population <span style={{ color: 'red' }}>*</span>{' '}
-            </Form.Label>
-            <PopulationSelect
-              id="qtls-results-population-input"
-              disabled={submitted || !ldPublic}
-              stateIndex={stateIndex}
-            />
-            {/* <Form.Control.Feedback type="invalid">
-                  Enter distance between 1 and 200Kb.
-                </Form.Control.Feedback> */}
-          </Col>
-        )}
-
-        <Col md="3">
-          <Form.Group>
-            <Form.Label className="mb-0">
-              cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
-              <small>
-                <i>(+/- Kb up to 5Mb)</i>
-              </small>
-            </Form.Label>
-            <Form.Control
-              type="number"
-              min="1"
-              max="2000"
-              id="qtls-distance-input"
-              disabled={submitted}
-              onChange={(e) => {
-                mergeState({ select_dist: e.target.value });
-              }}
-              value={select_dist}
-              isInvalid={select_dist < 1 || select_dist > 200}
-              // custom
-            />
-            <Form.Control.Feedback type="invalid">
-              Enter distance between 1 and 200Kb.
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-        {qtlPublic || ldPublic || gwasPublic ? (
-          <>
-            <Col md="3">
-              <Form.Group>
-                <Select
-                  disabled={submitted}
-                  id="chromosome"
-                  label="Chromosome"
-                  value={select_chromosome}
-                  options={[
-                    ...Array.from({ length: 22 }, (_, i) => ({
-                      value: i + 1,
-                      label: i + 1,
-                    })),
-                    {
-                      value: 'X',
-                      label: 'X',
-                    },
-                    {
-                      value: 'Y',
-                      label: 'Y',
-                    },
-                  ]}
-                  onChange={(chromosome) => {
-                    mergeState({ select_chromosome: chromosome });
-                  }}
-                />
-              </Form.Group>
-            </Col>
-            <Col md="3">
-              <Form.Label className="mb-0">Position</Form.Label>
-              <Form.Control
-                id="select_position"
-                disabled={submitted}
-                onChange={(e) => {
-                  mergeState({ select_position: e.target.value });
-                }}
-                placeholder="e.g. 100000-1000000"
-                value={select_position}
-              />
-            </Col>
-          </>
-        ) : (
-          <Col md="3">
-            <Form.Group>
-              <Form.Label className="mb-0">
-                SNP{' '}
-                <small>
-                  <i>(Default: lowest GWAS P-value SNP)</i>
-                </small>
-              </Form.Label>
-              <Form.Control
-                id="qtls-snp-input"
-                disabled={submitted}
-                onChange={(e) => {
-                  mergeState({ select_ref: e.target.value });
-                }}
-                value={select_ref ? select_ref : ''}
-                isInvalid={
-                  select_ref &&
-                  select_ref.length > 0 &&
-                  !/^rs\d+$/.test(select_ref)
-                }
-                // custom
-              />
-              <Form.Control.Feedback type="invalid">
-                Enter valid RS number. Leave empty for default.
-              </Form.Control.Feedback>
-            </Form.Group>
-          </Col>
-        )}
       </Form.Row>
+      {locusInformation.map((_, i) => (
+        <LocusInfo
+          locusIndex={i}
+          state={state}
+          mergeState={mergeState}
+          key={`locusInfo-${i}`}
+        />
+      ))}
       <Form.Row>
         <Col />
         <Col md="auto">

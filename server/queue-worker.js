@@ -287,7 +287,7 @@ async function processMultiLoci(data) {
             request: request,
           });
         } catch (error) {
-          logger.error(error);
+          // logger.error(error);
           const stdout = error.stdout ? error.stdout.toString() : '';
           const stderr = error.stderr ? error.stderr.toString() : '';
 
@@ -366,7 +366,7 @@ async function processMultiLoci(data) {
 
     return true;
   } catch (err) {
-    logger.error(err);
+    // logger.error(err);
 
     const stdout = err.stdout ? err.stdout.toString() : '';
     const stderr = err.stderr ? err.stderr.toString() : '';

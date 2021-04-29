@@ -248,7 +248,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
     logger.info(`Fetch Queue Result: ${request}`);
 
     // validate request format
-    if (!validate(request)) throw `Invalid request`;
+    if (!validate(request.substring(0, 36))) throw `Invalid request`;
 
     // ensure output directory exists
     const resultsFolder = path.resolve(config.tmp.folder, request);
