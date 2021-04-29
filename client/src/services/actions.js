@@ -1516,8 +1516,6 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
             })
           );
-        } else {
-          dispatch(updateQTLsGWAS({ isLoading: false }));
         }
       });
   };
@@ -1649,7 +1647,7 @@ export function qtlsGWASLocusQCCalculation(params) {
         }
       })
       .then(function () {
-        dispatch(updateQTLsGWAS({ isLoadingQC: false, isLoading: false }));
+        dispatch(updateQTLsGWAS({ isLoadingQC: false }));
       });
   };
 }
@@ -1866,6 +1864,7 @@ export function qtlsGWASCalculation(params) {
               //   pageSize: 0
               // }
             },
+            isLoading: false,
           })
         );
       })
@@ -1877,7 +1876,7 @@ export function qtlsGWASCalculation(params) {
             updateQTLsGWAS({
               isError: true,
               activeResultsTab: 'locus-qc',
-              isLoading: true,
+              isLoading: false,
             })
           );
         }
@@ -1903,10 +1902,7 @@ export function qtlsGWASCalculation(params) {
           );
         } else {
           dispatch(
-            updateQTLsGWAS({
-              qcError: 'No data available for QC plot',
-              isLoading: false,
-            })
+            updateQTLsGWAS({ qcError: 'No data available for QC plot' })
           );
         }
         /*
@@ -2087,7 +2083,11 @@ export function qtlsGWASBoxplotsCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({
+              isError: true,
+              activeResultsTab: 'locus-qc',
+              isLoading: false,
+            })
           );
         }
       })
@@ -2110,7 +2110,7 @@ export function getPublicGTEx(store = 'single') {
       if (store == 'single') {
         dispatch(updateQTLsGWAS({ loadingPublic: true }));
       } else if (store == 'multi') {
-        dispatch(updateMultiLoci({ isLoading: false }));
+        dispatch(updateMultiLoci({ isLoading: true }));
       }
       const { data } = await axios.post('api/getPublicGTEx');
 
@@ -2274,6 +2274,7 @@ export function fetchResults(request) {
           layout: locus_alignment_plot_layout,
           top: main['locus_alignment']['top'][0][0],
         },
+        locus_alignment_gwas_scatter_threshold: 1.0,
         locus_colocalization_correlation: {
           data: main['locus_colocalization_correlation']['data'][0],
         },
@@ -2286,7 +2287,7 @@ export function fetchResults(request) {
         },
       };
 
-      dispatch(updateQTLsGWAS({ ...state, isLoading: false }));
+      await dispatch(updateQTLsGWAS({ ...state, isLoading: false }));
 
       const qtlsGWAS = getState().qtlsGWAS;
       if (
@@ -2305,6 +2306,8 @@ export function fetchResults(request) {
             select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
           })
         );
+      } else {
+        dispatch(updateQTLsGWAS({ qcError: 'No data available for QC plot' }));
       }
     } catch (error) {
       console.log(error);

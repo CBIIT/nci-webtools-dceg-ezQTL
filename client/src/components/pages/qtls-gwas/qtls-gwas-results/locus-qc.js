@@ -10,7 +10,7 @@ export function LocusQC() {
     request,
     isLoading,
     locus_qc,
-    isLoadingQC
+    isLoadingQC,
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -19,45 +19,54 @@ export function LocusQC() {
         <LoadingOverlay
           active={true}
           content={
-            <>Select data in the left panel and click <b>Calculate</b> to see results here.</>
+            <>
+              Select data in the left panel and click <b>Calculate</b> to see
+              results here.
+            </>
           }
         />
       )}
       {submitted && qcError && (
         <LoadingOverlay
           active={true}
-          content={
-            <b className="text-danger">{qcError}</b>
-          }
+          content={<b className="text-danger">{qcError}</b>}
         />
       )}
-      {submitted && !qcError && !isLoading && !isLoadingQC && (
+      <LoadingOverlay active={isLoadingQC} />
+      {submitted && locus_qc && !qcError && !isLoading && !isLoadingQC && (
         <>
-          <div className="border mb-2">
-            <div className="p-2 mb-3" style={{ whiteSpace: 'pre-wrap' }}>
-              {locus_qc[0]}
+          {locus_qc.length && (
+            <div className="border mb-2">
+              <div className="p-2 mb-3" style={{ whiteSpace: 'pre-wrap' }}>
+                {locus_qc[0]}
+              </div>
+
+              <div className="row">
+                {locus_qc.slice(1).map((text, i) => {
+                  const splitText = text.split('\n');
+                  const firstLine = splitText.splice(0, 1) + '\n';
+                  console.log(splitText);
+
+                  return (
+                    <div
+                      className="col-md-4 px-4 mb-3"
+                      key={i}
+                      style={{ whiteSpace: 'pre-wrap' }}
+                    >
+                      {splitText.length !== 0 ? (
+                        <>
+                          <b>{firstLine}</b>
+                          {splitText.join('\n')}
+                        </>
+                      ) : (
+                        <>{firstLine}</>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-
-            <div className="row">
-              {locus_qc.slice(1).map((text, i) => {
-                const splitText = text.split('\n')
-                const firstLine = splitText.splice(0,1) + '\n'
-                console.log(splitText)
-
-                return (<div className="col-md-4 px-4 mb-3" key={i} style={{ whiteSpace: 'pre-wrap' }}>
-                  {splitText.length !== 0 ? 
-                  <>
-                    <b>{firstLine}</b>
-                    {splitText.join('\n')}
-                  </> :
-                  <>{firstLine}</>}
-
-                  
-                </div>)
-              })}
-            </div>
-          </div>
-
+          )}
           <Zoom
             plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
             className="border rounded p-3 mb-2"
