@@ -456,8 +456,6 @@ async function qtlsCalculateLD(params, res, next) {
 
   try {
 
-    fs.mkdirSync(path.resolve(workingDirectory,'tmp',request,'tabix'))
-
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
       'qtlsCalculateLD',

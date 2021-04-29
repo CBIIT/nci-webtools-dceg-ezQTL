@@ -69,7 +69,12 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
 }
 
 qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
+  library(plyr)
   source(rfile)
+
+  hydata <- ldply(hydata, data.frame)
+  ecdata <- ldply(ecdata, data.frame)
+
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
