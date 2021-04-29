@@ -2274,6 +2274,7 @@ export function fetchResults(request) {
           layout: locus_alignment_plot_layout,
           top: main['locus_alignment']['top'][0][0],
         },
+        locus_alignment_gwas_scatter_threshold: 1.0,
         locus_colocalization_correlation: {
           data: main['locus_colocalization_correlation']['data'][0],
         },
@@ -2286,7 +2287,7 @@ export function fetchResults(request) {
         },
       };
 
-      dispatch(updateQTLsGWAS({ ...state, isLoading: false }));
+      await dispatch(updateQTLsGWAS({ ...state, isLoading: false }));
 
       const qtlsGWAS = getState().qtlsGWAS;
       if (
@@ -2305,6 +2306,8 @@ export function fetchResults(request) {
             select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
           })
         );
+      } else {
+        dispatch(updateQTLsGWAS({ qcError: 'No data available for QC plot' }));
       }
     } catch (error) {
       console.log(error);
