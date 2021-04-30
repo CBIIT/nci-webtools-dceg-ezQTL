@@ -20,7 +20,6 @@ export const PopulationSelect = ({
 
   useEffect(() => {
     // console.log("USE EFFECT", _selectPop);
-    console.log(stateIndex);
     if (stateIndex >= 0) {
       // for multi loci form if an index is provided
       let newStates = states.slice();
