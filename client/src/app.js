@@ -46,8 +46,8 @@ export function App() {
 
   return (
     <Router>
-      <a href={window.location.href + "#main"} class="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center">Skip to Main Content</a>
       <header className="bg-primary-gradient py-3">
+        <a href={window.location.href + "#main"} className="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center">Skip to Main Content</a>
         <div className="container px-0">
           <a href="https://dceg.cancer.gov/" target="_blank" rel="noreferrer">
             <img
@@ -78,7 +78,8 @@ export function App() {
           </Navbar.Collapse>
         </div>
       </Navbar>
-      <div id="main" style={{ backgroundColor: '#EEEEEE' }}>
+      <main id="main" style={{ backgroundColor: '#EEEEEE' }}>
+        <h1 className="sr-only">ezQTL</h1>
         <ErrorModal />
         <SuccessModal />
         <div className="bg-white container py-4 shadow">
@@ -99,7 +100,7 @@ export function App() {
           <Route path="/qtls-multi" component={QTLsMulti} />
           <Route path="/help" component={Help} />
         </div>
-      </div>
+      </main>
       <NCIFooter
         className="py-4 bg-primary-gradient text-light"
         title={
