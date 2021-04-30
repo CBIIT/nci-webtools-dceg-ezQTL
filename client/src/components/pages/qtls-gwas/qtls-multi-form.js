@@ -51,7 +51,7 @@ function LocusInfo({ locusIndex, state, mergeState }) {
     mergeState({ locusInformation: newLocusInfo });
   }
 
-  function removeLocusInfo(locusIndex) {
+  function removeLocusInfo() {
     let newLocusInfo = state.locusInformation.slice();
     newLocusInfo.splice(locusIndex, 1);
     mergeState({ locusInformation: newLocusInfo });
@@ -126,7 +126,7 @@ function LocusInfo({ locusIndex, state, mergeState }) {
         </Col>
       )}
       {locusIndex == locusInformation.length - 1 && (
-        <Col md="auto" className="d-flex">
+        <Col md="auto">
           <Button
             className="my-4"
             variant="success"
@@ -137,11 +137,12 @@ function LocusInfo({ locusIndex, state, mergeState }) {
         </Col>
       )}
       {locusIndex != 0 && (
-        <Col md="auto" className="d-flex">
+        <Col md="auto">
           <Button
+            size="md"
             className="my-4"
             variant="danger"
-            onClick={() => removeLocusInfo(locusIndex)}
+            onClick={() => removeLocusInfo()}
           >
             <FontAwesomeIcon icon={faMinus} />
           </Button>
@@ -507,7 +508,7 @@ export default function MultiForm({
     viewPhenotypeOnly(false);
   }
 
-  function removeForm(stateIndex) {
+  function removeForm() {
     let newStates = states.slice();
     newStates.splice(stateIndex, 1);
 
