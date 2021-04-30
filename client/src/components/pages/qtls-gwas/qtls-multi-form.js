@@ -495,10 +495,10 @@ export default function MultiForm({
 
   function handleReset() {
     let newStates = states.slice();
-    newStates[stateIndex] = getInitialState().qtlsGWAS;
+    newStates[stateIndex] = getInitialState().multiLoci.states[0];
 
     dispatch(updateMultiLoci({ states: newStates }));
-    dispatch(updateAlert(getInitialState().alert));
+    // dispatch(updateAlert(getInitialState().alert));
     setFile('qtl', '');
     setFile('quantification', '');
     setFile('genotype', '');
@@ -506,6 +506,7 @@ export default function MultiForm({
     setFile('gwas', '');
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
+    setAdditionalInput(false);
   }
 
   function removeForm() {
@@ -911,7 +912,7 @@ export default function MultiForm({
       </Form.Row>
       <hr />
       <Form.Row>
-        <Col>
+        <Col md="6">
           <Form.Group controlId={`ldPublic-${stateIndex}`} className="mb-0">
             <Form.Label className="mr-5">
               <b>LD Information</b>
@@ -932,108 +933,107 @@ export default function MultiForm({
               }}
             />
           </Form.Group>
-        </Col>
-      </Form.Row>
-      <Form.Row>
-        <Form.Group className="col-md-12">
-          <Form.Label className="mb-0 mr-auto">
-            LD Data{' '}
-            <small>
-              <i>(Default: 1KG Phase 3, EUR)</i>
-            </small>
-          </Form.Label>
-          {ldPublic ? (
-            <div>
-              <Form.Row>
-                <Col md="2">
-                  <Form.Group>
-                    <Select
-                      disabled={loadingPublic || submitted}
-                      id="ldProject"
-                      label="Project"
-                      value={ldProject}
-                      options={ldProjectOptions}
-                      onChange={handleLdProject}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md="auto">
-                  <Form.Group>
-                    <Select
-                      disabled={submitted}
-                      id="chromosome"
-                      label="Chromosome"
-                      value={select_chromosome}
-                      options={[
-                        ...Array.from({ length: 22 }, (_, i) => ({
-                          value: i + 1,
-                          label: i + 1,
-                        })),
-                        {
-                          value: 'X',
-                          label: 'X',
-                        },
-                        {
-                          value: 'Y',
-                          label: 'Y',
-                        },
-                      ]}
-                      onChange={(chromosome) => handleChromosome(chromosome)}
-                    />
-                  </Form.Group>
-                </Col>
-                <Col md="3">
-                  <Form.Label className="mb-0">
-                    Population <span style={{ color: 'red' }}>*</span>{' '}
-                  </Form.Label>
-                  <PopulationSelect
-                    id="qtls-results-population-input"
-                    disabled={submitted || !ldPublic}
-                    stateIndex={stateIndex}
+          <Form.Row>
+            <Form.Group className="col-md-12">
+              <Form.Label className="mb-0 mr-auto">
+                LD Data{' '}
+                <small>
+                  <i>(Default: 1KG Phase 3, EUR)</i>
+                </small>
+              </Form.Label>
+              {ldPublic ? (
+                <div>
+                  <Form.Row>
+                    <Col md="4">
+                      <Form.Group>
+                        <Select
+                          disabled={loadingPublic || submitted}
+                          id="ldProject"
+                          label="Project"
+                          value={ldProject}
+                          options={ldProjectOptions}
+                          onChange={handleLdProject}
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md="auto">
+                      <Form.Group>
+                        <Select
+                          disabled={submitted}
+                          id="chromosome"
+                          label="Chromosome"
+                          value={select_chromosome}
+                          options={[
+                            ...Array.from({ length: 22 }, (_, i) => ({
+                              value: i + 1,
+                              label: i + 1,
+                            })),
+                            {
+                              value: 'X',
+                              label: 'X',
+                            },
+                            {
+                              value: 'Y',
+                              label: 'Y',
+                            },
+                          ]}
+                          onChange={(chromosome) =>
+                            handleChromosome(chromosome)
+                          }
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md="6">
+                      <Form.Label className="mb-0">
+                        Population <span style={{ color: 'red' }}>*</span>{' '}
+                      </Form.Label>
+                      <PopulationSelect
+                        id="qtls-results-population-input"
+                        disabled={submitted || !ldPublic}
+                        stateIndex={stateIndex}
+                      />
+                    </Col>
+                  </Form.Row>
+                </div>
+              ) : (
+                <Col md="6" className="px-0">
+                  <Form.File
+                    id="qtls-ld-file"
+                    disabled={submitted || select_qtls_samples}
+                    key={_LDFile}
+                    label={
+                      _LDFile
+                        ? _LDFile.name || _LDFile.filename || _LDFile
+                        : select_qtls_samples
+                        ? 'MX2.LD.gz'
+                        : 'Choose File'
+                    }
+                    onChange={(e) => {
+                      setFile('ld', e.target.files[0]);
+                    }}
+                    // accept=".tsv, .txt"
+                    // isInvalid={checkValid ? !validFile : false}
+                    // feedback="Please upload a data file"
+                    custom
                   />
                 </Col>
-              </Form.Row>
-            </div>
-          ) : (
-            <Col md="3" className="px-0">
-              <Form.File
-                id="qtls-ld-file"
-                disabled={submitted || select_qtls_samples}
-                key={_LDFile}
-                label={
-                  _LDFile
-                    ? _LDFile.name || _LDFile.filename || _LDFile
-                    : select_qtls_samples
-                    ? 'MX2.LD.gz'
-                    : 'Choose File'
-                }
-                onChange={(e) => {
-                  setFile('ld', e.target.files[0]);
-                }}
-                // accept=".tsv, .txt"
-                // isInvalid={checkValid ? !validFile : false}
-                // feedback="Please upload a data file"
-                custom
-              />
-            </Col>
-          )}
-        </Form.Group>
-      </Form.Row>
-      <hr />
-      <Form.Row>
-        <Col md="12">
+              )}
+            </Form.Group>
+          </Form.Row>
+        </Col>
+        <Col md="6">
           <b>Locus Information</b>
+          {locusInformation.map((_, i) => (
+            <LocusInfo
+              locusIndex={i}
+              state={state}
+              mergeState={mergeState}
+              key={`locusInfo-${i}`}
+            />
+          ))}
         </Col>
       </Form.Row>
-      {locusInformation.map((_, i) => (
-        <LocusInfo
-          locusIndex={i}
-          state={state}
-          mergeState={mergeState}
-          key={`locusInfo-${i}`}
-        />
-      ))}
-      <Form.Row>
+      <Form.Row className="mt-4">
         <Col />
         <Col md="auto">
           <Button
@@ -1055,7 +1055,7 @@ export default function MultiForm({
               onClick={() => removeForm()}
               disabled={submitted && isLoading}
             >
-              Remove Form
+              Remove Locus
             </Button>
           </Col>
         )}

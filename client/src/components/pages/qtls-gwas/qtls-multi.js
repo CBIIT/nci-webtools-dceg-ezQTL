@@ -264,7 +264,7 @@ export function QTLsMulti() {
               disabled={submitted}
               onClick={() => addForm()}
             >
-              + Add Form
+              + Add Locus
             </Button>
           </Col>
         </Row>
