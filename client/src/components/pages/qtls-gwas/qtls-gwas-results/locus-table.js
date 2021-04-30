@@ -211,6 +211,7 @@ export function LocusTable() {
 
       {locus_table && locus_table.data && locus_table.data.length > 0 && (
         <Table
+          controlId="locus-table"
           title="lctable"
           columns={columns}
           data={locus_table.data}

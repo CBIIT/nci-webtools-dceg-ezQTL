@@ -407,6 +407,7 @@ export function LocusColocalization() {
               </div>
             )}
             <Table
+              controlId="hyprcoloc-table"
               title=""
               columns={hyprcolocColumns}
               data={hyprcoloc_table.data}
@@ -454,6 +455,7 @@ export function LocusColocalization() {
               </div>
             )}
             <Table
+              controlId="hyprcoloc-snpscore-table"
               title=""
               columns={hyprcolocSNPScoreColumns}
               data={hyprcolocSNPScore_table.data}
@@ -536,6 +538,7 @@ export function LocusColocalization() {
               </div>
             )}{' '}
             <Table
+              controlId="ecaviar-table"
               title=""
               columns={ecaviarColumns}
               data={ecaviar_table.data}
