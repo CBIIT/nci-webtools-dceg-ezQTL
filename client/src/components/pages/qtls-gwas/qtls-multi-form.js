@@ -536,16 +536,14 @@ export default function MultiForm({
     <Form className="border rounded py-1 px-2 bg-light">
       <Form.Row>
         <Col md="2">
-          <Form.Group>
-            <Select
-              disabled={!genomeOptions.length || submitted}
-              id="genomeBuild"
-              label="Genome Build"
-              value={genome}
-              options={genomeOptions}
-              onChange={(genome) => mergeState({ genome: genome })}
-            />
-          </Form.Group>
+          <Select
+            disabled={!genomeOptions.length || submitted}
+            id="genomeBuild"
+            label="Genome Build"
+            value={genome}
+            options={genomeOptions}
+            onChange={(genome) => mergeState({ genome: genome })}
+          />
         </Col>
         <Col md="auto">
           <Form.Group>
@@ -688,46 +686,40 @@ export default function MultiForm({
                 <>
                   <Form.Row>
                     <Col>
-                      <Form.Group>
-                        <Select
-                          disabled={loadingPublic || tissueOnly || submitted}
-                          id="project"
-                          label="Project"
-                          value={qtlProject}
-                          options={qtlProjectOptions}
-                          onChange={handleQtlProject}
-                        />
-                      </Form.Group>
+                      <Select
+                        disabled={loadingPublic || tissueOnly || submitted}
+                        id="project"
+                        label="Project"
+                        value={qtlProject}
+                        options={qtlProjectOptions}
+                        onChange={handleQtlProject}
+                      />
                     </Col>
                   </Form.Row>
                   <Form.Row>
                     <Col>
-                      <Form.Group>
-                        <Select
-                          disabled={loadingPublic || tissueOnly || submitted}
-                          id="qtlType"
-                          label="QTL Type"
-                          value={xQtl}
-                          options={xQtlOptions}
-                          onChange={handleXqtl}
-                        />
-                      </Form.Group>
+                      <Select
+                        disabled={loadingPublic || tissueOnly || submitted}
+                        id="qtlType"
+                        label="QTL Type"
+                        value={xQtl}
+                        options={xQtlOptions}
+                        onChange={handleXqtl}
+                      />
                     </Col>
                   </Form.Row>
                 </>
               )}
               <Form.Row>
                 <Col>
-                  <Form.Group>
-                    <Select
-                      disabled={loadingPublic || submitted}
-                      id="tissue"
-                      label="Tissue"
-                      value={tissue}
-                      options={tissueOptions}
-                      onChange={handleTissue}
-                    />
-                  </Form.Group>
+                  <Select
+                    disabled={loadingPublic || submitted}
+                    id="tissue"
+                    label="Tissue"
+                    value={tissue}
+                    options={tissueOptions}
+                    onChange={handleTissue}
+                  />
                 </Col>
               </Form.Row>
             </div>
@@ -801,38 +793,34 @@ export default function MultiForm({
               {!phenotypeOnly && (
                 <Row>
                   <Col>
-                    <Form.Group>
-                      <Select
-                        disabled={
-                          submitted ||
-                          loadingPublic ||
-                          phenotypeOnly ||
-                          !gwasProjectOptions.length
-                        }
-                        id="gwasProject"
-                        label="Project"
-                        value={gwasProject}
-                        options={gwasProjectOptions}
-                        onChange={handleGwasProject}
-                      />
-                    </Form.Group>
+                    <Select
+                      disabled={
+                        submitted ||
+                        loadingPublic ||
+                        phenotypeOnly ||
+                        !gwasProjectOptions.length
+                      }
+                      id="gwasProject"
+                      label="Project"
+                      value={gwasProject}
+                      options={gwasProjectOptions}
+                      onChange={handleGwasProject}
+                    />
                   </Col>
                 </Row>
               )}
               <Row>
                 <Col>
-                  <Form.Group>
-                    <Select
-                      disabled={
-                        submitted || loadingPublic || !phenotypeOptions.length
-                      }
-                      id="gwasPhenotype"
-                      label="Phenotype"
-                      value={phenotype}
-                      options={phenotypeOptions}
-                      onChange={handlePhenotype}
-                    />
-                  </Form.Group>
+                  <Select
+                    disabled={
+                      submitted || loadingPublic || !phenotypeOptions.length
+                    }
+                    id="gwasPhenotype"
+                    label="Phenotype"
+                    value={phenotype}
+                    options={phenotypeOptions}
+                    onChange={handlePhenotype}
+                  />
                 </Col>
               </Row>
             </div>
@@ -956,43 +944,39 @@ export default function MultiForm({
                 <div>
                   <Form.Row>
                     <Col md="4">
-                      <Form.Group>
-                        <Select
-                          disabled={loadingPublic || submitted}
-                          id="ldProject"
-                          label="Project"
-                          value={ldProject}
-                          options={ldProjectOptions}
-                          onChange={handleLdProject}
-                        />
-                      </Form.Group>
+                      <Select
+                        disabled={loadingPublic || submitted}
+                        id="ldProject"
+                        className="mb-0"
+                        label="Project"
+                        value={ldProject}
+                        options={ldProjectOptions}
+                        onChange={handleLdProject}
+                      />
                     </Col>
                     <Col md="auto">
-                      <Form.Group>
-                        <Select
-                          disabled={submitted}
-                          id="chromosome"
-                          label="Chromosome"
-                          value={select_chromosome}
-                          options={[
-                            ...Array.from({ length: 22 }, (_, i) => ({
-                              value: i + 1,
-                              label: i + 1,
-                            })),
-                            {
-                              value: 'X',
-                              label: 'X',
-                            },
-                            {
-                              value: 'Y',
-                              label: 'Y',
-                            },
-                          ]}
-                          onChange={(chromosome) =>
-                            handleChromosome(chromosome)
-                          }
-                        />
-                      </Form.Group>
+                      <Select
+                        disabled={submitted}
+                        id="chromosome"
+                        className="mb-0"
+                        label="Chromosome"
+                        value={select_chromosome}
+                        options={[
+                          ...Array.from({ length: 22 }, (_, i) => ({
+                            value: i + 1,
+                            label: i + 1,
+                          })),
+                          {
+                            value: 'X',
+                            label: 'X',
+                          },
+                          {
+                            value: 'Y',
+                            label: 'Y',
+                          },
+                        ]}
+                        onChange={(chromosome) => handleChromosome(chromosome)}
+                      />
                     </Col>
                     <Col md="6">
                       <Form.Label className="mb-0">
