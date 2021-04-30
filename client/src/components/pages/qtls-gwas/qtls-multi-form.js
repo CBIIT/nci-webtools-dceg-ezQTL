@@ -1,12 +1,23 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { RootContext } from '../../../index';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import {
+  Form,
+  Button,
+  Row,
+  Col,
+  Popover,
+  OverlayTrigger,
+} from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateAlert, updateMultiLoci } from '../../../services/actions';
 import Select from '../../controls/select/select';
 import { PopulationSelect } from '../../controls/population-select/population-select';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faMinus } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPlus,
+  faMinus,
+  faInfoCircle,
+} from '@fortawesome/free-solid-svg-icons';
 
 function LocusInfo({ locusIndex, state, mergeState }) {
   const dispatch = useDispatch();
@@ -85,7 +96,7 @@ function LocusInfo({ locusIndex, state, mergeState }) {
       </Col>
       {qtlPublic || ldPublic || gwasPublic ? (
         <>
-          <Col md="2">
+          <Col md="4">
             <Form.Label className="mb-0">Position</Form.Label>
             <Form.Control
               id="select_position"
@@ -913,34 +924,34 @@ export default function MultiForm({
       <hr />
       <Form.Row>
         <Col md="6">
-          <Form.Group controlId={`ldPublic-${stateIndex}`} className="mb-0">
-            <Form.Label className="mr-5">
-              <b>LD Information</b>
-            </Form.Label>
-            <Form.Check
-              disabled={submitted || select_qtls_samples}
-              inline
-              label="Public"
-              type="checkbox"
-              checked={ldPublic}
-              onChange={(_) => {
-                mergeState({
-                  ldPublic: !ldPublic,
-                  select_pop: false,
-                  ...(!ldPublic && { select_ref: false }),
-                });
-                setFile('ld', '');
-              }}
-            />
-          </Form.Group>
           <Form.Row>
+            <Form.Group
+              className="col-md-6 mb-0"
+              controlId={`ldPublic-${stateIndex}`}
+            >
+              <div className="d-flex">
+                <Form.Label className="mb-0 mr-auto font-weight-bold">
+                  LD Information
+                </Form.Label>
+                <Form.Check
+                  className="mr-0"
+                  disabled={submitted || select_qtls_samples}
+                  inline
+                  label="Public"
+                  type="checkbox"
+                  checked={ldPublic}
+                  onChange={(_) => {
+                    mergeState({
+                      ldPublic: !ldPublic,
+                      select_pop: false,
+                      ...(!ldPublic && { select_ref: false }),
+                    });
+                    setFile('ld', '');
+                  }}
+                />
+              </div>
+            </Form.Group>
             <Form.Group className="col-md-12">
-              <Form.Label className="mb-0 mr-auto">
-                LD Data{' '}
-                <small>
-                  <i>(Default: 1KG Phase 3, EUR)</i>
-                </small>
-              </Form.Label>
               {ldPublic ? (
                 <div>
                   <Form.Row>
@@ -997,6 +1008,30 @@ export default function MultiForm({
                 </div>
               ) : (
                 <Col md="6" className="px-0">
+                  <Form.Label className="mb-0 mr-2">
+                    LD Data{' '}
+                    <OverlayTrigger
+                      trigger="click"
+                      placement="top"
+                      overlay={
+                        <Popover id="popover-basic">
+                          <Popover.Title as="h3">LD Information</Popover.Title>
+                          <Popover.Content>
+                            <p>Default: 1KG Phase 3, EUR</p>
+                          </Popover.Content>
+                        </Popover>
+                      }
+                      rootClose
+                    >
+                      <Button
+                        variant="link"
+                        className="p-0 font-weight-bold"
+                        aria-label="LD Information additional info"
+                      >
+                        <FontAwesomeIcon icon={faInfoCircle} />
+                      </Button>
+                    </OverlayTrigger>
+                  </Form.Label>
                   <Form.File
                     id="qtls-ld-file"
                     disabled={submitted || select_qtls_samples}
