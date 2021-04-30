@@ -46,6 +46,7 @@ export function App() {
 
   return (
     <Router>
+      <a href={window.location.href + "#main"} class="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center">Skip to Main Content</a>
       <header className="bg-primary-gradient py-3">
         <div className="container px-0">
           <a href="https://dceg.cancer.gov/" target="_blank" rel="noreferrer">
