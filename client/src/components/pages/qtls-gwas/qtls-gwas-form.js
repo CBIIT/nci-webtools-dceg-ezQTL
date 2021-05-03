@@ -105,8 +105,9 @@ export function QTLsGWASForm() {
       getGenomeOptions();
   }, [publicGTEx, genomeOptions]);
   useEffect(() => {
-    if (Object.keys(publicGTEx).length && genome) populatePublicParameters();
-  }, [genome]);
+    if (Object.keys(publicGTEx).length && genome.value)
+      populatePublicParameters();
+  }, [genome.value]);
   useEffect(() => {
     if (Object.keys(publicGTEx).length && qtlProject && qtlPublic)
       handleQtlProject(qtlProject);
@@ -206,7 +207,6 @@ export function QTLsGWASForm() {
 
     dispatch(
       updateQTLsGWAS({
-        genome: genome,
         qtlProject: qtlProjectOptions[0],
         ldProject: ldProjectOptions[0],
         xQtl: xQtlOptions[0],
@@ -277,15 +277,21 @@ export function QTLsGWASForm() {
   }
 
   function handleLdProject(project) {
-    const ldKey = publicGTEx['LD dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.Chromosome == select_chromosome.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
-    console.log(ldKey);
+    const ldKey =
+      project.value == '1000genome'
+        ? publicGTEx['LD dataset']
+            .filter(
+              (row) =>
+                row.Genome_build == genome.value &&
+                row.Project == project.value &&
+                row.Chromosome == select_chromosome.value
+            )[0]
+            .Biowulf_full_path.replace(
+              '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+              ''
+            )
+        : true;
+
     dispatch(updateQTLsGWAS({ ldProject: project, ldKey: ldKey }));
   }
 
@@ -417,6 +423,7 @@ export function QTLsGWASForm() {
       recalculateGene,
       recalculateDist,
       recalculateRef,
+      ldProject: ldProject.value,
       qtlKey: qtlPublic ? qtlKey : false,
       ldKey: ldPublic ? ldKey : false,
       gwasKey: gwasPublic ? gwasKey : false,
@@ -933,7 +940,7 @@ export function QTLsGWASForm() {
               </div>
             ) : (
               <>
-                <Form.Label className="mb-0" for="qtls-ld-file">
+                <Form.Label className="mb-0" htmlFor="qtls-ld-file">
                   LD Data{' '}
                   <small>
                     <i>(Default: 1KG Phase 3, EUR)</i>

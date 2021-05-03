@@ -28,6 +28,7 @@ async function calculateMain(params) {
     recalculateDist,
     recalculateRef,
     workingDirectory,
+    ldProject,
     qtlKey,
     ldKey,
     gwasKey,
@@ -57,6 +58,7 @@ async function calculateMain(params) {
     recalculateGene.toString(),
     recalculateDist.toString(),
     recalculateRef.toString(),
+    ldProject.toString(),
     qtlKey.toString(),
     ldKey.toString(),
     gwasKey.toString(),
@@ -88,6 +90,7 @@ async function calculateMain(params) {
       recalculateGene.toString(),
       recalculateDist.toString(),
       recalculateRef.toString(),
+      ldProject.toString(),
       qtlKey.toString(),
       ldKey.toString(),
       gwasKey.toString(),
@@ -170,7 +173,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
     select_pos,
     select_dist,
     workingDirectory,
-    bucket
+    bucket,
   } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
@@ -332,28 +335,22 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
 }
 
 async function qtlsColocVisualize(params, res, next) {
-
-  const {
-    request,
-    hydata,
-    ecdata
-  } = params;
+  const { request, hydata, ecdata } = params;
 
   logger.info(`[${request}] Execute /coloc-visualize`);
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  const requestPath = path.resolve(config.tmp.folder, request, request + '_Summary.svg');
+  const requestPath = path.resolve(
+    config.tmp.folder,
+    request,
+    request + '_Summary.svg'
+  );
 
   try {
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
       'qtlsColocVisualize',
-      [
-        rfile,
-        hydata,
-        ecdata,
-        requestPath
-      ]
+      [rfile, hydata, ecdata, requestPath]
     );
     logger.info(`[${request}] Finished /colc-visualize`);
     res.json(wrapper);
@@ -378,7 +375,6 @@ async function qtlsCalculateQC(params, res, next) {
     bucket,
   } = params;
 
-
   logger.info(`[${request}] Execute /ezQTL_ztw`);
   logger.debug(
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
@@ -386,9 +382,14 @@ async function qtlsCalculateQC(params, res, next) {
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
 
-  const plotPath = path.resolve(workingDirectory, 'tmp', request, request)
-  const inputPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL_input')
-  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log')
+  const plotPath = path.resolve(workingDirectory, 'tmp', request, request);
+  const inputPath = path.resolve(
+    workingDirectory,
+    'tmp',
+    request,
+    'ezQTL_input'
+  );
+  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
   try {
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -408,7 +409,7 @@ async function qtlsCalculateQC(params, res, next) {
         inputPath,
         logPath,
         workingDirectory,
-        bucket
+        bucket,
       ]
     );
 
@@ -417,8 +418,8 @@ async function qtlsCalculateQC(params, res, next) {
       summary = String(await fs.promises.readFile(logPath));
     }
 
-    summary = summary.replace(/#/g,'\u2022')
-    summary = summary.split('\n\n')
+    summary = summary.replace(/#/g, '\u2022');
+    summary = summary.split('\n\n');
 
     logger.info(`[${request}] Finished /ezqTL_ztw`);
     res.json(summary);
@@ -429,7 +430,6 @@ async function qtlsCalculateQC(params, res, next) {
 }
 
 async function qtlsCalculateLD(params, res, next) {
-
   const {
     request,
     select_gwas_sample,
@@ -439,7 +439,7 @@ async function qtlsCalculateLD(params, res, next) {
     LDFile,
     leadsnp,
     workingDirectory,
-    bucket
+    bucket,
   } = params;
 
   logger.info(`[${request}] Execute /calculateLD`);
@@ -448,14 +448,18 @@ async function qtlsCalculateLD(params, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  const tabixPath = path.resolve(workingDirectory, 'data','tabix')
-  const outputPath = path.resolve(workingDirectory, 'tmp', request, 'LD_Output.svg')
+  const tabixPath = path.resolve(workingDirectory, 'data', 'tabix');
+  const outputPath = path.resolve(
+    workingDirectory,
+    'tmp',
+    request,
+    'LD_Output.svg'
+  );
 
-  logger.info(tabixPath)
-  logger.info(outputPath)
+  logger.info(tabixPath);
+  logger.info(outputPath);
 
   try {
-
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
       'qtlsCalculateLD',
@@ -471,13 +475,11 @@ async function qtlsCalculateLD(params, res, next) {
         leadsnp.toString(),
         request.toString(),
         workingDirectory,
-        bucket
+        bucket,
       ]
     );
     logger.info(`[${request}] Finished /calculateLD`);
     res.json(wrapper);
-
-
   } catch (err) {
     logger.error(`[${request}] Error /calculateLD ${err}`);
     res.status(500).json(err);
@@ -493,5 +495,5 @@ module.exports = {
   qtlsCalculateLocusColocalizationECAVIAR,
   qtlsCalculateQC,
   qtlsCalculateLD,
-  qtlsColocVisualize
+  qtlsColocVisualize,
 };
