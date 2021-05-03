@@ -1496,6 +1496,18 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               select_position: qtlsGWAS.select_position,
             })
           );
+
+          dispatch(
+            qtlsGWASLocusLDCalculation({
+              request: qtlsGWAS.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_samples: qtlsGWAS.select_qtls_samples,
+              gwasFile: qtlsGWAS.inputs.gwas_file[0],
+              associationFile: qtlsGWAS.inputs.association_file[0],
+              LDFile: qtlsGWAS.inputs.ld_file[0],
+              leadsnp: qtlsGWAS.locus_alignment.top.rsnum
+            })
+          )
         }
         if (
           !qtlsGWAS.isError &&
@@ -1652,6 +1664,34 @@ export function qtlsGWASLocusQCCalculation(params) {
   };
 }
 
+export function qtlsGWASLocusLDCalculation(params) {
+  return async function (dispatch, getState) {
+    console.log('locus ld', params);
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingLD: true,
+      })
+    );
+    axios
+      .post('api/qtls-locus-ld', params)
+      .then(function (response) {
+        console.log('api/qtls-locus-ld response.data', response);
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(
+            updateQTLsGWAS({ ldError: 'Error occured in LD calculation', activeResultsTab: 'locus-qc' })
+          );
+        }
+      })
+      .then(function () {
+        dispatch(updateQTLsGWAS({ isLoadingLD: false }));
+      });
+  }
+}
+
 export function qtlsGWASColocVisualize(params) {
   return async function (dispatch, getState) {
     console.log('coloc visualize', params);
@@ -1712,7 +1752,7 @@ export function qtlsGWASColocVisualize(params) {
           axios
             .post('api/qtls-coloc-visualize', newParams)
             .then(function (response) {
-              console.log('api/qtls-locus-qc response.data', response.data);
+              console.log('api/qtls-locus-visualize response.data', response.data);
             })
             .catch(function (error) {
               console.log(error);
@@ -1736,7 +1776,7 @@ export function qtlsGWASColocVisualize(params) {
       axios
         .post('api/qtls-coloc-visualize', params)
         .then(function (response) {
-          console.log('api/qtls-locus-qc response.data', response.data);
+          console.log('api/qtls-coloc-visualize response.data', response.data);
         })
         .catch(function (error) {
           console.log(error);

@@ -95,9 +95,9 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
-    associationFile <- paste0('tmp/', request, '/', associationFile)
-    ldFile <- paste0('tmp/', request, '/', ldFile)
+    associationFile <- paste0(workDir,'/tmp/', request, '/', associationFile)
+    ldFile <- paste0(workDir,'/tmp/', request, '/', ldFile)
   }
 
-  IntRegionalPlot(genome_build = 'GRCh37',association_file = gwasFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath, trait = 'MX2', leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
+  IntRegionalPlot(chr = 21, left=42759805, right=42859805,trait = 'MX2',genome_build = 'GRCh37',association_file = gwasFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath,leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
 }

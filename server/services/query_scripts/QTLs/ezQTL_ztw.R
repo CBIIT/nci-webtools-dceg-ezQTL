@@ -1140,8 +1140,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_fi
     marker2label_list +
     theme_bw() + 
     theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
-  return(plot)
-  
+
   ggsave(filename = output_file,plot = plot,width = 16,height = 16)
 }
 
