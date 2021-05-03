@@ -28,6 +28,7 @@ RUN dnf -y update \
     gsl-devel \
     gmp-devel \
     mpfr-devel \
+    python3 \
     # v8-devel \
     && dnf clean all
 
@@ -70,6 +71,9 @@ RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 't
 
 # install Hyprcoloc R package
 RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = TRUE);"
+
+# install python packages
+RUN pip install scipy pandas numpy tensorflow
 
 RUN mkdir -p /deploy/server /deploy/logs
 
