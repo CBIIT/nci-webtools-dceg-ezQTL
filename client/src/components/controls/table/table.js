@@ -77,6 +77,7 @@ function PaginationText({
 }
 
 export default function Table({
+  controlId,
   title,
   columns,
   data,
@@ -171,7 +172,7 @@ export default function Table({
               <Dropdown.Toggle
                 variant="secondary"
                 size="sm"
-                id={`${title.replace(/\s/g, '')}-controls`}
+                id={`${title.replace(/\s/g, '')}-controls-${controlId}`}
               >
                 Columns
               </Dropdown.Toggle>
@@ -227,7 +228,7 @@ export default function Table({
             <tr {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
                 <th
-                  id={column.id.replace(/\s|\W/g, '')}
+                  id={column.id.replace(/\s|\W/g, '') + `-${controlId}`}
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   className="text-nowrap"
                 >

@@ -483,14 +483,8 @@ export function Help() {
           </a>{' '}
           and variant RS numbers are indexed based on dbSNP 151. Where
           coordinates are specified, GRCH37/hg19 is used. Only bi-allelic
-          variants are permitted as input.
-          <a
-            href="https://github.com/statgen/emeraLD"
-            target="_blank"
-            rel="noreferrer"
-          >
-            emeraLD was used to calculate the phased haplotype LD.
-          </a>{' '}
+          variants are permitted as input. <a href="https://github.com/statgen/emeraLD" target="_blank" rel="noreferrer">emeraLD</a> was 
+          used to calculate the phased haplotype LD.
           The LD information will be used in the colocalization analysis.
         </p>
       </div>
@@ -502,33 +496,18 @@ export function Help() {
           Three methods are used in colocalization analyses between GWAS and all
           QTLs (including all phenotypes in QTLs such as all genes in eQTL
           files) in the “Locus Colocalization” sub-module.{' '}
-          <a href="http://locuscompare.com/" target="_blank" rel="noreferrer">
-            The first method is similar to LocusCompare
-          </a>
+          The first method is similar to <a href="http://locuscompare.com/" target="_blank" rel="noreferrer">LocusCompare</a>
           , which investigates the correlation between the GWAS -log10(p-value)
           and QTL log10(p-value), which is visualized in “Locus Alignment”
           sub-modules. Both Pearson and Spearman correlation coefficients and
           p-value are calculated for each phenotype. An association p-value
           threshold can be applied to this regression module.
-          <a
-            href="https://github.com/jrs95/hyprcoloc"
-            target="_blank"
-            rel="noreferrer"
-          >
-            The second method uses HyPrColoc
-          </a>{' '}
-          to prioritize causal variants for the shared genetic etiology across
+          The second method uses <a href="https://github.com/jrs95/hyprcoloc" target="_blank" rel="noreferrer">HyPrColoc</a> to 
+          prioritize causal variants for the shared genetic etiology across
           multiple related traits. Two tables were generated including the
           colocalized traits information, potential causal variant and variant
-          ranked score.
-          <a
-            href="http://genetics.cs.ucla.edu/caviar/"
-            target="_blank"
-            rel="noreferrer"
-          >
-            The third method is eCAVIAR
-          </a>
-          , a statistical framework that quantifies the probability of the
+          ranked score. The third method is <a href="http://genetics.cs.ucla.edu/caviar/" target="_blank" rel="noreferrer">eCAVIAR</a>, 
+          a statistical framework that quantifies the probability of the
           variant to be causal both in GWAS and eQTL studies, while allowing the
           arbitrary number of causal variants.
         </p>

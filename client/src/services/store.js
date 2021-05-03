@@ -146,8 +146,13 @@ export const getInitialState = async () => {
           request: '',
           select_pop: false,
           select_gene: false,
-          select_dist: 100,
-          select_ref: false,
+          locusInformation: [
+            {
+              select_dist: 100,
+              select_ref: false,
+              select_position: '42743496',
+            },
+          ],
           recalculateAttempt: false,
           recalculatePop: false,
           recalculateGene: false,
@@ -172,7 +177,6 @@ export const getInitialState = async () => {
           phenotype: '',
           phenotypeOptions: [],
           select_chromosome: { value: 21, label: 21 },
-          select_position: '42743496',
           isQueue: false,
           email: '',
           qtlPublic: false,

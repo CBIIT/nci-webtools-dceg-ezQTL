@@ -1,18 +1,15 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button, Row, Col } from 'react-bootstrap';
-import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   uploadFile,
-  updateQTLsGWAS,
   getPublicGTEx,
   updateAlert,
   submitQueueMulti,
   updateMultiLoci,
 } from '../../../services/actions';
-import Select from '../../controls/select/select';
 import MultiForm from './qtls-multi-form';
 const { v1: uuidv1 } = require('uuid');
 
@@ -177,8 +174,6 @@ export function QTLsMulti() {
         select_gwas_sample,
         select_pop,
         select_gene,
-        select_dist,
-        select_ref,
         recalculateAttempt,
         recalculatePop,
         recalculateGene,
@@ -188,52 +183,55 @@ export function QTLsMulti() {
         ldKey,
         gwasKey,
         select_chromosome,
-        select_position,
         qtlPublic,
         gwasPublic,
         ldPublic,
         jobName,
+        locusInformation,
       } = state;
 
-      return {
-        jobName: jobName || `ezQTL ${i + 1}`,
-        request: requests[i],
-        email: email,
-        isQueue: true,
-        submitted: true,
-        associationFile:
-          (_associationFile[i] && _associationFile[i].name) || false,
-        quantificationFile:
-          (_quantificationFile[i] && _quantificationFile[i].name) || false,
-        genotypeFile: (_genotypeFile[i] && _genotypeFile[i].name) || false,
-        gwasFile: (_gwasFile[i] && _gwasFile[i].name) || false,
-        LDFile: (_LDFile[i] && _LDFile[i].name) || false,
+      return locusInformation.map((locusInfoRow, locusIndex) => {
+        const { select_dist, select_ref, select_position } = locusInfoRow;
+        return {
+          jobName: jobName || `ezQTL ${i + 1} - ${locusIndex}`,
+          request: `${requests[i]}-${locusIndex}`,
+          email: email,
+          isQueue: true,
+          submitted: true,
+          associationFile:
+            (_associationFile[i] && _associationFile[i].name) || false,
+          quantificationFile:
+            (_quantificationFile[i] && _quantificationFile[i].name) || false,
+          genotypeFile: (_genotypeFile[i] && _genotypeFile[i].name) || false,
+          gwasFile: (_gwasFile[i] && _gwasFile[i].name) || false,
+          LDFile: (_LDFile[i] && _LDFile[i].name) || false,
 
-        select_qtls_samples,
-        select_gwas_sample,
-        select_pop,
-        select_gene,
-        select_dist,
-        select_ref,
-        recalculateAttempt,
-        recalculatePop,
-        recalculateGene,
-        recalculateDist,
-        recalculateRef,
-        qtlPublic,
-        gwasPublic,
-        ldPublic,
-        qtlKey: qtlKey || false,
-        ldKey: ldKey || false,
-        gwasKey: gwasKey || false,
-        select_chromosome: select_chromosome.value,
-        select_position: select_position,
-      };
+          select_qtls_samples,
+          select_gwas_sample,
+          select_pop,
+          select_gene,
+          select_dist,
+          select_ref,
+          recalculateAttempt,
+          recalculatePop,
+          recalculateGene,
+          recalculateDist,
+          recalculateRef,
+          qtlPublic,
+          gwasPublic,
+          ldPublic,
+          qtlKey: qtlKey || false,
+          ldKey: ldKey || false,
+          gwasKey: gwasKey || false,
+          select_chromosome: select_chromosome.value,
+          select_position: select_position,
+        };
+      });
     });
 
     dispatch(
       submitQueueMulti({
-        paramsArr: paramsArr,
+        paramsArr: paramsArr.flat(),
         requests: requests,
         email: email,
       })
@@ -261,12 +259,14 @@ export function QTLsMulti() {
         <Row>
           <Col>
             <Button
+              title="Add Locus"
+              aria-label="Add Locus"
               variant="success"
               block
               disabled={submitted}
               onClick={() => addForm()}
             >
-              + Add Form
+              + Add Locus
             </Button>
           </Col>
         </Row>
