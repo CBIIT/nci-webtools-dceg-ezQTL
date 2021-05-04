@@ -94,6 +94,8 @@ export const getInitialState = async () => {
       summaryLoaded: false,
       summaryError: false,
       isLoadingQC: false,
+      isLoadingLD: false,
+      ldError: '',
       locus_qc: null,
       // locus_table: {
       //   globalFilter: '',

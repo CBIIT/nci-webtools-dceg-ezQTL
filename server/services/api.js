@@ -10,6 +10,7 @@ const {
   qtlsCalculateLocusColocalizationHyprcoloc,
   qtlsCalculateLocusColocalizationECAVIAR,
   qtlsCalculateQC,
+  qtlsCalculateLD,
   qtlsColocVisualize,
 } = require('./calculate');
 const apiRouter = express.Router();
@@ -391,5 +392,10 @@ apiRouter.post('/qtls-locus-qc', (req, res, next) =>
 apiRouter.post('/qtls-coloc-visualize', (req, res, next) =>
   qtlsColocVisualize(req.body, res, next)
 );
+
+apiRouter.post('/qtls-locus-ld', (req, res, next) =>
+  qtlsCalculateLD({ ...req.body, workingDirectory: workingDirectory, bucket: awsInfo.s3.data }, res, next)
+);
+
 
 module.exports = { apiRouter };

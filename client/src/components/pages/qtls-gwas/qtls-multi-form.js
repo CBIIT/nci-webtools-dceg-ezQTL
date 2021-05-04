@@ -79,6 +79,8 @@ function LocusInfo({ locusIndex, state, mergeState }) {
             </small>
           </Form.Label>
           <Form.Control
+            title="cis-QTL Distance Input"
+            aria-label="cis-QTL Distance Input"
             type="number"
             min="1"
             max="2000"
@@ -99,12 +101,14 @@ function LocusInfo({ locusIndex, state, mergeState }) {
           <Col md="4">
             <Form.Label className="mb-0">Position</Form.Label>
             <Form.Control
+              title="LD Reference Position Input"
+              aria-label="LD Refereence Position Input"
               id="select_position"
               disabled={submitted}
               onChange={(e) =>
                 mergeLocusInfo({ select_position: e.target.value })
               }
-              placeholder="e.g. 100000-1000000"
+              placeholder="e.g. 100000"
               value={select_position}
             />
           </Col>
@@ -119,6 +123,8 @@ function LocusInfo({ locusIndex, state, mergeState }) {
               </small>
             </Form.Label>
             <Form.Control
+              title="LD Reference SNP Input"
+              aria-label="LD Refereence SNP Input"
               id="qtls-snp-input"
               disabled={submitted}
               onChange={(e) => mergeLocusInfo({ select_ref: e.target.value })}
@@ -139,6 +145,8 @@ function LocusInfo({ locusIndex, state, mergeState }) {
       {locusIndex == locusInformation.length - 1 && (
         <Col md="auto">
           <Button
+            title="Add Locus Information"
+            aria-label="Add Locus Information"
             className="my-4"
             variant="success"
             onClick={() => addLocusInfo()}
@@ -554,6 +562,8 @@ export default function MultiForm({
           <Form.Group>
             <Form.Label className="mb-0">Job Name</Form.Label>
             <Form.Control
+              title="Job Name"
+              aria-label="Job Name Input"
               placeholder={`ezQTL ${stateIndex + 1}`}
               value={jobName}
               type="text"

@@ -261,6 +261,8 @@ export function QTLsMulti() {
         <Row>
           <Col>
             <Button
+              title="Add Locus"
+              aria-label="Add Locus"
               variant="success"
               block
               disabled={submitted}

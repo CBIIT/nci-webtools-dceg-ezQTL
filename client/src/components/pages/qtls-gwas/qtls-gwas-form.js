@@ -542,6 +542,7 @@ export function QTLsGWASForm() {
                 Association (QTL) Data <span style={{ color: 'red' }}>*</span>
               </Form.Label>
               <Form.Check
+                title="Association (QTL) Public Data Checkbox"
                 disabled={submitted || select_qtls_samples}
                 inline
                 id="qtlSource"
@@ -564,6 +565,7 @@ export function QTLsGWASForm() {
                 <Row>
                   <Col>
                     <Form.Check
+                      title="Association (QTL) Public Data Tissue Only Checkbox"
                       id="tissueOnly"
                       label="Tissue Only"
                       type="checkbox"
@@ -622,6 +624,7 @@ export function QTLsGWASForm() {
               </div>
             ) : (
               <Form.File
+                title="Association (QTL) Data User File Upload Input"
                 id="qtls-association-file"
                 disabled={submitted || select_qtls_samples}
                 key={_associationFile}
@@ -654,6 +657,7 @@ export function QTLsGWASForm() {
             <div className="d-flex">
               <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
               <Form.Check
+                title="GWAS Public Data Checkbox"
                 disabled={submitted || select_qtls_samples}
                 inline
                 id="gwasSource"
@@ -676,6 +680,7 @@ export function QTLsGWASForm() {
                 <Row>
                   <Col>
                     <Form.Check
+                      title="GWAS Public Data Phenotype Only Checkbox"
                       id="phenotypeOnly"
                       label="Phenotype Only"
                       type="checkbox"
@@ -728,6 +733,7 @@ export function QTLsGWASForm() {
               </div>
             ) : (
               <Form.File
+                title="GWAS Data User File Upload Input"
                 id="qtls-gwas-file"
                 disabled={submitted || select_gwas_sample}
                 key={_gwasFile}
@@ -771,6 +777,7 @@ export function QTLsGWASForm() {
                   Quantification Data File
                 </Form.Label>
                 <Form.File
+                  title="Quantification Data User File Upload Input"
                   ref={quantificationFileControl}
                   id="qtls-quantification-file"
                   disabled={submitted || select_qtls_samples}
@@ -814,6 +821,7 @@ export function QTLsGWASForm() {
               <Form.Group className="col-sm-12">
                 <Form.Label className="mb-0">Genotype Data File</Form.Label>
                 <Form.File
+                  title="Genotype Data User File Upload Input"
                   ref={genotypeFileControl}
                   id="qtls-genotype-file"
                   disabled={submitted || select_qtls_samples}
@@ -990,6 +998,8 @@ export function QTLsGWASForm() {
               </small>
             </Form.Label>
             <Form.Control
+              title="cis-QTL Distance Input"
+              aria-label="cis-QTL Distance Input"
               type="number"
               min="1"
               max="2000"
@@ -1014,6 +1024,8 @@ export function QTLsGWASForm() {
                 <Col>
                   <Form.Label className="mb-0">Position</Form.Label>
                   <Form.Control
+                    title="LD Reference Position Input"
+                    aria-label="LD Reference Position Input"
                     id="select_position"
                     disabled={submitted}
                     onChange={(e) => {
@@ -1021,7 +1033,7 @@ export function QTLsGWASForm() {
                         updateQTLsGWAS({ select_position: e.target.value })
                       );
                     }}
-                    placeholder="e.g. 100000-1000000"
+                    placeholder="e.g. 100000"
                     value={select_position}
                   />
                 </Col>
@@ -1038,6 +1050,8 @@ export function QTLsGWASForm() {
                 </small>
               </Form.Label>
               <Form.Control
+                title="LD Reference SNP Input"
+                aria-label="LD Reference SNP Input"
                 id="qtls-snp-input"
                 disabled={submitted}
                 onChange={(e) => {
@@ -1067,6 +1081,7 @@ export function QTLsGWASForm() {
             </Form.Label>{' '}
             <Form.Check inline>
               <Form.Check.Input
+                title="Choose Queued Submission Checkbox"
                 type="checkbox"
                 disabled={submitted}
                 checked={isQueue}
@@ -1082,6 +1097,8 @@ export function QTLsGWASForm() {
         <Col>
           <Form.Group controlId="email">
             <Form.Control
+              title="Queued Submission Email Input"
+              aria-label="Queued Submission Email Input"
               placeholder="Enter Email"
               size="sm"
               value={email}
