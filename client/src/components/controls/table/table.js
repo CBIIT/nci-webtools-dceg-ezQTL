@@ -266,8 +266,13 @@ export default function Table({
           {!data ||
             (data.length === 0 && (
               <tr>
-                {columns.map(() => {
-                  return <td style={{ height: '200px' }}></td>;
+                {columns.map((_, i) => {
+                  return (
+                    <td
+                      style={{ height: '200px' }}
+                      key={`${title}-td-${i}`}
+                    ></td>
+                  );
                 })}
               </tr>
             ))}
@@ -275,9 +280,11 @@ export default function Table({
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
+                {row.cells.map((cell, i) => {
                   return (
-                    <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                    <td {...cell.getCellProps()} key={`${title}-td-${i}`}>
+                      {cell.render('Cell')}
+                    </td>
                   );
                 })}
               </tr>

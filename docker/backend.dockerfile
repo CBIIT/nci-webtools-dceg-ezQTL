@@ -31,6 +31,11 @@ RUN dnf -y update \
     # v8-devel \
     && dnf clean all
 
+# install python3
+RUN dnf -y install \
+    python3 \
+    python3-devel
+
 # install emerald
 RUN cd /tmp \
     && git clone https://github.com/statgen/emeraLD.git \
@@ -70,6 +75,9 @@ RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 't
 
 # install Hyprcoloc R package
 RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = FALSE);"
+
+# install python packages
+RUN pip3 install scipy pandas numpy tensorflow
 
 RUN mkdir -p /deploy/server /deploy/logs
 

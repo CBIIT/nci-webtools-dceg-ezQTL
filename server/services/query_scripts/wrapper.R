@@ -19,9 +19,9 @@ getS3File <- function(key, bucket) {
   return(rawToChar(get_object(key, bucket)))
 }
 
-qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
+qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
   source(rfile)
-  main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket)
+  main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket)
 }
 
 qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, request, bucket) {
@@ -61,8 +61,8 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
 
     publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0(workDir,'/tmp/', request, '/MX2.LD.gz')
-    
+    ldFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
+
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
 
@@ -90,7 +90,7 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
-qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, tabixPath, outputPath, leadsnp, request, workDir, bucket){
+qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, tabixPath, outputPath, leadsnp, request, workDir, bucket) {
   source(rfile)
 
   if (identical(select_gwas_sample, 'true')) {
@@ -104,10 +104,10 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
 
   if (identical(select_qtls_samples, 'true')) {
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
-    
+
     publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0(workDir,'/tmp/', request, '/MX2.LD.gz')
-    
+    ldFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
+
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
     if(identical(associationFile, 'false'))

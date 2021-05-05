@@ -7,21 +7,30 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
   }
 }
 
-getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos) {
-  ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
+getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject) {
   LDFile = paste0('tmp/', request, '/', request, '.LD.gz')
   wd = getwd()
+  if (ldProject == '1000genome') {
+    ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
 
-  cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
-  system(cmd)
-  cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
-  system(cmd)
-  cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', "--stdout --extra --phased |sed 's/:/\t/' |bgzip > tmp/", request, '/', request, '.LD.gz')
-  system(cmd)
+    cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
+    system(cmd)
+    cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
+    system(cmd)
+    cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', "--stdout --extra --phased |sed 's/:/\t/' |bgzip > tmp/", request, '/', request, '.LD.gz')
+    system(cmd)
 
-  out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
-  info <- out[, 1:5]
-  colnames(info) <- c("chr", "pos", "id", "ref", "alt")
+    out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+    info <- out[, 1:5]
+    colnames(info) <- c("chr", "pos", "id", "ref", "alt")
+  } else if (ldProject == 'UKBB') {
+    cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -r ', wd, '/server/services/query_scripts/QTLs/Alkes_group.txt -o ', wd, '/', LDFile)
+    system(cmd)
+
+    out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+    info <- out[, 1:5]
+    colnames(info) <- c("id", "chr", "pos", "ref", "alt")
+  }
   if (length(unique(info$chr)) > 1) {
     errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
   } else {
@@ -30,7 +39,6 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos) {
     ld_data <- list("Sigma" = out, "info" = info)
   }
   saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
-
 }
 
 locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
@@ -117,7 +125,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, qtlKey, ldKey, gwasKey) {
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey) {
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -268,7 +276,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     if (identical(ldKey, 'false')) {
       locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
     } else {
-      getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos)
+      getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
       LDFile = paste0(request, '.input.vcf.gz')
     }
     ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
@@ -284,7 +292,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     # rownames(ld_info) <- ld_data$info$id
     # qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
     #use the chr:pos as index instead of rsnum
-    rownames(ld_info) <- paste0(ld_data$info$chr, ":", ld_data$info$pos)
+    rownames(ld_info) <- make.unique(paste0(ld_data$info$chr, ":", ld_data$info$pos))
     qdata_region$R2 <- (ld_info[paste0(qdata_region$chr, ":", qdata_region$pos), "R2"]) ^ 2
     # write.table(qdata_region, file = paste0("../static/output/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
     ## cast column types to string to prevent rounding of decimals
@@ -397,7 +405,7 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -602,7 +610,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, qtlKey, ldKey, gwasKey)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
