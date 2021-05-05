@@ -51,7 +51,11 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
-    gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
+
+    if(identical(gwasFile, 'false'))
+      gwasFile <- NULL
+    else 
+      gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
     associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
@@ -61,8 +65,16 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
-    associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
-    ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
+
+    if(identical(associationFile, 'false'))
+      associationFile = NULL
+    else
+      associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
+
+    if(identical(ldFile, 'false'))
+      ldFile = NULL
+    else
+      ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
   }
 
   coloc_QC(gwasFile, TRUE, associationFile, TRUE, ldFile, TRUE, leadsnp, NULL, distance, zscore_gene, plotPath, inputPath, logPath)
@@ -84,7 +96,10 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
-    gwasFile <- paste0('tmp/', request, '/', gwasFile)
+    if(identical(gwasFile, 'false'))
+      gwasFile <- NULL
+    else 
+      gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
   }
 
   if (identical(select_qtls_samples, 'true')) {
@@ -95,9 +110,19 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
-    associationFile <- paste0(workDir,'/tmp/', request, '/', associationFile)
-    ldFile <- paste0(workDir,'/tmp/', request, '/', ldFile)
+    if(identical(associationFile, 'false'))
+      associationFile = NULL
+    else
+      associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
+
+    if(identical(ldFile, 'false'))
+      ldFile = NULL
+    else
+      ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
   }
 
-  IntRegionalPlot(chr = 21, left=42759805, right=42859805,trait = 'MX2',genome_build = 'GRCh37',association_file = gwasFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath,leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
+  if(!is.null(gwasFile))
+    IntRegionalPlot(genome_build = 'GRCh37',association_file = gwasFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath,leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
+  else if(!is.null(associationFile))
+    IntRegionalPlot(chr = 21, left=42759805, right=42859805, trait = 'MX2', genome_build = 'GRCh37',association_file = associationFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath,leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE,)
 }
