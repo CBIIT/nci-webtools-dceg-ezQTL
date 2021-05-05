@@ -1,0 +1,15 @@
+.accordions > .accordion > .card {
+  border-bottom: 0;
+  border-radius: 0;
+}
+
+.accordions > .accordion:first-child > .card {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.accordions > .accordion:last-child > .card {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
