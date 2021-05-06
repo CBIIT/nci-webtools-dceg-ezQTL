@@ -1092,7 +1092,7 @@ export function QTLsGWASForm() {
             variant="link"
             onClick={() => {
               _setGwasFile('');
-              if (select_qtls_samples) {
+              if (!select_qtls_samples) {
                 dispatch(
                   updateQTLsGWAS({
                     select_qtls_samples: true,
