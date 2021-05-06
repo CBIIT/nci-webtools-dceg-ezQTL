@@ -1076,7 +1076,7 @@ export function QTLsGWASForm() {
         <Col>
           <Select
             className="border rounded p-2"
-            disabled={!genomeOptions.length || submitted}
+            disabled={!genomeOptions.length || select_qtls_samples || submitted}
             id="genomeBuild"
             label="Genome Build"
             value={genome}
@@ -1101,6 +1101,7 @@ export function QTLsGWASForm() {
                     gwasPublic: false,
                     ldPublic: false,
                     select_pop: false,
+                    genome: { value: 'GRCh37', label: 'GRCh37' },
                   })
                 );
               } else {
