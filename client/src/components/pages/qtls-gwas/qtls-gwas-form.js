@@ -1119,8 +1119,12 @@ export function QTLsGWASForm() {
           </Button>
         </Col>
 
-        <Col sm="6">
-          <a className="font-14" href="assets/files/MX2.examples.gz" download>
+        <Col sm="6" className="d-flex">
+          <a
+            className="font-14 ml-auto"
+            href="assets/files/MX2.examples.gz"
+            download
+          >
             Download Sample Data
           </a>
         </Col>
