@@ -1008,7 +1008,7 @@ export default function MultiForm({
   ];
 
   return (
-    <Form className="border rounded py-1 px-2">
+    <Form className="border rounded py-1 px-2 bg-light">
       <Form.Row>
         <Col md="2">
           <Select
