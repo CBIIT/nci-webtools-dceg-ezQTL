@@ -157,7 +157,12 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   
   if(!is.null(leadsnp))  {
     cat(paste0("\nReference SNP using for filtering SNPs based on the distance: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
-    leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
+    if(!is.null(gwasfile)){
+      leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
+    }else{
+      if(!is.null(qtlfile)) {leadchr <- qtl %>% filter(rsnum==leadsnp) %>% pull(chr)}
+    }
+    
     if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
     leadpos1 <- leadpos - distance
     leadpos2 <- leadpos + distance
@@ -731,7 +736,7 @@ locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL
 
 # Locus LD ----------------------------------------------------------------
 
-IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_file, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_folder, Distance = 50000, output_file,
+IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_folder, Distance = 50000, output_file = NULL,
                             slide_length = -1, threadN = 1, ldstatistics = "rsquare", leadsnp = NULL, threshold = NULL, 
                             link2gene = NULL, triangleLD = TRUE, link2LD = NULL, leadsnpLD = TRUE, label_gene_name = FALSE, 
                             colour02 = "gray", colour04 = "cyan", colour06 = "green", colour08 = "yellow", 
@@ -739,16 +744,20 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_fi
                             leadsnp_size = 1.5, marker2highlight = NULL, marker2label = NULL, marker2label_angle = 60, 
                             marker2label_size = 1) {
   
-  association <- read_delim(association_file,delim = '\t',col_names = T)
+  association <- read_delim(association_file,delim = '\t',col_names = T,n_max = 5)
+  if("variant_id" %in% colnames(association)){
+    association <- read_delim(association_file,delim = '\t',col_names = T,col_types = cols('variant_id'='c'))  
+  }else{
+    association <- read_delim(association_file,delim = '\t',col_names = T)
+  }
   
   if('pvalue' %in% colnames(association)){  association <- association %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pvalue) }
   if('pval_nominal' %in% colnames(association)){  
     if(is.null(trait)){
-      trait <- association %>% arrange(pval_nominal) %>% select(1) %>% pull(gene_id)
+      trait <- association %>% arrange(pval_nominal) %>% slice(1) %>% pull(gene_symbol)
     }
-    association <- association %>% filter(gene_id == trait) %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pval_nominal) 
+    association <- association %>% filter(gene_symbol == trait) %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pval_nominal) 
   }
-  
   
   if(any(is.null(chr),is.null(left),is.null(right))){
     tmplocus <- association %>% arrange(p) %>% slice(1) 
@@ -756,22 +765,20 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_fi
     left <- tmplocus$Site - Distance
     right <- tmplocus$Site + Distance
   }
-  
   # limmit to 100k
   
-  if((right - left)  > 100000){
+  if((right - left)  > 400000){
     middle <- (right-left)/2
-    left <- middle - 50000
-    right <- middle + 50000
+    left <- middle - 200000
+    right <- middle + 200000
   }
   
   chromosome_association <- association[association$Locus == chr, ]
   transcript_min <- left
   transcript_max <- right
-  transcript_association <- chromosome_association[chromosome_association$Site >= 
-                                                     transcript_min & chromosome_association$Site <= transcript_max, ]
-  transcript_association <- transcript_association[order(transcript_association$Site), 
-  ]
+  transcript_association <- chromosome_association[chromosome_association$Site >= transcript_min & chromosome_association$Site <= transcript_max, ]
+  transcript_association <- transcript_association[order(transcript_association$Site),]
+  
   if (dim(transcript_association)[1] < 2) {
     stop("Less than 2 markers, can not compute LD")
   } else {
@@ -784,6 +791,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_fi
     system(cmd_ztw)
     gtf <- read_delim(regionfile,delim = '\t',col_names = FALSE)
     colnames(gtf) <- paste0('V',1:9)
+    unlink(x = regionfile,force = TRUE)
     
     R2 <- Site <- Site2 <- V4 <- V5 <- V9 <- group <- p <- NULL
     x <- xend <- y <- yend <- aggregate <- NULL
@@ -1025,7 +1033,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_fi
   # add linking line to link gene structure and LD matrix
   if (isTRUE(triangleLD)) {
     if (is.null(link2gene) & is.null(link2LD)) {
-      link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]
+      if(!is.null(threshold)) {link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]}
       link_association_structure <- link_association_structure[!duplicated(link_association_structure$p), ]
       link_number <- dim(link_association_structure)[1]
       link_asso_gene <- list(
@@ -1140,10 +1148,18 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, gtf, association_fi
     marker2label_list +
     theme_bw() + 
     theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
-
-  ggsave(filename = output_file,plot = plot,width = 16,height = 16)
+  
+  if(is.null(output_file)){
+    return(plot)
+  }else{
+    if(!str_detect(output_file,'png$')) {ggsave(filename = output_file,plot = plot,width = 16,height = 16) }
+    if(str_detect(output_file,'png$')) {ggsave(filename = output_file,plot = plot,width = 16,height = 16,dpi = "retina")}
+    if(!str_detect(output_file,'pdf$')) {
+      output_file <- str_replace(output_file,"\\....$",".pdf")
+      ggsave(filename = output_file,plot = plot,width = 16,height = 16)}
+  }
+  
 }
-
 
 
 
