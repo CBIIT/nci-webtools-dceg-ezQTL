@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 import { Tooltip } from '../../../controls/tooltip/tooltip';
 import { Button } from 'react-bootstrap';
-import { 
-  updateQTLsGWAS, 
+import {
+  updateQTLsGWAS,
   qtlsGWASBoxplotsCalculation,
-  qtlsGWASCalculation
+  qtlsGWASCalculation,
 } from '../../../../services/actions';
 
 export function LocusAlignmentPlot(params) {
@@ -21,27 +21,31 @@ export function LocusAlignmentPlot(params) {
     gwas,
     request,
     select_qtls_samples,
-    select_gwas_sample, 
+    select_gwas_sample,
     isQueue,
+    ldProject,
     qtlKey,
     ldKey,
     gwasKey,
+    qtlPublic,
+    ldPublic,
+    gwasPublic,
     select_chromosome,
     select_position,
-    email
+    email,
   } = useSelector((state) => state.qtlsGWAS);
 
   // use local state to reset tooltip when this component unmounts
   const [tooltip, setTooltip] = useState({
     visible: false,
-    data: {}
+    data: {},
   });
 
-  const updateTooltip = state =>
+  const updateTooltip = (state) =>
     setTooltip({
       ...tooltip,
-      ...state
-  });
+      ...state,
+    });
 
   useEffect(() => updateTooltip({ visible: false }), []);
 
@@ -67,10 +71,20 @@ export function LocusAlignmentPlot(params) {
       request,
       select_qtls_samples,
       select_gwas_sample,
-      associationFile: inputs['association_file'][0] === 'false' ? false : inputs['association_file'][0],
-      quantificationFile: inputs['quantification_file'][0] === 'false' ? false : inputs['quantification_file'][0],
-      genotypeFile: inputs['genotype_file'][0] === 'false' ? false : inputs['genotype_file'][0],
-      gwasFile: inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
+      associationFile:
+        inputs['association_file'][0] === 'false'
+          ? false
+          : inputs['association_file'][0],
+      quantificationFile:
+        inputs['quantification_file'][0] === 'false'
+          ? false
+          : inputs['quantification_file'][0],
+      genotypeFile:
+        inputs['genotype_file'][0] === 'false'
+          ? false
+          : inputs['genotype_file'][0],
+      gwasFile:
+        inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
       LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
       select_pop: inputs['select_pop'][0],
       select_gene: inputs['select_gene'][0],
@@ -81,34 +95,37 @@ export function LocusAlignmentPlot(params) {
       recalculateGene: false,
       recalculateDist: false,
       recalculateRef: true,
-      qtlKey,
-      ldKey,
-      gwasKey,
+      ldProject: ldProject.value,
+      qtlKey: qtlPublic ? qtlKey : false,
+      ldKey: ldPublic ? ldKey : false,
+      gwasKey: gwasPublic ? gwasKey : false,
       select_chromosome: select_chromosome.value,
       select_position,
       email: email,
     };
 
     // clear all locus colocalization results
-    dispatch(updateQTLsGWAS({ 
-      activeColocalizationTab: 'hyprcoloc',
-      hyprcolocError: '',
-      hyprcoloc_ld: null,
-      hyprcoloc_table: {
-        data: [],
-        globalFilter: '',
-      },
-      hyprcolocSNPScore_table: {
-        data: [],
-        globalFilter: '',
-      },
-      isLoadingHyprcoloc: false,
-      ecaviar_table: {
-        data: [],
-        globalFilter: '',
-      },
-      isLoadingECaviar: false,
-    }));
+    dispatch(
+      updateQTLsGWAS({
+        activeColocalizationTab: 'hyprcoloc',
+        hyprcolocError: '',
+        hyprcoloc_ld: null,
+        hyprcoloc_table: {
+          data: [],
+          globalFilter: '',
+        },
+        hyprcolocSNPScore_table: {
+          data: [],
+          globalFilter: '',
+        },
+        isLoadingHyprcoloc: false,
+        ecaviar_table: {
+          data: [],
+          globalFilter: '',
+        },
+        isLoadingECaviar: false,
+      })
+    );
 
     dispatch(qtlsGWASCalculation(params));
   }
@@ -125,151 +142,194 @@ export function LocusAlignmentPlot(params) {
             data={locus_alignment.data}
             layout={locus_alignment.layout}
             config={config}
-            onClick={async data => {
+            onClick={async (data) => {
               const [point] = data.points;
               const { xaxis, yaxis } = point;
               const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
               const yOffset = yaxis.l2p(point.y) + yaxis._offset - 155;
 
-              if (point && 
-                point.customdata && 
-                (gwas && gwas.data && Object.keys(gwas.data).length > 0 ? point.curveNumber === 3 || point.curveNumber === 6 : point.curveNumber === 2)
+              if (
+                point &&
+                point.customdata &&
+                (gwas && gwas.data && Object.keys(gwas.data).length > 0
+                  ? point.curveNumber === 3 || point.curveNumber === 6
+                  : point.curveNumber === 2)
               ) {
                 updateTooltip({
                   visible: true,
                   data: point.customdata,
                   x: xOffset,
-                  y: yOffset
+                  y: yOffset,
                 });
               } else {
                 updateTooltip({ visible: false });
               }
             }}
-            onRelayout={relayout => {
-                updateTooltip({ visible: false });
+            onRelayout={(relayout) => {
+              updateTooltip({ visible: false });
             }}
           />
-      )}
+        )}
 
-      <Tooltip
-        closeButton
-        visible={tooltip.visible}
-        x={tooltip.x}
-        y={tooltip.y}
-        onClose={e => updateTooltip({ visible: false })}
-        style={{
-          width: '200px',
-          border: `1px solid ${tooltip.data.color}`
-        }}
-        className="text-left qq-plot-tooltip">
-        <div>
-          {/* chr:pos */}
-          {tooltip.data.chr && tooltip.data.pos && (
-            <div>
-              <b>chr{tooltip.data.chr}:{tooltip.data.pos}</b>
-            </div>
-          )}
-          {/* rsnum */}
-          {tooltip.data.rsnum && (
-            <div>
-              <b>{tooltip.data.rsnum}</b>
-            </div>
-          )}
-          {/* ref/alt */}
-          {tooltip.data.ref && tooltip.data.alt && (
-            <div>
-              Ref/Alt: <b>{tooltip.data.ref}/{tooltip.data.alt}</b>
-            </div>
-          )}
-          {/* p-value */}
-          {tooltip.data.pval_nominal && (
-            <div>
-              <i>P</i>-value: <b>{tooltip.data.pval_nominal}</b>
-            </div>
-          )}
-          {/* slope */}
-          {tooltip.data.slope && (
-            <div>
-              Slope: <b>{tooltip.data.slope}</b>
-            </div>
-          )}
-          {/* r2 */}
-          {tooltip.data.R2 && (
-            <div>
-              R<sup>2</sup>: <b>{tooltip.data.R2}</b>
-            </div>
-          )}
-          <div className="w-100 border border-top mx-0 my-0"></div>
-          {/* make ld reference action */}
-          {tooltip.data && !isQueue && (
-            <div>
-              <Button
-                variant="link"
-                onClick={(_) => {
-                  updateTooltip({ visible: false });
-                  handleSubmit(tooltip.data.rsnum);
-                }}
-              >
-                <b>Make LD Reference</b>
-              </Button>
-            </div>
-          )}
-          {/* ldpop link */}
-          {tooltip.data.rsnum && locus_alignment['top']['rsnum'] && (
-            <div>
-              <a href={"https://ldlink.nci.nih.gov/?tab=ldpop&var1=" + tooltip.data.rsnum + "&var2=" + locus_alignment['top']['rsnum'] + "&pop=" + inputs['select_pop'][0].split('+').join('%2B') + "&r2_d=r2"} 
-              target="_blank" 
-              rel="noreferrer">
-                <b>LDpop</b>
-              </a>
-            </div>
-          )}
-          {/* potential gwas link */}
-          {tooltip.data.rsnum && (
-            <div>
-              <a href={'https://www.ebi.ac.uk/gwas/search?query=' + tooltip.data.rsnum} 
-              target="_blank" 
-              rel="noreferrer">
-                <b>Potential GWAS</b>
-              </a>
-            </div>
-          )}
-          {/* potential gnomad link */}
-          {tooltip.data.chr && tooltip.data.pos && tooltip.data.ref &&  tooltip.data.alt && (
-            <div>
-              <a href={"http://gnomad.broadinstitute.org/variant/" + tooltip.data.chr + "-" + tooltip.data.pos + "-" + tooltip.data.ref + "-" + tooltip.data.alt} 
-                target="_blank" 
-                rel="noreferrer">
-                <b>gnomAD browser</b>
-              </a>
-            </div>
-          )}
-          {/* show boxplot action */}
-          {tooltip.data && (
-            <div>
-              <Button
-                variant="link"
-                onClick={async (_) => {
-                  dispatch(
-                    qtlsGWASBoxplotsCalculation({ 
-                      request,
-                      select_qtls_samples, 
-                      quantificationFile: inputs['quantification_file'][0], 
-                      genotypeFile: inputs['genotype_file'][0],
-                      info: tooltip.data
-                    })
-                  );
-                  updateTooltip({ visible: false });
-                }}
-                disabled={!(locus_quantification && locus_quantification.data && Object.keys(locus_quantification.data).length > 0)}
-              >
-                <b>Show Boxplots</b>
-              </Button>
-            </div>
-          )}
-        </div>
-      </Tooltip>
-
+        <Tooltip
+          closeButton
+          visible={tooltip.visible}
+          x={tooltip.x}
+          y={tooltip.y}
+          onClose={(e) => updateTooltip({ visible: false })}
+          style={{
+            width: '200px',
+            border: `1px solid ${tooltip.data.color}`,
+          }}
+          className="text-left qq-plot-tooltip"
+        >
+          <div>
+            {/* chr:pos */}
+            {tooltip.data.chr && tooltip.data.pos && (
+              <div>
+                <b>
+                  chr{tooltip.data.chr}:{tooltip.data.pos}
+                </b>
+              </div>
+            )}
+            {/* rsnum */}
+            {tooltip.data.rsnum && (
+              <div>
+                <b>{tooltip.data.rsnum}</b>
+              </div>
+            )}
+            {/* ref/alt */}
+            {tooltip.data.ref && tooltip.data.alt && (
+              <div>
+                Ref/Alt:{' '}
+                <b>
+                  {tooltip.data.ref}/{tooltip.data.alt}
+                </b>
+              </div>
+            )}
+            {/* p-value */}
+            {tooltip.data.pval_nominal && (
+              <div>
+                <i>P</i>-value: <b>{tooltip.data.pval_nominal}</b>
+              </div>
+            )}
+            {/* slope */}
+            {tooltip.data.slope && (
+              <div>
+                Slope: <b>{tooltip.data.slope}</b>
+              </div>
+            )}
+            {/* r2 */}
+            {tooltip.data.R2 && (
+              <div>
+                R<sup>2</sup>: <b>{tooltip.data.R2}</b>
+              </div>
+            )}
+            <div className="w-100 border border-top mx-0 my-0"></div>
+            {/* make ld reference action */}
+            {tooltip.data && !isQueue && (
+              <div>
+                <Button
+                  variant="link"
+                  onClick={(_) => {
+                    updateTooltip({ visible: false });
+                    handleSubmit(tooltip.data.rsnum);
+                  }}
+                >
+                  <b>Make LD Reference</b>
+                </Button>
+              </div>
+            )}
+            {/* ldpop link */}
+            {tooltip.data.rsnum && locus_alignment['top']['rsnum'] && (
+              <div>
+                <a
+                  href={
+                    'https://ldlink.nci.nih.gov/?tab=ldpop&var1=' +
+                    tooltip.data.rsnum +
+                    '&var2=' +
+                    locus_alignment['top']['rsnum'] +
+                    '&pop=' +
+                    inputs['select_pop'][0].split('+').join('%2B') +
+                    '&r2_d=r2'
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <b>LDpop</b>
+                </a>
+              </div>
+            )}
+            {/* potential gwas link */}
+            {tooltip.data.rsnum && (
+              <div>
+                <a
+                  href={
+                    'https://www.ebi.ac.uk/gwas/search?query=' +
+                    tooltip.data.rsnum
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <b>Potential GWAS</b>
+                </a>
+              </div>
+            )}
+            {/* potential gnomad link */}
+            {tooltip.data.chr &&
+              tooltip.data.pos &&
+              tooltip.data.ref &&
+              tooltip.data.alt && (
+                <div>
+                  <a
+                    href={
+                      'http://gnomad.broadinstitute.org/variant/' +
+                      tooltip.data.chr +
+                      '-' +
+                      tooltip.data.pos +
+                      '-' +
+                      tooltip.data.ref +
+                      '-' +
+                      tooltip.data.alt
+                    }
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <b>gnomAD browser</b>
+                  </a>
+                </div>
+              )}
+            {/* show boxplot action */}
+            {tooltip.data && (
+              <div>
+                <Button
+                  variant="link"
+                  onClick={async (_) => {
+                    dispatch(
+                      qtlsGWASBoxplotsCalculation({
+                        request,
+                        select_qtls_samples,
+                        quantificationFile: inputs['quantification_file'][0],
+                        genotypeFile: inputs['genotype_file'][0],
+                        info: tooltip.data,
+                      })
+                    );
+                    updateTooltip({ visible: false });
+                  }}
+                  disabled={
+                    !(
+                      locus_quantification &&
+                      locus_quantification.data &&
+                      Object.keys(locus_quantification.data).length > 0
+                    )
+                  }
+                >
+                  <b>Show Boxplots</b>
+                </Button>
+              </div>
+            )}
+          </div>
+        </Tooltip>
       </div>
     </>
   );
