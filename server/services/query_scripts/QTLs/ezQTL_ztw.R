@@ -102,6 +102,13 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       qtltmp <- qtltmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
       cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
       
+      
+      dup_qtl_id <- qtl %>% count(gene_id,gene_symbol) %>% count(gene_symbol) %>% filter(n>1)
+      if(dim(dup_qtl_id)[1]>1){
+        cat(paste0('Duplicated gene symbol in the qtl files. Use the gene id and gene symbol together as the new id'),file=logfile,sep="\n",append = T)
+        qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,"_",gene_symbol))
+      }
+      
     }
     
   }
@@ -156,14 +163,18 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   }
   
   if(!is.null(leadsnp))  {
-    cat(paste0("\nReference SNP using for filtering SNPs based on the distance: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
+    cat(paste0("\nReference SNP using for filtering SNPs based on the snp: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
     if(!is.null(gwasfile)){
       leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
+      if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
+      
     }else{
-      if(!is.null(qtlfile)) {leadchr <- qtl %>% filter(rsnum==leadsnp) %>% pull(chr)}
+      if(!is.null(qtlfile)) {
+        leadchr <- qtl %>% filter(rsnum==leadsnp) %>% pull(chr)
+        if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
+      }
     }
     
-    if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
     leadpos1 <- leadpos - distance
     leadpos2 <- leadpos + distance
     
@@ -173,9 +184,12 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     #ld.info <- ld.info %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
     if(!is.null(ldfile)){
       leadindex <- ld.info %>% filter(rsnum==leadsnp) %>% pull(Seq)
-      if(!is.na(leadindex)){
+      #!is.na(leadindex) | 
+      if(length(leadindex)!=0){
         ldtmp <- tibble(LD=ld.matrix[,leadindex])
+        ld_leadsnp <- TRUE
       }else{
+        ld_leadsnp <- FALSE
         ldtmp <- tibble(LD=rep(NA,dim(ld.matrix)[1]))
       }
       
@@ -189,7 +203,6 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     cat("No Reference SNP using for filtering SNPs based on the distance",file=logfile,sep="\n",append = T)
   }
   
-  
   ## QTL plots
   if(!is.null(qtlfile)){
     # qtl minmal p-visualize
@@ -198,11 +211,13 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       arrange(pval_nominal) %>%
       slice(1) %>%
       ungroup() %>% 
-      arrange(desc(pval_nominal)) 
+      arrange((pval_nominal)) %>% 
+      slice(1:50) %>% 
+      arrange(desc(pval_nominal))
     
-    pall0 <- qtl %>% 
-      mutate(gene_symbol=factor(gene_symbol,levels = qtl_min$gene_symbol)) %>% 
-      ggplot(aes(-log10(pval_nominal),gene_symbol,fill=-log10(pval_nominal)))+
+    pall0 <- qtl %>% filter(gene_id %in% qtl_min$gene_id) %>% 
+      mutate(gene_id=factor(gene_id,levels = qtl_min$gene_id)) %>% 
+      ggplot(aes(-log10(pval_nominal),gene_id,fill=-log10(pval_nominal)))+
       geom_point(pch=21,stroke=0.2,col="black",size=3)+
       geom_point(data = qtl_min,pch=21,stroke=0.5,col="red",size=3)+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XYx",axis = F,ticks = T,axis_title_size= 14)+
@@ -245,8 +260,25 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     snpalltmp <- snpall %>% filter(pos_gwas!=pos_ld|pos_gwas!=pos_qtl|pos_qtl!=pos_ld | ref_gwas!=ref_ld|ref_gwas!=ref_qtl|ref_qtl!=ref_ld|alt_gwas!=alt_ld|alt_gwas!=alt_qtl|alt_qtl!=alt_ld)
     cat(paste0('# number of overlapped snps by rsnum, but have different pos, ref, or alt:  ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     if(dim(snpalltmp)[1]>0){
-      cat('Warning: found SNPs with same rsnum, but differnt information. Check the SNP Match file for detail. However, ezQTL still use the rsnum as the ID for colocalization analyses.',file=logfile,sep="\n",append = T)
-      snpalltmp %>% write_delim('snp_match.txt',delim = '\t',col_names = T)
+      pertmp <- dim(snpalltmp)[1]/dim(snpall)[1]
+      pertmp2 <- percent_format()(pertmp)
+      cat(paste0('\nWarning: found ',pertmp2,' SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and allels information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID for colocalization analyses.'),file=logfile,sep="\n",append = T)
+      snpalltmp %>% write_delim('snp_not_match.txt',delim = '\t',col_names = T)
+      if(pertmp > 0.9){
+        cat(paste0('Warning: align GWAS and QTL dataset based on LD information'),file=logfile,sep="\n",append = T)
+        snpall <- snpall %>% select(rsnum,chr,pos=pos_ld,ref=ref_ld,alt=alt_ld)
+        gwas <- gwas %>% filter(rsnum %in% snpall$rsnum) %>% select(-pos,-ref,-alt) %>% left_join(snpall) %>% select(one_of(gwas_colnames))
+        qtl <- qtl %>% filter(rsnum %in% snpall$rsnum) %>% select(-pos,-ref,-alt) %>% left_join(snpall) %>% select(one_of(qtl_colnames))
+        
+        snpall <- inner_join(
+          gwas %>% select(rsnum,chr,pos_gwas=pos,ref_gwas=ref,alt_gwas=alt) %>% unique(),
+          qtl %>% select(rsnum,chr,pos_qtl=pos,ref_qtl=ref,alt_qtl=alt) %>% unique()
+        ) %>% 
+          inner_join(
+            ld.info %>% select(rsnum,chr,pos_ld=pos,ref_ld=ref,alt_ld=alt) %>% unique()
+          )
+      }
+      
     }
     
     cat("\nFinal Set of SNPs for ezQTL analyses",file=logfile,sep="\n",append = T)
@@ -257,21 +289,52 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     snpalltmp <- snpalltmp  %>% filter((ref_qtl %in% c('A','T') & alt_qtl %in% c('A','T'))|(ref_qtl %in% c('C','G') & alt_qtl %in% c('C','G')))
     cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     
+    # output the final dataset ------------------------------------------------
+    #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
+    orsnum <- snpall %>% pull(rsnum)
+    
+    # suggestive snp as the key
+    qtl_ref <- qtl %>% filter(rsnum %in% orsnum) %>% arrange(pval_nominal) %>% slice(1)
+    gwas_ref <- gwas %>% filter(rsnum %in% orsnum) %>% arrange(pvalue) %>% slice(1)
+    
+    leadsnp=gwas_ref$rsnum
+    
+    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWASP P=', gwas_ref$pvalue)
+    qtl_ref <- paste0(qtl_ref$rsnum, ' (',qtl_ref$chr,':',qtl_ref$pos,':',qtl_ref$ref,':',qtl_ref$alt,') QTL P=', qtl_ref$pval_nominal,' for ',qtl_ref$gene_id,":",qtl_ref$gene_symbol)
+    
+    cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
+    cat(paste0('Best GWAS overlapped snp: ',gwas_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best QTL overlapped snp: ',qtl_ref),file=logfile,sep="\n",append = T)
     
     ## additional filter for the QTL traits
     
     
-    # output the final dataset ------------------------------------------------
-    #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
-    orsnum <- snpall %>% pull(rsnum)
+    # recalculate the LD
+    if(!ld_leadsnp){
+      leadindex <- ld.info %>% filter(rsnum==leadsnp) %>% pull(Seq)
+      #!is.na(leadindex) | 
+      if(length(leadindex)!=0){
+        ldtmp <- tibble(LD=ld.matrix[,leadindex])
+      }else{
+        ldtmp <- tibble(LD=rep(NA,dim(ld.matrix)[1]))
+      }
+      
+      ld.data <- bind_cols(
+        ld.info,
+        ldtmp
+      ) %>% filter(chr==leadchr,pos>=leadpos1,pos<=leadpos2)
+      
+    }
+    
+    
     
     ## overlap plot 1
     qtl2 <- qtl %>% group_by(rsnum,pos) %>% arrange(pval_nominal) %>% summarise(pvalue=min(pval_nominal),n=n()) %>% ungroup()
     ndifgene <- qtl %>% count(gene_id) %>% count(n) %>% dim() %>% .[[1]]
     
-    pcol <- c('#cccccc','#1a9850')
+    pcol <- c("FALSE"='#cccccc',"TRUE"='#1a9850')
     p1 <- qtl2 %>% mutate(tmp=rsnum %in% orsnum) %>% arrange(tmp) %>% 
-      ggplot(aes(pos/1000000,-log10(pvalue),fill=rsnum %in% orsnum))+
+      ggplot(aes(pos/1000000,-log10(pvalue),fill=if_else(rsnum %in% orsnum,"TRUE","FALSE")))+
       geom_point(aes(size=n),pch=21,stroke=0.3,col="black")+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
       labs(fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
@@ -287,7 +350,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     }
     
     p2 <- gwas %>% 
-      ggplot(aes(pos/1000000,-log10(pvalue),fill=rsnum %in% orsnum))+
+      ggplot(aes(pos/1000000,-log10(pvalue),fill=if_else(rsnum %in% orsnum,"TRUE","FALSE")))+
       geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
       labs(fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
@@ -322,7 +385,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     }
     
     qdata <- left_join(
-      qtl %>% filter(rsnum %in% orsnum,gene_symbol %in% gene_ids) %>% mutate(Z=slope/slope_se) %>% mutate(Gene=paste0(gene_id,'/',gene_symbol)) %>% select(rsnum, pos, ref,alt, Z,Gene),
+      qtl %>% filter(rsnum %in% orsnum,gene_symbol %in% gene_ids|gene_id %in% gene_ids) %>% mutate(Z=slope/slope_se) %>% mutate(Gene=paste0(gene_id,'/',gene_symbol)) %>% select(rsnum, pos, ref,alt, Z,Gene),
       gwas %>% filter(rsnum %in% orsnum) %>% select(rsnum,pos,zscore)
     ) %>% 
       left_join(
