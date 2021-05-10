@@ -7,6 +7,7 @@ import './accordions.scss';
 const { Header, Body } = Card;
 const { Toggle, Collapse } = Accordion;
 
+// Bootstrap 4 Accordion with all cards open by default
 export default function Accordions({ components, bodyClass }) {
   const [toggleCollapse, setCollpase] = useState(
     components.reduce(

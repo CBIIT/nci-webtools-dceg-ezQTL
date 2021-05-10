@@ -11,6 +11,7 @@ import {
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 import {
   qtlsGWASCalculation,
   uploadFile,
@@ -1087,7 +1088,11 @@ export function QTLsGWASForm() {
       </Row>
       <Row>
         <Col sm="6">
-          <Button
+          <Link to={`/qtls/sample`} className="font-14">
+            <span className="sr-only">Load Sample Data</span>
+            Load Sample Data
+          </Link>
+          {/* <Button
             className="p-0 font-14"
             variant="link"
             onClick={() => {
@@ -1116,7 +1121,7 @@ export function QTLsGWASForm() {
             disabled={submitted}
           >
             {!select_gwas_sample ? 'Load' : 'Unload'} Sample Data
-          </Button>
+          </Button> */}
         </Col>
 
         <Col sm="6" className="d-flex">
