@@ -282,6 +282,7 @@ export const PopulationSelect = ({
       isClearable={false}
       backspaceRemovesValue={false}
       isDisabled={disabled}
+      menuPortalTarget={document.body}
     />
   );
 };
