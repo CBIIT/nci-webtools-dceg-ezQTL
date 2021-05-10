@@ -81,7 +81,6 @@ export function QTLsGWASResults({ queueRequest }) {
 
   useEffect(() => {
     if (queueRequest) {
-      console.log(queueRequest);
       dispatch(fetchResults({ request: queueRequest }));
     }
   }, [queueRequest]);

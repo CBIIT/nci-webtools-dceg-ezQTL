@@ -19,7 +19,7 @@ const fs = require('fs');
 const XLSX = require('xlsx');
 const AWS = require('aws-sdk');
 const tar = require('tar');
-const { validate } = require('uuid');
+const { validate, v1: uuidv1 } = require('uuid');
 
 const dataDir = path.resolve(config.data.folder);
 const tmpDir = path.resolve(config.tmp.folder);
@@ -248,18 +248,23 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
 
     logger.info(`Fetch Queue Result: ${request}`);
 
-    // validate request format
-    if (!validate(request.substring(0, 36))) throw `Invalid request`;
+    // validate request id
+    if (!validate(request.substring(0, 36)) && request != 'sample')
+      next(new Error(`Invalid request`));
 
     // ensure output directory exists
-    const resultsFolder = path.resolve(config.tmp.folder, request);
+    const request_id = request == 'sample' ? uuidv1() : request;
+    const resultsFolder = path.resolve(config.tmp.folder, request_id);
     await fs.promises.mkdir(resultsFolder, { recursive: true });
 
     // find objects which use the specified request as the prefix
     const objects = await s3
       .listObjectsV2({
-        Bucket: config.aws.s3.queue,
-        Prefix: `${config.aws.s3.outputPrefix}/${request}/`,
+        Bucket: request == 'sample' ? config.aws.s3.data : config.aws.s3.queue,
+        Prefix:
+          request == 'sample'
+            ? `${config.aws.s3.subFolder}/sample`
+            : `${config.aws.s3.outputPrefix}/${request}/`,
       })
       .promise();
 
@@ -268,12 +273,14 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
       const filename = path.basename(Key);
       const filepath = path.resolve(resultsFolder, filename);
 
-      // download results if they do not exist
+      // download files if they do not exist
       if (!fs.existsSync(filepath)) {
-        logger.info(`Downloading result: ${Key}`);
+        logger.info(`Downloading file: ${Key}`);
+
         const object = await s3
           .getObject({
-            Bucket: config.aws.s3.queue,
+            Bucket:
+              request == 'sample' ? config.aws.s3.data : config.aws.s3.queue,
             Key,
           })
           .promise();
@@ -301,13 +308,27 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
     let paramsFilePath = path.resolve(resultsFolder, `params.json`);
 
     if (fs.existsSync(paramsFilePath)) {
-      const params = JSON.parse(
+      let params = JSON.parse(
         String(await fs.promises.readFile(paramsFilePath))
       );
+      if (request == 'sample') {
+        // rename files
+        const oldRequest = params.params.request;
+        const files = fs.readdirSync(resultsFolder);
+        files.forEach((file) =>
+          fs.renameSync(
+            path.resolve(resultsFolder, file),
+            path.resolve(resultsFolder, file.replace(oldRequest, request_id))
+          )
+        );
 
+        // replace request id
+        params.params.request = request_id;
+        params.main.info.inputs.request[0] = request_id;
+      }
       res.json(params);
     } else {
-      throw `Invalid request`;
+      next(new Error(`Params not found`));
     }
   } catch (error) {
     next(error);
@@ -394,8 +415,15 @@ apiRouter.post('/qtls-coloc-visualize', (req, res, next) =>
 );
 
 apiRouter.post('/qtls-locus-ld', (req, res, next) =>
-  qtlsCalculateLD({ ...req.body, workingDirectory: workingDirectory, bucket: awsInfo.s3.data }, res, next)
+  qtlsCalculateLD(
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data,
+    },
+    res,
+    next
+  )
 );
-
 
 module.exports = { apiRouter };
