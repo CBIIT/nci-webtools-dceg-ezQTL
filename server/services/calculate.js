@@ -453,7 +453,7 @@ async function qtlsCalculateLD(params, res, next) {
     workingDirectory,
     'tmp',
     request,
-    'LD_Output.svg'
+    'LD_Output.png'
   );
 
   logger.info(tabixPath);

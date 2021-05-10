@@ -481,8 +481,10 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
       assocFile = paste0(request, ".qtl_temp.txt")
       cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
       system(cmd)
-      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp', '.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
+      # rename #gene_id to gene_id
+      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
+      qdata %>% write_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = '\t', col_names = T)
     }
     if (!identical(LDFile, 'false')) {
       LDFile <- paste0('tmp/', request, '/', LDFile)

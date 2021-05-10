@@ -35,7 +35,7 @@ export function LocusLD() {
       <LoadingOverlay active={isLoadingLD} />
       {submitted && !ldError && !isLoading && !isLoadingLD && (
         <Zoom
-          plotURL={`api/results/${request}/LD_Output.svg`}
+          plotURL={`api/results/${request}/LD_Output.png`}
           className="border rounded p-3"
           maxHeight="800px"
         />
