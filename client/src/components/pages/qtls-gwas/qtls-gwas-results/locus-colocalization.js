@@ -287,6 +287,7 @@ export function LocusColocalization() {
                   })
                 );
                 // lazy-load ecaviar calculation
+                /*
                 if (
                   e.currentTarget.value === 'ecaviar' &&
                   !isError &&
@@ -315,7 +316,7 @@ export function LocusColocalization() {
                     //   info: tooltip.data
                     // })
                   );
-                }
+                }*/
                 if (
                   e.target.value === 'summary' &&
                   !isError &&

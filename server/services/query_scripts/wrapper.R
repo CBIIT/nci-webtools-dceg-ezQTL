@@ -94,31 +94,28 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   source(rfile)
 
   if (identical(select_gwas_sample, 'true')) {
-    gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
+    gwasFile <- paste0(workDir,'/tmp/',request, '/ezQTL_input_gwas.txt')
   } else {
     if(identical(gwasFile, 'false'))
       gwasFile <- NULL
     else 
-      gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
+      gwasFile <- paste0(workDir,'/tmp/',request, '/ezQTL_input_gwas.txt')
   }
 
   if (identical(select_qtls_samples, 'true')) {
-    associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
+    associationFile <-  paste0(workDir,'/tmp/',request, '/ezQTL_input_qtl.txt')
+    ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
 
-    publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
-
-    save_object(publicLDFile, bucket, file = ldFile)
   } else {
     if(identical(associationFile, 'false'))
       associationFile = NULL
     else
-      associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
+      associationFile <-  paste0(workDir,'/tmp/',request, '/ezQTL_input_qtl.txt')
 
     if(identical(ldFile, 'false'))
       ldFile = NULL
     else
-      ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
+      ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
   }
 
   if(!is.null(gwasFile))

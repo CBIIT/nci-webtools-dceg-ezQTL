@@ -338,7 +338,9 @@ locus_quantification_heatmap <- function(edata_boxplot) {
   return(list(setNames(as.data.frame(tmpdata), tmpdata_colnames)))
 }
 
-locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile, edata, gdata) {
+locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile, edata, gdata, request) {
+
+  source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'ezQTL_ztw.R'))
   # initialize boxplot data as empty until data file detected
   locus_quantification_data <- list(c())
   # initialize heatmap data as empty until data file detected
@@ -361,6 +363,11 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
     locus_quantification_data <- list(setNames(as.data.frame(edata_boxplot), edata_boxplot_colnames))
 
     locus_quantification_heatmap_data <- locus_quantification_heatmap(edata_boxplot)
+
+    corPath <- paste0(workDir,'/','tmp/', request , '/quantification_cor.svg')
+    locus_quantification_cor(edata,tmp,corPath)
+    disPath <- paste0(workDir,'/','tmp/', request , '/quantification_dis.svg')
+    locus_quantification_dis(edata,tmp,output_plot = disPath)
   }
   return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
@@ -621,7 +628,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile, edata, gdata)
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile, edata, gdata, request)
   locus_quantification_data <- locus_quantification[[1]]
   locus_quantification_heatmap_data <- locus_quantification[[2]]
 

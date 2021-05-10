@@ -1628,6 +1628,19 @@ export function qtlsGWASLocusQCCalculation(params) {
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoadingQC: false }));
+        const qtlsGWAS = getState().qtlsGWAS;
+        
+        dispatch(
+          qtlsGWASLocusLDCalculation({
+            request: qtlsGWAS.request,
+            select_gwas_sample: qtlsGWAS.select_gwas_sample,
+            select_qtls_samples: qtlsGWAS.select_qtls_samples,
+            gwasFile: qtlsGWAS.inputs.gwas_file[0],
+            associationFile: qtlsGWAS.inputs.association_file[0],
+            LDFile: qtlsGWAS.inputs.ld_file[0],
+            leadsnp: qtlsGWAS.locus_alignment.top.rsnum
+          })
+        )
       });
   };
 }
@@ -1914,6 +1927,19 @@ export function qtlsGWASCalculation(params) {
                 select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
               })
             );
+
+            dispatch(
+              qtlsGWASECaviarCalculation({
+                LDFile: qtlsGWAS.inputs.ld_file[0],
+                associationFile: qtlsGWAS.inputs.association_file[0],
+                gwasFile:  qtlsGWAS.inputs.gwas_file[0],
+                request: qtlsGWAS.request,
+                select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+                select_gwas_sample: qtlsGWAS.select_gwas_sample,
+                select_qtls_samples: qtlsGWAS.select_qtls_samples,
+                select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+              })
+            );
           }
 
           dispatch(
@@ -1930,6 +1956,7 @@ export function qtlsGWASCalculation(params) {
             })
           );
 
+          /*
           dispatch(
             qtlsGWASLocusLDCalculation({
               request: qtlsGWAS.request,
@@ -1940,7 +1967,7 @@ export function qtlsGWASCalculation(params) {
               LDFile: qtlsGWAS.inputs.ld_file[0],
               leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
             })
-          );
+          );*/
         }
       })
       .catch(function (error) {
