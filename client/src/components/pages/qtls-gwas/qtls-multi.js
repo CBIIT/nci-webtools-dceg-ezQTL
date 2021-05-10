@@ -1,12 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { RootContext } from '../../../index';
 import { Form, Button, Row, Col } from 'react-bootstrap';
-import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   uploadFile,
   getPublicGTEx,
-  updateAlert,
   submitQueueMulti,
   updateMultiLoci,
 } from '../../../services/actions';

@@ -30,9 +30,7 @@ export function QTLsGWAS({ match }) {
         }
       >
         <SidebarPanel className="col-lg-3">
-          <div className="border rounded">
-            <QTLsGWASForm />
-          </div>
+          <QTLsGWASForm />
         </SidebarPanel>
 
         <MainPanel className="col-lg-9">
