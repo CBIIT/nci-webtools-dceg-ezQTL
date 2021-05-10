@@ -1650,14 +1650,17 @@ export function qtlsGWASLocusLDCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({ ldError: 'Error occured in LD calculation', activeResultsTab: 'locus-qc' })
+            updateQTLsGWAS({
+              ldError: 'Error occured in LD calculation',
+              activeResultsTab: 'locus-qc',
+            })
           );
         }
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoadingLD: false }));
       });
-  }
+  };
 }
 
 export function qtlsGWASColocVisualize(params) {
@@ -1720,7 +1723,10 @@ export function qtlsGWASColocVisualize(params) {
           axios
             .post('api/qtls-coloc-visualize', newParams)
             .then(function (response) {
-              console.log('api/qtls-locus-visualize response.data', response.data);
+              console.log(
+                'api/qtls-locus-visualize response.data',
+                response.data
+              );
             })
             .catch(function (error) {
               console.log(error);
@@ -1892,10 +1898,12 @@ export function qtlsGWASCalculation(params) {
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (
-          !qtlsGWAS.isError 
-        ) {
-          if(qtlsGWAS.gwas && qtlsGWAS.gwas.data && Object.keys(qtlsGWAS.gwas.data).length > 0){
+        if (!qtlsGWAS.isError) {
+          if (
+            qtlsGWAS.gwas &&
+            qtlsGWAS.gwas.data &&
+            Object.keys(qtlsGWAS.gwas.data).length > 0
+          ) {
             dispatch(
               qtlsGWASHyprcolocLDCalculation({
                 request: qtlsGWAS.request,
@@ -1907,7 +1915,7 @@ export function qtlsGWASCalculation(params) {
               })
             );
           }
-        
+
           dispatch(
             qtlsGWASLocusQCCalculation({
               request: qtlsGWAS.request,
@@ -1921,7 +1929,7 @@ export function qtlsGWASCalculation(params) {
               select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
             })
           );
-          
+
           dispatch(
             qtlsGWASLocusLDCalculation({
               request: qtlsGWAS.request,
@@ -1930,9 +1938,9 @@ export function qtlsGWASCalculation(params) {
               gwasFile: qtlsGWAS.inputs.gwas_file[0],
               associationFile: qtlsGWAS.inputs.association_file[0],
               LDFile: qtlsGWAS.inputs.ld_file[0],
-              leadsnp: qtlsGWAS.locus_alignment.top.rsnum
+              leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
             })
-          )
+          );
         }
       })
       .catch(function (error) {
@@ -2306,6 +2314,32 @@ export function fetchResults(request) {
             select_chr: qtlsGWAS.locus_alignment.top.chr,
             select_pos: qtlsGWAS.locus_alignment.top.pos,
             select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+          })
+        );
+
+        dispatch(
+          qtlsGWASLocusQCCalculation({
+            request: qtlsGWAS.request,
+            select_gwas_sample: qtlsGWAS.select_gwas_sample,
+            select_qtls_samples: qtlsGWAS.select_qtls_samples,
+            gwasFile: qtlsGWAS.inputs.gwas_file[0],
+            associationFile: qtlsGWAS.inputs.association_file[0],
+            ldfile: qtlsGWAS.inputs.ld_file[0],
+            leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
+            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+            select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+          })
+        );
+
+        dispatch(
+          qtlsGWASLocusLDCalculation({
+            request: qtlsGWAS.request,
+            select_gwas_sample: qtlsGWAS.select_gwas_sample,
+            select_qtls_samples: qtlsGWAS.select_qtls_samples,
+            gwasFile: qtlsGWAS.inputs.gwas_file[0],
+            associationFile: qtlsGWAS.inputs.association_file[0],
+            LDFile: qtlsGWAS.inputs.ld_file[0],
+            leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
           })
         );
       } else {
