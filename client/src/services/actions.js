@@ -1628,6 +1628,19 @@ export function qtlsGWASLocusQCCalculation(params) {
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoadingQC: false }));
+        const qtlsGWAS = getState().qtlsGWAS;
+        
+        dispatch(
+          qtlsGWASLocusLDCalculation({
+            request: qtlsGWAS.request,
+            select_gwas_sample: qtlsGWAS.select_gwas_sample,
+            select_qtls_samples: qtlsGWAS.select_qtls_samples,
+            gwasFile: qtlsGWAS.inputs.gwas_file[0],
+            associationFile: qtlsGWAS.inputs.association_file[0],
+            LDFile: qtlsGWAS.inputs.ld_file[0],
+            leadsnp: qtlsGWAS.locus_alignment.top.rsnum
+          })
+        )
       });
   };
 }
@@ -1922,17 +1935,7 @@ export function qtlsGWASCalculation(params) {
             })
           );
           
-          dispatch(
-            qtlsGWASLocusLDCalculation({
-              request: qtlsGWAS.request,
-              select_gwas_sample: qtlsGWAS.select_gwas_sample,
-              select_qtls_samples: qtlsGWAS.select_qtls_samples,
-              gwasFile: qtlsGWAS.inputs.gwas_file[0],
-              associationFile: qtlsGWAS.inputs.association_file[0],
-              LDFile: qtlsGWAS.inputs.ld_file[0],
-              leadsnp: qtlsGWAS.locus_alignment.top.rsnum
-            })
-          )
+         
         }
       })
       .catch(function (error) {

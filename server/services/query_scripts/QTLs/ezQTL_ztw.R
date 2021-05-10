@@ -646,14 +646,14 @@ locus_quantification_cor <- function(qdata,qtldata,output_plot=NULL,plot_width=N
   
   
   p <- ggplot(df) +
-    geom_asymmat(aes(x = x, y = y,
+    ggasym::geom_asymmat(aes(x = x, y = y,
                      fill_tl = pearson_r, fill_br = spearman_r)) +
-    scale_fill_tl_distiller(type = "div", palette = "RdYlBu",
+    ggasym::scale_fill_tl_distiller(type = "div", palette = "RdYlBu",
                             na.value = "grey90",
                             guide = guide_colourbar(direction = "vertical",barheight = unit(6,'cm'),
                                                     order = 1,
                                                     title.position = "top")) +
-    scale_fill_br_distiller(type = "div", palette = "RdYlBu",
+    ggasym::scale_fill_br_distiller(type = "div", palette = "RdYlBu",
                             na.value = "grey90",
                             guide = guide_colourbar(direction = "vertical",barheight = unit(6,'cm'),
                                                     order = 2,
@@ -708,7 +708,7 @@ locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL
     mutate(gene_symbol=factor(gene_symbol,levels = genelevel)) %>% 
     ggplot(aes(x=expression,y=gene_symbol,fill=stat(x)))+
     #stat_density_ridges(quantile_lines = TRUE, quantiles = 2,fill='#cccccc')+
-    geom_density_ridges_gradient() + 
+    ggridges::geom_density_ridges_gradient() + 
     scale_fill_viridis_c(option = 'C')+
     scale_x_continuous(expand = c(0, 0),breaks = pretty_breaks()) +
     scale_y_discrete(expand = c(0, 0)) +
