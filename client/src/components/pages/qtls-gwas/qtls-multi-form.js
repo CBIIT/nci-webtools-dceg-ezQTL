@@ -519,32 +519,57 @@ export default function MultiForm({
   }
 
   function handleTissue(tissue) {
-    const qtlKey = publicGTEx['cis-QTL dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == qtlProject.value &&
-          row.xQTL == xQtl.value &&
-          row.Tissue == tissue.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const qtlKey = tissueOnly
+      ? publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value && row.Tissue == tissue.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == qtlProject.value &&
+              row.xQTL == xQtl.value &&
+              row.Tissue == tissue.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
+
     mergeState({ tissue: tissue, qtlKey: qtlKey });
   }
 
   function handlePhenotype(phenotype) {
-    const gwasKey = publicGTEx['GWAS dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == gwasProject.value &&
-          row.Phenotype == phenotype.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const gwasKey = phenotypeOnly
+      ? publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotype.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == gwasProject.value &&
+              row.Phenotype == phenotype.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
-    mergeState({
-      phenotype: phenotype,
-      gwasKey: gwasKey,
-    });
+    mergeState({ phenotype: phenotype, gwasKey: gwasKey });
   }
 
   function handleReset() {
