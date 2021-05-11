@@ -243,15 +243,29 @@ export function QTLsGWASForm() {
       project.value,
       xQtlOptions[0].value
     );
-    const qtlKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.xQTL == xQtlOptions[0].value &&
-          row.Tissue == tissueOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const qtlKey = tissueOnly
+      ? data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Tissue == tissueOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == project.value &&
+              row.xQTL == xQtlOptions[0].value &&
+              row.Tissue == tissueOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
     dispatch(
       updateQTLsGWAS({
@@ -268,14 +282,29 @@ export function QTLsGWASForm() {
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
-    const gwasKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.Phenotype == phenotypeOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+
+    const gwasKey = phenotypeOnly
+      ? data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotypeOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == project.value &&
+              row.Phenotype == phenotypeOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
     dispatch(
       updateQTLsGWAS({
@@ -935,7 +964,6 @@ export function QTLsGWASForm() {
       title: 'Locus Information',
       component: (
         <>
-          {' '}
           <Row>
             <Col>
               <Form.Label className="mb-0">
