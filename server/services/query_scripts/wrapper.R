@@ -92,6 +92,7 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
 
 qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, request, workDir, bucket) {
   source(rfile)
+  loadAWS()
 
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_gwas.txt')
