@@ -1610,26 +1610,14 @@ export function qtlsGWASLocusQCCalculation(params) {
 
     axios
       .post('api/qtls-locus-qc', params)
-      .then(function (response) {
+      .then(async function (response) {
         console.log('api/qtls-locus-qc response.data', response);
-        dispatch(updateQTLsGWAS({ locus_qc: response.data }));
-      })
-      .catch(function (error) {
-        console.log(error);
-        if (error) {
-          dispatch(updateError({ visible: true }));
-          dispatch(
-            updateQTLsGWAS({
-              qcError: 'Error occured in QC calculation',
-              // activeResultsTab: 'locus-qc',
-            })
-          );
-        }
-      })
-      .then(function () {
-        dispatch(updateQTLsGWAS({ isLoadingQC: false }));
+        await dispatch(
+          updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
+        );
+
         const qtlsGWAS = getState().qtlsGWAS;
-        
+
         dispatch(
           qtlsGWASLocusLDCalculation({
             request: qtlsGWAS.request,
@@ -1638,9 +1626,23 @@ export function qtlsGWASLocusQCCalculation(params) {
             gwasFile: qtlsGWAS.inputs.gwas_file[0],
             associationFile: qtlsGWAS.inputs.association_file[0],
             LDFile: qtlsGWAS.inputs.ld_file[0],
-            leadsnp: qtlsGWAS.locus_alignment.top.rsnum
+            leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
+            genome_build: qtlsGWAS.genome.value,
           })
-        )
+        );
+      })
+      .catch(function (error) {
+        console.log(error);
+        if (error) {
+          dispatch(updateError({ visible: true }));
+          dispatch(
+            updateQTLsGWAS({
+              qcError: 'Error occured in QC calculation',
+              isLoadingQC: false,
+              // activeResultsTab: 'locus-qc',
+            })
+          );
+        }
       });
   };
 }
@@ -1932,7 +1934,7 @@ export function qtlsGWASCalculation(params) {
               qtlsGWASECaviarCalculation({
                 LDFile: qtlsGWAS.inputs.ld_file[0],
                 associationFile: qtlsGWAS.inputs.association_file[0],
-                gwasFile:  qtlsGWAS.inputs.gwas_file[0],
+                gwasFile: qtlsGWAS.inputs.gwas_file[0],
                 request: qtlsGWAS.request,
                 select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
                 select_gwas_sample: qtlsGWAS.select_gwas_sample,
@@ -2343,35 +2345,34 @@ export function fetchResults(request) {
             select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
           })
         );
-
-        dispatch(
-          qtlsGWASLocusQCCalculation({
-            request: qtlsGWAS.request,
-            select_gwas_sample: qtlsGWAS.select_gwas_sample,
-            select_qtls_samples: qtlsGWAS.select_qtls_samples,
-            gwasFile: qtlsGWAS.inputs.gwas_file[0],
-            associationFile: qtlsGWAS.inputs.association_file[0],
-            ldfile: qtlsGWAS.inputs.ld_file[0],
-            leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
-            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-            select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
-          })
-        );
-
-        dispatch(
-          qtlsGWASLocusLDCalculation({
-            request: qtlsGWAS.request,
-            select_gwas_sample: qtlsGWAS.select_gwas_sample,
-            select_qtls_samples: qtlsGWAS.select_qtls_samples,
-            gwasFile: qtlsGWAS.inputs.gwas_file[0],
-            associationFile: qtlsGWAS.inputs.association_file[0],
-            LDFile: qtlsGWAS.inputs.ld_file[0],
-            leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
-          })
-        );
       } else {
         dispatch(updateQTLsGWAS({ qcError: 'No data available for QC plot' }));
       }
+      dispatch(
+        qtlsGWASLocusQCCalculation({
+          request: qtlsGWAS.request,
+          select_gwas_sample: qtlsGWAS.select_gwas_sample,
+          select_qtls_samples: qtlsGWAS.select_qtls_samples,
+          gwasFile: qtlsGWAS.inputs.gwas_file[0],
+          associationFile: qtlsGWAS.inputs.association_file[0],
+          ldfile: qtlsGWAS.inputs.ld_file[0],
+          leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
+          select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+          select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+        })
+      );
+
+      // dispatch(
+      //   qtlsGWASLocusLDCalculation({
+      //     request: qtlsGWAS.request,
+      //     select_gwas_sample: qtlsGWAS.select_gwas_sample,
+      //     select_qtls_samples: qtlsGWAS.select_qtls_samples,
+      //     gwasFile: qtlsGWAS.inputs.gwas_file[0],
+      //     associationFile: qtlsGWAS.inputs.association_file[0],
+      //     LDFile: qtlsGWAS.inputs.ld_file[0],
+      //     leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
+      //   })
+      // );
     } catch (error) {
       console.log(error);
       if (error) {
