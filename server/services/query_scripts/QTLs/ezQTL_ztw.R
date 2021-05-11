@@ -1062,7 +1062,7 @@ locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL
 
 # Locus LD ----------------------------------------------------------------
 
-IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_folder, Distance = 50000, output_file = NULL,
+IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_file, Distance = 50000, output_file = NULL,
                             slide_length = -1, threadN = 1, ldstatistics = "rsquare", leadsnp = NULL, threshold = NULL, 
                             link2gene = NULL, triangleLD = TRUE, link2LD = NULL, leadsnpLD = TRUE, label_gene_name = FALSE, 
                             colour02 = "gray", colour04 = "cyan", colour06 = "green", colour08 = "yellow", 
@@ -1109,12 +1109,8 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
   if (dim(transcript_association)[1] < 2) {
     stop("Less than 2 markers, can not compute LD")
   } else {
-    
-    ## tabix gtf file
-    if(genome_build == "GRCh37") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v19.annotation.gtf.gz')}
-    if(genome_build == "GRCh38") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v37.annotation.gtf.gz')}
     regionfile=paste0(chr,":",left,"-",right,'.gtf_tmp')
-    cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' > ',regionfile)
+    cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' -D > ',regionfile)
     system(cmd_ztw)
     gtf <- read_delim(regionfile,delim = '\t',col_names = FALSE)
     colnames(gtf) <- paste0('V',1:9)

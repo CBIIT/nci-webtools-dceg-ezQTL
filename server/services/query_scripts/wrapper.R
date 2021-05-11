@@ -52,9 +52,9 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
 
-    if(identical(gwasFile, 'false'))
+    if (identical(gwasFile, 'false'))
       gwasFile <- NULL
-    else 
+    else
       gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
   }
   if (identical(select_qtls_samples, 'true')) {
@@ -66,12 +66,12 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
 
-    if(identical(associationFile, 'false'))
+    if (identical(associationFile, 'false'))
       associationFile = NULL
     else
       associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
 
-    if(identical(ldFile, 'false'))
+    if (identical(ldFile, 'false'))
       ldFile = NULL
     else
       ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
@@ -90,36 +90,42 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
-qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, tabixPath, outputPath, leadsnp, request, workDir, bucket) {
+qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, request, workDir, bucket) {
   source(rfile)
 
   if (identical(select_gwas_sample, 'true')) {
-    gwasFile <- paste0(workDir,'/tmp/',request, '/ezQTL_input_gwas.txt')
+    gwasFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_gwas.txt')
   } else {
-    if(identical(gwasFile, 'false'))
+    if (identical(gwasFile, 'false'))
       gwasFile <- NULL
-    else 
-      gwasFile <- paste0(workDir,'/tmp/',request, '/ezQTL_input_gwas.txt')
+    else
+      gwasFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_gwas.txt')
   }
 
   if (identical(select_qtls_samples, 'true')) {
-    associationFile <-  paste0(workDir,'/tmp/',request, '/ezQTL_input_qtl.txt')
+    associationFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_qtl.txt')
     ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
 
   } else {
-    if(identical(associationFile, 'false'))
+    if (identical(associationFile, 'false'))
       associationFile = NULL
     else
-      associationFile <-  paste0(workDir,'/tmp/',request, '/ezQTL_input_qtl.txt')
+      associationFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_qtl.txt')
 
-    if(identical(ldFile, 'false'))
+    if (identical(ldFile, 'false'))
       ldFile = NULL
     else
       ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
   }
 
-  if(!is.null(gwasFile))
-    IntRegionalPlot(genome_build = 'GRCh37',association_file = gwasFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath,leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
-  else if(!is.null(associationFile))
-    IntRegionalPlot(chr = 21, left=42759805, right=42859805, trait = 'MX2', genome_build = 'GRCh37',association_file = associationFile,LDfile = ldFile,gtf_tabix_folder = tabixPath,output_file = outputPath,leadsnp = leadsnp, threshold = 5,label_gene_name = TRUE)
+  # select tabix gtf file
+  # GRCh37: gencode.v19.annotation.gtf.gz
+  # GRCh38: gencode.v37.annotation.gtf.gz
+  tabixFile <- ifelse(genome_build == 'GRCh37', 'gencode.v19.annotation.gtf.gz', 'gencode.v37.annotation.gtf.gz')
+  tabixPath = paste0('s3://', bucket, '/ezQTL/tabix/', tabixFile)
+
+  if (!is.null(gwasFile))
+    IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = 5, label_gene_name = TRUE)
+  else if (!is.null(associationFile))
+    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = 5, label_gene_name = TRUE)
 }

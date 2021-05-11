@@ -437,6 +437,7 @@ async function qtlsCalculateLD(params, res, next) {
     associationFile,
     gwasFile,
     LDFile,
+    genome_build,
     leadsnp,
     workingDirectory,
     bucket,
@@ -448,7 +449,6 @@ async function qtlsCalculateLD(params, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  const tabixPath = path.resolve(workingDirectory, 'data', 'tabix');
   const outputPath = path.resolve(
     workingDirectory,
     'tmp',
@@ -456,7 +456,6 @@ async function qtlsCalculateLD(params, res, next) {
     'LD_Output.png'
   );
 
-  logger.info(tabixPath);
   logger.info(outputPath);
 
   try {
@@ -470,7 +469,7 @@ async function qtlsCalculateLD(params, res, next) {
         gwasFile.toString(),
         associationFile.toString(),
         LDFile.toString(),
-        tabixPath.toString(),
+        genome_build.toString(),
         outputPath.toString(),
         leadsnp.toString(),
         request.toString(),
