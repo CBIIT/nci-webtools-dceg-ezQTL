@@ -549,7 +549,7 @@ export default function MultiForm({
 
   const accordionComponents = [
     {
-      title: 'QTLs Data',
+      title: 'Association Data',
       component: (
         <>
           <Form.Row>
