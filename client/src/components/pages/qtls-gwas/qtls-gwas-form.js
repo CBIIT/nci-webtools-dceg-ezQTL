@@ -282,7 +282,6 @@ export function QTLsGWASForm() {
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
-
     const gwasKey = phenotypeOnly
       ? data
           .filter(
