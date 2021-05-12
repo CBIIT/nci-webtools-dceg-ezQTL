@@ -90,7 +90,6 @@ function LocusInfo({ locusIndex, state, mergeState }) {
             onChange={(e) => mergeLocusInfo({ select_dist: e.target.value })}
             value={select_dist}
             isInvalid={select_dist < 1 || select_dist > 200}
-            // custom
           />
           <Form.Control.Feedback type="invalid">
             Enter distance between 1 and 200Kb.
@@ -135,7 +134,6 @@ function LocusInfo({ locusIndex, state, mergeState }) {
                 select_ref.length > 0 &&
                 !/^rs\d+$/.test(select_ref)
               }
-              // custom
             />
             <Form.Control.Feedback type="invalid">
               Enter valid RS number. Leave empty for default.
