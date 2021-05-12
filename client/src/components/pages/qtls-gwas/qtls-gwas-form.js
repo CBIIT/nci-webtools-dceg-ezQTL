@@ -8,8 +8,6 @@ import {
   Popover,
   OverlayTrigger,
 } from 'react-bootstrap';
-import Overlay from 'react-bootstrap/Overlay';
-import Tooltip from 'react-bootstrap/Tooltip';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
@@ -40,15 +38,14 @@ export function QTLsGWASForm() {
   const [_genotypeFile, _setGenotypeFile] = useState('');
   const [_LDFile, _setLDFile] = useState('');
   const [_gwasFile, _setGwasFile] = useState('');
-  const [showQuantificationTooltip, setShowQuantificationTooltip] = useState(
-    false
-  );
-  const [showGenotypeTooltip, setShowGenotypeTooltip] = useState(false);
+
   const [tissueOnly, viewTissueOnly] = useState(false);
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
-  const [showAdditionalInput, setAdditionalInput] = useState(false);
+  const [useQuantification, toggleQuantification] = useState(false);
 
   const [validEmail, setValidEmail] = useState(false);
+  const [attempt, setAttempt] = useState(false);
+  const [valid, setValid] = useState(false);
 
   const {
     select_qtls_samples,
@@ -107,8 +104,8 @@ export function QTLsGWASForm() {
   useEffect(() => _setLDFile(LDFile), [LDFile]);
   useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
   useEffect(() => {
-    if (select_qtls_samples || select_gwas_sample) setAdditionalInput(true);
-    else setAdditionalInput(false);
+    if (select_qtls_samples || select_gwas_sample) toggleQuantification(true);
+    else toggleQuantification(false);
   }, [select_qtls_samples, select_gwas_sample]);
   useEffect(() => {
     if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx());
@@ -134,6 +131,40 @@ export function QTLsGWASForm() {
     if (Object.keys(publicGTEx).length && ldProject && ldPublic)
       handleLdProject(ldProject);
   }, [ldPublic]);
+
+  // check form validity
+  useEffect(() => {
+    if (
+      !select_dist ||
+      select_dist < 1 ||
+      select_dist > 200 ||
+      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref))
+    ) {
+      setValid(false);
+    } else {
+      setValid(true);
+    }
+  }, [ldPublic, qtlPublic, select_dist, select_ref]);
+  useEffect(() => {
+    if (
+      (!_associationFile && !select_qtls_samples && !qtlPublic) ||
+      // (ldPublic && (!select_pop || select_pop.length <= 0)) ||
+      (_quantificationFile && !_genotypeFile) ||
+      (!_quantificationFile && _genotypeFile)
+    ) {
+      setValid(false);
+    } else {
+      setValid(true);
+    }
+  }, [
+    _associationFile,
+    _quantificationFile,
+    _genotypeFile,
+    ldPublic,
+    qtlPublic,
+    select_pop,
+    select_qtls_samples,
+  ]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -438,24 +469,19 @@ export function QTLsGWASForm() {
     viewPhenotypeOnly(false);
   };
 
-  function validateForm() {
+  function validateEmail() {
     const re = new RegExp(
       /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
     );
     const check = re.test(email);
     setValidEmail(check);
-    return check;
+    setAttempt(true);
+
+    return isQueue ? check : true;
   }
 
   async function handleSubmit() {
-    if (_quantificationFile && !_genotypeFile) {
-      setShowGenotypeTooltip(true);
-      setTimeout(() => setShowGenotypeTooltip(false), 5000);
-      return;
-    }
-    if (!_quantificationFile && _genotypeFile) {
-      setShowQuantificationTooltip(true);
-      setTimeout(() => setShowQuantificationTooltip(false), 5000);
+    if (!valid) {
       return;
     }
     const request = uuidv1();
@@ -631,14 +657,10 @@ export function QTLsGWASForm() {
                     _setAssociationFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  // isInvalid={checkValid ? !validFile : false}
-                  // feedback="Please upload a data file"
-                  // onChange={(e) => {
-                  //     setInput(e.target.files[0]);
-                  //     mergeVisualize({
-                  //     storeFilename: e.target.files[0].name,
-                  //     });
-                  // }}
+                  isInvalid={
+                    attempt ? !_associationFile && !select_qtls_samples : false
+                  }
+                  feedback="Please upload a data file"
                   custom
                 />
               )}
@@ -762,12 +784,12 @@ export function QTLsGWASForm() {
                 id="quantificationDataToggle"
                 label="Use Quantification Data"
                 type="checkbox"
-                checked={showAdditionalInput}
-                onChange={(_) => setAdditionalInput(!showAdditionalInput)}
+                checked={useQuantification}
+                onChange={(_) => toggleQuantification(!useQuantification)}
               />
             </Col>
           </Row>
-          {showAdditionalInput && (
+          {useQuantification && (
             <>
               <Row>
                 <Form.Group className="col-sm-12">
@@ -787,32 +809,22 @@ export function QTLsGWASForm() {
                         ? 'MX2.quantification.txt'
                         : 'Choose File'
                     }
+                    custom
                     onChange={(e) => {
                       _setQuantificationFile(e.target.files[0]);
                     }}
                     // accept=".tsv, .txt"
-                    // isInvalid={checkValid ? !validFile : false}
-                    // feedback="Please upload a data file"
-                    // onChange={(e) => {
-                    //     setInput(e.target.files[0]);
-                    //     mergeVisualize({
-                    //     storeFilename: e.target.files[0].name,
-                    //     });
-                    // }}
-                    custom
+                    isInvalid={
+                      attempt &&
+                      useQuantification &&
+                      !_quantificationFile &&
+                      _genotypeFile
+                        ? true
+                        : false
+                    }
+                    feedback="Please input accompanying Quantification Data File with
+          Genotype Data File."
                   />
-                  <Overlay
-                    target={quantificationFileControl.current}
-                    show={showQuantificationTooltip}
-                    placement="bottom"
-                  >
-                    {(props) => (
-                      <Tooltip id="overlay-example" {...props}>
-                        Please input accompanying Quantification Data File with
-                        Genotype Data File.
-                      </Tooltip>
-                    )}
-                  </Overlay>
                 </Form.Group>
                 <Form.Group className="col-sm-12">
                   <Form.Label className="mb-0">Genotype Data</Form.Label>
@@ -835,28 +847,18 @@ export function QTLsGWASForm() {
                       _setGenotypeFile(e.target.files[0]);
                     }}
                     // accept=".tsv, .txt"
-                    // isInvalid={checkValid ? !validFile : false}
-                    // feedback="Please upload a data file"
-                    // onChange={(e) => {
-                    //     setInput(e.target.files[0]);
-                    //     mergeVisualize({
-                    //     storeFilename: e.target.files[0].name,
-                    //     });
-                    // }}
                     custom
+                    isInvalid={
+                      attempt &&
+                      useQuantification &&
+                      _quantificationFile &&
+                      !_genotypeFile
+                        ? true
+                        : false
+                    }
+                    feedback="Please input accompanying Genotype Data File with
+          Quantification Data File."
                   />
-                  <Overlay
-                    target={genotypeFileControl.current}
-                    show={showGenotypeTooltip}
-                    placement="bottom"
-                  >
-                    {(props) => (
-                      <Tooltip id="overlay-example" {...props}>
-                        Please input accompanying Genotype Data File with
-                        Quantification Data File.
-                      </Tooltip>
-                    )}
-                  </Overlay>
                 </Form.Group>
               </Row>
             </>
@@ -1103,7 +1105,6 @@ export function QTLsGWASForm() {
                     select_ref.length > 0 &&
                     !/^rs\d+$/.test(select_ref)
                   }
-                  // custom
                 />
                 <Form.Control.Feedback type="invalid">
                   Enter valid RS number. Leave empty for default.
@@ -1217,7 +1218,7 @@ export function QTLsGWASForm() {
                   dispatch(updateQTLsGWAS({ email: e.target.value }))
                 }
                 disabled={!isQueue || submitted}
-                isInvalid={isQueue ? !validEmail : false}
+                isInvalid={isQueue && attempt ? !validEmail : false}
               />
               <Form.Control.Feedback type="invalid">
                 Please provide a valid email
@@ -1251,24 +1252,9 @@ export function QTLsGWASForm() {
             variant="primary"
             type="button"
             onClick={() => {
-              if (isQueue) {
-                if (validateForm()) handleSubmit();
-              } else {
-                handleSubmit();
-              }
+              if (validateEmail()) handleSubmit();
             }}
-            disabled={
-              submitted ||
-              (!_associationFile && !select_qtls_samples && !qtlPublic) ||
-              select_dist.length <= 0 ||
-              select_dist < 1 ||
-              select_dist > 200 ||
-              (select_ref &&
-                select_ref.length > 0 &&
-                !/^rs\d+$/.test(select_ref))
-              //   ||
-              // (ldPublic && (!select_pop || select_pop.length <= 0))
-            }
+            disabled={submitted || publicLoading}
           >
             {isQueue ? 'Submit' : 'Calculate'}
           </Button>
