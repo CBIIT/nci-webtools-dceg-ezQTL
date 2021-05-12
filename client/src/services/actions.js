@@ -1617,7 +1617,7 @@ export function qtlsGWASLocusQCCalculation(params) {
         await dispatch(
           updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
         );
-
+        /*
         const qtlsGWAS = getState().qtlsGWAS;
 
         dispatch(
@@ -1631,7 +1631,7 @@ export function qtlsGWASLocusQCCalculation(params) {
             leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
             genome_build: qtlsGWAS.genome.value,
           })
-        );
+        );*/
       })
       .catch(function (error) {
         console.log(error);
