@@ -102,11 +102,13 @@ export function QTLsGWASResults({ queueRequest }) {
             eventKey={item.key}
             title={item.title}
             disabled={item.disabled}
-            tabClassName={
-              'border-top-0 rounded-0 ' + (idx === 0 ? 'border-left-0' : '')
-            }
+            tabClassName={`mx-0 ${
+              activeResultsTab == item.key ? 'font-weight-bold' : ''
+            }`}
           >
-            {item.component}
+            <div className="rounded-bottom border-left border-bottom border-right ">
+              {item.component}
+            </div>
           </Tab>
         ))}
       </Tabs>
