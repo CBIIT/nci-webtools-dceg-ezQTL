@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
   qtlsGWASCalculation,
+  qtlsGWASLocusQCCalculation,
   uploadFile,
   updateQTLsGWAS,
   getPublicGTEx,
@@ -446,7 +447,7 @@ export function QTLsGWASForm() {
     if (isQueue) {
       dispatch(submitQueue(params));
     } else {
-      dispatch(qtlsGWASCalculation(params));
+      dispatch(qtlsGWASLocusQCCalculation(params));
     }
   }
 

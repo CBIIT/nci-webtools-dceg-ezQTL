@@ -367,10 +367,15 @@ async function qtlsCalculateQC(params, res, next) {
     select_qtls_samples,
     gwasFile,
     associationFile,
-    ldfile,
-    leadsnp,
+    LDFile,
+    qtlKey,
+    ldKey,
+    gwasKey,
+    select_ref,
     select_dist,
-    select_gene,
+    select_chromosome,
+    select_position,
+    ldProject,
     workingDirectory,
     bucket,
   } = params;
@@ -390,6 +395,7 @@ async function qtlsCalculateQC(params, res, next) {
     'ezQTL_input'
   );
   const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
+
   try {
     const wrapper = await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -400,10 +406,15 @@ async function qtlsCalculateQC(params, res, next) {
         select_qtls_samples.toString(),
         gwasFile.toString(),
         associationFile.toString(),
-        ldfile.toString(),
-        leadsnp.toString(),
-        select_dist,
-        select_gene.toString(),
+        LDFile.toString(),
+        qtlKey.toString(),
+        gwasKey.toString(),
+        ldKey.toString(),
+        select_ref.toString(),
+        select_dist.toString(),
+        select_chromosome,
+        select_position,
+        ldProject.toString(),
         request,
         plotPath,
         inputPath,
