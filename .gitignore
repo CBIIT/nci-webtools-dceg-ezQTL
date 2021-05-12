@@ -16,6 +16,8 @@ false
 *.tbi
 server/ezQTL.log
 server/snp_match.txt
+server/snp_not_match.txt
+data_old
 
 # server
 server/config.json

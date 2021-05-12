@@ -1,46 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Form } from 'react-bootstrap';
 import ReactSelect, { components } from 'react-select';
-import { useDispatch, useSelector } from 'react-redux';
-import { updateMultiLoci, updateQTLsGWAS } from '../../../services/actions';
+import { useSelector } from 'react-redux';
 
-export const PopulationSelect = ({
-  id,
-  // value,
-  disabled,
-  // onChange
-  stateIndex,
-}) => {
-  const dispatch = useDispatch();
-
-  const { select_pop, inputs } = useSelector((state) => state.qtlsGWAS);
-  const { states } = useSelector((state) => state.multiLoci);
-
+export const PopulationSelect = ({ id, disabled, mergeState }) => {
+  const { inputs } = useSelector((state) => state.qtlsGWAS);
   const [_selectPop, _setSelectPop] = useState([]);
 
   useEffect(() => {
-    // console.log("USE EFFECT", _selectPop);
-    if (stateIndex >= 0) {
-      // for multi loci form if an index is provided
-      let newStates = states.slice();
-      newStates[stateIndex] = {
-        ...newStates[stateIndex],
-        select_pop:
-          _selectPop && _selectPop.length > 0
-            ? _selectPop.map((item) => item.value).join('+')
-            : false,
-      };
-      dispatch(updateMultiLoci({ states: newStates }));
-    } else {
-      dispatch(
-        updateQTLsGWAS({
-          select_pop:
-            _selectPop && _selectPop.length > 0
-              ? _selectPop.map((item) => item.value).join('+')
-              : false,
-        })
-      );
-    }
+    mergeState({
+      select_pop:
+        _selectPop && _selectPop.length > 0
+          ? _selectPop.map((item) => item.value).join('+')
+          : false,
+    });
   }, [_selectPop]);
 
   // const allPopulationValues = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
@@ -282,6 +254,7 @@ export const PopulationSelect = ({
       isClearable={false}
       backspaceRemovesValue={false}
       isDisabled={disabled}
+      menuPortalTarget={document.body}
     />
   );
 };

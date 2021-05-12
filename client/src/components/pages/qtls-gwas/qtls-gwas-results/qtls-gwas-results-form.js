@@ -172,7 +172,8 @@ export function QTLsGWASResultsForm() {
               </Form.Label>
               <PopulationSelect
                 id="qtls-results-population-input"
-                disabled={!submitted}
+                disabled={!submitted || ldProject == 'UKBB'}
+                mergeState={(data) => dispatch(updateQTLsGWAS(data))}
               />
             </div>
             <div className="col-md-4">

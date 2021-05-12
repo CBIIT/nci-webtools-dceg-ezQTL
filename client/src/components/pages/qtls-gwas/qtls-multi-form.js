@@ -396,15 +396,29 @@ export default function MultiForm({
       project.value,
       xQtlOptions[0].value
     );
-    const qtlKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.xQTL == xQtlOptions[0].value &&
-          row.Tissue == tissueOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const qtlKey = tissueOnly
+      ? data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Tissue == tissueOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == project.value &&
+              row.xQTL == xQtlOptions[0].value &&
+              row.Tissue == tissueOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
     mergeState({
       qtlProject: project,
@@ -419,14 +433,28 @@ export default function MultiForm({
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
-    const gwasKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.Phenotype == phenotypeOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const gwasKey = phenotypeOnly
+      ? data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotypeOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == project.value &&
+              row.Phenotype == phenotypeOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
     mergeState({
       gwasProject: project,
@@ -452,7 +480,11 @@ export default function MultiForm({
             )
         : false;
 
-    mergeState({ ldProject: project, ldKey: ldKey });
+    mergeState({
+      ldProject: project,
+      ldKey: ldKey,
+      select_pop: project.value == 'UKBB' ? 'CEU+TSI+FIN+GBR+IBS' : select_pop,
+    });
   }
 
   function handleChromosome(chromosome) {
@@ -491,32 +523,57 @@ export default function MultiForm({
   }
 
   function handleTissue(tissue) {
-    const qtlKey = publicGTEx['cis-QTL dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == qtlProject.value &&
-          row.xQTL == xQtl.value &&
-          row.Tissue == tissue.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const qtlKey = tissueOnly
+      ? publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value && row.Tissue == tissue.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == qtlProject.value &&
+              row.xQTL == xQtl.value &&
+              row.Tissue == tissue.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
+
     mergeState({ tissue: tissue, qtlKey: qtlKey });
   }
 
   function handlePhenotype(phenotype) {
-    const gwasKey = publicGTEx['GWAS dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == gwasProject.value &&
-          row.Phenotype == phenotype.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const gwasKey = phenotypeOnly
+      ? publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotype.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == gwasProject.value &&
+              row.Phenotype == phenotype.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
-    mergeState({
-      phenotype: phenotype,
-      gwasKey: gwasKey,
-    });
+    mergeState({ phenotype: phenotype, gwasKey: gwasKey });
   }
 
   function handleReset() {
@@ -549,7 +606,7 @@ export default function MultiForm({
 
   const accordionComponents = [
     {
-      title: 'QTLs Data',
+      title: 'Association Data',
       component: (
         <>
           <Form.Row>
@@ -944,14 +1001,31 @@ export default function MultiForm({
                           />
                         </Col>
                         <Col md="6">
-                          <Form.Label className="mb-0">
-                            Population <span style={{ color: 'red' }}>*</span>{' '}
-                          </Form.Label>
-                          <PopulationSelect
-                            id="qtls-results-population-input"
-                            disabled={submitted || !ldPublic}
-                            stateIndex={stateIndex}
-                          />
+                          {ldProject.value != 'UKBB' ? (
+                            <>
+                              <Form.Label className="mb-0">
+                                Population{' '}
+                                <span style={{ color: 'red' }}>*</span>{' '}
+                              </Form.Label>
+                              <PopulationSelect
+                                id="qtls-results-population-input-asdf"
+                                mergeState={mergeState}
+                                disabled={
+                                  submitted ||
+                                  !ldPublic ||
+                                  ldProject.value == 'UKBB'
+                                }
+                              />
+                            </>
+                          ) : (
+                            <Select
+                              disabled={true}
+                              id="population"
+                              label="Population"
+                              value={{ label: '(EUR) European', value: '' }}
+                              options={[]}
+                            />
+                          )}
                         </Col>
                       </Form.Row>
                     </div>

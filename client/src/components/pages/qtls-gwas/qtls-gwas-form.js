@@ -48,6 +48,8 @@ export function QTLsGWASForm() {
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
   const [showAdditionalInput, setAdditionalInput] = useState(false);
 
+  const [validEmail, setValidEmail] = useState(false);
+
   const {
     select_qtls_samples,
     select_gwas_sample,
@@ -244,15 +246,29 @@ export function QTLsGWASForm() {
       project.value,
       xQtlOptions[0].value
     );
-    const qtlKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.xQTL == xQtlOptions[0].value &&
-          row.Tissue == tissueOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const qtlKey = tissueOnly
+      ? data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Tissue == tissueOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == project.value &&
+              row.xQTL == xQtlOptions[0].value &&
+              row.Tissue == tissueOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
     dispatch(
       updateQTLsGWAS({
@@ -269,14 +285,28 @@ export function QTLsGWASForm() {
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
-    const gwasKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == project.value &&
-          row.Phenotype == phenotypeOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const gwasKey = phenotypeOnly
+      ? data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotypeOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : data
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == project.value &&
+              row.Phenotype == phenotypeOptions[0].value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
     dispatch(
       updateQTLsGWAS({
@@ -304,7 +334,14 @@ export function QTLsGWASForm() {
             )
         : true;
 
-    dispatch(updateQTLsGWAS({ ldProject: project, ldKey: ldKey }));
+    dispatch(
+      updateQTLsGWAS({
+        ldProject: project,
+        ldKey: ldKey,
+        select_pop:
+          project.value == 'UKBB' ? 'CEU+TSI+FIN+GBR+IBS' : select_pop,
+      })
+    );
   }
 
   // qtl type
@@ -332,34 +369,57 @@ export function QTLsGWASForm() {
   }
 
   function handleTissue(tissue) {
-    const qtlKey = publicGTEx['cis-QTL dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == qtlProject.value &&
-          row.xQTL == xQtl.value &&
-          row.Tissue == tissue.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const qtlKey = tissueOnly
+      ? publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value && row.Tissue == tissue.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : publicGTEx['cis-QTL dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == qtlProject.value &&
+              row.xQTL == xQtl.value &&
+              row.Tissue == tissue.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
+
     dispatch(updateQTLsGWAS({ tissue: tissue, qtlKey: qtlKey }));
   }
 
   function handlePhenotype(phenotype) {
-    const gwasKey = publicGTEx['GWAS dataset']
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == gwasProject.value &&
-          row.Phenotype == phenotype.value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
+    const gwasKey = phenotypeOnly
+      ? publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Phenotype == phenotype.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          )
+      : publicGTEx['GWAS dataset']
+          .filter(
+            (row) =>
+              row.Genome_build == genome.value &&
+              row.Project == gwasProject.value &&
+              row.Phenotype == phenotype.value
+          )[0]
+          .Biowulf_full_path.replace(
+            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+            ''
+          );
 
-    dispatch(
-      updateQTLsGWAS({
-        phenotype: phenotype,
-        gwasKey: gwasKey,
-      })
-    );
+    dispatch(updateQTLsGWAS({ phenotype: phenotype, gwasKey: gwasKey }));
   }
 
   const handleReset = () => {
@@ -377,6 +437,15 @@ export function QTLsGWASForm() {
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
   };
+
+  function validateForm() {
+    const re = new RegExp(
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    );
+    const check = re.test(email);
+    setValidEmail(check);
+    return check;
+  }
 
   async function handleSubmit() {
     if (_quantificationFile && !_genotypeFile) {
@@ -453,7 +522,7 @@ export function QTLsGWASForm() {
 
   const accordionComponents = [
     {
-      title: 'QTLs Data',
+      title: 'Association Data',
       component: (
         <>
           <Row>
@@ -685,104 +754,113 @@ export function QTLsGWASForm() {
               </Form.Text>
             </Form.Group>
           </Row>
-        </>
-      ),
-    },
-    {
-      title: 'Locus Quantification',
-      collapseDefault: true,
-      component: (
-        <>
           <Row>
-            <Form.Group className="col-sm-12">
-              <Form.Label className="mb-0">Quantification Data</Form.Label>
-              <Form.File
-                title="Quantification Data User File Upload Input"
-                ref={quantificationFileControl}
-                id="qtls-quantification-file"
+            <Col>
+              <Form.Check
                 disabled={submitted || select_qtls_samples}
-                key={_quantificationFile}
-                label={
-                  _quantificationFile
-                    ? _quantificationFile.name ||
-                      _quantificationFile.filename ||
-                      _quantificationFile
-                    : select_qtls_samples
-                    ? 'MX2.quantification.txt'
-                    : 'Choose File'
-                }
-                onChange={(e) => {
-                  _setQuantificationFile(e.target.files[0]);
-                }}
-                // accept=".tsv, .txt"
-                // isInvalid={checkValid ? !validFile : false}
-                // feedback="Please upload a data file"
-                // onChange={(e) => {
-                //     setInput(e.target.files[0]);
-                //     mergeVisualize({
-                //     storeFilename: e.target.files[0].name,
-                //     });
-                // }}
-                custom
+                inline
+                id="quantificationDataToggle"
+                label="Use Quantification Data"
+                type="checkbox"
+                checked={showAdditionalInput}
+                onChange={(_) => setAdditionalInput(!showAdditionalInput)}
               />
-              <Overlay
-                target={quantificationFileControl.current}
-                show={showQuantificationTooltip}
-                placement="bottom"
-              >
-                {(props) => (
-                  <Tooltip id="overlay-example" {...props}>
-                    Please input accompanying Quantification Data File with
-                    Genotype Data File.
-                  </Tooltip>
-                )}
-              </Overlay>
-            </Form.Group>
-            <Form.Group className="col-sm-12">
-              <Form.Label className="mb-0">Genotype Data</Form.Label>
-              <Form.File
-                title="Genotype Data User File Upload Input"
-                ref={genotypeFileControl}
-                id="qtls-genotype-file"
-                disabled={submitted || select_qtls_samples}
-                key={_genotypeFile}
-                label={
-                  _genotypeFile
-                    ? _genotypeFile.name ||
-                      _genotypeFile.filename ||
-                      _genotypeFile
-                    : select_qtls_samples
-                    ? 'MX2.genotyping.txt'
-                    : 'Choose File'
-                }
-                onChange={(e) => {
-                  _setGenotypeFile(e.target.files[0]);
-                }}
-                // accept=".tsv, .txt"
-                // isInvalid={checkValid ? !validFile : false}
-                // feedback="Please upload a data file"
-                // onChange={(e) => {
-                //     setInput(e.target.files[0]);
-                //     mergeVisualize({
-                //     storeFilename: e.target.files[0].name,
-                //     });
-                // }}
-                custom
-              />
-              <Overlay
-                target={genotypeFileControl.current}
-                show={showGenotypeTooltip}
-                placement="bottom"
-              >
-                {(props) => (
-                  <Tooltip id="overlay-example" {...props}>
-                    Please input accompanying Genotype Data File with
-                    Quantification Data File.
-                  </Tooltip>
-                )}
-              </Overlay>
-            </Form.Group>
+            </Col>
           </Row>
+          {showAdditionalInput && (
+            <>
+              <Row>
+                <Form.Group className="col-sm-12">
+                  <Form.Label className="mb-0">Quantification Data</Form.Label>
+                  <Form.File
+                    title="Quantification Data User File Upload Input"
+                    ref={quantificationFileControl}
+                    id="qtls-quantification-file"
+                    disabled={submitted || select_qtls_samples}
+                    key={_quantificationFile}
+                    label={
+                      _quantificationFile
+                        ? _quantificationFile.name ||
+                          _quantificationFile.filename ||
+                          _quantificationFile
+                        : select_qtls_samples
+                        ? 'MX2.quantification.txt'
+                        : 'Choose File'
+                    }
+                    onChange={(e) => {
+                      _setQuantificationFile(e.target.files[0]);
+                    }}
+                    // accept=".tsv, .txt"
+                    // isInvalid={checkValid ? !validFile : false}
+                    // feedback="Please upload a data file"
+                    // onChange={(e) => {
+                    //     setInput(e.target.files[0]);
+                    //     mergeVisualize({
+                    //     storeFilename: e.target.files[0].name,
+                    //     });
+                    // }}
+                    custom
+                  />
+                  <Overlay
+                    target={quantificationFileControl.current}
+                    show={showQuantificationTooltip}
+                    placement="bottom"
+                  >
+                    {(props) => (
+                      <Tooltip id="overlay-example" {...props}>
+                        Please input accompanying Quantification Data File with
+                        Genotype Data File.
+                      </Tooltip>
+                    )}
+                  </Overlay>
+                </Form.Group>
+                <Form.Group className="col-sm-12">
+                  <Form.Label className="mb-0">Genotype Data</Form.Label>
+                  <Form.File
+                    title="Genotype Data User File Upload Input"
+                    ref={genotypeFileControl}
+                    id="qtls-genotype-file"
+                    disabled={submitted || select_qtls_samples}
+                    key={_genotypeFile}
+                    label={
+                      _genotypeFile
+                        ? _genotypeFile.name ||
+                          _genotypeFile.filename ||
+                          _genotypeFile
+                        : select_qtls_samples
+                        ? 'MX2.genotyping.txt'
+                        : 'Choose File'
+                    }
+                    onChange={(e) => {
+                      _setGenotypeFile(e.target.files[0]);
+                    }}
+                    // accept=".tsv, .txt"
+                    // isInvalid={checkValid ? !validFile : false}
+                    // feedback="Please upload a data file"
+                    // onChange={(e) => {
+                    //     setInput(e.target.files[0]);
+                    //     mergeVisualize({
+                    //     storeFilename: e.target.files[0].name,
+                    //     });
+                    // }}
+                    custom
+                  />
+                  <Overlay
+                    target={genotypeFileControl.current}
+                    show={showGenotypeTooltip}
+                    placement="bottom"
+                  >
+                    {(props) => (
+                      <Tooltip id="overlay-example" {...props}>
+                        Please input accompanying Genotype Data File with
+                        Quantification Data File.
+                      </Tooltip>
+                    )}
+                  </Overlay>
+                </Form.Group>
+              </Row>
+            </>
+          )}
         </>
       ),
     },
@@ -880,13 +958,28 @@ export function QTLsGWASForm() {
                 </Form.Row>
                 <Form.Row>
                   <Col>
-                    <Form.Label className="mb-0">
-                      Population <span style={{ color: 'red' }}>*</span>{' '}
-                    </Form.Label>
-                    <PopulationSelect
-                      id="qtls-results-population-input"
-                      disabled={submitted || !ldPublic}
-                    />
+                    {ldProject.value != 'UKBB' ? (
+                      <>
+                        <Form.Label className="mb-0">
+                          Population <span style={{ color: 'red' }}>*</span>{' '}
+                        </Form.Label>
+                        <PopulationSelect
+                          id="qtls-results-population-input-asdf"
+                          mergeState={(data) => dispatch(updateQTLsGWAS(data))}
+                          disabled={
+                            submitted || !ldPublic || ldProject.value == 'UKBB'
+                          }
+                        />
+                      </>
+                    ) : (
+                      <Select
+                        disabled={true}
+                        id="population"
+                        label="Population"
+                        value={{ label: '(EUR) European', value: '' }}
+                        options={[]}
+                      />
+                    )}
                   </Col>
                 </Form.Row>
               </div>
@@ -927,7 +1020,6 @@ export function QTLsGWASForm() {
       title: 'Locus Information',
       component: (
         <>
-          {' '}
           <Row>
             <Col>
               <Form.Label className="mb-0">
@@ -974,7 +1066,15 @@ export function QTLsGWASForm() {
                       }}
                       placeholder="e.g. 100000"
                       value={select_position}
+                      isInvalid={
+                        select_ref &&
+                        select_ref.length > 0 &&
+                        !/^rs\d+$/.test(select_ref)
+                      }
                     />
+                    <Form.Control.Feedback type="invalid">
+                      Enter valid RS number. Leave empty for default.
+                    </Form.Control.Feedback>
                   </Col>
                 </Form.Row>
               </Col>
@@ -1012,62 +1112,6 @@ export function QTLsGWASForm() {
             </Row>
           )}
         </>
-      ),
-    },
-    {
-      title: 'Queue Job',
-      component: (
-        <div>
-          <Row>
-            <Col>
-              <Form.Group controlId="toggleQueue" className="mb-0">
-                <Form.Check inline>
-                  <Form.Check.Input
-                    className="mr-0"
-                    title="Choose Queued Submission Checkbox"
-                    type="checkbox"
-                    disabled={submitted}
-                    checked={isQueue}
-                    onChange={(_) => {
-                      dispatch(updateQTLsGWAS({ isQueue: !isQueue }));
-                    }}
-                  />
-                </Form.Check>
-                <Form.Label className="mr-auto">
-                  Submit this job to a Queue
-                </Form.Label>
-              </Form.Group>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <Form.Group controlId="email">
-                <Form.Control
-                  title="Queued Submission Email Input"
-                  aria-label="Queued Submission Email Input"
-                  placeholder="Enter Email"
-                  size="sm"
-                  value={email}
-                  type="email"
-                  onChange={(e) =>
-                    dispatch(updateQTLsGWAS({ email: e.target.value }))
-                  }
-                  disabled={!isQueue || submitted}
-                  // isInvalid={isQueue && checkValid ? !validEmail : false}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Please provide a valid email
-                </Form.Control.Feedback>
-                <Form.Text className="text-muted">
-                  <i>
-                    Note: if sending to queue, when computation is completed, a
-                    notification will be sent to the e-mail entered above.
-                  </i>
-                </Form.Text>
-              </Form.Group>
-            </Col>
-          </Row>
-        </div>
       ),
     },
   ];
@@ -1136,6 +1180,58 @@ export function QTLsGWASForm() {
         </Col>
       </Row>
       <Accordions components={accordionComponents} bodyClass="p-2" />
+      <div className="border rounded p-2 mt-2">
+        <Row>
+          <Col>
+            <Form.Group controlId="toggleQueue" className="mb-0">
+              <Form.Check inline>
+                <Form.Check.Input
+                  className="mr-0"
+                  title="Choose Queued Submission Checkbox"
+                  type="checkbox"
+                  disabled={submitted}
+                  checked={isQueue}
+                  onChange={(_) => {
+                    dispatch(updateQTLsGWAS({ isQueue: !isQueue }));
+                  }}
+                />
+              </Form.Check>
+              <Form.Label className="mr-auto">
+                Submit this job to a Queue
+              </Form.Label>
+            </Form.Group>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            <Form.Group controlId="email">
+              <Form.Control
+                title="Queued Submission Email Input"
+                aria-label="Queued Submission Email Input"
+                placeholder="Enter Email"
+                size="sm"
+                value={email}
+                type="email"
+                onChange={(e) =>
+                  dispatch(updateQTLsGWAS({ email: e.target.value }))
+                }
+                disabled={!isQueue || submitted}
+                isInvalid={isQueue ? !validEmail : false}
+              />
+              <Form.Control.Feedback type="invalid">
+                Please provide a valid email
+              </Form.Control.Feedback>
+              <Form.Text className="text-muted">
+                <i>
+                  Note: if sending to queue, when computation is completed, a
+                  notification will be sent to the e-mail entered above.
+                </i>
+              </Form.Text>
+            </Form.Group>
+          </Col>
+        </Row>
+      </div>
       <Row className="mt-2">
         <Col sm="6">
           <Button
@@ -1155,7 +1251,11 @@ export function QTLsGWASForm() {
             variant="primary"
             type="button"
             onClick={() => {
-              handleSubmit();
+              if (isQueue) {
+                if (validateForm()) handleSubmit();
+              } else {
+                handleSubmit();
+              }
             }}
             disabled={
               submitted ||
