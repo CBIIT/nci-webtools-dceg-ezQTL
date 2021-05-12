@@ -1974,6 +1974,7 @@ export function qtlsGWASCalculation(params) {
               associationFile: qtlsGWAS.inputs.association_file[0],
               LDFile: qtlsGWAS.inputs.ld_file[0],
               leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
+              genome_build: qtlsGWAS.genome.value
             })
           );
         }
