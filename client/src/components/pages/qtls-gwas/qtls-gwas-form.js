@@ -331,7 +331,14 @@ export function QTLsGWASForm() {
             )
         : true;
 
-    dispatch(updateQTLsGWAS({ ldProject: project, ldKey: ldKey }));
+    dispatch(
+      updateQTLsGWAS({
+        ldProject: project,
+        ldKey: ldKey,
+        select_pop:
+          project.value == 'UKBB' ? 'CEU+TSI+FIN+GBR+IBS' : select_pop,
+      })
+    );
   }
 
   // qtl type
@@ -939,13 +946,28 @@ export function QTLsGWASForm() {
                 </Form.Row>
                 <Form.Row>
                   <Col>
-                    <Form.Label className="mb-0">
-                      Population <span style={{ color: 'red' }}>*</span>{' '}
-                    </Form.Label>
-                    <PopulationSelect
-                      id="qtls-results-population-input"
-                      disabled={submitted || !ldPublic}
-                    />
+                    {ldProject.value != 'UKBB' ? (
+                      <>
+                        <Form.Label className="mb-0">
+                          Population <span style={{ color: 'red' }}>*</span>{' '}
+                        </Form.Label>
+                        <PopulationSelect
+                          id="qtls-results-population-input-asdf"
+                          mergeState={(data) => dispatch(updateQTLsGWAS(data))}
+                          disabled={
+                            submitted || !ldPublic || ldProject.value == 'UKBB'
+                          }
+                        />
+                      </>
+                    ) : (
+                      <Select
+                        disabled={true}
+                        id="population"
+                        label="Population"
+                        value={{ label: '(EUR) European', value: '' }}
+                        options={[]}
+                      />
+                    )}
                   </Col>
                 </Form.Row>
               </div>

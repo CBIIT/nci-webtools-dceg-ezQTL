@@ -480,7 +480,11 @@ export default function MultiForm({
             )
         : false;
 
-    mergeState({ ldProject: project, ldKey: ldKey });
+    mergeState({
+      ldProject: project,
+      ldKey: ldKey,
+      select_pop: project.value == 'UKBB' ? 'CEU+TSI+FIN+GBR+IBS' : select_pop,
+    });
   }
 
   function handleChromosome(chromosome) {
@@ -997,14 +1001,31 @@ export default function MultiForm({
                           />
                         </Col>
                         <Col md="6">
-                          <Form.Label className="mb-0">
-                            Population <span style={{ color: 'red' }}>*</span>{' '}
-                          </Form.Label>
-                          <PopulationSelect
-                            id="qtls-results-population-input"
-                            disabled={submitted || !ldPublic}
-                            stateIndex={stateIndex}
-                          />
+                          {ldProject.value != 'UKBB' ? (
+                            <>
+                              <Form.Label className="mb-0">
+                                Population{' '}
+                                <span style={{ color: 'red' }}>*</span>{' '}
+                              </Form.Label>
+                              <PopulationSelect
+                                id="qtls-results-population-input-asdf"
+                                mergeState={mergeState}
+                                disabled={
+                                  submitted ||
+                                  !ldPublic ||
+                                  ldProject.value == 'UKBB'
+                                }
+                              />
+                            </>
+                          ) : (
+                            <Select
+                              disabled={true}
+                              id="population"
+                              label="Population"
+                              value={{ label: '(EUR) European', value: '' }}
+                              options={[]}
+                            />
+                          )}
                         </Col>
                       </Form.Row>
                     </div>
