@@ -47,6 +47,8 @@ export function QTLsGWASForm() {
   const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
   const [showAdditionalInput, setAdditionalInput] = useState(false);
 
+  const [validEmail, setValidEmail] = useState(false);
+
   const {
     select_qtls_samples,
     select_gwas_sample,
@@ -434,6 +436,15 @@ export function QTLsGWASForm() {
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
   };
+
+  function validateForm() {
+    const re = new RegExp(
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+    );
+    const check = re.test(email);
+    setValidEmail(check);
+    return check;
+  }
 
   async function handleSubmit() {
     if (_quantificationFile && !_genotypeFile) {
@@ -1054,7 +1065,15 @@ export function QTLsGWASForm() {
                       }}
                       placeholder="e.g. 100000"
                       value={select_position}
+                      isInvalid={
+                        select_ref &&
+                        select_ref.length > 0 &&
+                        !/^rs\d+$/.test(select_ref)
+                      }
                     />
+                    <Form.Control.Feedback type="invalid">
+                      Enter valid RS number. Leave empty for default.
+                    </Form.Control.Feedback>
                   </Col>
                 </Form.Row>
               </Col>
@@ -1197,7 +1216,7 @@ export function QTLsGWASForm() {
                   dispatch(updateQTLsGWAS({ email: e.target.value }))
                 }
                 disabled={!isQueue || submitted}
-                // isInvalid={isQueue && checkValid ? !validEmail : false}
+                isInvalid={isQueue ? !validEmail : false}
               />
               <Form.Control.Feedback type="invalid">
                 Please provide a valid email
@@ -1231,7 +1250,11 @@ export function QTLsGWASForm() {
             variant="primary"
             type="button"
             onClick={() => {
-              handleSubmit();
+              if (isQueue) {
+                if (validateForm()) handleSubmit();
+              } else {
+                handleSubmit();
+              }
             }}
             disabled={
               submitted ||
