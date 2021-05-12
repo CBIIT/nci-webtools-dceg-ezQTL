@@ -37,7 +37,7 @@ export function QTLsGWAS({ match }) {
           {/* <div className="border rounded mb-3">
             <QTLsGWASResultsForm />
           </div> */}
-          <div className="border rounded">
+          <div className="">
             <QTLsGWASResults queueRequest={match.params.request} />
           </div>
         </MainPanel>
