@@ -22,6 +22,7 @@ export function QTLsGWASResults({ queueRequest }) {
     isError,
     gwas,
     LDFile,
+    select_qtls_samples,
     locus_quantification,
   } = useSelector((state) => state.qtlsGWAS);
 
@@ -39,7 +40,7 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled: 
         !submitted || 
         isError ||
-        !LDFile,
+        (!select_qtls_samples || !LDFile),
     },
     {
       component: <LocusAlignment />,
