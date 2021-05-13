@@ -1950,7 +1950,7 @@ export function qtlsGWASCalculation(params) {
             );
           }
           
-          if(qtlsGWAS.LDFile){
+          if(qtlsGWAS.LDFile || qtlsGWAS.ldKey){
             dispatch(
               qtlsGWASLocusLDCalculation({
                 request: qtlsGWAS.request,
