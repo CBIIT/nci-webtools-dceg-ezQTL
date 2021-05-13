@@ -420,8 +420,6 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   library(broom)
   library(data.table)
 
-  dir.create(file.path(workDir, paste0('tmp/', request)))
-
   # initialize messages to empty
   warningMessages <- list()
   errorMessages <- list()

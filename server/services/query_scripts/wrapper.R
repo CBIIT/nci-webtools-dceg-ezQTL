@@ -49,6 +49,8 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   library(data.table)
   setwd(workDir)
 
+  dir.create(file.path(workDir, paste0('tmp/', request)))
+
   source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'qtls.r'))
 
   if (identical(distance, 'false')) {
