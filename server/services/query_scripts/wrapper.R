@@ -47,6 +47,8 @@ qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, s
 qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, ldProject, request, plotPath, inputPath, logPath, workDir, bucket) {
   source(rfile)
   library(data.table)
+  setwd(workDir)
+
   source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'qtls.r'))
 
   if (identical(distance, 'false')) {
@@ -77,7 +79,7 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       gwasFile = paste0(request, ".gwas_temp.txt")
       cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
       system(cmd)
-      gwasFile <- paste0('tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
+      gwasFile <- paste0(workDir,'/tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
     }
   }
   if (identical(select_qtls_samples, 'true')) {
@@ -102,7 +104,7 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       assocFile = paste0(request, ".qtl_temp.txt")
       cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
       system(cmd)
-      associationFile <- paste0('tmp/', request, '/', request, '.', 'qtl_temp', '.txt')
+      associationFile <- paste0(workDir, '/tmp/', request, '/', request, '.', 'qtl_temp', '.txt')
     }
     if(identical(ldKey, 'false')){
       if(identical(ldFile, 'false'))
@@ -112,13 +114,16 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     }
     else{
       getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
-      ldFile <- paste0('tmp/', request, '/', request, '.input.vcf.gz')
+      ldFile <- paste0(workDir, '/tmp/', request, '/', request, '.input.vcf.gz')
     }
   }
 
   if(identical(leadsnp,'false'))
     leadsnp <- NULL
 
+  print(gwasFile)
+  print(associationFile)
+  print(ldFile)
   coloc_QC(gwasFile, TRUE, associationFile, TRUE, ldFile, TRUE, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
 }
 
