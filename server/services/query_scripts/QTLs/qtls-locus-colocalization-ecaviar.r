@@ -14,7 +14,7 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
     # download example files from s3 and save to request dir
     save_object(publicGWASFile, bucket, file = gwasFile)
   } else {
-    gwasFile <- paste0(workDir, '/', 'tmp/', request, '/', gwasFile)
+    gwasFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_gwas.txt')
   }
   if (identical(select_qtls_samples, 'true')) {
     publicAssocFile = 'ezQTL/MX2.examples/MX2.eQTL.txt'
@@ -26,9 +26,9 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
     save_object(publicAssocFile, bucket, file = assocFile)
     save_object(publicLDFile, bucket, file = LDFile)
   } else {
-    assocFile <- paste0(workDir, '/', 'tmp/', request, '/', assocFile)
+    assocFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_qtl.txt')
     if (!identical(LDFile, 'false')) {
-      LDFile <- paste0(workDir, '/', 'tmp/', request, '/', LDFile)
+      LDFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_ld.gz')
     }
   }
 

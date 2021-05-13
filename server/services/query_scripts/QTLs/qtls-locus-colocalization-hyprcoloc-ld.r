@@ -7,7 +7,7 @@ locus_colocalization_hyprcoloc_ld <- function(workDir, ldfile, select_ref, chr, 
     system(cmd)
     filename <- paste0('tmp/', request, '/', request, ".LD.gz")
   } else {
-    filename <- paste0('tmp/', request, '/', ldfile)
+    filename <- paste0('tmp/', request, '/ezQTL_input_ld.gz')
   }
   
   ## return completion message
