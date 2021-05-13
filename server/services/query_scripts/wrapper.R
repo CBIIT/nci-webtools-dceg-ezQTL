@@ -44,12 +44,12 @@ qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, s
   locus_colocalization_hyprcoloc(workingDirectory, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, ldfile, request, qtlKey, select_chromosome, select_position, bucket)
 }
 
-qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, ldProject, request, plotPath, inputPath, logPath, workDir, bucket) {
+qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, request, plotPath, inputPath, logPath, workDir, bucket) {
   source(rfile)
   library(data.table)
   setwd(workDir)
 
-  dir.create(file.path(workDir, paste0('tmp/', request)))
+  #dir.create(file.path(workDir, paste0('tmp/', request)))
 
   source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'qtls.r'))
 
@@ -121,16 +121,19 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
         ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
     }
     else{
+      kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
+      kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
+        select(sample:gender)
+
+      createExtractedPanel(select_pop, kgpanel, request)
       getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
-      ldFile <- paste0(workDir, '/tmp/', request, '/', request, '.input.vcf.gz')
+      ldFile <- paste0(workDir, '/tmp/', request, '/', request, '.LD.gz')
     }
   }
 
   if(identical(leadsnp,'false'))
     leadsnp <- NULL
 
-  print(gwasFile)
-  print(associationFile)
   print(ldFile)
   coloc_QC(gwasFile, TRUE, associationFile, TRUE, ldFile, TRUE, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
 }

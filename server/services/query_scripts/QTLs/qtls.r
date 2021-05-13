@@ -19,7 +19,6 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     system(cmd)
     cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', "--stdout --extra --phased |sed 's/:/\t/' |bgzip > tmp/", request, '/', request, '.LD.gz')
     system(cmd)
-
     out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
@@ -39,6 +38,26 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     ld_data <- list("Sigma" = out, "info" = info)
   }
   saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
+}
+
+createExtractedPanel <- function(select_pop, kgpanel, request){
+
+   select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
+
+   for (pop_i in select_pop_list) {
+    if (pop_i %in% kgpanel$super_pop) {
+      kgpanel %>%
+        filter(super_pop == pop_i) %>%
+        select(sample) %>%
+        write_delim(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'), delim = '\t', col_names = F, append = TRUE)
+    } else if (pop_i %in% kgpanel$pop) {
+      kgpanel %>%
+        filter(pop == pop_i) %>%
+        select(sample) %>%
+        write_delim(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'), delim = '\t', col_names = F, append = TRUE)
+    }
+  }
+
 }
 
 locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
@@ -276,7 +295,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
     if (identical(ldKey, 'false')) {
       locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
     } else {
-      getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
+      #getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
       LDFile = paste0(request, '.input.vcf.gz')
     }
     ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
