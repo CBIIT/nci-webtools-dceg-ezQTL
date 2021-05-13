@@ -93,7 +93,7 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
 
-    if(identical(gwasKey, 'false')){
+    if(identical(qtlKey, 'false')){
 
       if(identical(associationFile, 'false'))
         associationFile = NULL
@@ -106,8 +106,14 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       assocFile = paste0(request, ".qtl_temp.txt")
       cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
       system(cmd)
+      # rename #gene_id to gene_id
+      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
+      names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
+      qdata %>% write_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = '\t', col_names = T)
+
       associationFile <- paste0(workDir, '/tmp/', request, '/', request, '.', 'qtl_temp', '.txt')
     }
+
     if(identical(ldKey, 'false')){
       if(identical(ldFile, 'false'))
         ldFile = NULL
