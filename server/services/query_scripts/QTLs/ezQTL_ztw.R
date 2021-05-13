@@ -708,8 +708,19 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     bind_cols(ld.info %>% select(-Seq),as_tibble(ld.matrix)) %>% write_delim(file=paste0(output_prefix,"_ld.gz"),delim = '\t',col_names = FALSE)
   }
   
+  # the following funciton work for gwas only ------------------
+  if(!is.null(gwasfile) & is.null(qtlfile) & is.null(ldfile)){
+    cat('\nWarning: QTL and LD files are missing, only GWAS file are detected. Only Locus Alignment may work.',file=logfile,sep="\n",append = T)
+    gwas %>% write_delim(file=paste0(output_prefix,"_gwas.txt"),delim = '\t',col_names = T)
+  }
+  
+  # the following funciton work for qtl only ------------------
+  if(is.null(gwasfile) & !is.null(qtlfile) & is.null(ldfile)){
+    cat('\nWarning: GWAS and LD files are missing, only QTL file are detected. Only Locus Alignment may work.',file=logfile,sep="\n",append = T)
+    qtl %>% write_delim(file=paste0(output_prefix,"_qtl.txt"),delim = '\t',col_names = T)
+  }
+  
 }
-
 
 
 hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
@@ -1062,28 +1073,52 @@ locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL
 
 # Locus LD ----------------------------------------------------------------
 
-IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_file, Distance = 50000, output_file = NULL,
-                            slide_length = -1, threadN = 1, ldstatistics = "rsquare", leadsnp = NULL, threshold = NULL, 
+IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NULL, trait=NULL, LDfile, genome_build="GRCh37",gtf_tabix_file, Distance = 50000,Distance_max = 2000000, output_file = NULL,
+                            slide_length = -1, threadN = 1, ldstatistics = "rsquare", leadsnp = NULL,leadsnp_pos = NULL, threshold = NULL, 
                             link2gene = NULL, triangleLD = TRUE, link2LD = NULL, leadsnpLD = TRUE, label_gene_name = FALSE, 
                             colour02 = "gray", colour04 = "cyan", colour06 = "green", colour08 = "yellow", 
                             colour10 = "red", leadsnp_shape = 23, leadsnp_colour = "black", leadsnp_fill = "purple", 
                             leadsnp_size = 1.5, marker2highlight = NULL, marker2label = NULL, marker2label_angle = 60, 
                             marker2label_size = 1) {
   
-  association <- read_delim(association_file,delim = '\t',col_names = T,n_max = 5)
-  if("variant_id" %in% colnames(association)){
-    association <- read_delim(association_file,delim = '\t',col_names = T,col_types = cols('variant_id'='c'))  
-  }else{
-    association <- read_delim(association_file,delim = '\t',col_names = T)
+  
+  if(is.null(association_file) && is.null(leadsnp) && is.null(leadsnp_pos)){
+    stop("You have to input the SNP in the locus informaiton for the LD visualization.")
   }
   
-  if('pvalue' %in% colnames(association)){  association <- association %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pvalue) }
-  if('pval_nominal' %in% colnames(association)){  
-    if(is.null(trait)){
-      trait <- association %>% arrange(pval_nominal) %>% slice(1) %>% pull(gene_symbol)
-    }
-    association <- association %>% filter(gene_symbol == trait) %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pval_nominal) 
+  ld.matrix <- read_delim(LDfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
+  ld.info <- ld.matrix %>% dplyr::select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
+  ld.matrix <- ld.matrix %>% dplyr::select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
+  rownames(ld.matrix) <- ld.info$Seq
+  colnames(ld.matrix) <- ld.info$Seq
+  
+  if(is.null(association_file) && !(leadsnp %in% ld.info$rsnum) && !(leadsnp_pos %in% ld.info$pos)){
+    stop("The input SNP informaiton does not existed in LD file")
   }
+  
+  if(is.null(association_file)){
+    
+    threshold=9
+    if(!is.null(leadsnp)) {association <- ld.info %>% dplyr::mutate(p=if_else((rsnum==leadsnp),1e-10,0.05)) %>% dplyr::select(Marker=rsnum,Locus=chr,Site=pos,p)}
+    if(!is.null(leadsnp_pos)) {association <- ld.info %>% dplyr::mutate(p=if_else((pos==leadsnp_pos),1e-10,0.05)) %>% dplyr::select(Marker=rsnum,Locus=chr,Site=pos,p)}
+    
+  }else{
+    association <- read_delim(association_file,delim = '\t',col_names = T,n_max = 5)
+    if("variant_id" %in% colnames(association)){
+      association <- read_delim(association_file,delim = '\t',col_names = T,col_types = cols('variant_id'='c'))  
+    }else{
+      association <- read_delim(association_file,delim = '\t',col_names = T)
+    }
+    
+    if('pvalue' %in% colnames(association)){  association <- association %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pvalue) }
+    if('pval_nominal' %in% colnames(association)){  
+      if(is.null(trait)){
+        trait <- association %>% arrange(pval_nominal) %>% slice(1) %>% pull(gene_symbol)
+      }
+      association <- association %>% filter(gene_symbol == trait) %>% select(Marker=rsnum,Locus=chr,Site=pos,p=pval_nominal) 
+    }
+  }
+  
   
   if(any(is.null(chr),is.null(left),is.null(right))){
     tmplocus <- association %>% arrange(p) %>% slice(1) 
@@ -1093,23 +1128,33 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
   }
   # limmit to 100k
   
-  if((right - left)  > 400000){
+  if((right - left)  > Distance_max){
     middle <- (right-left)/2
-    left <- middle - 200000
-    right <- middle + 200000
+    left <- middle - Distance_max/2
+    right <- middle + Distance_max/2
+  }
+  
+  ## redefine the region if the association region is mall
+  if((max(association$Site)-min(association$Site)) < 2*Distance){
+    left <- min(association$Site)
+    right <- max(association$Site)
   }
   
   chromosome_association <- association[association$Locus == chr, ]
   transcript_min <- left
   transcript_max <- right
-
   transcript_association <- chromosome_association[chromosome_association$Site >= transcript_min & chromosome_association$Site <= transcript_max, ]
   transcript_association <- transcript_association[order(transcript_association$Site),]
   
   if (dim(transcript_association)[1] < 2) {
     stop("Less than 2 markers, can not compute LD")
   } else {
+    
+    ## tabix gtf file
+    #if(genome_build == "GRCh37") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v19.annotation.gtf.gz')}
+    #if(genome_build == "GRCh38") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v37.annotation.gtf.gz')}
     regionfile=paste0(chr,":",left,"-",right,'.gtf_tmp')
+    #cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' > ',regionfile)
     cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' -D > ',regionfile)
     system(cmd_ztw)
     gtf <- read_delim(regionfile,delim = '\t',col_names = FALSE)
@@ -1199,11 +1244,11 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
     # structure
     if (any(isTRUE(leadsnpLD), isTRUE(triangleLD))) {
       
-      ld.matrix <- read_delim(LDfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
-      ld.info <- ld.matrix %>% dplyr::select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
-      ld.matrix <- ld.matrix %>% dplyr::select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
-      rownames(ld.matrix) <- ld.info$Seq
-      colnames(ld.matrix) <- ld.info$Seq
+      # ld.matrix <- read_delim(LDfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
+      # ld.info <- ld.matrix %>% dplyr::select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
+      # ld.matrix <- ld.matrix %>% dplyr::select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
+      # rownames(ld.matrix) <- ld.info$Seq
+      # colnames(ld.matrix) <- ld.info$Seq
       
       ld.info <- ld.info[ld.info$chr==chr & ld.info$pos >= transcript_min & ld.info$pos <= transcript_max,]
       ld.matrix <- ld.matrix[ld.info$Seq,ld.info$Seq]
@@ -1254,9 +1299,16 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
         ld_leadsnp$R2 <- as.character(ld_leadsnp$R2)
         ld_leadsnp$R2[ld_leadsnp$R2 == "0"] = "0.2"
         ld_leadsnp$R2[ld_leadsnp$R2 == "1.2"] = "1"
-        ld_leadsnp_colour <- list(
-          geom_point(data = ld_leadsnp, aes(Site2, -log10(p) * fold, fill = R2), shape = 21, colour = "black"), 
-          scale_fill_manual(values = c(`0.2` = colour02, `0.4` = colour04, `0.6` = colour06, `0.8` = colour08, `1` = colour10), labels = c("0-0.2","0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0"), name = lengend_name))
+        
+        
+        if(is.null(association_file)){
+          ld_leadsnp_colour <- list(scale_fill_manual(values = c(`0.2` = colour02, `0.4` = colour04, `0.6` = colour06, `0.8` = colour08, `1` = colour10), labels = c("0-0.2","0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0"), name = lengend_name))
+        }else{
+          ld_leadsnp_colour <- list(
+            geom_point(data = ld_leadsnp, aes(Site2, -log10(p) * fold, fill = R2), shape = 21, colour = "black",size=2), 
+            scale_fill_manual(values = c(`0.2` = colour02, `0.4` = colour04, `0.6` = colour06, `0.8` = colour08, `1` = colour10), labels = c("0-0.2","0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0"), name = lengend_name))
+        }
+        
       }
       if (!isTRUE(leadsnpLD)) {
         ld_leadsnp_colour <- list(NULL)
@@ -1321,7 +1373,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
     }
   }
   # link line from significant loci to the strucuture
-  if (!is.null(link2gene) & any(!is.null(threshold), is.null(threshold))) {
+  if (!is.null(link2gene) & !is.null(threshold)) {
     link_association_structure <- transcript_association[transcript_association$Marker %in% link2gene$rs, ]
     if (dim(link_association_structure)[1] == 0) {
       print("no matched locis, will not draw linking line")
@@ -1336,6 +1388,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
   if (is.null(link2gene) & is.null(threshold)) {
     print("threshold acquired")
     link_asso_gene <- list(NULL)
+    link_LD_genic_structure <- list(NULL)
   }
   if (is.null(link2gene) & !is.null(threshold)) {
     link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]
@@ -1356,22 +1409,25 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
   # add linking line to link gene structure and LD matrix
   if (isTRUE(triangleLD)) {
     if (is.null(link2gene) & is.null(link2LD)) {
-      if(!is.null(threshold)) {link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]}
-      link_association_structure <- link_association_structure[!duplicated(link_association_structure$p), ]
-      link_number <- dim(link_association_structure)[1]
-      link_asso_gene <- list(
-        geom_segment(
-          data = link_association_structure, 
-          aes(x = Site, xend = Site, y = rep(-max(pvalue_range) * fold/30, link_number), yend = -log10(p) * fold),
-          linetype = "longdash", colour = "red"))
-      marker_axis_LD_x <- transcript_min + (seq(1:marker_number) - 1) * 2 * distance
-      marker_axis_genic_x <- ld.info$pos
-      marker_axis_LD_y <- rep(-5 * max(pvalue_range) * fold/30, marker_number)
-      marker_axis_genic_y <- rep(-max(pvalue_range) * fold/30, marker_number)
-      link_ld_data <- data.frame(x = marker_axis_LD_x, xend = marker_axis_genic_x, 
-                                 y = marker_axis_LD_y, yend = marker_axis_genic_y)
-      link_ld_data <- link_ld_data[link_ld_data$xend %in% link_association_structure$Site, ]
-      link_LD_genic_structure <- geom_segment(data = link_ld_data, aes(x = x,  xend = xend, y = y, yend = yend), colour = "red", linetype = "longdash")
+      if(!is.null(threshold)) {
+        link_association_structure <- transcript_association[-log10(transcript_association$p) >=  threshold, ]
+        link_association_structure <- link_association_structure[!duplicated(link_association_structure$p), ]
+        link_number <- dim(link_association_structure)[1]
+        
+        link_asso_gene <- list(
+          geom_segment(
+            data = link_association_structure, 
+            aes(x = Site, xend = Site, y = rep(-max(pvalue_range) * fold/30, link_number), yend = -log10(p) * fold),
+            linetype = "longdash", colour = "red"))
+        marker_axis_LD_x <- transcript_min + (seq(1:marker_number) - 1) * 2 * distance
+        marker_axis_genic_x <- ld.info$pos
+        marker_axis_LD_y <- rep(-5 * max(pvalue_range) * fold/30, marker_number)
+        marker_axis_genic_y <- rep(-max(pvalue_range) * fold/30, marker_number)
+        link_ld_data <- data.frame(x = marker_axis_LD_x, xend = marker_axis_genic_x, 
+                                   y = marker_axis_LD_y, yend = marker_axis_genic_y)
+        link_ld_data <- link_ld_data[link_ld_data$xend %in% link_association_structure$Site, ]
+        link_LD_genic_structure <- geom_segment(data = link_ld_data, aes(x = x,  xend = xend, y = y, yend = yend), colour = "red", linetype = "longdash")
+      }
     }
     if (!is.null(link2gene) & !is.null(link2LD)) {
       link_association_structure <- transcript_association[transcript_association$Marker %in%  link2LD$rs, ]
@@ -1447,30 +1503,53 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
     transcript_association = transcript_association[!(transcript_association$Marker %in%  marker2highlight$rs), ]
   }
   
-  plot <- ggplot() + 
-    threshold_line +
-    link_asso_gene + 
-    link_LD_genic_structure + 
-    geom_point(data = transcript_association, aes(Site, -log10(p) * fold), 
-               shape = 21, colour = "black", fill = "black") +
-    ld_leadsnp_colour + 
-    gene_box + 
-    bottom_trianglLD +
-    gene_for_seg_name + 
-    gene_rev_seg_name + 
-    gene_for_seg + 
-    gene_rev_seg +
-    scale_x + 
-    scale_y_line +
-    scale_y_ticks + 
-    scale_y_text + 
-    y_axis_text + 
-    xtext + 
-    leadsnp2highlight_list + 
-    marker2highlight_list + 
-    marker2label_list +
-    theme_bw() + 
-    theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
+  if(is.null(association_file)){
+    plot <- ggplot() + 
+      link_asso_gene+
+      link_LD_genic_structure + 
+      # geom_point(data = transcript_association, aes(Site, -log10(p) * fold),
+      #            shape = 21, colour = "black", fill = "black",size=3) +
+      ld_leadsnp_colour+
+      gene_box + 
+      bottom_trianglLD +
+      gene_for_seg_name + 
+      gene_rev_seg_name + 
+      gene_for_seg + 
+      gene_rev_seg +
+      scale_x + 
+      xtext + 
+      leadsnp2highlight_list + 
+      marker2highlight_list + 
+      marker2label_list +
+      theme_bw() + 
+      theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
+    
+  } else{
+    plot <- ggplot() + 
+      threshold_line +
+      link_asso_gene + 
+      link_LD_genic_structure + 
+      # geom_point(data = transcript_association, aes(Site, -log10(p) * fold),
+      #            shape = 21, colour = "black", fill = "black",size=3) +
+      ld_leadsnp_colour + 
+      gene_box + 
+      bottom_trianglLD +
+      gene_for_seg_name + 
+      gene_rev_seg_name + 
+      gene_for_seg + 
+      gene_rev_seg +
+      scale_x + 
+      scale_y_line +
+      scale_y_ticks + 
+      scale_y_text + 
+      y_axis_text + 
+      xtext + 
+      leadsnp2highlight_list + 
+      marker2highlight_list + 
+      marker2label_list +
+      theme_bw() + 
+      theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
+  }
   
   if(is.null(output_file)){
     return(plot)
@@ -1483,6 +1562,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file, t
   }
   
 }
+
 
 
 
