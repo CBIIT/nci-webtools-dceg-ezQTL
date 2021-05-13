@@ -472,7 +472,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   } else {
     # load association data from user upload 
     if (!identical(assocFile, 'false')) {
-      qdatafile <- paste0('tmp/', request, '/', assocFile)
+      qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
       qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
     } else {
       # load assocation data from s3
@@ -532,7 +532,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     if (identical(select_qtls_samples, 'true')) {
       out = s3read_using(fread, header = FALSE, showProgress = FALSE, object = LDFile, bucket = bucket)
     } else {
-      out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+      out <- fread(input = paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz'), header = FALSE, showProgress = FALSE)
     }
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
@@ -549,7 +549,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   gwasdata <- 'false'
   if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
     if (identical(select_gwas_sample, 'false')) {
-      gwasdatafile <- paste0('tmp/', request, '/', gwasFile)
+      gwasdatafile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
     } else {
       gwasdatafile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
     }
