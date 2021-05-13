@@ -10,6 +10,7 @@ export function LocusQC() {
     request,
     isLoading,
     locus_qc,
+    gwasFile,
     isLoadingQC,
   } = useSelector((state) => state.qtlsGWAS);
 
@@ -72,17 +73,22 @@ export function LocusQC() {
             maxHeight="800px"
           />
 
-          <Zoom
+          {gwasFile ? <Zoom
             plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
             className="border rounded p-3 mb-2"
             maxHeight="1000px"
-          />
+          /> :
+            <div className="border rounded p-3 mb-2">No GWAS data.</div>
+          }
 
-          <Zoom
+
+          {gwasFile ? <Zoom
             plotURL={`api/results/${request}/${request}_QC_zscore.svg`}
             className="border rounded p-3"
             maxHeight="800px"
-          />
+          /> :
+            <div className="border rounded p-3 mb-2">No GWAS data.</div>
+          }
         </>
       )}
     </div>
