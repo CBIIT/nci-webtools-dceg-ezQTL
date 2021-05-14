@@ -1134,11 +1134,11 @@ export function QTLsGWASForm() {
       </Row>
       <Row>
         <Col sm="6">
-          <Link to={`/qtls/sample`} className="font-14">
+          {/* <Link to={`/qtls/sample`} className="font-14">
             <span className="sr-only">Load Sample Data</span>
             Load Sample Data
-          </Link>
-          {/* <Button
+          </Link> */}
+          <Button
             className="p-0 font-14"
             variant="link"
             onClick={() => {
@@ -1167,7 +1167,7 @@ export function QTLsGWASForm() {
             disabled={submitted}
           >
             {!select_gwas_sample ? 'Load' : 'Unload'} Sample Data
-          </Button> */}
+          </Button>
         </Col>
 
         <Col sm="6" className="d-flex">
