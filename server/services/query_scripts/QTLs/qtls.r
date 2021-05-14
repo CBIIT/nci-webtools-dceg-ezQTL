@@ -488,21 +488,10 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
   } else {
     # load association data from user upload 
-    if (!identical(assocFile, 'false')) {
+    if (!identical(assocFile, 'false') || !identical(qtlKey, 'false')) {
       qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
       qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-    } else {
-      # load assocation data from s3
-      loadAWS()
-      qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
-      assocFile = paste0(request, ".qtl_temp.txt")
-      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
-      system(cmd)
-      # rename #gene_id to gene_id
-      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-      names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
-      qdata %>% write_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = '\t', col_names = T)
-    }
+    } 
     if (!identical(LDFile, 'false')) {
       LDFile <- paste0('tmp/', request, '/', LDFile)
     }
@@ -564,7 +553,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## if GWAS File is loaded
   gwasdata <- 'false'
-  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true')) {
+  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true') || !identical(gwasKey,'false')) {
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
     } else {
@@ -577,14 +566,6 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
       # dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
       # return(dataSourceJSON)
     }
-  } else if (!identical(gwasKey, 'false')) {
-    loadAWS()
-    gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
-    gwasFile = paste0(request, ".gwas_temp.txt")
-    cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
-    system(cmd)
-    gwasdatafile <- paste0('tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
-    gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
   }
 
   ## return errors if there are any
