@@ -26,7 +26,6 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
     ld.matrix <- s3read_using(read_delim, delim = '\t', col_names = F, col_types = cols('X1' = 'c'), object = ldfile, bucket = bucket) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
   } else {
     qtlfile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
-    ldfile <- paste0('tmp/', request, '/ezQTL_input_ld.gz')
 
     ld.matrix <- read_delim(ldfile, delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
   }
