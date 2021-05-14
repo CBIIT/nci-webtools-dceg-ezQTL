@@ -1617,6 +1617,24 @@ export function qtlsGWASLocusQCCalculation(params) {
         await dispatch(
           updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
         );
+
+        const qtlsGWAS = getState().qtlsGWAS;
+
+        if(qtlsGWAS.associationFile || qtlsGWAS.qtlKey){
+          await dispatch(updateQTLsGWAS({associationFile: 'ezQTL_input_qtl.txt'}))
+          params.associationFile = 'ezQTL_input_qtl.txt'
+        }
+
+        if(qtlsGWAS.LDFile || qtlsGWAS.ldKey){
+          await dispatch(updateQTLsGWAS({LDFile: 'ezQTL_input_ld.gz'}))
+          params.LDFile = 'ezQTL_input_ld.gz'
+        }
+
+        if(qtlsGWAS.gwasFile || qtlsGWAS.gwasKey){
+          await dispatch(updateQTLsGWAS({gwasFile: 'ezQTL_input_gwas.txt'}))
+          params.gwasFile = 'ezQTL_input_gwas.txt'
+        }
+
         /*
         const qtlsGWAS = getState().qtlsGWAS;
 
