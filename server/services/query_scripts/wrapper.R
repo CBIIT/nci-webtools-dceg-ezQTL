@@ -81,6 +81,10 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       gwasFile = paste0(request, ".gwas_temp.txt")
       cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
       system(cmd)
+
+      gdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'gwas_temp.txt'), delim = "\t", col_names = T)
+      names(gdata)[names(gdata) == "#trait"] <- "trait"
+      gdata %>% write_delim(paste0('tmp/', request, '/', request, '.', 'gwas_temp.txt'), delim = '\t', col_names = T)
       gwasFile <- paste0(workDir,'/tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
     }
   }
