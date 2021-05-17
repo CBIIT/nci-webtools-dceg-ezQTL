@@ -18,6 +18,7 @@ RUN dnf -y update \
     cairo \
     cairo-devel \
     openssl-devel \
+    pkg-config \
     zlib-devel \
     xz-devel \
     git \
