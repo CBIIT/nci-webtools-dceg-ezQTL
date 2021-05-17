@@ -8,12 +8,20 @@ const { Console, DailyRotateFile } = transports;
 module.exports = new createLogger({
   level: logLevel || 'info',
   format: format.combine(
+    format.colorize(),
+    format.prettyPrint(),
     format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss'
+      format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    format.printf(info => `[${info.timestamp}] [${info.level}] ${info.stack || 
-      (typeof info.message === 'string' ? info.message : JSON.stringify(info.message))
-    }`)
+    format.printf(
+      (info) =>
+        `[${info.timestamp}] [${info.level}] ${
+          info.stack ||
+          (typeof info.message === 'string'
+            ? info.message
+            : JSON.stringify(info.message))
+        }`
+    )
   ),
   transports: [
     new Console(),
@@ -24,8 +32,8 @@ module.exports = new createLogger({
       maxSize: '1024m',
       timestamp: true,
       maxFiles: '1d',
-      prepend: true
+      prepend: true,
     }),
   ],
-  exitOnError: false
+  exitOnError: false,
 });
