@@ -4,9 +4,18 @@ const AWS = require('aws-sdk');
 const nodemailer = require('nodemailer');
 const r = require('r-wrapper').async;
 const tar = require('tar');
+var _ = require('lodash');
 const config = require('./config.json');
 const logger = require('./services/logger');
-const { calculateMain } = require('./services/calculate');
+const {
+  calculateQC,
+  calculateMain,
+  calculateHyprcolocLD,
+  calculateLocusLD,
+  calculateECAVIAR,
+  calculateHyprcoloc,
+  calculateColocVisualize,
+} = require('./services/calculate');
 
 const workingDirectory = path.resolve(config.R.workDir);
 
@@ -24,6 +33,14 @@ const workingDirectory = path.resolve(config.R.workDir);
 
   receiveMessage();
 })();
+
+function mergeState(state, data) {
+  return _.mergeWith(state, data, (obj, src) => {
+    if (_.isArray(obj)) {
+      return src;
+    }
+  });
+}
 
 /**
  * Reads a template, substituting {tokens} with data values
@@ -73,7 +90,7 @@ async function downloadS3(request, savePath) {
     const filename = path.basename(Key);
     const filepath = path.resolve(savePath, filename);
 
-    logger.info(`Downloading: ${Key} to ${savePath}`);
+    logger.debug(`Downloading: ${Key} to ${savePath}`);
     const object = await s3
       .getObject({
         Bucket: config.aws.s3.queue,
@@ -95,12 +112,230 @@ async function downloadS3(request, savePath) {
   }
 }
 
+async function calculate(params) {
+  const { request } = params;
+
+  // qtlsCalculateQC
+  await calculateQC({
+    workingDirectory: workingDirectory,
+    bucket: config.aws.s3.data,
+    ...params,
+  });
+  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
+  let summary = '';
+  if (fs.existsSync(logPath)) {
+    summary = String(await fs.promises.readFile(logPath));
+  }
+  summary = summary.replace(/#/g, '\u2022');
+  summary = summary.split('\n\n');
+
+  let newParams = params;
+  if (params.associationFile || params.qtlKey || params.select_qtls_samples)
+    newParams.associationFile = 'ezQTL_input_qtl.txt';
+  if (params.LDFile || params.ldKey || params.select_qtls_samples)
+    newParams.LDFile = 'ezQTL_input_ld.gz';
+  if (params.gwasFile || params.gwasKey || params.select_gwas_sample)
+    newParams.gwasFile = 'ezQTL_input_gwas.txt';
+
+  let state = {
+    ...newParams,
+    locus_qc: summary,
+    locusInformation: [
+      {
+        select_dist: params.select_dist,
+        select_ref: params.select_ref,
+        select_position: params.select_position,
+      },
+    ],
+  };
+  // qtlsCalculateMain
+  const main = JSON.parse(
+    await calculateMain({
+      workingDirectory: workingDirectory,
+      bucket: config.aws.s3.data,
+      ...newParams,
+    })
+  );
+  state = mergeState(state, {
+    openSidebar: false,
+    select_qtls_samples:
+      main['info']['select_qtls_samples'][0] === 'true' ? true : false,
+    select_gwas_sample:
+      main['info']['select_gwas_sample'][0] === 'true' ? true : false,
+    select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
+    recalculateAttempt:
+      main['info']['recalculateAttempt'][0] === 'true' ? true : false,
+    top_gene_variants: {
+      data: main['info']['top_gene_variants']['data'][0],
+    },
+    all_gene_variants: {
+      data: main['info']['all_gene_variants']['data'][0],
+    },
+    gene_list: {
+      data: main['info']['gene_list']['data'][0],
+    },
+    inputs: main['info']['inputs'],
+    messages: main['info']['messages'],
+    locus_quantification: {
+      data: main['locus_quantification']['data'][0],
+    },
+    locus_quantification_heatmap: {
+      data: main['locus_quantification_heatmap']['data'][0],
+    },
+    locus_alignment: {
+      top: main['locus_alignment']['top'][0][0],
+    },
+    locus_alignment_gwas_scatter_threshold: 1.0,
+    locus_colocalization_correlation: {
+      data: main['locus_colocalization_correlation']['data'][0],
+    },
+    gwas: {
+      data: main['gwas']['data'][0],
+    },
+    locus_table: {
+      data: main['locus_alignment']['data'][0],
+      globalFilter: '',
+    },
+    isLoading: false,
+  });
+
+  // qtlsCalculateLocusColocalizationHyprcolocLD
+  try {
+    const { hyprcoloc_ld } = main.gwas.data.length
+      ? JSON.parse(
+          await calculateHyprcolocLD({
+            workingDirectory: workingDirectory,
+            bucket: config.aws.s3.data,
+            request: request,
+            ldfile: state.inputs.ld_file[0],
+            select_ref: state.locus_alignment.top.rsnum,
+            select_chr: state.locus_alignment.top.chr,
+            select_pos: state.locus_alignment.top.pos,
+            select_dist: state.inputs.select_dist[0] * 1000,
+          })
+        )
+      : {};
+    // qtlsCalculateLocusColocalizationHyprcoloc
+    if (Object.keys(hyprcoloc_ld).length && hyprcoloc_ld.filename) {
+      const { hyprcoloc } = JSON.parse(
+        await calculateHyprcoloc({
+          workingDirectory: workingDirectory,
+          bucket: config.aws.s3.data,
+          request: request,
+          select_gwas_sample: state.select_gwas_sample,
+          select_qtls_samples: state.select_qtls_samples,
+          select_dist: state.inputs.select_dist[0] * 1000,
+          select_ref: state.locus_alignment.top.rsnum,
+          gwasfile: state.inputs.gwas_file[0],
+          qtlfile: state.inputs.association_file[0],
+          ldfile: hyprcoloc_ld.filename[0],
+          qtlKey: params.qtlKey,
+          select_chromosome: params.select_chromosome,
+          select_position: params.select_position,
+        })
+      );
+
+      state = mergeState(state, {
+        hyprcoloc_ld: {
+          filename: hyprcoloc_ld.filename[0],
+        },
+        hyprcoloc_table: {
+          data: hyprcoloc['result_hyprcoloc']['data'][0],
+        },
+        hyprcolocSNPScore_table: {
+          data: hyprcoloc['result_snpscore']['data'][0],
+        },
+      });
+    }
+  } catch (err) {
+    logger.error(err);
+  }
+
+  // qtlsGWASECaviarCalculation
+  try {
+    const { ecaviar } = JSON.parse(
+      await calculateECAVIAR({
+        workingDirectory: workingDirectory,
+        bucket: config.aws.s3.data,
+        request: request,
+        LDFile: state.inputs.ld_file[0],
+        associationFile: state.inputs.association_file[0],
+        gwasFile: state.inputs.gwas_file[0],
+        select_dist: state.inputs.select_dist[0] * 1000,
+        select_gwas_sample: state.select_gwas_sample,
+        select_qtls_samples: state.select_qtls_samples,
+        select_ref: state.locus_alignment.top.rsnum,
+      })
+    );
+
+    state = mergeState(state, {
+      ecaviar_table: {
+        data: ecaviar['data'][0],
+      },
+    });
+  } catch (err) {
+    logger.error(err);
+  }
+
+  // qtlsColocVisualization - summary
+  try {
+    if (
+      state.hyprcoloc_table.data.length > 0 &&
+      state.ecaviar_table.data.length > 0
+    ) {
+      const colocSummary = await calculateColocVisualize({
+        workingDirectory: workingDirectory,
+        bucket: config.aws.s3.data,
+        request: request,
+        hydata: state.hyprcoloc_table.data,
+        ecdata: state.ecaviar_table.data,
+        LDFile: state.inputs['ld_file'][0],
+        associationFile: state.inputs['association_file'][0],
+        gwasFile: state.inputs['gwas_file'][0],
+        select_dist: state.inputs['select_dist'][0] * 1000,
+        select_gwas_sample: params.select_gwas_sample,
+        select_qtls_samples: params.select_qtls_samples,
+        select_ref: state.locus_alignment['top']['rsnum'],
+        calcEcaviar: state.ecaviar_table.data.length === 0,
+      });
+
+      state = mergeState(state, {
+        summaryLoaded: true,
+      });
+    }
+  } catch (err) {
+    logger.error(err);
+  }
+
+  // qtlsGWASLocusLDCalculation
+  try {
+    if (params.LDFile || params.ldKey || params.select_qtls_samples) {
+      const locusLD = await calculateLocusLD({
+        workingDirectory: workingDirectory,
+        bucket: config.aws.s3.data,
+        request: request,
+        select_gwas_sample: state.select_gwas_sample,
+        select_qtls_samples: state.select_qtls_samples,
+        gwasFile: state.inputs.gwas_file[0],
+        associationFile: state.inputs.association_file[0],
+        LDFile: state.inputs.ld_file[0],
+        leadsnp: state.locus_alignment.top.rsnum,
+        genome_build: params.genome_build,
+      });
+    }
+  } catch (err) {
+    logger.error(err);
+  }
+
+  return { state: state, main: main };
+}
+
 /**
  * Processes a message and sends emails when finished
  * @param {object} params
  */
-async function processSingleLocus(params) {
-  const { request, timestamp } = params;
+async function processSingleLocus(requestData) {
+  const { params, request, timestamp } = requestData;
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
 
@@ -115,15 +350,8 @@ async function processSingleLocus(params) {
     const start = new Date().getTime();
     await downloadS3(request, directory);
 
-    const main = JSON.parse(
-      await calculateMain({
-        workingDirectory: workingDirectory,
-        bucket: config.aws.s3.data,
-        ...params,
-      })
-    );
+    const { state, main } = await calculate(params);
 
-    logger;
     const end = new Date().getTime();
 
     logger.info('Calculation Done');
@@ -137,9 +365,9 @@ async function processSingleLocus(params) {
     // upload parameters
     await s3
       .upload({
-        Body: JSON.stringify({ params: params, main: main }),
+        Body: JSON.stringify({ state: state, main: main }),
         Bucket: config.aws.s3.queue,
-        Key: `${config.aws.s3.outputPrefix}/${request}/params.json`,
+        Key: `${config.aws.s3.outputPrefix}/${request}/state.json`,
       })
       .promise();
 
@@ -161,6 +389,7 @@ async function processSingleLocus(params) {
       runTime: runtime,
       resultsUrl: `${config.email.baseUrl}/#/qtls/${request}`,
       supportEmail: config.email.admin,
+      jobName: params.jobName,
     };
 
     // send user success email
@@ -223,7 +452,9 @@ async function processSingleLocus(params) {
 }
 
 async function processMultiLoci(data) {
-  const { paramsArr, requests, email, timestamp } = data;
+  const { params: paramsArr, request: mainRequest, timestamp } = data;
+  const email = paramsArr[0].email;
+
   const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
 
@@ -238,21 +469,17 @@ async function processMultiLoci(data) {
           const directory = path.resolve(config.tmp.folder, request);
           await fs.promises.mkdir(directory, { recursive: true });
 
-          logger.info(`Calculating: ${jobName} ${request}`);
+          logger.info(`Calculating: ${request}`);
 
           const start = new Date().getTime();
-          await downloadS3(request, directory);
 
-          const main = JSON.parse(
-            await calculateMain({
-              workingDirectory: workingDirectory,
-              bucket: config.aws.s3.data,
-              ...params,
-            })
-          );
+          // download user uploaded files into unique
+          await downloadS3(mainRequest, directory);
+          const { state, main } = await calculate(params);
+
           const end = new Date().getTime();
 
-          logger.info('Calculation Done');
+          logger.info(`${request} Done`);
 
           const time = end - start;
           const minutes = Math.floor(time / 60000);
@@ -264,9 +491,9 @@ async function processMultiLoci(data) {
           // upload parameters
           await s3
             .upload({
-              Body: JSON.stringify({ params: params, main: main }),
+              Body: JSON.stringify({ state: state, main: main }),
               Bucket: config.aws.s3.queue,
-              Key: `${config.aws.s3.outputPrefix}/${request}/params.json`,
+              Key: `${config.aws.s3.outputPrefix}/${request}/state.json`,
             })
             .promise();
 
@@ -287,7 +514,7 @@ async function processMultiLoci(data) {
             request: request,
           });
         } catch (error) {
-          // logger.error(error);
+          logger.error(error);
           const stdout = error.stdout ? error.stdout.toString() : '';
           const stderr = error.stderr ? error.stderr.toString() : '';
 
@@ -353,19 +580,23 @@ async function processMultiLoci(data) {
       );
 
       logger.info(`Sending admin multi results email`);
+
       const adminEmailResults = await mailer.sendMail({
         from: config.email.sender,
         to: config.email.admin,
         subject: `ezQTL Results - ${timestamp} EST`,
         html: await readTemplate(
           __dirname + '/templates/admin-multi-failure.html',
-          { errors: errorsTemplate.join(''), request: requests[0] }
+          { errors: errorsTemplate.join(''), request: data.request }
         ),
       });
     }
 
     return true;
   } catch (err) {
+    logger.error(err);
+    const { params, request } = data;
+
     // logger.error(err);
 
     const stdout = err.stdout ? err.stdout.toString() : '';
@@ -373,7 +604,7 @@ async function processMultiLoci(data) {
 
     // template variables
     const templateData = {
-      request: requests[0],
+      request: request,
       parameters: JSON.stringify(params, null, 4),
       originalTimestamp: timestamp,
       exception: err.toString(),
@@ -436,9 +667,9 @@ async function receiveMessage() {
 
     if (data.Messages && data.Messages.length > 0) {
       const message = data.Messages[0];
-      const params = JSON.parse(message.Body);
+      const requestData = JSON.parse(message.Body);
 
-      logger.info(`Received Message ${params.request || params.requests[0]}`);
+      logger.info(`Received Message ${requestData.request}`);
       // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout
@@ -456,9 +687,9 @@ async function receiveMessage() {
 
       // processSingleLocus should return a boolean status indicating success or failure
 
-      const status = params.multi
-        ? await processMultiLoci(params)
-        : await processSingleLocus(params);
+      const status = requestData.multi
+        ? await processMultiLoci(requestData)
+        : await processSingleLocus(requestData);
       clearInterval(intervalId);
 
       // if message was not processed successfully, send it to the

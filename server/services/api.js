@@ -140,8 +140,7 @@ apiRouter.post('/getPublicGTEx', async (req, res, next) => {
 });
 
 apiRouter.post('/queue', async (req, res, next) => {
-  const params = req.body;
-  const request = params.request;
+  const { request, multi } = req.body;
   const sqs = new AWS.SQS();
   const wd = path.join(tmpDir, '/', request);
 
@@ -150,7 +149,7 @@ apiRouter.post('/queue', async (req, res, next) => {
   }
 
   try {
-    logger.info(`Uploading: ${fs.readdirSync(wd)}`);
+    logger.debug(`Uploading: ${fs.readdirSync(wd)}`);
     await new AWS.S3()
       .upload({
         Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),
@@ -169,8 +168,8 @@ apiRouter.post('/queue', async (req, res, next) => {
         MessageDeduplicationId: request,
         MessageGroupId: request,
         MessageBody: JSON.stringify({
-          ...params,
-          multi: false,
+          ...req.body,
+          multi: multi,
           timestamp: new Date().toLocaleString('en-US', {
             timeZone: 'America/New_York',
           }),
@@ -182,61 +181,6 @@ apiRouter.post('/queue', async (req, res, next) => {
     res.json({ request });
   } catch (err) {
     logger.info('Queue failed to submit request: ' + request);
-    next(err);
-  }
-});
-
-apiRouter.post('/queue-multi', async (req, res, next) => {
-  const { paramsArr, requests, email } = req.body;
-  const sqs = new AWS.SQS();
-
-  // upload each request and accompanying data
-  requests.forEach(async (request) => {
-    const wd = path.join(tmpDir, '/', request);
-
-    if (!fs.existsSync(wd)) {
-      fs.mkdirSync(wd);
-    }
-
-    try {
-      logger.info(`Uploading: ${fs.readdirSync(wd)}`);
-      await new AWS.S3()
-        .upload({
-          Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),
-          Bucket: awsInfo.s3.queue,
-          Key: `${awsInfo.s3.inputPrefix}/${request}/${request}.tgz`,
-        })
-        .promise();
-    } catch (err) {
-      logger.info('QueueMulti failed to upload request: ' + request);
-      next(err);
-    }
-  });
-
-  try {
-    const { QueueUrl } = await sqs
-      .getQueueUrl({ QueueName: awsInfo.sqs.url })
-      .promise();
-
-    await sqs
-      .sendMessage({
-        QueueUrl: QueueUrl,
-        MessageDeduplicationId: requests[0],
-        MessageGroupId: requests[0],
-        MessageBody: JSON.stringify({
-          ...req.body,
-          multi: true,
-          timestamp: new Date().toLocaleString('en-US', {
-            timeZone: 'America/New_York',
-          }),
-        }),
-      })
-      .promise();
-
-    logger.info('QueueMulti submitted request: ' + requests[0]);
-    res.json({ requests });
-  } catch (err) {
-    logger.info('QueueMulti failed to submit queue request: ' + requests[0]);
     next(err);
   }
 });
@@ -275,7 +219,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
 
       // download files if they do not exist
       if (!fs.existsSync(filepath)) {
-        logger.info(`Downloading file: ${Key}`);
+        logger.debug(`Downloading file: ${Key}`);
 
         const object = await s3
           .getObject({
@@ -305,15 +249,13 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
       }
     }
 
-    let paramsFilePath = path.resolve(resultsFolder, `params.json`);
+    let stateFilePath = path.resolve(resultsFolder, `state.json`);
 
-    if (fs.existsSync(paramsFilePath)) {
-      let params = JSON.parse(
-        String(await fs.promises.readFile(paramsFilePath))
-      );
+    if (fs.existsSync(stateFilePath)) {
+      let data = JSON.parse(String(await fs.promises.readFile(stateFilePath)));
       if (request == 'sample') {
         // rename files
-        const oldRequest = params.params.request;
+        const oldRequest = state.qtlsGWAS.request;
         const files = fs.readdirSync(resultsFolder);
         files.forEach((file) =>
           fs.renameSync(
@@ -323,10 +265,10 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
         );
 
         // replace request id
-        params.params.request = request_id;
-        params.main.info.inputs.request[0] = request_id;
+        data.state.qtlsGWAS.request = request_id;
+        data.state.qtlsGWAS.inputs.request[0] = request_id;
       }
-      res.json(params);
+      res.json(data);
     } else {
       next(new Error(`Params not found`));
     }

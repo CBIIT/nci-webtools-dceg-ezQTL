@@ -9,7 +9,6 @@ import {
 import { NCIFooter } from '@cbiitss/react-components';
 import { Home } from './components/pages/home/home';
 import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
-import { QTLsMulti } from './components/pages/qtls-gwas/qtls-multi';
 import { Help } from './components/pages/help/help';
 import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
@@ -34,10 +33,7 @@ export function App() {
       route: '/qtls',
       title: 'Single Locus',
     },
-    {
-      route: '/qtls-multi',
-      title: 'Multiple Loci',
-    },
+
     {
       route: '/help',
       title: 'Help',
@@ -47,7 +43,12 @@ export function App() {
   return (
     <Router>
       <header className="bg-primary-gradient py-3">
-        <a href={window.location.href + "#main"} className="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center">Skip to Main Content</a>
+        <a
+          href={window.location.href + '#main'}
+          className="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center"
+        >
+          Skip to Main Content
+        </a>
         <div className="container px-0">
           <a href="https://dceg.cancer.gov/" target="_blank" rel="noreferrer">
             <img
@@ -97,7 +98,6 @@ export function App() {
           <Route exact path={`/`} render={() => <Redirect to="/home" />} />
           <Route path="/home" exact={true} component={Home} />
           <Route path="/qtls/:request?" component={QTLsGWAS} />
-          <Route path="/qtls-multi" component={QTLsMulti} />
           <Route path="/help" component={Help} />
         </div>
       </main>

@@ -26,6 +26,163 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 const { v1: uuidv1 } = require('uuid');
 
+function LocusInfo({ locusIndex, attempt, setValid }) {
+  const dispatch = useDispatch();
+  const { getInitialState } = useContext(RootContext);
+  const {
+    locusInformation,
+    submitted,
+    qtlPublic,
+    ldPublic,
+    gwasPublic,
+  } = useSelector((state) => state.qtlsGWAS);
+  const { select_dist, select_position, select_ref } = locusInformation[
+    locusIndex
+  ];
+
+  // check form validity
+  useEffect(() => {
+    if (
+      !select_dist ||
+      select_dist < 1 ||
+      select_dist > 200 ||
+      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref))
+    ) {
+      setValid(false);
+    } else {
+      setValid(true);
+    }
+  }, [ldPublic, qtlPublic, select_dist, select_ref]);
+
+  function mergeLocusInfo(data) {
+    let newLocusInfo = locusInformation.slice();
+    newLocusInfo[locusIndex] = { ...newLocusInfo[locusIndex], ...data };
+    dispatch(updateQTLsGWAS({ locusInformation: newLocusInfo }));
+  }
+
+  function addLocusInfo() {
+    let newLocusInfo = locusInformation.slice();
+    newLocusInfo = [
+      ...newLocusInfo,
+      ...getInitialState().qtlsGWAS.locusInformation,
+    ];
+    dispatch(updateQTLsGWAS({ locusInformation: newLocusInfo }));
+  }
+
+  function removeLocusInfo() {
+    let newLocusInfo = locusInformation.slice();
+    newLocusInfo.splice(locusIndex, 1);
+    dispatch(updateQTLsGWAS({ locusInformation: newLocusInfo }));
+  }
+
+  return (
+    <>
+      <div className="border rounded p-2">
+        <Form.Row>
+          {locusIndex != 0 && (
+            <Col className="d-flex justify-content-end">
+              <Button
+                className="text-danger p-0"
+                style={{ 'text-decoration': 'underline', fontSize: '.8rem' }}
+                variant="link"
+                size="sm"
+                onClick={() => removeLocusInfo()}
+              >
+                Remove
+              </Button>
+            </Col>
+          )}
+        </Form.Row>
+        <Form.Row>
+          <Col>
+            <Form.Label className="mb-0">
+              cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
+              <small>
+                <i>(+/- Kb up to 5Mb)</i>
+              </small>
+            </Form.Label>
+            <Form.Control
+              title="cis-QTL Distance Input"
+              aria-label="cis-QTL Distance Input"
+              type="number"
+              min="1"
+              max="2000"
+              id="qtls-distance-input"
+              disabled={submitted}
+              onChange={(e) => mergeLocusInfo({ select_dist: e.target.value })}
+              value={select_dist}
+              isInvalid={(attempt && select_dist < 1) || select_dist > 200}
+            />
+            <Form.Control.Feedback type="invalid">
+              Enter distance between 1 and 200Kb.
+            </Form.Control.Feedback>
+          </Col>
+        </Form.Row>
+        <Form.Row>
+          {qtlPublic || ldPublic || gwasPublic ? (
+            <Col>
+              <Form.Label className="mb-0">Position</Form.Label>
+              <Form.Control
+                title="LD Reference Position Input"
+                aria-label="LD Refereence Position Input"
+                id="select_position"
+                disabled={submitted}
+                onChange={(e) =>
+                  mergeLocusInfo({ select_position: e.target.value })
+                }
+                placeholder="e.g. 100000"
+                value={select_position}
+              />
+            </Col>
+          ) : (
+            <Col>
+              <Form.Label className="mb-0">
+                SNP{' '}
+                <small>
+                  <i>(Default: lowest GWAS P-value SNP)</i>
+                </small>
+              </Form.Label>
+              <Form.Control
+                title="LD Reference SNP Input"
+                aria-label="LD Refereence SNP Input"
+                id="qtls-snp-input"
+                disabled={submitted}
+                onChange={(e) => mergeLocusInfo({ select_ref: e.target.value })}
+                value={select_ref ? select_ref : ''}
+                isInvalid={
+                  attempt &&
+                  select_ref &&
+                  select_ref.length > 0 &&
+                  !/^rs\d+$/.test(select_ref)
+                }
+              />
+              <Form.Control.Feedback type="invalid">
+                Enter valid RS number. Leave empty for default.
+              </Form.Control.Feedback>
+            </Col>
+          )}
+        </Form.Row>
+      </div>
+
+      <Row>
+        {locusIndex == locusInformation.length - 1 && (
+          <Col className="d-flex justify-content-end">
+            <Button
+              className="p-0"
+              variant="link"
+              title="Add Locus Information"
+              aria-label="Add Locus Information"
+              onClick={() => addLocusInfo()}
+            >
+              + Add Locus
+            </Button>
+          </Col>
+        )}
+      </Row>
+    </>
+  );
+}
+
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
@@ -58,8 +215,7 @@ export function QTLsGWASForm() {
     request,
     select_pop,
     select_gene,
-    select_dist,
-    select_ref,
+    locusInformation,
     recalculateAttempt,
     recalculatePop,
     recalculateGene,
@@ -85,8 +241,8 @@ export function QTLsGWASForm() {
     phenotype,
     phenotypeOptions,
     select_chromosome,
-    select_position,
     isQueue,
+    jobName,
     email,
     qtlPublic,
     gwasPublic,
@@ -133,18 +289,6 @@ export function QTLsGWASForm() {
   }, [ldPublic]);
 
   // check form validity
-  useEffect(() => {
-    if (
-      !select_dist ||
-      select_dist < 1 ||
-      select_dist > 200 ||
-      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref))
-    ) {
-      setValid(false);
-    } else {
-      setValid(true);
-    }
-  }, [ldPublic, qtlPublic, select_dist, select_ref]);
   useEffect(() => {
     if (
       (!_associationFile && !select_qtls_samples && !qtlPublic) ||
@@ -467,6 +611,7 @@ export function QTLsGWASForm() {
     _setGwasFile('');
     viewTissueOnly(false);
     viewPhenotypeOnly(false);
+    setAttempt(false);
   };
 
   function validateEmail() {
@@ -488,13 +633,6 @@ export function QTLsGWASForm() {
 
     await dispatch(
       uploadFile({
-        // dataFiles: [
-        //   _associationFile,
-        //   _quantificationFile,
-        //   _genotypeFile,
-        //   _LDFile,
-        //   _gwasFile,
-        // ],
         associationFile: _associationFile,
         quantificationFile: _quantificationFile,
         genotypeFile: _genotypeFile,
@@ -511,38 +649,57 @@ export function QTLsGWASForm() {
       })
     );
 
-    const params = {
-      request,
-      select_qtls_samples,
-      select_gwas_sample,
-      associationFile: (_associationFile && _associationFile.name) || false,
-      quantificationFile:
-        (_quantificationFile && _quantificationFile.name) || false,
-      genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
-      gwasFile: (_gwasFile && _gwasFile.name) || false,
-      LDFile: (_LDFile && _LDFile.name) || false,
-      select_pop,
-      select_gene,
-      select_dist,
-      select_ref,
-      recalculateAttempt,
-      recalculatePop,
-      recalculateGene,
-      recalculateDist,
-      recalculateRef,
-      ldProject: ldProject.value,
-      qtlKey: qtlPublic ? qtlKey : false,
-      ldKey: ldPublic ? ldKey : false,
-      gwasKey: gwasPublic ? gwasKey : false,
-      select_chromosome: select_chromosome.value,
-      select_position: select_position,
-      email: email,
-    };
+    const params = locusInformation.map((locusInfo, locusIndex) => {
+      const { select_dist, select_ref, select_position } = locusInfo;
+      return {
+        jobName: jobName
+          ? `${jobName} - ${locusIndex}`
+          : `ezQTL - ${locusIndex}`,
+        request: `${request}-${locusIndex}`,
+        email: email,
+        isQueue: true,
+        submitted: true,
+        associationFile: (_associationFile && _associationFile.name) || false,
+        quantificationFile:
+          (_quantificationFile && _quantificationFile.name) || false,
+        genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
+        gwasFile: (_gwasFile && _gwasFile.name) || false,
+        LDFile: (_LDFile && _LDFile.name) || false,
+        select_qtls_samples,
+        select_gwas_sample,
+        select_pop,
+        select_gene,
+        select_dist,
+        select_ref,
+        recalculateAttempt,
+        recalculatePop,
+        recalculateGene,
+        recalculateDist,
+        recalculateRef,
+        ldProject: ldProject.value,
+        qtlPublic,
+        gwasPublic,
+        ldPublic,
+        qtlKey: qtlKey || false,
+        ldKey: ldKey || false,
+        gwasKey: gwasKey || false,
+        select_chromosome: select_chromosome.value,
+        select_position: select_position,
+        genome_build: genome.value,
+      };
+    });
 
     if (isQueue) {
-      dispatch(submitQueue(params));
+      dispatch(
+        submitQueue({
+          params:
+            params.length > 1 ? params : { ...params[0], request: request },
+          request: request,
+          multi: params.length > 1 ? true : false,
+        })
+      );
     } else {
-      dispatch(qtlsGWASLocusQCCalculation(params));
+      dispatch(qtlsGWASLocusQCCalculation({ ...params[0], request: request }));
     }
   }
 
@@ -1020,100 +1177,14 @@ export function QTLsGWASForm() {
     },
     {
       title: 'Locus Information',
-      component: (
-        <>
-          <Row>
-            <Col>
-              <Form.Label className="mb-0">
-                cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
-                <small>
-                  <i>(+/- Kb up to 5Mb)</i>
-                </small>
-              </Form.Label>
-              <Form.Control
-                title="cis-QTL Distance Input"
-                aria-label="cis-QTL Distance Input"
-                type="number"
-                min="1"
-                max="2000"
-                id="qtls-distance-input"
-                disabled={submitted}
-                onChange={(e) => {
-                  dispatch(updateQTLsGWAS({ select_dist: e.target.value }));
-                }}
-                value={select_dist}
-                isInvalid={select_dist < 1 || select_dist > 200}
-                // custom
-              />
-              <Form.Control.Feedback type="invalid">
-                Enter distance between 1 and 200Kb.
-              </Form.Control.Feedback>
-            </Col>
-          </Row>
-          {qtlPublic || ldPublic || gwasPublic ? (
-            <Row>
-              <Col>
-                <Form.Row>
-                  <Col>
-                    <Form.Label className="mb-0">Position</Form.Label>
-                    <Form.Control
-                      title="LD Reference Position Input"
-                      aria-label="LD Reference Position Input"
-                      id="select_position"
-                      disabled={submitted}
-                      onChange={(e) => {
-                        dispatch(
-                          updateQTLsGWAS({ select_position: e.target.value })
-                        );
-                      }}
-                      placeholder="e.g. 100000"
-                      value={select_position}
-                      isInvalid={
-                        select_ref &&
-                        select_ref.length > 0 &&
-                        !/^rs\d+$/.test(select_ref)
-                      }
-                    />
-                    <Form.Control.Feedback type="invalid">
-                      Enter valid RS number. Leave empty for default.
-                    </Form.Control.Feedback>
-                  </Col>
-                </Form.Row>
-              </Col>
-            </Row>
-          ) : (
-            <Row>
-              <Col>
-                <Form.Label className="mb-0">
-                  SNP{' '}
-                  <small>
-                    <i>(Default: lowest GWAS P-value SNP)</i>
-                  </small>
-                </Form.Label>
-                <Form.Control
-                  title="LD Reference SNP Input"
-                  aria-label="LD Reference SNP Input"
-                  id="qtls-snp-input"
-                  disabled={submitted}
-                  onChange={(e) => {
-                    dispatch(updateQTLsGWAS({ select_ref: e.target.value }));
-                  }}
-                  f
-                  value={select_ref ? select_ref : ''}
-                  isInvalid={
-                    select_ref &&
-                    select_ref.length > 0 &&
-                    !/^rs\d+$/.test(select_ref)
-                  }
-                />
-                <Form.Control.Feedback type="invalid">
-                  Enter valid RS number. Leave empty for default.
-                </Form.Control.Feedback>
-              </Col>
-            </Row>
-          )}
-        </>
-      ),
+      component: locusInformation.map((_, i) => (
+        <LocusInfo
+          key={`locusInfo-${i}`}
+          locusIndex={i}
+          attempt={attempt}
+          setValid={setValid}
+        />
+      )),
     },
   ];
 
@@ -1204,6 +1275,24 @@ export function QTLsGWASForm() {
           </Col>
         </Row>
 
+        <Row>
+          <Col>
+            <Form.Group controlId="jobName" className="mb-2">
+              <Form.Control
+                title="Job Name Input"
+                aria-label="Job Name Input"
+                placeholder="Job Name"
+                size="sm"
+                value={jobName}
+                type="text"
+                onChange={(e) =>
+                  dispatch(updateQTLsGWAS({ jobName: e.target.value }))
+                }
+                disabled={!isQueue || submitted}
+              />
+            </Form.Group>
+          </Col>
+        </Row>
         <Row>
           <Col>
             <Form.Group controlId="email">

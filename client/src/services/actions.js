@@ -1620,20 +1620,32 @@ export function qtlsGWASLocusQCCalculation(params) {
 
         const qtlsGWAS = getState().qtlsGWAS;
 
-        if(qtlsGWAS.associationFile || qtlsGWAS.qtlKey){
-          await dispatch(updateQTLsGWAS({associationFile: 'ezQTL_input_qtl.txt'}))
-          params.associationFile = 'ezQTL_input_qtl.txt'
+        if (
+          qtlsGWAS.associationFile ||
+          qtlsGWAS.qtlKey ||
+          qtlsGWAS.select_qtls_samples
+        ) {
+          await dispatch(
+            updateQTLsGWAS({ associationFile: 'ezQTL_input_qtl.txt' })
+          );
+          params.associationFile = 'ezQTL_input_qtl.txt';
         }
 
-        if(qtlsGWAS.LDFile || qtlsGWAS.ldKey){
-          await dispatch(updateQTLsGWAS({LDFile: 'ezQTL_input_ld.gz'}))
-          params.LDFile = 'ezQTL_input_ld.gz'
+        if (qtlsGWAS.LDFile || qtlsGWAS.ldKey || qtlsGWAS.select_qtls_samples) {
+          await dispatch(updateQTLsGWAS({ LDFile: 'ezQTL_input_ld.gz' }));
+          params.LDFile = 'ezQTL_input_ld.gz';
         }
 
-        if(qtlsGWAS.gwasFile || qtlsGWAS.gwasKey){
-          await dispatch(updateQTLsGWAS({gwasFile: 'ezQTL_input_gwas.txt'}))
-          params.gwasFile = 'ezQTL_input_gwas.txt'
+        if (
+          qtlsGWAS.gwasFile ||
+          qtlsGWAS.gwasKey ||
+          qtlsGWAS.select_gwas_sample
+        ) {
+          await dispatch(updateQTLsGWAS({ gwasFile: 'ezQTL_input_gwas.txt' }));
+          params.gwasFile = 'ezQTL_input_gwas.txt';
         }
+
+        dispatch(qtlsGWASCalculation(params));
 
         /*
         const qtlsGWAS = getState().qtlsGWAS;
@@ -1658,15 +1670,12 @@ export function qtlsGWASLocusQCCalculation(params) {
           dispatch(
             updateQTLsGWAS({
               qcError: 'Error occured in QC calculation',
+              isLoading: false,
               isLoadingQC: false,
               // activeResultsTab: 'locus-qc',
             })
           );
         }
-      })
-      .then(function () {
-        dispatch(updateQTLsGWAS({ isLoadingQC: false }));
-        dispatch(qtlsGWASCalculation(params));
       });
   };
 }
@@ -1967,8 +1976,12 @@ export function qtlsGWASCalculation(params) {
               })
             );
           }
-          
-          if(qtlsGWAS.LDFile || qtlsGWAS.ldKey){
+
+          if (
+            qtlsGWAS.LDFile ||
+            qtlsGWAS.ldKey ||
+            qtlsGWAS.select_qtls_samples
+          ) {
             dispatch(
               qtlsGWASLocusLDCalculation({
                 request: qtlsGWAS.request,
@@ -1978,7 +1991,7 @@ export function qtlsGWASCalculation(params) {
                 associationFile: qtlsGWAS.inputs.association_file[0],
                 LDFile: qtlsGWAS.inputs.ld_file[0],
                 leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
-                genome_build: qtlsGWAS.genome.value
+                genome_build: qtlsGWAS.genome.value,
               })
             );
           }
@@ -2221,41 +2234,6 @@ export function submitQueue(params) {
     }
   };
 }
-export function submitQueueMulti(params) {
-  return async function (dispatch, getState) {
-    dispatch(
-      updateMultiLoci({
-        submitted: true,
-        isLoading: true,
-      })
-    );
-
-    try {
-      const response = await axios.post('api/queue-multi', params);
-      console.log('api/queue-multi', response);
-      dispatch(
-        updateSuccess({
-          visible: true,
-          message: `Your job was successfully submitted to the queue. You will recieve an email at ${params.email} with your results.`,
-        })
-      );
-      dispatch(updateMultiLoci({ isLoading: false }));
-    } catch (error) {
-      console.log(error);
-      if (error) {
-        dispatch(
-          updateError({ visible: true, message: 'Queue submission failed' })
-        );
-        dispatch(
-          updateMultiLoci({
-            isError: true,
-            isLoading: false,
-          })
-        );
-      }
-    }
-  };
-}
 
 export function fetchResults(request) {
   return async function (dispatch, getState) {
@@ -2268,9 +2246,9 @@ export function fetchResults(request) {
 
     try {
       const { data } = await axios.post('api/fetch-results', request);
-      console.log('api/fetch-results', data);
+      const { state, main } = data;
+      // console.log('api/fetch-results', state);
 
-      const { params, main } = data;
       const { pdata, locus_alignment_plot_layout } =
         Object.keys(main['gwas']['data'][0]).length > 0
           ? drawLocusAlignmentGWAS({ data: main })
@@ -2287,104 +2265,17 @@ export function fetchResults(request) {
         );
       }
 
-      const state = {
-        ...params,
-        select_chromosome: {
-          value: params.select_chromosome,
-          label: params.select_chromosome,
-        },
-        request: main['info']['inputs']['request'][0],
-        openSidebar: false,
-        select_qtls_samples: main['info']['select_qtls_samples'][0] === 'true',
-        select_gwas_sample: main['info']['select_gwas_sample'][0] === 'true',
-        select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
-        recalculateAttempt: main['info']['recalculateAttempt'][0] === 'true',
-        // recalculatePop: main['info']['recalculatePop'][0] === 'true',
-        // recalculateGene: main['info']['recalculateGene'][0] === 'true',
-        // recalculateDist: main['info']['recalculateDist'][0] === 'true',
-        // recalculateRef: main['info']['recalculateRef'][0] === 'true',
-        top_gene_variants: {
-          data: main['info']['top_gene_variants']['data'][0],
-        },
-        all_gene_variants: {
-          data: main['info']['all_gene_variants']['data'][0],
-        },
-        gene_list: {
-          data: main['info']['gene_list']['data'][0],
-        },
-        inputs: main['info']['inputs'],
-        messages: main['info']['messages'],
-        locus_quantification: {
-          data: main['locus_quantification']['data'][0],
-        },
-        locus_quantification_heatmap: {
-          data: main['locus_quantification_heatmap']['data'][0],
-        },
-        locus_alignment: {
-          data: pdata,
-          layout: locus_alignment_plot_layout,
-          top: main['locus_alignment']['top'][0][0],
-        },
-        locus_alignment_gwas_scatter_threshold: 1.0,
-        locus_colocalization_correlation: {
-          data: main['locus_colocalization_correlation']['data'][0],
-        },
-        gwas: {
-          data: main['gwas']['data'][0],
-        },
-        locus_table: {
-          data: main['locus_alignment']['data'][0],
-          globalFilter: '',
-        },
-      };
-
-      await dispatch(updateQTLsGWAS({ ...state, isLoading: false }));
-
-      const qtlsGWAS = getState().qtlsGWAS;
-      if (
-        !qtlsGWAS.isError &&
-        qtlsGWAS.gwas &&
-        qtlsGWAS.gwas.data &&
-        Object.keys(qtlsGWAS.gwas.data).length > 0
-      ) {
-        dispatch(
-          qtlsGWASHyprcolocLDCalculation({
-            request: qtlsGWAS.request,
-            ldfile: qtlsGWAS.inputs.ld_file[0],
-            select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-            select_chr: qtlsGWAS.locus_alignment.top.chr,
-            select_pos: qtlsGWAS.locus_alignment.top.pos,
-            select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-          })
-        );
-      } else {
-        dispatch(updateQTLsGWAS({ qcError: 'No data available for QC plot' }));
-      }
-      dispatch(
-        qtlsGWASLocusQCCalculation({
-          request: qtlsGWAS.request,
-          select_gwas_sample: qtlsGWAS.select_gwas_sample,
-          select_qtls_samples: qtlsGWAS.select_qtls_samples,
-          gwasFile: qtlsGWAS.inputs.gwas_file[0],
-          associationFile: qtlsGWAS.inputs.association_file[0],
-          ldfile: qtlsGWAS.inputs.ld_file[0],
-          leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
-          select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-          select_gene: qtlsGWAS.locus_alignment.top.gene_symbol,
+      await dispatch(
+        updateQTLsGWAS({
+          ...state,
+          submitted: true,
+          locus_alignment: {
+            data: pdata,
+            layout: locus_alignment_plot_layout,
+          },
+          isLoading: false,
         })
       );
-
-      // dispatch(
-      //   qtlsGWASLocusLDCalculation({
-      //     request: qtlsGWAS.request,
-      //     select_gwas_sample: qtlsGWAS.select_gwas_sample,
-      //     select_qtls_samples: qtlsGWAS.select_qtls_samples,
-      //     gwasFile: qtlsGWAS.inputs.gwas_file[0],
-      //     associationFile: qtlsGWAS.inputs.association_file[0],
-      //     LDFile: qtlsGWAS.inputs.ld_file[0],
-      //     leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
-      //   })
-      // );
     } catch (error) {
       console.log(error);
       if (error) {

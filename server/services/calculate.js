@@ -38,34 +38,6 @@ async function calculateMain(params) {
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
-  logger.debug([
-    rfile,
-    workingDirectory.toString(),
-    select_qtls_samples.toString(),
-    select_gwas_sample.toString(),
-    associationFile.toString(),
-    quantificationFile.toString(),
-    genotypeFile.toString(),
-    gwasFile.toString(),
-    LDFile.toString(),
-    request.toString(),
-    select_pop.toString(),
-    select_gene.toString(),
-    select_dist.toString(),
-    select_ref.toString(),
-    recalculateAttempt.toString(),
-    recalculatePop.toString(),
-    recalculateGene.toString(),
-    recalculateDist.toString(),
-    recalculateRef.toString(),
-    ldProject.toString(),
-    qtlKey.toString(),
-    ldKey.toString(),
-    gwasKey.toString(),
-    select_chromosome.toString(),
-    select_position,
-    bucket.toString(),
-  ]);
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -159,12 +131,7 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   }
 }
 
-async function qtlsCalculateLocusColocalizationHyprcolocLD(
-  params,
-  req,
-  res,
-  next
-) {
+async function calculateHyprcolocLD(params) {
   const {
     request,
     ldfile,
@@ -176,33 +143,44 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
     bucket,
   } = params;
 
-  logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
-
   const rfile = path.resolve(
     __dirname,
     'query_scripts',
     'QTLs',
     'qtls-locus-colocalization-hyprcoloc-ld.r'
   );
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateLocusColocalizationHyprcolocLD',
+    [
+      rfile,
+      workingDirectory.toString(),
+      ldfile.toString(),
+      select_ref.toString(),
+      select_chr.toString(),
+      select_pos.toString(),
+      select_dist.toString(),
+      request.toString(),
+      bucket.toString(),
+    ]
+  );
+}
+
+async function qtlsCalculateLocusColocalizationHyprcolocLD(
+  params,
+  req,
+  res,
+  next
+) {
+  const { request } = params;
+
+  logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
+
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateLocusColocalizationHyprcolocLD',
-      [
-        rfile,
-        workingDirectory.toString(),
-        ldfile.toString(),
-        select_ref.toString(),
-        select_chr.toString(),
-        select_pos.toString(),
-        select_dist.toString(),
-        request.toString(),
-        bucket.toString(),
-      ]
-    );
+    const wrapper = await calculateHyprcolocLD(params);
     logger.info(
       `[${request}] Finished /qtls-locus-colocalization-hyprcoloc-ld`
     );
@@ -215,12 +193,7 @@ async function qtlsCalculateLocusColocalizationHyprcolocLD(
   }
 }
 
-async function qtlsCalculateLocusColocalizationHyprcoloc(
-  params,
-  req,
-  res,
-  next
-) {
+async function calculateHyprcoloc(params) {
   const {
     request,
     select_gwas_sample,
@@ -237,11 +210,6 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(
     bucket,
   } = params;
 
-  logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
-
   const rfile = path.resolve(
     __dirname,
     'query_scripts',
@@ -249,27 +217,43 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(
     'qtls-locus-colocalization-hyprcoloc.r'
   );
 
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateLocusColocalizationHyprcoloc',
+    [
+      rfile,
+      workingDirectory.toString(),
+      select_gwas_sample.toString(),
+      select_qtls_samples.toString(),
+      select_dist.toString(),
+      select_ref.toString(),
+      gwasfile.toString(),
+      qtlfile.toString(),
+      ldfile.toString(),
+      request.toString(),
+      qtlKey.toString(),
+      select_chromosome.toString(),
+      parseInt(select_position),
+      bucket.toString(),
+    ]
+  );
+}
+
+async function qtlsCalculateLocusColocalizationHyprcoloc(
+  params,
+  req,
+  res,
+  next
+) {
+  const { request } = params;
+
+  logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
+
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateLocusColocalizationHyprcoloc',
-      [
-        rfile,
-        workingDirectory.toString(),
-        select_gwas_sample.toString(),
-        select_qtls_samples.toString(),
-        select_dist.toString(),
-        select_ref.toString(),
-        gwasfile.toString(),
-        qtlfile.toString(),
-        ldfile.toString(),
-        request.toString(),
-        qtlKey.toString(),
-        select_chromosome.toString(),
-        parseInt(select_position),
-        bucket.toString(),
-      ]
-    );
+    const wrapper = await calculateHyprcoloc(params);
     logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);
     res.json(JSON.parse(wrapper));
   } catch (err) {
@@ -280,8 +264,7 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(
   }
 }
 
-async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
-  req.setTimeout(900000);
+function calculateECAVIAR(params) {
   const {
     request,
     select_gwas_sample,
@@ -295,35 +278,42 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
     bucket,
   } = params;
 
-  logger.info(`[${request}] Execute /qtls-locus-colocalization-ecaviar`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
-
   const rfile = path.resolve(
     __dirname,
     'query_scripts',
     'QTLs',
     'qtls-locus-colocalization-ecaviar.r'
   );
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateLocusColocalizationECAVIAR',
+    [
+      rfile,
+      workingDirectory.toString(),
+      select_gwas_sample.toString(),
+      select_qtls_samples.toString(),
+      gwasFile.toString(),
+      associationFile.toString(),
+      LDFile.toString(),
+      select_ref.toString(),
+      select_dist.toString(),
+      request.toString(),
+      bucket.toString(),
+    ]
+  );
+}
+
+async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
+  req.setTimeout(900000);
+  const { request } = params;
+
+  logger.info(`[${request}] Execute /qtls-locus-colocalization-ecaviar`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
+
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateLocusColocalizationECAVIAR',
-      [
-        rfile,
-        workingDirectory.toString(),
-        select_gwas_sample.toString(),
-        select_qtls_samples.toString(),
-        gwasFile.toString(),
-        associationFile.toString(),
-        LDFile.toString(),
-        select_ref.toString(),
-        select_dist.toString(),
-        request.toString(),
-        bucket.toString(),
-      ]
-    );
+    const wrapper = await calculateECAVIAR(params);
     logger.info(`[${request}] Finished /qtls-locus-colocalization-ecaviar`);
     res.json(JSON.parse(wrapper));
   } catch (err) {
@@ -334,10 +324,8 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
   }
 }
 
-async function qtlsColocVisualize(params, res, next) {
+function calculateColocVisualize(params) {
   const { request, hydata, ecdata } = params;
-
-  logger.info(`[${request}] Execute /coloc-visualize`);
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
   const requestPath = path.resolve(
@@ -346,12 +334,20 @@ async function qtlsColocVisualize(params, res, next) {
     request + '_Summary.svg'
   );
 
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsColocVisualize',
+    [rfile, hydata, ecdata, requestPath]
+  );
+}
+
+async function qtlsColocVisualize(params, res, next) {
+  const { request } = params;
+
+  logger.info(`[${request}] Execute /coloc-visualize`);
+
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsColocVisualize',
-      [rfile, hydata, ecdata, requestPath]
-    );
+    const wrapper = await calculateColocVisualize(params);
     logger.info(`[${request}] Finished /colc-visualize`);
     res.json(wrapper);
   } catch (err) {
@@ -360,7 +356,7 @@ async function qtlsColocVisualize(params, res, next) {
   }
 }
 
-async function qtlsCalculateQC(params, res, next) {
+async function calculateQC(params) {
   const {
     request,
     select_gwas_sample,
@@ -381,11 +377,6 @@ async function qtlsCalculateQC(params, res, next) {
     bucket,
   } = params;
 
-  logger.info(`[${request}] Execute /ezQTL_ztw`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
-
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
 
   const plotPath = path.resolve(workingDirectory, 'tmp', request, request);
@@ -397,34 +388,47 @@ async function qtlsCalculateQC(params, res, next) {
   );
   const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
 
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateQC',
+    [
+      rfile,
+      select_gwas_sample.toString(),
+      select_qtls_samples.toString(),
+      gwasFile.toString(),
+      associationFile.toString(),
+      LDFile.toString(),
+      qtlKey.toString(),
+      gwasKey.toString(),
+      ldKey.toString(),
+      select_ref.toString(),
+      select_dist.toString(),
+      select_chromosome,
+      select_position,
+      select_pop,
+      ldProject.toString(),
+      request,
+      plotPath,
+      inputPath,
+      logPath,
+      workingDirectory,
+      bucket,
+    ]
+  );
+}
+
+async function qtlsCalculateQC(params, res, next) {
+  const { request, workingDirectory } = params;
+
+  logger.info(`[${request}] Execute /ezQTL_ztw`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
+
+  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
+
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateQC',
-      [
-        rfile,
-        select_gwas_sample.toString(),
-        select_qtls_samples.toString(),
-        gwasFile.toString(),
-        associationFile.toString(),
-        LDFile.toString(),
-        qtlKey.toString(),
-        gwasKey.toString(),
-        ldKey.toString(),
-        select_ref.toString(),
-        select_dist.toString(),
-        select_chromosome,
-        select_position,
-        select_pop,
-        ldProject.toString(),
-        request,
-        plotPath,
-        inputPath,
-        logPath,
-        workingDirectory,
-        bucket,
-      ]
-    );
+    const wrapper = await calculateQC(params);
 
     let summary = '';
     if (fs.existsSync(logPath)) {
@@ -442,7 +446,7 @@ async function qtlsCalculateQC(params, res, next) {
   }
 }
 
-async function qtlsCalculateLD(params, res, next) {
+async function calculateLocusLD(params) {
   const {
     request,
     select_gwas_sample,
@@ -456,11 +460,6 @@ async function qtlsCalculateLD(params, res, next) {
     bucket,
   } = params;
 
-  logger.info(`[${request}] Execute /calculateLD`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
-
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
   const outputPath = path.resolve(
     workingDirectory,
@@ -469,27 +468,36 @@ async function qtlsCalculateLD(params, res, next) {
     'LD_Output.png'
   );
 
-  logger.info(outputPath);
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateLD',
+    [
+      rfile,
+      select_gwas_sample.toString(),
+      select_qtls_samples.toString(),
+      gwasFile.toString(),
+      associationFile.toString(),
+      LDFile.toString(),
+      genome_build.toString(),
+      outputPath.toString(),
+      leadsnp.toString(),
+      request.toString(),
+      workingDirectory,
+      bucket,
+    ]
+  );
+}
+
+async function qtlsCalculateLD(params, res, next) {
+  const { request } = params;
+
+  logger.info(`[${request}] Execute /calculateLD`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
 
   try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateLD',
-      [
-        rfile,
-        select_gwas_sample.toString(),
-        select_qtls_samples.toString(),
-        gwasFile.toString(),
-        associationFile.toString(),
-        LDFile.toString(),
-        genome_build.toString(),
-        outputPath.toString(),
-        leadsnp.toString(),
-        request.toString(),
-        workingDirectory,
-        bucket,
-      ]
-    );
+    const wrapper = await calculateLocusLD(params);
     logger.info(`[${request}] Finished /calculateLD`);
     res.json(wrapper);
   } catch (err) {
@@ -502,10 +510,16 @@ module.exports = {
   calculateMain,
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
+  calculateHyprcolocLD,
   qtlsCalculateLocusColocalizationHyprcolocLD,
+  calculateHyprcoloc,
   qtlsCalculateLocusColocalizationHyprcoloc,
+  calculateECAVIAR,
   qtlsCalculateLocusColocalizationECAVIAR,
+  calculateQC,
   qtlsCalculateQC,
+  calculateLocusLD,
   qtlsCalculateLD,
+  calculateColocVisualize,
   qtlsColocVisualize,
 };
