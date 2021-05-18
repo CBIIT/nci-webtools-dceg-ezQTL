@@ -374,6 +374,9 @@ async function calculateQC(params) {
     select_pop,
     ldProject,
     workingDirectory,
+    qtlPublic,
+    gwasPublic,
+    ldPublic,
     bucket,
   } = params;
 
@@ -411,6 +414,9 @@ async function calculateQC(params) {
       plotPath,
       inputPath,
       logPath,
+      qtlPublic,
+      gwasPublic,
+      ldPublic,
       workingDirectory,
       bucket,
     ]
