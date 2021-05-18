@@ -31,6 +31,7 @@ export function LocusColocalization() {
     select_gwas_sample,
     select_qtls_samples,
     locus_alignment,
+    submitted
   } = useSelector((state) => state.qtlsGWAS);
 
   const radios = [
@@ -447,7 +448,7 @@ export function LocusColocalization() {
                 !isLoadingHyprcoloc && hyprcolocError ? hyprcolocError : null
               }
             />
-            {hyprcolocSNPScore_table.data.length && (
+            {submitted && !isLoadingHyprcoloc && !hyprcolocError && (
               <div className="mb-2">
                 <Zoom
                   plotURL={`api/results/${request}/hyprcoloc_snpscore_table.svg`}
