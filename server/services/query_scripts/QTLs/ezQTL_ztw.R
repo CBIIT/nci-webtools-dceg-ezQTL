@@ -884,6 +884,8 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
 
 hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
+  hydata <- hydata %>% mutate(posterior_prob=as.numeric(posterior_prob),candidate_snp=as.character(candidate_snp))
+  
   ngene <- nrow(hydata)
   
   if(ngene>20){
@@ -937,24 +939,30 @@ hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=
 
 
 hycoloc_boxplot <- function(hydata_score,output_plot=NULL,plot_width=NULL,plot_height=NULL){
-  
-  ngene <- hydata_score %>% select(gene_symbol) %>% unique() %>% nrow()
-  
-  if(ngene<1){
-    errinfo <- "ERROR: No coloclaization trait found between GWAS and QTL"
-    return(errinfo)
-  }else {
-    p <- hydata_score %>% 
-      mutate(label=if_else(snpscore>0.05,rsnum,NA_character_)) %>% 
-      ggplot(aes(snpscore,gene_symbol))+
-      geom_vline(xintercept = 0.05,col='#2CA02CFF',size=0.5)+
-      geom_boxplot(outlier.size = 2,outlier.shape = 21,outlier.fill = "#D62728FF",size=0.3)+
-      geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = 0.1,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
-      scale_x_continuous(breaks = pretty_breaks())+
-      labs(x='SNP Score',y='QTL Trait')+
-      theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'XY',axis_col = 'black',base_family='Roboto Condensed')+
-      theme(legend.position = 'none',panel.grid.major.x = element_line(linetype = 5))+
-      panel_border()
+  if(dim(hydata_score)[1]==0){
+    labeltext="No colocalization traits found by HyPrColoc. No SNP score will be calculated"
+    p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=6)+theme_nothing()
+    ngene <- 2
+  }else{
+    
+    ngene <- hydata_score %>% select(gene_symbol) %>% unique() %>% nrow()
+    
+    if(ngene<1){
+      errinfo <- "ERROR: No coloclaization trait found between GWAS and QTL"
+      return(errinfo)
+    }else {
+      p <- hydata_score %>% 
+        mutate(label=if_else(snpscore>0.05,rsnum,NA_character_)) %>% 
+        ggplot(aes(snpscore,gene_symbol))+
+        geom_vline(xintercept = 0.05,col='#2CA02CFF',size=0.5)+
+        geom_boxplot(outlier.size = 2,outlier.shape = 21,outlier.fill = "#D62728FF",size=0.3)+
+        geom_text_repel(aes(label=label),hjust=1,vjust=0,nudge_y = 0.1,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 20)+
+        scale_x_continuous(breaks = pretty_breaks())+
+        labs(x='SNP Score',y='QTL Trait')+
+        theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'XY',axis_col = 'black',base_family='Roboto Condensed')+
+        theme(legend.position = 'none',panel.grid.major.x = element_line(linetype = 5))+
+        panel_border()
+    }
   }
   
   if(is.null(output_plot)){
