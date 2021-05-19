@@ -19,6 +19,8 @@ export default function Accordions({ components, bodyClass }) {
     )
   );
 
+  const colors = ['#e52207 ', '#04c585', '#8168b3'];
+
   return (
     <div className="accordions">
       {components.map(({ title, collapseDefault, component }, index) => {
@@ -30,6 +32,7 @@ export default function Accordions({ components, bodyClass }) {
             <Card>
               <Toggle
                 className="font-weight-bold d-flex justify-content-between"
+                style={{ borderTop: `3px solid ${colors[index]}` }}
                 as={Header}
                 eventKey={`${index}`}
                 onClick={() =>
