@@ -16,21 +16,12 @@ module.exports = new createLogger({
     format.timestamp({
       format: 'YYYY-MM-DD HH:mm:ss',
     }),
-    // The simple format outputs
-    // `${level}: ${message} ${[Object with everything else]}`
-    //
-    // format.simple(),
-    //
-    // Alternatively you could use this custom printf format if you
-    // want to control where the timestamp comes in your final message.
-    // Try replacing `format.simple()` above with this:
-    //
-    format.printf((info) => {
-      if (info.level === 'error') {
-        return `[${info.timestamp}] [${info.level}] ${info.stack}`;
-      } else {
-        return `[${info.timestamp}] [${info.level}] ${info.message}`;
+    format.printf(({ level, message, timestamp, stack }) => {
+      if (stack) {
+        // print log trace
+        return `[${timestamp}] [${level}] ${message} - ${stack}`;
       }
+      return `[${timestamp}] [${level}] ${message}`;
     })
   ),
   transports: [

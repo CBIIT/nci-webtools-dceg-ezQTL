@@ -255,7 +255,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
       let data = JSON.parse(String(await fs.promises.readFile(stateFilePath)));
       if (request == 'sample') {
         // rename files
-        const oldRequest = state.qtlsGWAS.request;
+        const oldRequest = data.state.request;
         const files = fs.readdirSync(resultsFolder);
         files.forEach((file) =>
           fs.renameSync(
@@ -265,8 +265,8 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
         );
 
         // replace request id
-        data.state.qtlsGWAS.request = request_id;
-        data.state.qtlsGWAS.inputs.request[0] = request_id;
+        data.state.request = request_id;
+        data.state.inputs.request[0] = request_id;
       }
       res.json(data);
     } else {
