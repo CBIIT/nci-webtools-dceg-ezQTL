@@ -6,7 +6,7 @@ import ReactSelect, { createFilter } from 'react-select';
 import {
   updateAlert,
   updateQTLsGWAS,
-  qtlsGWASCalculation,
+  qtlsGWASLocusQCCalculation,
 } from '../../../../services/actions';
 import { PopulationSelect } from '../../../controls/population-select/population-select';
 
@@ -19,24 +19,22 @@ export function QTLsGWASResultsForm() {
     all_gene_variants,
     locus_alignment,
     inputs,
-    select_ref,
     gene_list,
     select_gene,
     select_pop,
     request,
     ldProject,
-    qtlKey,
-    ldKey,
-    gwasKey,
     qtlPublic,
     ldPublic,
     gwasPublic,
     select_chromosome,
-    select_position,
-    email,
     select_qtls_samples,
     select_gwas_sample,
+    genome,
+    locusInformation,
   } = useSelector((state) => state.qtlsGWAS);
+
+  const { select_ref, select_position } = locusInformation[0];
 
   const [_selectRef, _setSelectRef] = useState('');
 
@@ -57,7 +55,10 @@ export function QTLsGWASResultsForm() {
     }
   }, [locus_alignment, gene_list]);
 
-  useEffect(() => _setSelectRef(select_ref), [select_ref]);
+  useEffect(() => {
+    if (select_ref) _setSelectRef(select_ref);
+    else _setSelectRef(locus_alignment['top']['rsnum']);
+  }, [locus_alignment.data]);
 
   const validateForm = () => {
     dispatch(updateQTLsGWAS({ isLoading: true }));
@@ -65,6 +66,7 @@ export function QTLsGWASResultsForm() {
       (item) => item.rsnum === _selectRef
     );
     if (
+      !_selectRef ||
       _selectRef.length === 0 ||
       (_selectRef.length > 0 && matchSNP.length > 0)
     ) {
@@ -91,8 +93,6 @@ export function QTLsGWASResultsForm() {
   async function handleSubmit() {
     const params = {
       request,
-      select_qtls_samples,
-      select_gwas_sample,
       associationFile:
         inputs['association_file'][0] === 'false'
           ? false
@@ -108,22 +108,27 @@ export function QTLsGWASResultsForm() {
       gwasFile:
         inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
       LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
+      select_qtls_samples,
+      select_gwas_sample,
       select_pop: select_pop,
       select_gene: select_gene['gene_id'],
       select_dist: inputs['select_dist'][0],
       select_ref: _selectRef && _selectRef.length > 0 ? _selectRef : false,
-      recalculateAttempt: true,
-      recalculatePop: true,
-      recalculateGene: true,
+      recalculateAttempt: false,
+      recalculatePop: false,
+      recalculateGene: false,
       recalculateDist: false,
-      recalculateRef: true,
+      recalculateRef: false,
       ldProject: ldProject.value,
-      qtlKey: qtlPublic ? qtlKey : false,
-      ldKey: ldPublic ? ldKey : false,
-      gwasKey: gwasPublic ? gwasKey : false,
+      qtlPublic,
+      gwasPublic,
+      ldPublic,
+      qtlKey: false,
+      ldKey: false,
+      gwasKey: false,
       select_chromosome: select_chromosome.value,
       select_position,
-      email,
+      genome_build: genome.value,
     };
 
     // clear all locus colocalization results
@@ -149,7 +154,7 @@ export function QTLsGWASResultsForm() {
       })
     );
 
-    dispatch(qtlsGWASCalculation(params));
+    dispatch(qtlsGWASLocusQCCalculation(params));
   }
 
   return (

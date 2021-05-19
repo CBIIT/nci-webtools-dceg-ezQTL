@@ -6,7 +6,7 @@ import { Button } from 'react-bootstrap';
 import {
   updateQTLsGWAS,
   qtlsGWASBoxplotsCalculation,
-  qtlsGWASCalculation,
+  qtlsGWASLocusQCCalculation,
 } from '../../../../services/actions';
 
 export function LocusAlignmentPlot(params) {
@@ -24,16 +24,15 @@ export function LocusAlignmentPlot(params) {
     select_gwas_sample,
     isQueue,
     ldProject,
-    qtlKey,
-    ldKey,
-    gwasKey,
     qtlPublic,
     ldPublic,
     gwasPublic,
     select_chromosome,
-    select_position,
-    email,
+    genome,
+    locusInformation,
   } = useSelector((state) => state.qtlsGWAS);
+
+  const { select_position } = locusInformation[0];
 
   // use local state to reset tooltip when this component unmounts
   const [tooltip, setTooltip] = useState({
@@ -69,8 +68,6 @@ export function LocusAlignmentPlot(params) {
   async function handleSubmit(recalcRSNum) {
     const params = {
       request,
-      select_qtls_samples,
-      select_gwas_sample,
       associationFile:
         inputs['association_file'][0] === 'false'
           ? false
@@ -86,22 +83,27 @@ export function LocusAlignmentPlot(params) {
       gwasFile:
         inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
       LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
+      select_qtls_samples,
+      select_gwas_sample,
       select_pop: inputs['select_pop'][0],
       select_gene: inputs['select_gene'][0],
       select_dist: inputs['select_dist'][0],
       select_ref: recalcRSNum,
-      recalculateAttempt: true,
+      recalculateAttempt: false,
       recalculatePop: false,
       recalculateGene: false,
       recalculateDist: false,
-      recalculateRef: true,
+      recalculateRef: false,
       ldProject: ldProject.value,
-      qtlKey: qtlPublic ? qtlKey : false,
-      ldKey: ldPublic ? ldKey : false,
-      gwasKey: gwasPublic ? gwasKey : false,
+      qtlPublic,
+      gwasPublic,
+      ldPublic,
+      qtlKey: false,
+      ldKey: false,
+      gwasKey: false,
       select_chromosome: select_chromosome.value,
       select_position,
-      email: email,
+      genome_build: genome.value,
     };
 
     // clear all locus colocalization results
@@ -127,7 +129,7 @@ export function LocusAlignmentPlot(params) {
       })
     );
 
-    dispatch(qtlsGWASCalculation(params));
+    dispatch(qtlsGWASLocusQCCalculation(params));
   }
 
   return (
