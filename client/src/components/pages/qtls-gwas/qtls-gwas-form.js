@@ -313,7 +313,6 @@ export function QTLsGWASForm() {
   useEffect(() => {
     if (locusInformation.length > 1)
       dispatch(updateQTLsGWAS({ isQueue: true }));
-    else dispatch(updateQTLsGWAS({ isQueue: false }));
   }, [locusInformation]);
 
   function getGenomeOptions() {
