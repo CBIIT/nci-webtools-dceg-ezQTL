@@ -24,7 +24,8 @@ export function QTLsGWASResults({ queueRequest }) {
     LDFile,
     ldKey,
     select_qtls_samples,
-    locus_quantification,
+    quantificationFile,
+    genotypeFile
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -72,9 +73,9 @@ export function QTLsGWASResults({ queueRequest }) {
         !submitted ||
         isError ||
         !(
-          locus_quantification &&
-          locus_quantification.data &&
-          Object.keys(locus_quantification.data).length > 0
+          (quantificationFile &&
+          genotypeFile) ||
+          select_qtls_samples
         ),
     },
     {
