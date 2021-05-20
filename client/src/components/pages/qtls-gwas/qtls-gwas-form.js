@@ -942,15 +942,12 @@ export function QTLsGWASForm() {
           </Row>
           <Row>
             <Col>
-              <Form.Check
-                disabled={submitted || select_qtls_samples}
-                inline
-                id="quantificationDataToggle"
-                label="Use Quantification Data"
-                type="checkbox"
-                checked={useQuantification}
-                onChange={(_) => toggleQuantification(!useQuantification)}
-              />
+              <Button
+                variant="link"
+                onClick={() => toggleQuantification(!useQuantification)}
+              >
+                {useQuantification ? '- Remove ' : '+ Add '} Quantification Data
+              </Button>
             </Col>
           </Row>
           {useQuantification && (

@@ -67,25 +67,24 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(select_gwas_sample, 'true')) {
     gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
   } else {
-
-    if(identical(gwasKey, 'false')){
-
-      if(identical(gwasFile, 'false'))
+    if (identical(gwasKey, 'false')) {
+      if (identical(gwasFile, 'false'))
         gwasFile <- NULL
-      else 
+      else
         gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
     }
-    else{
-      loadAWS()
-      gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
-      gwasFile = paste0(request, ".gwas_temp.txt")
-      cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', gwasFile)
-      system(cmd)
+    else {
+      gwasFile = paste0(workDir, '/tmp/', request, '/', request, '.gwas_temp.txt')
+      if (!file.exists(gwasFile)) {
+        loadAWS()
+        gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
+        cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", gwasFile)
+        system(cmd)
 
-      gdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'gwas_temp.txt'), delim = "\t", col_names = T)
-      names(gdata)[names(gdata) == "#trait"] <- "trait"
-      gdata %>% write_delim(paste0('tmp/', request, '/', request, '.', 'gwas_temp.txt'), delim = '\t', col_names = T)
-      gwasFile <- paste0(workDir,'/tmp/', request, '/', request, '.', 'gwas_temp', '.txt')
+        gdata <- read_delim(paste0('tmp/', request, '/', request, '.gwas_temp.txt'), delim = "\t", col_names = T)
+        names(gdata)[names(gdata) == "#trait"] <- "trait"
+        gdata %>% write_delim(paste0('tmp/', request, '/', request, '.gwas_temp.txt'), delim = '\t', col_names = T)
+      }
     }
   }
   if (identical(select_qtls_samples, 'true')) {
@@ -97,45 +96,48 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     save_object(publicLDFile, bucket, file = ldFile)
   } else {
 
-    if(identical(qtlKey, 'false')){
+    if (identical(qtlKey, 'false')) {
 
-      if(identical(associationFile, 'false'))
+      if (identical(associationFile, 'false'))
         associationFile = NULL
       else
         associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
     }
-    else{
-      loadAWS()
-      qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
-      assocFile = paste0(request, ".qtl_temp.txt")
-      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", workDir, "/tmp/", request, '/', assocFile)
-      system(cmd)
-      # rename #gene_id to gene_id
-      qdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-      names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
-      qdata %>% write_delim(paste0('tmp/', request, '/', request, '.', 'qtl_temp.txt'), delim = '\t', col_names = T)
+    else {
+      associationFile = paste0(workDir, '/tmp/', request, '/', request, '.qtl_temp.txt')
+      if (!file.exists(associationFile)) {
+        loadAWS()
+        qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
+        cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", associationFile)
+        system(cmd)
 
-      associationFile <- paste0(workDir, '/tmp/', request, '/', request, '.', 'qtl_temp', '.txt')
+        # rename #gene_id to gene_id
+        qdata <- read_delim(paste0('tmp/', request, '/', request, '.qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
+        names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
+        qdata %>% write_delim(paste0('tmp/', request, '/', request, '.qtl_temp.txt'), delim = '\t', col_names = T)
+      }
     }
 
-    if(identical(ldKey, 'false')){
-      if(identical(ldFile, 'false'))
+    if (identical(ldKey, 'false')) {
+      if (identical(ldFile, 'false'))
         ldFile = NULL
       else
         ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
     }
-    else{
-      kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
-      kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
+    else {
+      ldFile = paste0(workDir, '/tmp/', request, '/', request, '.LD.gz')
+      if (!file.exists(ldFile)) {
+        kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
+        kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
         select(sample:gender)
 
-      createExtractedPanel(select_pop, kgpanel, request)
-      getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
-      ldFile <- paste0(workDir, '/tmp/', request, '/', request, '.LD.gz')
+        createExtractedPanel(select_pop, kgpanel, request)
+        getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
+      }
     }
   }
 
-  if(identical(leadsnp,'false'))
+  if (identical(leadsnp, 'false'))
     leadsnp <- NULL
 
   print(ldFile)
