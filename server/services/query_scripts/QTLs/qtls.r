@@ -366,29 +366,13 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   locus_quantification_heatmap_data <- list(c())
   # check to see if boxplot data files are present
   if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
-    tmp <- tmp %>%
-      slice(1:30)
-
-    edata_boxplot <- edata %>%
-      gather(Sample, exp, - (chr:gene_id)) %>%
-      right_join(tmp %>% select(gene_id, gene_symbol) %>% unique())
-
-    edata_boxplot <- edata_boxplot %>%
-      left_join(edata_boxplot %>% group_by(gene_id) %>% summarise(mean = mean(exp))) %>%
-      left_join(tmp %>% select(gene_id, pval_nominal)) %>%
-      mutate(gene_symbol = fct_reorder(gene_symbol, (pval_nominal)))
-
-    edata_boxplot_colnames <- colnames(edata_boxplot)
-    locus_quantification_data <- list(setNames(as.data.frame(edata_boxplot), edata_boxplot_colnames))
-
-    locus_quantification_heatmap_data <- locus_quantification_heatmap(edata_boxplot)
 
     corPath <- paste0(workDir,'/','tmp/', request , '/quantification_cor.svg')
     locus_quantification_cor(edata,tmp,corPath)
     disPath <- paste0(workDir,'/','tmp/', request , '/quantification_dis.svg')
     locus_quantification_dis(edata,tmp,output_plot = disPath)
   }
-  return(list(locus_quantification_data, locus_quantification_heatmap_data))
+  #return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
 locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info, request, bucket) {
@@ -628,9 +612,9 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata_tmp, exprFile, genoFile, edata, gdata, request)
-  locus_quantification_data <- locus_quantification[[1]]
-  locus_quantification_heatmap_data <- locus_quantification[[2]]
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata, exprFile, genoFile, edata, gdata, request)
+  #locus_quantification_data <- locus_quantification[[1]]
+  #locus_quantification_heatmap_data <- locus_quantification[[2]]
 
   ## Reassign LD file if public LD data is used
   if (identical(LDFile, 'false') && !identical(ldKey, 'false')) {
@@ -638,7 +622,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   }
 
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_quantification = list(data = locus_quantification_data), locus_quantification_heatmap = list(data = locus_quantification_heatmap_data), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
