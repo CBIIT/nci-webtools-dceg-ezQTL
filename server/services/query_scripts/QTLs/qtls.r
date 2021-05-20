@@ -14,11 +14,12 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
 
     cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
-    system(cmd)
+    system(cmd, intern = TRUE)
     cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
-    system(cmd)
-    cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', "--stdout --extra --phased |sed 's/:/\t/' |bgzip > tmp/", request, '/', request, '.LD.gz')
-    system(cmd)
+    system(cmd, intern = TRUE)
+    cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > tmp/', request, '/', request, '.LD.gz')
+    system(cmd, intern = TRUE)
+
     out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
@@ -40,21 +41,22 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
   saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
 }
 
-createExtractedPanel <- function(select_pop, kgpanel, request){
-
-   select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
-
-   for (pop_i in select_pop_list) {
+createExtractedPanel <- function(select_pop, kgpanel, request) {
+  panelPath = paste0('tmp/', request, '/', request, '.', 'extracted', '.panel')
+  # Remove pre-existing panel
+  unlink(panelPath)
+  select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
+  for (pop_i in select_pop_list) {
     if (pop_i %in% kgpanel$super_pop) {
       kgpanel %>%
         filter(super_pop == pop_i) %>%
         select(sample) %>%
-        write_delim(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'), delim = '\t', col_names = F, append = TRUE)
+        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE)
     } else if (pop_i %in% kgpanel$pop) {
       kgpanel %>%
         filter(pop == pop_i) %>%
         select(sample) %>%
-        write_delim(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'), delim = '\t', col_names = F, append = TRUE)
+        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE)
     }
   }
 
@@ -383,10 +385,10 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
 
     locus_quantification_heatmap_data <- locus_quantification_heatmap(edata_boxplot)
 
-    corPath <- paste0(workDir,'/','tmp/', request , '/quantification_cor.svg')
-    locus_quantification_cor(edata,tmp,corPath)
-    disPath <- paste0(workDir,'/','tmp/', request , '/quantification_dis.svg')
-    locus_quantification_dis(edata,tmp,output_plot = disPath)
+    corPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_cor.svg')
+    locus_quantification_cor(edata, tmp, corPath)
+    disPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_dis.svg')
+    locus_quantification_dis(edata, tmp, output_plot = disPath)
   }
   return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
@@ -491,7 +493,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     if (!identical(assocFile, 'false') || !identical(qtlKey, 'false')) {
       qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
       qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-    } 
+    }
     if (!identical(LDFile, 'false')) {
       LDFile <- paste0('tmp/', request, '/', LDFile)
     }
@@ -553,7 +555,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## if GWAS File is loaded
   gwasdata <- 'false'
-  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true') || !identical(gwasKey,'false')) {
+  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true') || !identical(gwasKey, 'false')) {
     if (identical(select_gwas_sample, 'false')) {
       gwasdatafile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
     } else {
