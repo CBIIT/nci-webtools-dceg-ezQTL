@@ -140,6 +140,22 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(leadsnp, 'false'))
     leadsnp <- NULL
 
+  if (identical(qtlPublic,'false'))
+    qtlPublic <- FALSE
+  else
+    qtlPublic <- TRUE
+
+  if (identical(ldPublic,'false'))
+    ldPublic <- FALSE
+  else
+    ldPublic <- TRUE
+
+  if (identical(gwasPublic,'false'))
+    gwasPublic <- FALSE
+  else
+    gwasPublic <- TRUE
+  
+
   print(ldFile)
   coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
 }
