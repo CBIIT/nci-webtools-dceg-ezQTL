@@ -11,6 +11,7 @@ import { LocusQuantifiation } from './locus-quantification';
 import { LocusTable } from './locus-table';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { LocusDownload } from './locus-download';
+import { QTLsGWASResultsForm } from './qtls-gwas-results-form';
 
 export function QTLsGWASResults({ queueRequest }) {
   const dispatch = useDispatch();
@@ -25,7 +26,10 @@ export function QTLsGWASResults({ queueRequest }) {
     ldKey,
     select_qtls_samples,
     quantificationFile,
-    genotypeFile
+    genotypeFile,
+    locus_alignment,
+    locus_table,
+    isQueue,
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -39,10 +43,8 @@ export function QTLsGWASResults({ queueRequest }) {
       component: <LocusLD />,
       key: 'locus-ld',
       title: 'Locus LD',
-      disabled: 
-        !submitted || 
-        isError ||
-        (!select_qtls_samples && !LDFile && !ldKey),
+      disabled:
+        !submitted || isError || (!select_qtls_samples && !LDFile && !ldKey),
     },
     {
       component: <LocusAlignment />,
@@ -114,6 +116,18 @@ export function QTLsGWASResults({ queueRequest }) {
             }`}
           >
             <div className="rounded-bottom border-left border-bottom border-right ">
+              {(item.key == 'locus-alignment' || item.key == 'locus-table') &&
+                (locus_alignment.data || locus_table.data) &&
+                !isQueue &&
+                submitted &&
+                !isError && (
+                  <>
+                    <div className="px-3 py-2">
+                      <QTLsGWASResultsForm />
+                    </div>
+                    <hr />
+                  </>
+                )}
               {item.component}
             </div>
           </Tab>

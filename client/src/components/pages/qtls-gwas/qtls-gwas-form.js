@@ -77,7 +77,7 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
 
   return (
     <>
-      <div className="border rounded p-2">
+      <div className="border rounded p-2 mb-1">
         <Form.Row>
           {locusIndex != 0 && (
             <Col className="d-flex justify-content-end">
@@ -309,6 +309,13 @@ export function QTLsGWASForm() {
     select_pop,
     select_qtls_samples,
   ]);
+
+  // automatically enable/disable queue if more locus info panels are added
+  useEffect(() => {
+    if (locusInformation.length > 1)
+      dispatch(updateQTLsGWAS({ isQueue: true }));
+    else dispatch(updateQTLsGWAS({ isQueue: false }));
+  }, [locusInformation]);
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
@@ -1261,7 +1268,7 @@ export function QTLsGWASForm() {
                   className="mr-0"
                   title="Choose Queued Submission Checkbox"
                   type="checkbox"
-                  disabled={submitted}
+                  disabled={submitted || locusInformation.length > 1}
                   checked={isQueue}
                   onChange={(_) => {
                     dispatch(updateQTLsGWAS({ isQueue: !isQueue }));
