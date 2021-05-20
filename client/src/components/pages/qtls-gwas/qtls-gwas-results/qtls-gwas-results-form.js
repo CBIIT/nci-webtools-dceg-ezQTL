@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Button } from 'react-bootstrap';
-import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import ReactSelect, { createFilter } from 'react-select';
 import {
   updateAlert,
@@ -24,6 +23,7 @@ export function QTLsGWASResultsForm() {
     select_pop,
     request,
     ldProject,
+    phenotype,
     qtlPublic,
     ldPublic,
     gwasPublic,
@@ -123,6 +123,7 @@ export function QTLsGWASResultsForm() {
       recalculateDist: false,
       recalculateRef: false,
       ldProject: ldProject.value,
+      gwasPhenotype: phenotype.value,
       qtlPublic,
       gwasPublic,
       ldPublic,
