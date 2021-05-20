@@ -299,7 +299,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     leadsnp=gwas_ref$rsnum
     
-    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWASP P=', gwas_ref$pvalue)
+    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWAS P=', gwas_ref$pvalue)
     qtl_ref <- paste0(qtl_ref$rsnum, ' (',qtl_ref$chr,':',qtl_ref$pos,':',qtl_ref$ref,':',qtl_ref$alt,') QTL P=', qtl_ref$pval_nominal,' for ',qtl_ref$gene_id,":",qtl_ref$gene_symbol)
     
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
@@ -498,7 +498,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     leadsnp=gwas_ref$rsnum
     
-    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWASP P=', gwas_ref$pvalue)
+    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWAS P=', gwas_ref$pvalue)
     qtl_ref <- paste0(qtl_ref$rsnum, ' (',qtl_ref$chr,':',qtl_ref$pos,':',qtl_ref$ref,':',qtl_ref$alt,') QTL P=', qtl_ref$pval_nominal,' for ',qtl_ref$gene_id,":",qtl_ref$gene_symbol)
     
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
@@ -793,7 +793,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     # suggestive snp as the key
     gwas_ref <- gwas %>% filter(rsnum %in% orsnum) %>% arrange(pvalue) %>% slice(1)
     leadsnp=gwas_ref$rsnum
-    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWASP P=', gwas_ref$pvalue)
+    gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWAS P=', gwas_ref$pvalue)
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
     cat(paste0('Best GWAS overlapped snp: ',gwas_ref),file=logfile,sep="\n",append = T)
     
@@ -882,13 +882,16 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
 }
 
 
+
+
+
 hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
   hydata <- hydata %>% mutate(posterior_prob=as.numeric(posterior_prob),candidate_snp=as.character(candidate_snp))
   
   ngene <- nrow(hydata)
   
-  if(ngene>20){
+  if(ngene>50){
     p <- hydata %>% 
       mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) %>% 
       mutate(label=if_else(is.na(candidate_snp)|posterior_prob<0.5,NA_character_,paste0(gene_symbol,"/",candidate_snp))) %>% 
@@ -1027,7 +1030,10 @@ ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plo
     theme(legend.position = 'none',panel.grid.major.x = element_line(linetype = 5))+
     panel_border()
   
-  
+  if(length(genelevel)>50){
+    p1 <- p1 + theme(axis.text.x = element_blank())
+    p2 <- p2 + theme(axis.text.y = element_blank())
+  }
   
   if(is.null(output_plot_prefix)){
     return(list(p1,p2))
@@ -1127,7 +1133,13 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
 
 locus_quantification_cor <- function(qdata,qtldata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
+  if(any(is.na(unique(qtldata$gene_symbol)))){
+    qtldata <- qtldata %>% mutate(gene_symbol=paste0(gene_id,'\n',gene_symbol))
+  }
+  
+  
   id2symbol <- qtldata %>% select(gene_id,gene_symbol) %>% unique()
+  qdata <- qdata %>% filter(gene_id %in% id2symbol$gene_id)
   
   mqdata <- qdata %>% select(-chr,-start,-end,-gene_id) %>% as.matrix()
   rownames(mqdata) <- qdata %>% select(gene_id) %>% left_join(id2symbol) %>% pull(gene_symbol)
@@ -1195,7 +1207,13 @@ locus_quantification_cor <- function(qdata,qtldata,output_plot=NULL,plot_width=N
 
 locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
+  if(any(is.na(unique(qtldata$gene_symbol)))){
+    qtldata <- qtldata %>% mutate(gene_symbol=paste0(gene_id,'\n',gene_symbol))
+  }
+  
+  
   id2symbol <- qtldata %>% select(gene_id,gene_symbol) %>% unique()
+  
   if(is.null(genesets)){
     genesets <- qtldata %>% group_by(gene_symbol) %>% arrange(pval_nominal) %>% slice(1) %>% ungroup() %>% arrange(pval_nominal) %>% slice(1:15) %>% pull(gene_symbol)
   }
@@ -1729,7 +1747,6 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   }
   
 }
-
 
 
 
