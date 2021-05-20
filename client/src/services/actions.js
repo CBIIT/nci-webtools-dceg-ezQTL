@@ -1899,12 +1899,6 @@ export function qtlsGWASCalculation(params) {
             },
             inputs: response.data['info']['inputs'],
             messages: response.data['info']['messages'],
-            locus_quantification: {
-              data: response.data['locus_quantification']['data'][0],
-            },
-            locus_quantification_heatmap: {
-              data: response.data['locus_quantification_heatmap']['data'][0],
-            },
             locus_alignment: {
               data: pdata,
               layout: locus_alignment_plot_layout,
