@@ -139,6 +139,11 @@ async function calculate(params) {
 
   let state = {
     ...newParams,
+    ldProject: { value: params.ldProject, label: params.ldProject },
+    select_chromosome: {
+      value: params.select_chromosome,
+      label: params.select_chromosome,
+    },
     locus_qc: summary,
     locusInformation: [
       {
