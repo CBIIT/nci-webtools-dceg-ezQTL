@@ -1748,5 +1748,68 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   
 }
 
+locus_quantification_qtl <- function(gdata,qdata,gdata_queryid=NULL,qdata_queryid=NULL,output_plot=NULL,log2=TRUE){
+  #  queryid <- '21:42642038:A:G'
+  #queryid2 <- "ENSG00000226496.1"
+  
+  require(ggstatsplot)
+
+  # box plot
+  gdata_samples <- colnames(gdata)[-c(1:4)]
+  qdata_samples <- colnames(qdata)[-c(1:4)]
+  
+  osamples <- intersect(gdata_samples,qdata_samples)
+  gdata <- gdata %>% select(1:4,all_of(osamples))
+  qdata <- qdata %>% select(1:4,all_of(osamples))
+  
+  if(!is.null(gdata_queryid)){
+    gdata_tmp <- gdata %>% 
+      mutate(id=paste(chr,pos,ref,alt,sep=':')) %>%
+      filter(id == gdata_queryid) %>% 
+      pivot_longer(cols = -c(chr,pos,ref,alt,),names_to = 'Sample',values_to = 'Genotype') %>% 
+      select(-c(chr:alt))
+  }else{
+    gdata_tmp <- gdata %>% 
+      mutate(id=paste(chr,pos,ref,alt,sep=':')) %>%
+      dplyr::slice(1) %>% 
+      pivot_longer(cols = -c(chr,pos,ref,alt,),names_to = 'Sample',values_to = 'Genotype') %>% 
+      select(-c(chr:alt))
+  }
+  
+  
+  
+  if(!is.null(qdata_queryid)){
+    qdata_tmp <- qdata %>%
+      filter(gene_id == qdata_queryid) %>% 
+      pivot_longer(cols = -c(chr,start,end,gene_id),names_to = 'Sample',values_to = 'Quantification') %>% 
+      select(-c(chr:end))
+  }else{
+    qdata_tmp <- qdata %>%
+      dplyr::slice(1) %>% 
+      pivot_longer(cols = -c(chr,start,end,gene_id),names_to = 'Sample',values_to = 'Quantification') %>% 
+      select(-c(chr:end))
+  }
+  
+  if(log2){
+    qdata_tmp <- qdata_tmp %>% mutate(Quantification=log2(Quantification+0.1))
+  }
+  
+  tmpdata <- gdata_tmp %>% left_join(qdata_tmp)
+  
+  p <- ggbetweenstats(
+    data = tmpdata,
+    x = Genotype,
+    y = Quantification,
+    #ggtheme = hrbrthemes::theme_ipsum_pub(),
+  )
+  
+  if(is.null(output_plot)){
+    return(p)
+  }else{
+    ggsave(filename = output_plot,plot = p,width = 6,height = 8)
+  }
+  
+}
+
 
 

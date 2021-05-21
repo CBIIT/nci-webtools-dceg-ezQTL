@@ -20,6 +20,11 @@ export function LocusQuantifiation() {
         className="border rounded p-3 mb-2"
         maxHeight="800px"
       />
+      <Zoom
+        plotURL={`api/results/${request}/quantification_qtl.svg`}
+        className="border rounded p-3 mb-2"
+        maxHeight="800px"
+      />
     </div>
   );
 }
