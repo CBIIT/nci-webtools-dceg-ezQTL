@@ -137,18 +137,16 @@ export default function Zoom({
                   </Col>
                 </Row>
 
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <TransformComponent>
-                    <img
-                      className="w-100"
-                      src={plotURL}
-                      style={{ maxHeight: maxHeight || '500px', 
-                        maxWidth: maxWidth ? maxWidth : '100%',
-                        marginLeft: marginLeft ? marginLeft : '0px' }}
-                      alt={alt || 'Plot is unavailable.'}
-                    />
-                  </TransformComponent>
-                </div>
+
+                <TransformComponent>
+                  <img
+                    className="w-100"
+                    src={plotURL}
+                    style={{ maxHeight: maxHeight || '500px' }}
+                    alt={alt || 'Plot is unavailable.'}
+                  />
+                </TransformComponent>
+
               </React.Fragment>
             )}
           </TransformWrapper>

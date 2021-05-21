@@ -33,8 +33,6 @@ export function LocusLD() {
           plotURL={`api/results/${request}/LD_Output.png`}
           className="border rounded p-3"
           maxHeight="100%"
-          //maxWidth= "1000px"
-          //marginLeft= "200px"
         />
       )}
     </div>
