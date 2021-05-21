@@ -13,6 +13,8 @@ export default function Zoom({
   txtPath,
   alt,
   maxHeight,
+  maxWidth,
+  marginLeft,
   className,
   ...rest
 }) {
@@ -135,14 +137,18 @@ export default function Zoom({
                   </Col>
                 </Row>
 
-                <TransformComponent>
-                  <img
-                    className="w-100"
-                    src={plotURL}
-                    style={{ maxHeight: maxHeight || '500px' }}
-                    alt={alt || 'Plot is unavailable.'}
-                  />
-                </TransformComponent>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <TransformComponent>
+                    <img
+                      className="w-100"
+                      src={plotURL}
+                      style={{ maxHeight: maxHeight || '500px', 
+                        maxWidth: maxWidth ? maxWidth : '100%',
+                        marginLeft: marginLeft ? marginLeft : '0px' }}
+                      alt={alt || 'Plot is unavailable.'}
+                    />
+                  </TransformComponent>
+                </div>
               </React.Fragment>
             )}
           </TransformWrapper>

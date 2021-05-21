@@ -37,7 +37,9 @@ export function LocusLD() {
         <Zoom
           plotURL={`api/results/${request}/LD_Output.png`}
           className="border rounded p-3"
-          maxHeight="800px"
+          maxHeight="1000px"
+          maxWidth= "1000px"
+          marginLeft= "200px"
         />
       )}
     </div>
