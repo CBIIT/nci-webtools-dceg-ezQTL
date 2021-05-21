@@ -373,6 +373,8 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
     locus_quantification_cor(edata, tmp, corPath)
     disPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_dis.svg')
     locus_quantification_dis(edata, tmp, output_plot = disPath)
+    qtlPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_qtl.svg')
+    locus_quantification_qtl(gdata, edata, output_plot = qtlPath)
   }
   #return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }

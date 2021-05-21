@@ -416,9 +416,9 @@ async function calculateQC(params) {
       plotPath,
       inputPath,
       logPath,
-      qtlPublic,
-      gwasPublic,
-      ldPublic,
+      qtlPublic.toString(),
+      gwasPublic.toString(),
+      ldPublic.toString(),
       workingDirectory,
       bucket,
     ]

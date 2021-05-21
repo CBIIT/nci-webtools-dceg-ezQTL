@@ -13,6 +13,8 @@ export default function Zoom({
   txtPath,
   alt,
   maxHeight,
+  maxWidth,
+  marginLeft,
   className,
   ...rest
 }) {
@@ -135,6 +137,7 @@ export default function Zoom({
                   </Col>
                 </Row>
 
+
                 <TransformComponent>
                   <img
                     className="w-100"
@@ -143,6 +146,7 @@ export default function Zoom({
                     alt={alt || 'Plot is unavailable.'}
                   />
                 </TransformComponent>
+
               </React.Fragment>
             )}
           </TransformWrapper>
