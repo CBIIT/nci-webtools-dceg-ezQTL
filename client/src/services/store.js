@@ -103,7 +103,6 @@ export const getInitialState = async () => {
       ldError: '',
       locus_qc: null,
       publicGTEx: [],
-      loadingPublic: false,
       genome: '',
       genomeOptions: [],
       qtlProject: '',
