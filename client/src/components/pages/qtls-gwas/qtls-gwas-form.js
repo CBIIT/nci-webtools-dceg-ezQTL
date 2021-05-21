@@ -11,7 +11,6 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
-  qtlsGWASCalculation,
   qtlsGWASLocusQCCalculation,
   uploadFile,
   updateQTLsGWAS,
@@ -314,7 +313,6 @@ export function QTLsGWASForm() {
   useEffect(() => {
     if (locusInformation.length > 1)
       dispatch(updateQTLsGWAS({ isQueue: true }));
-    else dispatch(updateQTLsGWAS({ isQueue: false }));
   }, [locusInformation]);
 
   function getGenomeOptions() {
@@ -684,6 +682,7 @@ export function QTLsGWASForm() {
         recalculateDist,
         recalculateRef,
         ldProject: ldProject.value,
+        gwasPhenotype: phenotype.value,
         qtlPublic,
         gwasPublic,
         ldPublic,

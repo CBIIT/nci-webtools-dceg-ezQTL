@@ -136,3 +136,8 @@ input::-webkit-inner-spin-button {
   margin-left: 1px;
   margin-right: 1px;
 }
+
+.nav-item.nav-link.active {
+  text-decoration: underline 2px #f5ab35;
+  text-underline-offset: 5px;
+}

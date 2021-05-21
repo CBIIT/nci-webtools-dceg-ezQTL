@@ -1387,6 +1387,7 @@ export function uploadFile(params) {
         'Content-Type': 'multipart/form-data',
       },
     };
+    dispatch(updateQTLsGWAS({ isLoading: true }));
 
     try {
       const res = await axios.post('api/file-upload', form, config);
@@ -1428,12 +1429,17 @@ export function uploadFile(params) {
           })
         );
       }
+      dispatch(updateQTLsGWAS({ isLoading: false }));
     } catch (error) {
       console.log(error);
       if (error) {
         dispatch(updateError({ visible: true }));
         dispatch(
-          updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
+          updateQTLsGWAS({
+            isError: true,
+            isLoading: false,
+            activeResultsTab: 'locus-qc',
+          })
         );
       }
     }

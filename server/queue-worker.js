@@ -176,12 +176,6 @@ async function calculate(params) {
     },
     inputs: main['info']['inputs'],
     messages: main['info']['messages'],
-    locus_quantification: {
-      data: main['locus_quantification']['data'][0],
-    },
-    locus_quantification_heatmap: {
-      data: main['locus_quantification_heatmap']['data'][0],
-    },
     locus_alignment: {
       top: main['locus_alignment']['top'][0][0],
     },

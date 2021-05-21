@@ -4,15 +4,9 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import Zoom from '../../../controls/zoom/zoom';
 
 export function LocusLD() {
-
-  const {
-    submitted,
-    ldError,
-    request,
-    isLoading,
-    isLoadingLD
-  } = useSelector((state) => state.qtlsGWAS);
-
+  const { submitted, ldError, request, isLoading, isLoadingLD } = useSelector(
+    (state) => state.qtlsGWAS
+  );
 
   return (
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
@@ -20,16 +14,17 @@ export function LocusLD() {
         <LoadingOverlay
           active={true}
           content={
-            <>Select data in the left panel and click <b>Calculate</b> to see results here.</>
+            <>
+              Select data in the left panel and click <b>Calculate</b> to see
+              results here.
+            </>
           }
         />
       )}
       {submitted && ldError && (
         <LoadingOverlay
           active={true}
-          content={
-            <b className="text-danger">{ldError}</b>
-          }
+          content={<b className="text-danger">{ldError}</b>}
         />
       )}
       <LoadingOverlay active={isLoadingLD} />
@@ -37,9 +32,9 @@ export function LocusLD() {
         <Zoom
           plotURL={`api/results/${request}/LD_Output.png`}
           className="border rounded p-3"
-          maxHeight="1000px"
-          maxWidth= "1000px"
-          marginLeft= "200px"
+          maxHeight="100%"
+          //maxWidth= "1000px"
+          //marginLeft= "200px"
         />
       )}
     </div>
