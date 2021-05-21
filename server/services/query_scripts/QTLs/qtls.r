@@ -27,9 +27,9 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -r ', wd, '/data/Alkes_group.txt -o ', wd, '/', LDFile)
     system(cmd)
 
-    out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
+    out <- read_delim(LDFile, delim = '\t', col_names = F, col_types = cols('X2' = 'c')) %>% rename(id = X1, chr = X2, pos = X3, ref = X4, alt = X5) %>% relocate(chr, pos, id)
+    out %>% write_delim(LDFile, delim = '\t', col_names = F)
     info <- out[, 1:5]
-    colnames(info) <- c("id", "chr", "pos", "ref", "alt")
   }
   if (length(unique(info$chr)) > 1) {
     errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
