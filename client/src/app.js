@@ -42,21 +42,42 @@ export function App() {
 
   return (
     <Router>
-      <header className="bg-primary-gradient py-3">
-        <a
-          href={window.location.href + '#main'}
-          className="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center"
-        >
-          Skip to Main Content
-        </a>
-        <div className="container px-0">
-          <a href="https://dceg.cancer.gov/" target="_blank" rel="noreferrer">
-            <img
-              src="assets/images/dceg-logo-inverted.svg"
-              alt="NCI Logo"
-              className="w-50"
-            />
+      <header className="bg-white">
+        <div>
+          <a
+            href={window.location.href + '#main'}
+            class="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center"
+          >
+            Skip to Main Content
           </a>
+          <div class="ml-4 mr-5">
+            <div class="p-2 d-none d-sm-block">
+              <div className="d-flex">
+                <a href="https://dceg.cancer.gov/" target="_blank">
+                  <img
+                    src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                    height="100"
+                    alt="National Cancer Institute Logo"
+                  />
+                </a>
+                <img
+                  class="d-none d-md-block ml-auto my-auto"
+                  src="assets/images/ezqtl-logo.png"
+                  alt="ezQTL Logo"
+                  height="80"
+                />
+              </div>
+            </div>
+            <div class="p-1 d-sm-none">
+              <a href="https://dceg.cancer.gov/">
+                <img
+                  src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
+                  height="80"
+                  alt="National Cancer Institute Logo"
+                />
+              </a>
+            </div>
+          </div>
         </div>
       </header>
       <Navbar bg="dark" expand="sm" className="navbar-dark py-0">
@@ -102,7 +123,7 @@ export function App() {
         </div>
       </main>
       <NCIFooter
-        className="py-4 bg-primary-gradient text-light"
+        className="py-4 bg-dark text-light"
         title={
           <div className="mb-4">
             <div className="h4 mb-0">
