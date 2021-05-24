@@ -46,12 +46,12 @@ export function App() {
         <div>
           <a
             href={window.location.href + '#main'}
-            class="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center"
+            className="sr-only sr-only-focusable d-block text-white bg-primary-dark text-center"
           >
             Skip to Main Content
           </a>
-          <div class="ml-4 mr-5">
-            <div class="p-2 d-none d-sm-block">
+          <div className="ml-4 mr-5">
+            <div className="p-2 d-none d-sm-block">
               <div className="d-flex">
                 <a href="https://dceg.cancer.gov/" target="_blank">
                   <img
@@ -61,14 +61,14 @@ export function App() {
                   />
                 </a>
                 <img
-                  class="d-none d-md-block ml-auto my-auto"
+                  className="d-none d-md-block ml-auto my-auto"
                   src="assets/images/ezqtl-logo.png"
                   alt="ezQTL Logo"
                   height="80"
                 />
               </div>
             </div>
-            <div class="p-1 d-sm-none">
+            <div className="p-1 d-sm-none">
               <a href="https://dceg.cancer.gov/">
                 <img
                   src="https://analysistools.cancer.gov/common/images/DCEG-logo.svg"
