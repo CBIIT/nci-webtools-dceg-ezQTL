@@ -15,7 +15,7 @@ const {
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
-const fs = require('fs');
+const fs = require('fs-extra');
 const XLSX = require('xlsx');
 const AWS = require('aws-sdk');
 const tar = require('tar');
@@ -193,22 +193,17 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
     logger.info(`Fetch Queue Result: ${request}`);
 
     // validate request id
-    if (!validate(request.substring(0, 36)) && request != 'sample')
-      next(new Error(`Invalid request`));
+    if (!validate(request.substring(0, 36))) next(new Error(`Invalid request`));
 
     // ensure output directory exists
-    const request_id = request == 'sample' ? uuidv1() : request;
-    const resultsFolder = path.resolve(config.tmp.folder, request_id);
+    const resultsFolder = path.resolve(config.tmp.folder, request);
     await fs.promises.mkdir(resultsFolder, { recursive: true });
 
     // find objects which use the specified request as the prefix
     const objects = await s3
       .listObjectsV2({
-        Bucket: request == 'sample' ? config.aws.s3.data : config.aws.s3.queue,
-        Prefix:
-          request == 'sample'
-            ? `${config.aws.s3.subFolder}/sample`
-            : `${config.aws.s3.outputPrefix}/${request}/`,
+        Bucket: config.aws.s3.queue,
+        Prefix: `${config.aws.s3.outputPrefix}/${request}/`,
       })
       .promise();
 
@@ -223,8 +218,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
 
         const object = await s3
           .getObject({
-            Bucket:
-              request == 'sample' ? config.aws.s3.data : config.aws.s3.queue,
+            Bucket: config.aws.s3.queue,
             Key,
           })
           .promise();
@@ -253,21 +247,56 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
 
     if (fs.existsSync(stateFilePath)) {
       let data = JSON.parse(String(await fs.promises.readFile(stateFilePath)));
-      if (request == 'sample') {
-        // rename files
-        const oldRequest = data.state.request;
-        const files = fs.readdirSync(resultsFolder);
-        files.forEach((file) =>
-          fs.renameSync(
-            path.resolve(resultsFolder, file),
-            path.resolve(resultsFolder, file.replace(oldRequest, request_id))
-          )
-        );
 
-        // replace request id
-        data.state.request = request_id;
-        data.state.inputs.request[0] = request_id;
-      }
+      res.json(data);
+    } else {
+      next(new Error(`Params not found`));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+apiRouter.get('/fetch-sample', async (req, res, next) => {
+  logger.info(`Fetching Sample`);
+  try {
+    const request_id = uuidv1();
+    const sampleArchive = path.resolve(config.data.folder, 'sample/sample.tgz');
+    const resultsFolder = path.resolve(config.tmp.folder, request_id);
+
+    // ensure output directory exists
+    await fs.promises.mkdir(resultsFolder, { recursive: true });
+
+    // copy sample to resultsFolder
+    await fs.copy(path.resolve(config.data.folder, 'sample'), resultsFolder);
+
+    // extract files
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(sampleArchive)
+        .on('end', () => resolve())
+        .on('error', (err) => reject(err))
+        .pipe(tar.x({ strip: 1, C: resultsFolder }));
+    });
+
+    let stateFilePath = path.resolve(resultsFolder, `state.json`);
+
+    if (fs.existsSync(stateFilePath)) {
+      let data = JSON.parse(String(await fs.promises.readFile(stateFilePath)));
+
+      // rename files
+      const oldRequest = data.state.request;
+      const files = fs.readdirSync(resultsFolder);
+      files.forEach((file) =>
+        fs.renameSync(
+          path.resolve(resultsFolder, file),
+          path.resolve(resultsFolder, file.replace(oldRequest, request_id))
+        )
+      );
+
+      // replace request id
+      data.state.request = request_id;
+      data.state.inputs.request[0] = request_id;
+
       res.json(data);
     } else {
       next(new Error(`Params not found`));

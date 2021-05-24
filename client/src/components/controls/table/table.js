@@ -213,86 +213,94 @@ export default function Table({
           </span>
         </Col>
       </Row>
-
-      <BTable
-        responsive
-        striped
-        bordered
-        hover
-        size="sm"
-        {...getTableProps()}
-        className="mb-2"
-      >
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th
-                  id={column.id.replace(/\s|\W/g, '') + `-${controlId}`}
-                  {...column.getHeaderProps(column.getSortByToggleProps())}
-                  className="text-nowrap"
-                >
-                  {column.render('Header')}
-                  {column.canSort && (
-                    <span>
-                      {' '}
-                      {column.isSorted ? (
-                        column.isSortedDesc ? (
-                          <FontAwesomeIcon
-                            className="text-primary"
-                            icon={faSortDown}
-                          />
-                        ) : (
-                          <FontAwesomeIcon
-                            className="text-primary"
-                            icon={faSortUp}
-                          />
-                        )
-                      ) : (
-                        <FontAwesomeIcon className="text-muted" icon={faSort} />
+      <Row>
+        <Col>
+          <BTable
+            responsive
+            striped
+            bordered
+            hover
+            size="sm"
+            {...getTableProps()}
+            className="mb-2"
+          >
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th
+                      id={column.id.replace(/\s|\W/g, '') + `-${controlId}`}
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                      className="text-nowrap"
+                    >
+                      {column.render('Header')}
+                      {column.canSort && (
+                        <span>
+                          {' '}
+                          {column.isSorted ? (
+                            column.isSortedDesc ? (
+                              <FontAwesomeIcon
+                                className="text-primary"
+                                icon={faSortDown}
+                              />
+                            ) : (
+                              <FontAwesomeIcon
+                                className="text-primary"
+                                icon={faSortUp}
+                              />
+                            )
+                          ) : (
+                            <FontAwesomeIcon
+                              className="text-muted"
+                              icon={faSort}
+                            />
+                          )}
+                        </span>
                       )}
-                    </span>
-                  )}
-                  <div>
-                    {/* Use column search if global search isn't used */}
-                    {globalSearch == undefined ? column.render('Filter') : null}
-                  </div>
-                </th>
+                      <div>
+                        {/* Use column search if global search isn't used */}
+                        {globalSearch == undefined
+                          ? column.render('Filter')
+                          : null}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps}>
-          {!data ||
-            (data.length === 0 && (
-              <tr>
-                {columns.map((_, i) => {
-                  return (
-                    <td
-                      style={{ height: '200px' }}
-                      key={`${title}-td-${i}`}
-                    ></td>
-                  );
-                })}
-              </tr>
-            ))}
-          {page.map((row, i) => {
-            prepareRow(row);
-            return (
-              <tr {...row.getRowProps()}>
-                {row.cells.map((cell, i) => {
-                  return (
-                    <td {...cell.getCellProps()} key={`${title}-td-${i}`}>
-                      {cell.render('Cell')}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </BTable>
-      <Row className="pagination">
+            </thead>
+            <tbody {...getTableBodyProps}>
+              {!data ||
+                (data.length === 0 && (
+                  <tr>
+                    {columns.map((_, i) => {
+                      return (
+                        <td
+                          style={{ height: '200px' }}
+                          key={`${title}-td-${i}`}
+                        ></td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              {page.map((row, i) => {
+                prepareRow(row);
+                return (
+                  <tr {...row.getRowProps()}>
+                    {row.cells.map((cell, i) => {
+                      return (
+                        <td {...cell.getCellProps()} key={`${title}-td-${i}`}>
+                          {cell.render('Cell')}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </BTable>
+        </Col>
+      </Row>
+      <Row className="pagination mt-3">
         <Col>
           <select
             className="form-control-sm"

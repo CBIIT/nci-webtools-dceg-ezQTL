@@ -22,7 +22,6 @@ export function LocusAlignmentPlot(params) {
     request,
     select_qtls_samples,
     select_gwas_sample,
-    isQueue,
     ldProject,
     phenotype,
     qtlPublic,
@@ -234,7 +233,7 @@ export function LocusAlignmentPlot(params) {
             )}
             <div className="w-100 border border-top mx-0 my-0"></div>
             {/* make ld reference action */}
-            {tooltip.data && !isQueue && (
+            {tooltip.data && (
               <div>
                 <Button
                   variant="link"

@@ -2169,30 +2169,18 @@ export function qtlsGWASBoxplotsCalculation(params) {
   };
 }
 
-export function getPublicGTEx(store = 'single') {
+export function getPublicGTEx() {
   return async function (dispatch, getState) {
     try {
-      if (store == 'single') {
-        dispatch(updateQTLsGWAS({ loadingPublic: true }));
-      } else if (store == 'multi') {
-        dispatch(updateMultiLoci({ isLoading: true }));
-      }
+      dispatch(updateQTLsGWAS({ isLoading: true }));
+
       const { data } = await axios.post('api/getPublicGTEx');
 
-      if (store == 'single') {
-        dispatch(updateQTLsGWAS({ publicGTEx: data, loadingPublic: false }));
-      } else if (store == 'multi') {
-        dispatch(updateMultiLoci({ publicGTEx: data, isLoading: false }));
-      }
+      dispatch(updateQTLsGWAS({ publicGTEx: data, isLoading: false }));
     } catch (error) {
       console.log(error);
       if (error) {
-        if (store == 'single') {
-          dispatch(updateQTLsGWAS({ loadingPublic: false }));
-        } else if (store == 'multi') {
-          dispatch(updateMultiLoci({ isLoading: false }));
-        }
-
+        dispatch(updateQTLsGWAS({ isLoading: false }));
         dispatch(updateError({ visible: true }));
       }
     }
@@ -2244,9 +2232,13 @@ export function fetchResults(request) {
         submitted: true,
       })
     );
-
+    console.log(request);
     try {
-      const { data } = await axios.post('api/fetch-results', request);
+      const { data } =
+        request.request == 'sample'
+          ? await axios.get('api/fetch-sample')
+          : await axios.post('api/fetch-results', request);
+
       const { state, main } = data;
       // console.log('api/fetch-results', state);
 
@@ -2271,6 +2263,7 @@ export function fetchResults(request) {
           ...state,
           submitted: true,
           locus_alignment: {
+            ...state.locus_alignment,
             data: pdata,
             layout: locus_alignment_plot_layout,
           },

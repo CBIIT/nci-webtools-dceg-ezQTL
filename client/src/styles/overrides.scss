@@ -63,7 +63,7 @@ legend {
     color: white;
     transition: all 0.1s;
     &.active {
-      border-bottom-color: #f5ab35;
+      border-bottom-color: #bb0e3d;
     }
   }
 }
@@ -138,6 +138,6 @@ input::-webkit-inner-spin-button {
 }
 
 .nav-item.nav-link.active {
-  text-decoration: underline 2px #f5ab35;
+  text-decoration: underline 2px #bb0e3d;
   text-underline-offset: 5px;
 }

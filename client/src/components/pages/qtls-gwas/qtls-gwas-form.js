@@ -224,7 +224,6 @@ export function QTLsGWASForm() {
     isLoading,
     isError,
     publicGTEx,
-    publicLoading,
     genome,
     genomeOptions,
     qtlProject,
@@ -750,7 +749,7 @@ export function QTLsGWASForm() {
                         type="checkbox"
                         disabled={
                           submitted ||
-                          publicLoading ||
+                          isLoading ||
                           !Object.keys(publicGTEx).length
                         }
                         checked={tissueOnly}
@@ -765,7 +764,7 @@ export function QTLsGWASForm() {
                       <Row>
                         <Col>
                           <Select
-                            disabled={publicLoading || tissueOnly || submitted}
+                            disabled={isLoading || tissueOnly || submitted}
                             id="project"
                             label="Project"
                             value={qtlProject}
@@ -777,7 +776,7 @@ export function QTLsGWASForm() {
                       <Row>
                         <Col>
                           <Select
-                            disabled={publicLoading || tissueOnly || submitted}
+                            disabled={isLoading || tissueOnly || submitted}
                             id="qtlType"
                             label="QTL Type"
                             value={xQtl}
@@ -791,7 +790,7 @@ export function QTLsGWASForm() {
                   <Row>
                     <Col>
                       <Select
-                        disabled={publicLoading || submitted}
+                        disabled={isLoading || submitted}
                         id="tissue"
                         label="Tissue"
                         value={tissue}
@@ -861,7 +860,7 @@ export function QTLsGWASForm() {
                         type="checkbox"
                         disabled={
                           submitted ||
-                          publicLoading ||
+                          isLoading ||
                           !Object.keys(publicGTEx).length
                         }
                         checked={phenotypeOnly}
@@ -877,7 +876,7 @@ export function QTLsGWASForm() {
                         <Select
                           disabled={
                             submitted ||
-                            publicLoading ||
+                            isLoading ||
                             phenotypeOnly ||
                             !gwasProjectOptions.length
                           }
@@ -895,7 +894,7 @@ export function QTLsGWASForm() {
                     <Col>
                       <Select
                         disabled={
-                          submitted || publicLoading || !phenotypeOptions.length
+                          submitted || isLoading || !phenotypeOptions.length
                         }
                         id="gwasPhenotype"
                         label="Phenotype"
@@ -1080,7 +1079,7 @@ export function QTLsGWASForm() {
                 <Form.Row>
                   <Col>
                     <Select
-                      disabled={publicLoading || submitted}
+                      disabled={isLoading || submitted}
                       id="ldProject"
                       label="Project"
                       value={ldProject}
@@ -1346,7 +1345,7 @@ export function QTLsGWASForm() {
             onClick={() => {
               if (validateEmail()) handleSubmit();
             }}
-            disabled={submitted || publicLoading}
+            disabled={submitted || isLoading}
           >
             {isQueue ? 'Submit' : 'Calculate'}
           </Button>

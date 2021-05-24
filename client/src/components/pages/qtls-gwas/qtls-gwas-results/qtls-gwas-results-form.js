@@ -41,7 +41,7 @@ export function QTLsGWASResultsForm() {
 
   const [_selectRef, _setSelectRef] = useState('');
 
-  // set inital select_gene
+  // set inital select_gene and select_ref
   useEffect(() => {
     if (!select_gene) {
       const option =
@@ -56,12 +56,10 @@ export function QTLsGWASResultsForm() {
         dispatch(updateQTLsGWAS({ select_gene: option[0] }));
       }
     }
-  }, [locus_alignment, gene_list]);
 
-  useEffect(() => {
     if (select_ref) _setSelectRef(select_ref);
     else _setSelectRef(locus_alignment['top']['rsnum']);
-  }, [locus_alignment.data]);
+  }, [locus_alignment, gene_list]);
 
   const validateForm = () => {
     dispatch(updateQTLsGWAS({ isLoading: true }));
