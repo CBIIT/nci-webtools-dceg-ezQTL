@@ -464,6 +464,7 @@ async function calculateLocusLD(params) {
     LDFile,
     genome_build,
     leadsnp,
+    ldThreshold,
     workingDirectory,
     bucket,
   } = params;
@@ -489,6 +490,7 @@ async function calculateLocusLD(params) {
       genome_build.toString(),
       outputPath.toString(),
       leadsnp.toString(),
+      ldThreshold,
       request.toString(),
       workingDirectory,
       bucket,

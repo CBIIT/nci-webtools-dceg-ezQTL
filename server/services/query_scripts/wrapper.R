@@ -170,7 +170,7 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
-qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, request, workDir, bucket) {
+qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, ldThreshold, request, workDir, bucket) {
   source(rfile)
   loadAWS()
 
@@ -199,6 +199,10 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
   }
 
+  if(identical(ldThreshold,''))
+    ldThreshold = NULL
+
+
   # select tabix gtf file
   # GRCh37: gencode.v19.annotation.gtf.gz
   # GRCh38: gencode.v37.annotation.gtf.gz
@@ -206,7 +210,7 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   tabixPath = paste0('s3://', bucket, '/ezQTL/tabix/', tabixFile)
 
   if (!is.null(gwasFile))
-    IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = 5, label_gene_name = TRUE)
-  else if (!is.null(associationFile))
-    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = 5, label_gene_name = TRUE)
+    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+  else if(!is.null(associationFile))
+    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = NULL, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
 }
