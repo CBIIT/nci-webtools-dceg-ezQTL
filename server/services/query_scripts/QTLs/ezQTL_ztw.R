@@ -103,10 +103,19 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
       
       
+      
+      if(all(is.na(qtl$gene_symbol)) | all(qtl$gene_symbol=="NA")){
+        qtl <- qtl %>% mutate(gene_symbol=gene_id)
+      }else{
+        if(any(is.na(qtl$gene_symbol))){
+          qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+        }
+      }
+      
       dup_qtl_id <- qtl %>% count(gene_id,gene_symbol) %>% count(gene_symbol) %>% filter(n>1)
       if(dim(dup_qtl_id)[1]>1){
         cat(paste0('Duplicated gene symbol in the qtl files. Use the gene id and gene symbol together as the new id'),file=logfile,sep="\n",append = T)
-        qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,"_",gene_symbol))
+        qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,"|",gene_symbol))
       }
       
     }
@@ -1064,11 +1073,43 @@ ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plo
 
 coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
+  hydata <- hydata %>% mutate(posterior_prob=as.numeric(posterior_prob),candidate_snp=as.character(candidate_snp))
   hydata <- hydata %>%  mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) 
   
-  genelevel <- hydata %>% arrange(posterior_prob) %>% pull(gene_symbol)
+  ecdata2 <- ecdata %>% 
+    mutate(CLPP=as.numeric(CLPP),CLPP2=as.numeric(CLPP2)) %>% 
+    mutate(CLPP=if_else(is.na(CLPP),0,CLPP),CLPP2=if_else(is.na(CLPP2),0,CLPP2)) %>% 
+    select(gene_id,gene_symbol,rsnum,Leadsnp,leadsnp_included,CLPP,CLPP2) %>% 
+    pivot_longer(cols = c(CLPP,CLPP2),names_to = 'Group',values_to = 'CLPP') %>% 
+    filter(!is.na(CLPP)) %>% 
+    mutate(Group=if_else(Group=="CLPP","window=100kb","window=50 SNPs")) 
+  
+  cdata <- hydata %>% 
+    select(gene_id,gene_symbol,posterior_prob) %>% 
+    left_join(
+      ecdata2 %>% group_by(gene_id,gene_symbol) %>% summarise(CLPP=max(CLPP)) %>% arrange(desc(CLPP))
+    ) %>% 
+    arrange(posterior_prob,CLPP)
+  
+  if(all(is.na(cdata$gene_symbol))){
+    hydata <- hydata %>% mutate(gene_symbol=gene_id)
+    ecdata <- ecdata %>% mutate(gene_symbol=gene_id)
+    ecdata2 <- ecdata2 %>% mutate(gene_symbol=gene_id)
+    cdata <- cdata %>% mutate(gene_symbol=gene_id)
+  }else{
+    if(any(is.na(cdata$gene_symbol))){
+      hydata <- hydata %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+      ecdata <- ecdata %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+      ecdata2 <- ecdata2 %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+      cdata <- cdata %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+    }
+    
+  }
+  
+  genelevel <- cdata %>% pull(gene_symbol)
   
   p1 <- hydata %>% 
+    mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) %>% 
     mutate(label=if_else(is.na(candidate_snp)|posterior_prob<0.5,NA_character_,candidate_snp)) %>% 
     #mutate(label=paste0(gene_symbol,"/",candidate_snp)) %>% 
     mutate(gene_symbol=fct_reorder(gene_symbol,posterior_prob)) %>% 
@@ -1082,13 +1123,6 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
     theme_ipsum_rc(axis_title_just = 'm',axis_title_size = 14,grid = 'Yy',axis = "XY",axis_col = 'black',base_family='Roboto Condensed')+
     theme(axis.text.x = element_blank(),axis.title.x = element_blank(),legend.position = 'none',panel.grid = element_line(linetype = 5))
   
-  
-  ecdata2 <- ecdata %>% 
-    mutate(CLPP=as.numeric(CLPP),CLPP2=as.numeric(CLPP2)) %>% 
-    select(gene_symbol,rsnum,Leadsnp,leadsnp_included,CLPP,CLPP2) %>% 
-    pivot_longer(cols = c(CLPP,CLPP2),names_to = 'Group',values_to = 'CLPP') %>% 
-    filter(!is.na(CLPP)) %>% 
-    mutate(Group=if_else(Group=="CLPP","window=100kb","window=50 SNPs")) 
   
   nudge_y <- 0.03*max(ecdata2$CLPP)
   ngene <- length(genelevel)
