@@ -210,7 +210,7 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   tabixPath = paste0('s3://', bucket, '/ezQTL/tabix/', tabixFile)
 
   if (!is.null(gwasFile))
-    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
-  else if(!is.null(associationFile))
-    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = NULL, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+    IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = 5, label_gene_name = TRUE)
+  else if (!is.null(associationFile))
+    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = 'MX2', genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = 5, label_gene_name = TRUE)
 }
