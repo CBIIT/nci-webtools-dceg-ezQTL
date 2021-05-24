@@ -2231,9 +2231,13 @@ export function fetchResults(request) {
         submitted: true,
       })
     );
-
+    console.log(request);
     try {
-      const { data } = await axios.post('api/fetch-results', request);
+      const { data } =
+        request.request == 'sample'
+          ? await axios.get('api/fetch-sample')
+          : await axios.post('api/fetch-results', request);
+
       const { state, main } = data;
       // console.log('api/fetch-results', state);
 
