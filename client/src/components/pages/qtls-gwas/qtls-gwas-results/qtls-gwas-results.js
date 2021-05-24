@@ -29,7 +29,6 @@ export function QTLsGWASResults({ queueRequest }) {
     genotypeFile,
     locus_alignment,
     locus_table,
-    isQueue,
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -74,11 +73,7 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        !(
-          (quantificationFile &&
-          genotypeFile) ||
-          select_qtls_samples
-        ),
+        !((quantificationFile && genotypeFile) || select_qtls_samples),
     },
     {
       component: <LocusDownload />,
@@ -115,10 +110,9 @@ export function QTLsGWASResults({ queueRequest }) {
               activeResultsTab == item.key ? 'font-weight-bold' : ''
             }`}
           >
-            <div className="rounded-bottom border-left border-bottom border-right ">
+            <div className="rounded-bottom border-left border-bottom border-right">
               {(item.key == 'locus-alignment' || item.key == 'locus-table') &&
                 (locus_alignment.data || locus_table.data) &&
-                !isQueue &&
                 submitted &&
                 !isError && (
                   <>

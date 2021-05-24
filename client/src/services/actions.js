@@ -2262,6 +2262,7 @@ export function fetchResults(request) {
           ...state,
           submitted: true,
           locus_alignment: {
+            ...state.locus_alignment,
             data: pdata,
             layout: locus_alignment_plot_layout,
           },
