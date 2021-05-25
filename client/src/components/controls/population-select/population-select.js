@@ -131,6 +131,11 @@ export const PopulationSelect = ({ id, disabled, mergeState }) => {
     _setSelectPop(parsePopulation);
   }, [inputs]);
 
+  // set default pop to EUR
+  useEffect(() => {
+    _setSelectPop(allPopulationsGrouped[4].options);
+  }, []);
+
   const customStyles = {
     menu: (provided, state) => ({
       ...provided,
