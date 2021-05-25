@@ -289,8 +289,13 @@ export function QTLsGWASForm() {
   // check form validity
   useEffect(() => {
     if (
-      (!_associationFile && !select_qtls_samples && !qtlPublic) ||
-      // (ldPublic && (!select_pop || select_pop.length <= 0)) ||
+      (!select_qtls_samples &&
+        !_associationFile &&
+        !_gwasFile &&
+        !_LDFile &&
+        !qtlPublic &&
+        !gwasPublic &&
+        !ldPublic) ||
       (_quantificationFile && !_genotypeFile) ||
       (!_quantificationFile && _genotypeFile)
     ) {
@@ -922,14 +927,10 @@ export function QTLsGWASForm() {
                     _setGwasFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  // isInvalid={checkValid ? !validFile : false}
-                  // feedback="Please upload a data file"
-                  // onChange={(e) => {
-                  //     setInput(e.target.files[0]);
-                  //     mergeVisualize({
-                  //     storeFilename: e.target.files[0].name,
-                  //     });
-                  // }}
+                  isInvalid={
+                    attempt ? !_gwasFile && !select_qtls_samples : false
+                  }
+                  feedback="Please upload a data file"
                   custom
                 />
               )}
@@ -1068,6 +1069,7 @@ export function QTLsGWASForm() {
                       ldPublic: !ldPublic,
                       select_pop: false,
                       ...(!ldPublic && { select_ref: false }),
+                      ...(ldPublic && { ldKey: '' }),
                     })
                   );
                   _setLDFile('');
@@ -1161,14 +1163,8 @@ export function QTLsGWASForm() {
                     _setLDFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  // isInvalid={checkValid ? !validFile : false}
-                  // feedback="Please upload a data file"
-                  // onChange={(e) => {
-                  //     setInput(e.target.files[0]);
-                  //     mergeVisualize({
-                  //     storeFilename: e.target.files[0].name,
-                  //     });
-                  // }}
+                  isInvalid={attempt ? !_LDFile && !select_qtls_samples : false}
+                  feedback="Please upload a data file"
                   custom
                 />
               </>
