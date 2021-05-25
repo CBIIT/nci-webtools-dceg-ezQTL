@@ -110,6 +110,8 @@ export const getInitialState = async () => {
       gwasProject: '',
       gwasProjectOptions: [],
       ldProject: '',
+      ldThreshold: '',
+      ldAssocData: '',
       ldProjectOptions: [],
       xQtl: '',
       xQtlOptions: [],
