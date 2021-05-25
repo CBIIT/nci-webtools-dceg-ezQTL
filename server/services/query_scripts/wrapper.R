@@ -140,21 +140,21 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(leadsnp, 'false'))
     leadsnp <- NULL
 
-  if (identical(qtlPublic,'false'))
+  if (identical(qtlPublic, 'false'))
     qtlPublic <- FALSE
   else
     qtlPublic <- TRUE
 
-  if (identical(ldPublic,'false'))
+  if (identical(ldPublic, 'false'))
     ldPublic <- FALSE
   else
     ldPublic <- TRUE
 
-  if (identical(gwasPublic,'false'))
+  if (identical(gwasPublic, 'false'))
     gwasPublic <- FALSE
   else
     gwasPublic <- TRUE
-  
+
 
   print(ldFile)
   coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
@@ -170,7 +170,7 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
-qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
+qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, distance, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
   source(rfile)
   loadAWS()
 
@@ -199,7 +199,7 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
   }
 
-  if(identical(ldThreshold,''))
+  if (identical(ldThreshold, ''))
     ldThreshold = NULL
 
 
@@ -209,11 +209,11 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   tabixFile <- ifelse(genome_build == 'GRCh37', 'gencode.v19.annotation.gtf.gz', 'gencode.v37.annotation.gtf.gz')
   tabixPath = paste0('s3://', bucket, '/ezQTL/tabix/', tabixFile)
 
-  if (identical(ldAssocData,'GWAS') & !is.null(gwasFile))
+  if (identical(ldAssocData, 'GWAS') & !is.null(gwasFile))
     IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
   else if (identical(ldAssocData, 'QTL') & !is.null(associationFile))
     IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = select_gene, genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
-  else{
+  else {
     IntRegionalPlot(genome_build = genome_build, association_file = NULL, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
   }
 }

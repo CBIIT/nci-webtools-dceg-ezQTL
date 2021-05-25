@@ -1498,7 +1498,8 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               qtlfile: qtlsGWAS.inputs.association_file[0],
               ldfile: qtlsGWAS.hyprcoloc_ld.filename,
               qtlKey: qtlsGWAS.qtlKey,
-              select_chromosome: qtlsGWAS.select_chromosome.value,
+              select_chromosome:
+                qtlsGWAS.locusInformation[0].select_chromosome.value,
               select_position: qtlsGWAS.select_position,
             })
           );
@@ -1589,7 +1590,7 @@ export function qtlsGWASECaviarCalculation(params) {
       .catch(function (error) {
         console.log(error);
         if (error) {
-          dispatch(updateError({ visible: true }));
+          dispatch(updateError({ visible: true, message: error }));
           dispatch(
             updateQTLsGWAS({
               // isError: true,
@@ -1651,23 +1652,29 @@ export function qtlsGWASLocusQCCalculation(params) {
           params.gwasFile = 'ezQTL_input_gwas.txt';
         }
 
-        dispatch(qtlsGWASCalculation(params));
-
-        /*
-        const qtlsGWAS = getState().qtlsGWAS;
-
-        dispatch(
-          qtlsGWASLocusLDCalculation({
-            request: qtlsGWAS.request,
-            select_gwas_sample: qtlsGWAS.select_gwas_sample,
-            select_qtls_samples: qtlsGWAS.select_qtls_samples,
-            gwasFile: qtlsGWAS.inputs.gwas_file[0],
-            associationFile: qtlsGWAS.inputs.association_file[0],
-            LDFile: qtlsGWAS.inputs.ld_file[0],
-            leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
-            genome_build: qtlsGWAS.genome.value,
-          })
-        );*/
+        if (params.associationFile || params.gwasFile) {
+          await dispatch(qtlsGWASCalculation(params));
+        } else if (params.LDFile) {
+          await dispatch(
+            updateQTLsGWAS({ isLoading: false, request: params.request })
+          );
+          await dispatch(
+            qtlsGWASLocusLDCalculation({
+              request: params.request,
+              select_gwas_sample: qtlsGWAS.select_gwas_sample,
+              select_qtls_samples: qtlsGWAS.select_qtls_samples,
+              gwasFile: params.gwasFile,
+              associationFile: params.associationFile,
+              LDFile: params.LDFile,
+              leadsnp: params.select_ref,
+              genome_build: qtlsGWAS.genome.value,
+              distance: params.select_dist,
+              select_gene: qtlsGWAS.select_gene,
+              ldThreshold: qtlsGWAS.ldThreshold,
+              ldAssocData: qtlsGWAS.ldAssocData,
+            })
+          );
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -1992,9 +1999,10 @@ export function qtlsGWASCalculation(params) {
                 LDFile: qtlsGWAS.inputs.ld_file[0],
                 leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
                 genome_build: qtlsGWAS.genome.value,
+                distance: qtlsGWAS.locusInformation[0].select_dist,
                 select_gene: qtlsGWAS.select_gene,
                 ldThreshold: qtlsGWAS.ldThreshold,
-                ldAssocData: qtlsGWAS.ldAssocData
+                ldAssocData: qtlsGWAS.ldAssocData,
               })
             );
           }

@@ -35,9 +35,12 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
     ldPublic,
     gwasPublic,
   } = useSelector((state) => state.qtlsGWAS);
-  const { select_dist, select_position, select_ref } = locusInformation[
-    locusIndex
-  ];
+  const {
+    select_dist,
+    select_position,
+    select_ref,
+    select_chromosome,
+  } = locusInformation[locusIndex];
 
   // check form validity
   useEffect(() => {
@@ -45,13 +48,22 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
       !select_dist ||
       select_dist < 1 ||
       select_dist > 200 ||
-      (select_ref && select_ref.length > 0 && !/^rs\d+$/.test(select_ref))
+      !select_position ||
+      !select_chromosome
+      // ||(select_ref && !/^rs\d+$/.test(select_ref))
     ) {
       setValid(false);
     } else {
       setValid(true);
     }
-  }, [ldPublic, qtlPublic, select_dist, select_ref]);
+  }, [
+    ldPublic,
+    qtlPublic,
+    select_dist,
+    select_ref,
+    select_position,
+    select_chromosome,
+  ]);
 
   function mergeLocusInfo(data) {
     let newLocusInfo = locusInformation.slice();
@@ -95,7 +107,7 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
         <Form.Row>
           <Col>
             <Form.Label className="mb-0">
-              cis-QTL Distance <span style={{ color: 'red' }}>*</span>{' '}
+              cis-QTL Distance <span style={{ color: 'red' }}>*</span>
               <small>
                 <i>(+/- Kb up to 5Mb)</i>
               </small>
@@ -118,9 +130,44 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
           </Col>
         </Form.Row>
         <Form.Row>
+          <Col>
+            <Select
+              className="mb-0"
+              disabled={submitted}
+              id="chromosome"
+              label={
+                <>
+                  Chromosome <span style={{ color: 'red' }}>*</span>
+                </>
+              }
+              placeholder={'Select Chromosome'}
+              value={select_chromosome}
+              options={[
+                ...Array.from({ length: 22 }, (_, i) => ({
+                  value: i + 1,
+                  label: i + 1,
+                })),
+                {
+                  value: 'X',
+                  label: 'X',
+                },
+                {
+                  value: 'Y',
+                  label: 'Y',
+                },
+              ]}
+              onChange={(chromosome) => {
+                mergeLocusInfo({ select_chromosome: chromosome });
+              }}
+            />
+          </Col>
+        </Form.Row>
+        <Form.Row>
           {qtlPublic || ldPublic || gwasPublic ? (
             <Col>
-              <Form.Label className="mb-0">Position</Form.Label>
+              <Form.Label className="mb-0">
+                Position <span style={{ color: 'red' }}>*</span>
+              </Form.Label>
               <Form.Control
                 title="LD Reference Position Input"
                 aria-label="LD Refereence Position Input"
@@ -129,9 +176,13 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
                 onChange={(e) =>
                   mergeLocusInfo({ select_position: e.target.value })
                 }
-                placeholder="e.g. 100000"
+                placeholder="e.g. 42743496"
                 value={select_position}
+                isInvalid={attempt ? !select_position : false}
               />
+              <Form.Control.Feedback type="invalid">
+                Enter a valid position
+              </Form.Control.Feedback>
             </Col>
           ) : (
             <Col>
@@ -172,6 +223,7 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
               title="Add Locus Information"
               aria-label="Add Locus Information"
               onClick={() => addLocusInfo()}
+              disabled={submitted}
             >
               + Add Locus
             </Button>
@@ -238,7 +290,6 @@ export function QTLsGWASForm() {
     tissueOptions,
     phenotype,
     phenotypeOptions,
-    select_chromosome,
     isQueue,
     jobName,
     email,
@@ -281,10 +332,6 @@ export function QTLsGWASForm() {
     if (Object.keys(publicGTEx).length && gwasProject && gwasPublic)
       handleGwasProject(gwasProject);
   }, [gwasPublic, phenotypeOnly]);
-  useEffect(() => {
-    if (Object.keys(publicGTEx).length && ldProject && ldPublic)
-      handleLdProject(ldProject);
-  }, [ldPublic]);
 
   // check form validity
   useEffect(() => {
@@ -503,29 +550,7 @@ export function QTLsGWASForm() {
   }
 
   function handleLdProject(project) {
-    const ldKey =
-      project.value == '1000genome'
-        ? publicGTEx['LD dataset']
-            .filter(
-              (row) =>
-                row.Genome_build == genome.value &&
-                row.Project == project.value &&
-                row.Chromosome == select_chromosome.value
-            )[0]
-            .Biowulf_full_path.replace(
-              '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-              ''
-            )
-        : true;
-
-    dispatch(
-      updateQTLsGWAS({
-        ldProject: project,
-        ldKey: ldKey,
-        select_pop:
-          project.value == 'UKBB' ? 'CEU+TSI+FIN+GBR+IBS' : select_pop,
-      })
-    );
+    dispatch(updateQTLsGWAS({ ldProject: project }));
   }
 
   // qtl type
@@ -659,7 +684,30 @@ export function QTLsGWASForm() {
     );
 
     const params = locusInformation.map((locusInfo, locusIndex) => {
-      const { select_dist, select_ref, select_position } = locusInfo;
+      const {
+        select_dist,
+        select_ref,
+        select_position,
+        select_chromosome,
+      } = locusInfo;
+
+      const ldKey =
+        ldProject.value == '1000genome'
+          ? publicGTEx['LD dataset']
+              .filter(
+                (row) =>
+                  row.Genome_build == genome.value &&
+                  row.Project == ldProject.value &&
+                  row.Chromosome == locusInformation[0].select_chromosome.value
+              )[0]
+              .Biowulf_full_path.replace(
+                '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+                ''
+              )
+          : true;
+
+      dispatch(updateQTLsGWAS({ ldKey: ldKey }));
+
       return {
         jobName: jobName
           ? `${jobName} - ${locusIndex}`
@@ -691,7 +739,7 @@ export function QTLsGWASForm() {
         gwasPublic,
         ldPublic,
         qtlKey: qtlKey || false,
-        ldKey: ldKey || false,
+        ldKey: ldPublic ? ldKey : false,
         gwasKey: gwasKey || false,
         select_chromosome: select_chromosome.value,
         select_position: select_position,
@@ -1092,35 +1140,6 @@ export function QTLsGWASForm() {
                 </Form.Row>
                 <Form.Row>
                   <Col>
-                    <Select
-                      disabled={submitted}
-                      id="chromosome"
-                      label="Chromosome"
-                      value={select_chromosome}
-                      options={[
-                        ...Array.from({ length: 22 }, (_, i) => ({
-                          value: i + 1,
-                          label: i + 1,
-                        })),
-                        {
-                          value: 'X',
-                          label: 'X',
-                        },
-                        {
-                          value: 'Y',
-                          label: 'Y',
-                        },
-                      ]}
-                      onChange={(chromosome) => {
-                        dispatch(
-                          updateQTLsGWAS({ select_chromosome: chromosome })
-                        );
-                      }}
-                    />
-                  </Col>
-                </Form.Row>
-                <Form.Row>
-                  <Col>
                     {ldProject.value != 'UKBB' ? (
                       <>
                         <Form.Label className="mb-0">
@@ -1203,7 +1222,18 @@ export function QTLsGWASForm() {
       </Row>
       <Row>
         <Col sm="6">
-          <Link to={`/qtls/sample`} className="font-14">
+          <Link
+            to={`/qtls/sample`}
+            className="font-14"
+            style={
+              window.location.hash == '#/qtls/sample'
+                ? {
+                    pointerEvents: 'none',
+                    color: 'gray',
+                  }
+                : {}
+            }
+          >
             <span className="sr-only">Load Sample Data</span>
             Load Sample Data
           </Link>

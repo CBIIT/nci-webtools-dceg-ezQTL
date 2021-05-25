@@ -30,12 +30,11 @@ export function LocusAlignmentPlot(params) {
     qtlKey,
     gwasKey,
     ldKey,
-    select_chromosome,
     genome,
     locusInformation,
   } = useSelector((state) => state.qtlsGWAS);
 
-  const { select_position } = locusInformation[0];
+  const { select_position, select_chromosome } = locusInformation[0];
 
   // use local state to reset tooltip when this component unmounts
   const [tooltip, setTooltip] = useState({

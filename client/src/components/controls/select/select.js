@@ -12,8 +12,10 @@ export default function Select({
   options,
   onChange,
   disabled,
+  ...rest
 }) {
   const props = {
+    ...rest,
     styles: {
       menuPortal: (base) => ({ ...base, zIndex: 9999 }),
     },
