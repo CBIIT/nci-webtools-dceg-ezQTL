@@ -1992,7 +1992,9 @@ export function qtlsGWASCalculation(params) {
                 LDFile: qtlsGWAS.inputs.ld_file[0],
                 leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
                 genome_build: qtlsGWAS.genome.value,
-                ldThreshold: qtlsGWAS.ldThreshold
+                select_gene: qtlsGWAS.select_gene,
+                ldThreshold: qtlsGWAS.ldThreshold,
+                ldAssocData: qtlsGWAS.ldAssocData
               })
             );
           }

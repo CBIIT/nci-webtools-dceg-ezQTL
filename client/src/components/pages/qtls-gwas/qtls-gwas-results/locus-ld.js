@@ -6,13 +6,20 @@ import { Form, Button } from 'react-bootstrap';
 import ReactSelect, { createFilter } from 'react-select';
 import {
   updateQTLsGWAS,
-  qtlsGWASLocusQCCalculation,
+  qtlsGWASLocusLDCalculation,
 } from '../../../../services/actions';
 
 
 export function LocusLD() {
   const {
     submitted,
+    select_gwas_sample,
+    select_qtls_samples,
+    gwasFile,
+    associationFile,
+    inputs,
+    LDFile,
+    genome,
     locus_alignment,
     gene_list,
     select_gene,
@@ -25,21 +32,22 @@ export function LocusLD() {
   }
     = useSelector((state) => state.qtlsGWAS);
 
-  useEffect(() => {
-    if (!select_gene) {
-      const option =
-        locus_alignment['top']['gene_symbol'] && gene_list['data']
-          ? gene_list['data'].filter(
-            (item) =>
-              item.gene_symbol === locus_alignment['top']['gene_symbol']
-          )
-          : [];
+  async function handleRecalculate(){
 
-      if (option.length > 0) {
-        dispatch(updateQTLsGWAS({ select_gene: option[0] }));
-      }
-    }
-  }, [locus_alignment, gene_list]);
+    dispatch(qtlsGWASLocusLDCalculation({ 
+      request: request,
+      select_gwas_sample: select_gwas_sample,
+      select_qtls_samples: select_qtls_samples,
+      gwasFile: inputs['gwas_file'][0],
+      associationFile: inputs['association_file'][0],
+      LDFile: inputs['ld_file'][0],
+      leadsnp: locus_alignment['top']['rsnum'],
+      genome_build: genome['value'],
+      ldThreshold: ldThreshold,
+      ldAssocData: ldAssocData.value,
+      select_gene: select_gene
+    }));
+  }
 
   const dispatch = useDispatch();
   const [tissueOnly, viewTissueOnly] = useState(false);
@@ -79,9 +87,11 @@ export function LocusLD() {
                     isDisabled={!submitted}
                     inputId="qtls-results-ld-association-data"
                     value={ldAssocData}
-                    onChange={(option) =>
+                    onChange={(option) => {
                       dispatch(updateQTLsGWAS({ ldAssocData: option }))
-                    }
+                      if(option.value === 'GWAS')
+                        dispatch(updateQTLsGWAS({ select_gene: ''}))
+                    }}
                     options={
                       [
                         {value: 'QTL', label: 'QTL'},
@@ -109,10 +119,10 @@ export function LocusLD() {
                 </span>
                   </Form.Label>
                   <ReactSelect
-                    isDisabled={!submitted}
+                    isDisabled={!submitted || ldAssocData.value === 'GWAS'}
                     inputId="qtls-results-gene-input"
                     // label=""
-                    value={select_gene}
+                    value={ ldAssocData.value === 'QTL' ? select_gene : null}
                     options={gene_list ? gene_list.data : []}
                     getOptionLabel={(option) => option.gene_symbol}
                     getOptionValue={(option) => option.gene_id}
@@ -153,6 +163,7 @@ export function LocusLD() {
                 className="d-block"
                 variant="primary"
                 type="button"
+                onClick={()=> handleRecalculate()}
               >
                 Recalculate
             </Button>
