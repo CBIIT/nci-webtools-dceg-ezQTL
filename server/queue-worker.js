@@ -319,6 +319,8 @@ async function calculate(params) {
         associationFile: state.inputs.association_file[0],
         LDFile: state.inputs.ld_file[0],
         leadsnp: state.locus_alignment.top.rsnum,
+        ldThreshold: state.ldThreshold,
+        ldAssocData: state.ldAssocData,
         genome_build: params.genome_build,
       });
     }

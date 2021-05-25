@@ -464,6 +464,9 @@ async function calculateLocusLD(params) {
     LDFile,
     genome_build,
     leadsnp,
+    ldThreshold,
+    ldAssocData,
+    select_gene,
     workingDirectory,
     bucket,
   } = params;
@@ -475,6 +478,11 @@ async function calculateLocusLD(params) {
     request,
     'LD_Output.png'
   );
+
+  let threshold = ldThreshold
+
+  if(ldThreshold)
+    threshold = parseFloat(ldThreshold)
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
@@ -489,6 +497,9 @@ async function calculateLocusLD(params) {
       genome_build.toString(),
       outputPath.toString(),
       leadsnp.toString(),
+      threshold,
+      ldAssocData,
+      select_gene,
       request.toString(),
       workingDirectory,
       bucket,
