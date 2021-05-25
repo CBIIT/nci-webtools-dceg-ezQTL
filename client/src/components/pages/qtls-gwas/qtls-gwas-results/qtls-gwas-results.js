@@ -22,7 +22,11 @@ export function QTLsGWASResults({ queueRequest }) {
     activeResultsTab,
     isError,
     gwas,
+    associationFile,
+    gwasFile,
     LDFile,
+    qtlKey,
+    gwasKey,
     ldKey,
     select_qtls_samples,
     quantificationFile,
@@ -49,7 +53,14 @@ export function QTLsGWASResults({ queueRequest }) {
       component: <LocusAlignment />,
       key: 'locus-alignment',
       title: 'Locus Alignment',
-      disabled: !submitted || isError,
+      disabled:
+        !submitted ||
+        isError ||
+        (!select_qtls_samples &&
+          !associationFile &&
+          !qtlKey &&
+          !gwasFile &&
+          !gwasKey),
     },
     {
       component: <LocusColocalization />,
@@ -64,7 +75,14 @@ export function QTLsGWASResults({ queueRequest }) {
       component: <LocusTable />,
       key: 'locus-table',
       title: 'Locus Table',
-      disabled: !submitted || isError,
+      disabled:
+        !submitted ||
+        isError ||
+        (!select_qtls_samples &&
+          !associationFile &&
+          !qtlKey &&
+          !gwasFile &&
+          !gwasKey),
     },
     {
       component: <LocusQuantifiation />,
