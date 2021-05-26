@@ -1,13 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { RootContext } from '../../../index';
-import {
-  Form,
-  Button,
-  Row,
-  Col,
-  Popover,
-  OverlayTrigger,
-} from 'react-bootstrap';
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
@@ -21,19 +14,9 @@ import {
 import Select from '../../controls/select/select';
 import Accordions from '../../controls/accordions/accordions';
 import { PopulationSelect } from '../../controls/population-select/population-select';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 const { v1: uuidv1 } = require('uuid');
 
-function LocusInfo({
-  locusIndex,
-  attempt,
-  valid,
-  setValid,
-  _LDFile,
-  _associationFile,
-  _gwasFile,
-}) {
+function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
   const {
@@ -57,13 +40,15 @@ function LocusInfo({
       select_dist < 1 ||
       select_dist > 200 ||
       !select_position ||
-      !select_chromosome ||
       (select_ref && !/^rs\d+$/.test(select_ref)) ||
-      (_LDFile && !_associationFile && !_gwasFile && !select_ref)
+      (ldPublic && Object.entries(select_chromosome).length) ||
+      (_LDFile && !select_ref)
     ) {
-      setValid(false);
+      setLocusValid(false);
+      console.log(false);
     } else {
-      setValid(true);
+      setLocusValid(true);
+      console.log(true);
     }
   }, [
     ldPublic,
@@ -73,6 +58,7 @@ function LocusInfo({
     select_position,
     select_chromosome,
     _LDFile,
+    ldPublic,
   ]);
 
   function mergeLocusInfo(data) {
@@ -139,73 +125,74 @@ function LocusInfo({
             </Form.Control.Feedback>
           </Col>
         </Form.Row>
-        <Form.Row>
-          <Col>
-            <Select
-              className="mb-0"
-              disabled={submitted}
-              id="chromosome"
-              label={
-                <>
-                  Chromosome <span style={{ color: 'red' }}>*</span>
-                </>
-              }
-              placeholder={'Select Chromosome'}
-              value={select_chromosome}
-              options={[
-                ...Array.from({ length: 22 }, (_, i) => ({
-                  value: i + 1,
-                  label: i + 1,
-                })),
-                {
-                  value: 'X',
-                  label: 'X',
-                },
-                {
-                  value: 'Y',
-                  label: 'Y',
-                },
-              ]}
-              onChange={(chromosome) => {
-                mergeLocusInfo({ select_chromosome: chromosome });
-              }}
-            />
-            {attempt && !select_chromosome && (
-              <div class="text-danger" style={{ fontSize: '80%' }}>
-                Please select a chromosome
-              </div>
-            )}
-          </Col>
-        </Form.Row>
-        <Form.Row>
-          {qtlPublic || ldPublic || gwasPublic ? (
-            <Col>
-              <Form.Label className="mb-0">
-                Position <span style={{ color: 'red' }}>*</span>
-              </Form.Label>
-              <Form.Control
-                title="LD Reference Position Input"
-                aria-label="LD Refereence Position Input"
-                id="select_position"
-                disabled={submitted}
-                onChange={(e) =>
-                  mergeLocusInfo({ select_position: e.target.value })
-                }
-                placeholder="e.g. 42743496"
-                value={select_position}
-                isInvalid={attempt ? !select_position : false}
-              />
-              <Form.Control.Feedback type="invalid">
-                Enter a valid position
-              </Form.Control.Feedback>
-            </Col>
-          ) : (
-            <Col>
-              <Form.Label className="mb-0">
-                SNP{' '}
-                {_LDFile && !_associationFile && !_gwasFile && (
-                  <span style={{ color: 'red' }}>* </span>
+        {ldPublic ? (
+          <>
+            <Form.Row>
+              <Col>
+                <Select
+                  className="mb-0"
+                  disabled={submitted}
+                  id="chromosome"
+                  label={
+                    <>
+                      Chromosome <span style={{ color: 'red' }}>*</span>
+                    </>
+                  }
+                  placeholder={'Select Chromosome'}
+                  value={select_chromosome}
+                  options={[
+                    ...Array.from({ length: 22 }, (_, i) => ({
+                      value: i + 1,
+                      label: i + 1,
+                    })),
+                    {
+                      value: 'X',
+                      label: 'X',
+                    },
+                    {
+                      value: 'Y',
+                      label: 'Y',
+                    },
+                  ]}
+                  onChange={(chromosome) => {
+                    mergeLocusInfo({ select_chromosome: chromosome });
+                  }}
+                />
+                {attempt && Object.entries(select_chromosome).length && (
+                  <div class="text-danger" style={{ fontSize: '80%' }}>
+                    Please select a chromosome
+                  </div>
                 )}
+              </Col>
+            </Form.Row>
+            <Form.Row>
+              <Col>
+                <Form.Label className="mb-0">
+                  Position <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
+                <Form.Control
+                  title="LD Reference Position Input"
+                  aria-label="LD Refereence Position Input"
+                  id="select_position"
+                  disabled={submitted}
+                  onChange={(e) =>
+                    mergeLocusInfo({ select_position: e.target.value })
+                  }
+                  placeholder="e.g. 42743496"
+                  value={select_position}
+                  isInvalid={attempt ? !select_position : false}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Enter a valid position
+                </Form.Control.Feedback>
+              </Col>
+            </Form.Row>
+          </>
+        ) : (
+          <Form.Row>
+            <Col>
+              <Form.Label className="mb-0">
+                SNP {_LDFile && <span style={{ color: 'red' }}>* </span>}
                 <small>
                   <i>(Default: lowest GWAS P-value SNP)</i>
                 </small>
@@ -220,15 +207,15 @@ function LocusInfo({
                 isInvalid={
                   attempt &&
                   ((select_ref && !/^rs\d+$/.test(select_ref)) ||
-                    (_LDFile && !_associationFile && !_gwasFile && !select_ref))
+                    (_LDFile && !select_ref))
                 }
               />
               <Form.Control.Feedback type="invalid">
                 Enter a valid RS number
               </Form.Control.Feedback>
             </Col>
-          )}
-        </Form.Row>
+          </Form.Row>
+        )}
       </div>
 
       <Row>
@@ -271,6 +258,7 @@ export function QTLsGWASForm() {
   const [validEmail, setValidEmail] = useState(false);
   const [attempt, setAttempt] = useState(false);
   const [valid, setValid] = useState(false);
+  const [locusValid, setLocusValid] = useState(false);
 
   const {
     select_qtls_samples,
@@ -368,13 +356,16 @@ export function QTLsGWASForm() {
       setValid(true);
     }
   }, [
+    select_qtls_samples,
     _associationFile,
+    _gwasFile,
+    _LDFile,
     _quantificationFile,
     _genotypeFile,
-    ldPublic,
     qtlPublic,
+    gwasPublic,
+    ldPublic,
     select_pop,
-    select_qtls_samples,
   ]);
 
   // automatically enable/disable queue if more locus info panels are added
@@ -677,7 +668,7 @@ export function QTLsGWASForm() {
   }
 
   async function handleSubmit() {
-    if (!valid) {
+    if (!valid && !locusValid) {
       return;
     }
     setAttempt(false);
@@ -710,19 +701,21 @@ export function QTLsGWASForm() {
       } = locusInfo;
 
       const ldKey =
-        ldProject.value == '1000genome'
-          ? publicGTEx['LD dataset']
-              .filter(
-                (row) =>
-                  row.Genome_build == genome.value &&
-                  row.Project == ldProject.value &&
-                  row.Chromosome == locusInformation[0].select_chromosome.value
-              )[0]
-              .Biowulf_full_path.replace(
-                '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-                ''
-              )
-          : true;
+        ldPublic && Object.entries(select_chromosome).length
+          ? ldProject.value == '1000genome'
+            ? publicGTEx['LD dataset']
+                .filter(
+                  (row) =>
+                    row.Genome_build == genome.value &&
+                    row.Project == ldProject.value &&
+                    row.Chromosome == select_chromosome.value
+                )[0]
+                .Biowulf_full_path.replace(
+                  '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+                  ''
+                )
+            : true
+          : false;
 
       dispatch(updateQTLsGWAS({ ldKey: ldKey }));
 
@@ -757,7 +750,7 @@ export function QTLsGWASForm() {
         gwasPublic,
         ldPublic,
         qtlKey: qtlKey || false,
-        ldKey: ldPublic ? ldKey : false,
+        ldKey: ldKey,
         gwasKey: gwasKey || false,
         select_chromosome: select_chromosome.value,
         select_position: select_position,
@@ -788,7 +781,7 @@ export function QTLsGWASForm() {
             <Form.Group className="col-sm-12">
               <div className="d-flex">
                 <Form.Label className="mb-0 mr-auto">
-                  Association (QTL) Data <span style={{ color: 'red' }}>*</span>
+                  Association (QTL) Data
                 </Form.Label>
                 <Form.Check
                   title="Association (QTL) Public Data Checkbox"
@@ -1099,28 +1092,7 @@ export function QTLsGWASForm() {
           <Form.Group className="col-sm-12 mb-0">
             <div className="d-flex">
               <Form.Label className="mb-0 mr-auto">
-                LD Data{' '}
-                <OverlayTrigger
-                  trigger="click"
-                  placement="top"
-                  overlay={
-                    <Popover id="popover-basic">
-                      <Popover.Title as="h3">LD Information</Popover.Title>
-                      <Popover.Content>
-                        <p>Default: 1KG Phase 3, EUR</p>
-                      </Popover.Content>
-                    </Popover>
-                  }
-                  rootClose
-                >
-                  <Button
-                    variant="link"
-                    className="p-0 font-weight-bold"
-                    aria-label="LD Information additional info"
-                  >
-                    <FontAwesomeIcon icon={faInfoCircle} />
-                  </Button>
-                </OverlayTrigger>
+                LD Data <span style={{ color: 'red' }}>*</span>
               </Form.Label>
               <Form.Check
                 disabled={submitted || select_qtls_samples}
@@ -1217,11 +1189,8 @@ export function QTLsGWASForm() {
           key={`locusInfo-${i}`}
           locusIndex={i}
           attempt={attempt}
-          valid={valid}
-          setValid={setValid}
+          setLocusValid={setLocusValid}
           _LDFile={_LDFile}
-          _associationFile={_associationFile}
-          _gwasFile={_gwasFile}
         />
       )),
     },
@@ -1248,7 +1217,7 @@ export function QTLsGWASForm() {
             to={`/qtls/sample`}
             className="font-14"
             style={
-              window.location.hash == '#/qtls/sample'
+              submitted
                 ? {
                     pointerEvents: 'none',
                     color: 'gray',
