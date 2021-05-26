@@ -22,7 +22,7 @@ RUN dnf -y update \
     zlib-devel \
     xz-devel \
     git \
-    libxml2-devel \ 
+    libxml2-devel \
     readline-devel \
     lapack-devel \
     blas-devel \
