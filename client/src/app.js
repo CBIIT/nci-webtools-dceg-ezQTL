@@ -31,12 +31,12 @@ export function App() {
     },
     {
       route: '/qtls',
-      title: 'Single Locus',
+      title: 'Analyses',
     },
 
     {
       route: '/help',
-      title: 'Help',
+      title: 'Documentation',
     },
   ];
 
