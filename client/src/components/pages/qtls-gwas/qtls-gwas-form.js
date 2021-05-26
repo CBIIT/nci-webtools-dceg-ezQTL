@@ -944,7 +944,7 @@ export function QTLsGWASForm() {
                 variant="link"
                 onClick={() => toggleQuantification(!useQuantification)}
               >
-                {useQuantification ? '- Remove ' : '+ Add '} Quantification Data
+                {useQuantification ? '- Remove ' : '+ Add '} QTL Raw Data
               </Button>
             </Col>
           </Row>
