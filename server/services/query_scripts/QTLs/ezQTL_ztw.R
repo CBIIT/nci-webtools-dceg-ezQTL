@@ -171,7 +171,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     }
   }
   
-  if(!is.null(leadsnp))  {
+  if(!is.null(leadsnp)) {
     cat(paste0("\nReference SNP using for filtering SNPs based on the snp: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
     if(!is.null(gwasfile)){
       leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
@@ -181,8 +181,14 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       if(!is.null(qtlfile)) {
         leadchr <- qtl %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(chr) 
         if(is.null(leadpos)) {leadpos <- qtl %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(pos)}
+      }else{
+        if(!is.null(ldfile)){
+          leadchr <- ld.info %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(chr) 
+          if(is.null(leadpos)) {leadpos <- ld.info %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(pos)}
+        }
       }
     }
+    
     
     leadpos1 <- leadpos - distance
     leadpos2 <- leadpos + distance
@@ -242,7 +248,9 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     xleng <- if_else(xleng>12,12,xleng)
     ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = xleng)
   }else{
-    pall0 <- ggplot()
+    labeltext="No qtl input detected. No plot of QTL minimal P will be shown"
+    pall0 <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=6)+theme_nothing()
+    #pall0 <- ggplot()
     ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = 4)
   }
   
@@ -1161,10 +1169,6 @@ coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_
 
 
 
-
-
-
-
 locus_quantification_cor <- function(qdata,qtldata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
   if(any(is.na(unique(qtldata$gene_symbol)))){
@@ -1196,14 +1200,14 @@ locus_quantification_cor <- function(qdata,qtldata,output_plot=NULL,plot_width=N
   
   
   p <- ggplot(df) +
-    ggasym::geom_asymmat(aes(x = x, y = y,
+    geom_asymmat(aes(x = x, y = y,
                      fill_tl = pearson_r, fill_br = spearman_r)) +
-    ggasym::scale_fill_tl_distiller(type = "div", palette = "RdYlBu",
+    scale_fill_tl_distiller(type = "div", palette = "RdYlBu",
                             na.value = "grey90",
                             guide = guide_colourbar(direction = "vertical",barheight = unit(6,'cm'),
                                                     order = 1,
                                                     title.position = "top")) +
-    ggasym::scale_fill_br_distiller(type = "div", palette = "RdYlBu",
+    scale_fill_br_distiller(type = "div", palette = "RdYlBu",
                             na.value = "grey90",
                             guide = guide_colourbar(direction = "vertical",barheight = unit(6,'cm'),
                                                     order = 2,
@@ -1264,7 +1268,7 @@ locus_quantification_dis<- function(qdata,qtldata,genesets=NULL,output_plot=NULL
     mutate(gene_symbol=factor(gene_symbol,levels = genelevel)) %>% 
     ggplot(aes(x=expression,y=gene_symbol,fill=stat(x)))+
     #stat_density_ridges(quantile_lines = TRUE, quantiles = 2,fill='#cccccc')+
-    ggridges::geom_density_ridges_gradient() + 
+    geom_density_ridges_gradient() + 
     scale_fill_viridis_c(option = 'C')+
     scale_x_continuous(expand = c(0, 0),breaks = pretty_breaks()) +
     scale_y_discrete(expand = c(0, 0)) +
@@ -1782,12 +1786,12 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   
 }
 
+
 locus_quantification_qtl <- function(gdata,qdata,gdata_queryid=NULL,qdata_queryid=NULL,output_plot=NULL,log2=TRUE){
   #  queryid <- '21:42642038:A:G'
   #queryid2 <- "ENSG00000226496.1"
   
   require(ggstatsplot)
-
   # box plot
   gdata_samples <- colnames(gdata)[-c(1:4)]
   qdata_samples <- colnames(qdata)[-c(1:4)]
@@ -1844,6 +1848,3 @@ locus_quantification_qtl <- function(gdata,qdata,gdata_queryid=NULL,qdata_queryi
   }
   
 }
-
-
-

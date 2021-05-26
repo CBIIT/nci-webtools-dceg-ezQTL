@@ -170,7 +170,7 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
-qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, distance, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
+qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
   source(rfile)
   loadAWS()
 
@@ -214,6 +214,6 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   else if (identical(ldAssocData, 'QTL') & !is.null(associationFile))
     IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = select_gene, genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
   else {
-    IntRegionalPlot(genome_build = genome_build, association_file = NULL, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+    IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp = leadsnp, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
   }
 }

@@ -469,7 +469,6 @@ async function calculateLocusLD(params) {
     select_gene,
     workingDirectory,
     bucket,
-    distance,
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
@@ -500,7 +499,6 @@ async function calculateLocusLD(params) {
       threshold,
       ldAssocData,
       select_gene,
-      distance || 100,
       request.toString(),
       workingDirectory,
       bucket,

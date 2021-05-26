@@ -25,7 +25,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 const { v1: uuidv1 } = require('uuid');
 
-function LocusInfo({ locusIndex, attempt, setValid }) {
+function LocusInfo({
+  locusIndex,
+  attempt,
+  valid,
+  setValid,
+  _LDFile,
+  _associationFile,
+  _gwasFile,
+}) {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
   const {
@@ -49,8 +57,9 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
       select_dist < 1 ||
       select_dist > 200 ||
       !select_position ||
-      !select_chromosome
-      // ||(select_ref && !/^rs\d+$/.test(select_ref))
+      !select_chromosome ||
+      (select_ref && !/^rs\d+$/.test(select_ref)) ||
+      (_LDFile && !_associationFile && !_gwasFile && !select_ref)
     ) {
       setValid(false);
     } else {
@@ -63,6 +72,7 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
     select_ref,
     select_position,
     select_chromosome,
+    _LDFile,
   ]);
 
   function mergeLocusInfo(data) {
@@ -188,6 +198,9 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
             <Col>
               <Form.Label className="mb-0">
                 SNP{' '}
+                {_LDFile && !_associationFile && !_gwasFile && (
+                  <span style={{ color: 'red' }}>* </span>
+                )}
                 <small>
                   <i>(Default: lowest GWAS P-value SNP)</i>
                 </small>
@@ -199,15 +212,10 @@ function LocusInfo({ locusIndex, attempt, setValid }) {
                 disabled={submitted}
                 onChange={(e) => mergeLocusInfo({ select_ref: e.target.value })}
                 value={select_ref ? select_ref : ''}
-                isInvalid={
-                  attempt &&
-                  select_ref &&
-                  select_ref.length > 0 &&
-                  !/^rs\d+$/.test(select_ref)
-                }
+                isInvalid={attempt && !valid}
               />
               <Form.Control.Feedback type="invalid">
-                Enter valid RS number. Leave empty for default.
+                Enter a valid RS number
               </Form.Control.Feedback>
             </Col>
           )}
@@ -663,6 +671,7 @@ export function QTLsGWASForm() {
     if (!valid) {
       return;
     }
+    setAttempt(false);
     const request = uuidv1();
 
     await dispatch(
@@ -1199,7 +1208,11 @@ export function QTLsGWASForm() {
           key={`locusInfo-${i}`}
           locusIndex={i}
           attempt={attempt}
+          valid={valid}
           setValid={setValid}
+          _LDFile={_LDFile}
+          _associationFile={_associationFile}
+          _gwasFile={_gwasFile}
         />
       )),
     },
