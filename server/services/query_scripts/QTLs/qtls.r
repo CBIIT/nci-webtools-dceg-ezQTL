@@ -360,7 +360,9 @@ locus_quantification_heatmap <- function(edata_boxplot) {
 }
 
 locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile, edata, gdata, request) {
-
+  library(ggasym)
+  library(ggridges)
+  library(ggstatsplot)
   source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'ezQTL_ztw.R'))
   # initialize boxplot data as empty until data file detected
   locus_quantification_data <- list(c())
