@@ -72,7 +72,7 @@ RUN cd /tmp \
 RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts; fc-cache -fv;
 
 # install R packages
-RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); options(warn=2); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.ec2metadata', 'aws.s3', 'aws.signature', 'gdtools', 'cowplot', 'hrbrthemes','svglite', 'ggsci', 'ggrepel', 'ggplot2', 'ggstatsplot', 'scales', 'ggasym', 'corrr', 'ggridges', 'plyr', 'reshape2'), repos='https://cloud.r-project.org/')"
+RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.ec2metadata', 'aws.s3', 'aws.signature', 'gdtools', 'cowplot', 'hrbrthemes','svglite', 'ggsci', 'ggrepel', 'ggplot2', 'ggstatsplot', 'scales', 'ggasym', 'corrr', 'ggridges', 'plyr', 'reshape2'), repos='https://cloud.r-project.org/')"
 
 # install Hyprcoloc R package
 RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = FALSE);"
