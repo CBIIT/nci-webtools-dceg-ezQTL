@@ -170,6 +170,11 @@ function LocusInfo({
                 mergeLocusInfo({ select_chromosome: chromosome });
               }}
             />
+            {attempt && !select_chromosome && (
+              <div class="text-danger" style={{ fontSize: '80%' }}>
+                Please select a chromosome
+              </div>
+            )}
           </Col>
         </Form.Row>
         <Form.Row>
@@ -212,7 +217,11 @@ function LocusInfo({
                 disabled={submitted}
                 onChange={(e) => mergeLocusInfo({ select_ref: e.target.value })}
                 value={select_ref ? select_ref : ''}
-                isInvalid={attempt && !valid}
+                isInvalid={
+                  attempt &&
+                  ((select_ref && !/^rs\d+$/.test(select_ref)) ||
+                    (_LDFile && !_associationFile && !_gwasFile && !select_ref))
+                }
               />
               <Form.Control.Feedback type="invalid">
                 Enter a valid RS number
