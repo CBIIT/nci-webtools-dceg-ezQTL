@@ -19,13 +19,9 @@ const { v1: uuidv1 } = require('uuid');
 function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
-  const {
-    locusInformation,
-    submitted,
-    qtlPublic,
-    ldPublic,
-    gwasPublic,
-  } = useSelector((state) => state.qtlsGWAS);
+  const { locusInformation, submitted, qtlPublic, ldPublic } = useSelector(
+    (state) => state.qtlsGWAS
+  );
   const {
     select_dist,
     select_position,
@@ -33,7 +29,7 @@ function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
     select_chromosome,
   } = locusInformation[locusIndex];
 
-  // check form validity
+  // check form validity for locus info params
   useEffect(() => {
     if (
       !select_dist ||
@@ -45,10 +41,8 @@ function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
       (_LDFile && !select_ref)
     ) {
       setLocusValid(false);
-      console.log(false);
     } else {
       setLocusValid(true);
-      console.log(true);
     }
   }, [
     ldPublic,
@@ -338,7 +332,7 @@ export function QTLsGWASForm() {
       handleGwasProject(gwasProject);
   }, [gwasPublic, phenotypeOnly]);
 
-  // check form validity
+  // check form validity for file uploads
   useEffect(() => {
     if (
       (!select_qtls_samples &&
@@ -668,7 +662,7 @@ export function QTLsGWASForm() {
   }
 
   async function handleSubmit() {
-    if (!valid && !locusValid) {
+    if (!valid || !locusValid) {
       return;
     }
     setAttempt(false);
@@ -883,10 +877,10 @@ export function QTLsGWASForm() {
                     _setAssociationFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  isInvalid={
-                    attempt ? !_associationFile && !select_qtls_samples : false
-                  }
-                  feedback="Please upload a data file"
+                  // isInvalid={
+                  //   attempt ? !_associationFile && !select_qtls_samples : false
+                  // }
+                  // feedback="Please upload a data file"
                   custom
                 />
               )}
@@ -986,10 +980,10 @@ export function QTLsGWASForm() {
                     _setGwasFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  isInvalid={
-                    attempt ? !_gwasFile && !select_qtls_samples : false
-                  }
-                  feedback="Please upload a data file"
+                  // isInvalid={
+                  //   attempt ? !_gwasFile && !select_qtls_samples : false
+                  // }
+                  // feedback="Please upload a data file"
                   custom
                 />
               )}
