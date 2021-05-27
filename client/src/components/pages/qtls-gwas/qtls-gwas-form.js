@@ -47,9 +47,12 @@ function LocusInfo({
       select_dist < 1 ||
       select_dist > 200 ||
       (select_ref && !/^rs\d+$/.test(select_ref)) ||
-      (ldPublic &&
-        (!select_position || !Object.entries(select_chromosome).length)) ||
-      (_LDFile && !select_ref)
+      (ldPublic && !select_position) ||
+      (_LDFile && !select_ref) ||
+      !(
+        (ldPublic || qtlPublic || gwasPublic) &&
+        Object.entries(select_chromosome).length
+      )
     ) {
       setLocusValid(false);
     } else {
