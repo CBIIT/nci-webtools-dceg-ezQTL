@@ -1870,7 +1870,7 @@ export function qtlsGWASCalculation(params) {
               response.data['locus_alignment_gwas_scatter']['data'][0],
               response.data['locus_alignment_gwas_scatter']['title'][0],
               response.data['locus_alignment']['top'][0][0]['gene_symbol'],
-              1.0
+              Math.pow(10, 0.0 * -1.0)
             )
           );
         }
@@ -1924,7 +1924,7 @@ export function qtlsGWASCalculation(params) {
               layout: locus_alignment_plot_layout,
               top: response.data['locus_alignment']['top'][0][0],
             },
-            locus_alignment_gwas_scatter_threshold: 1.0,
+            locus_alignment_gwas_scatter_threshold: 0.0,
             locus_colocalization_correlation: {
               data:
                 response.data['locus_colocalization_correlation']['data'][0],
@@ -2272,7 +2272,7 @@ export function fetchResults(request) {
             main['locus_alignment_gwas_scatter']['data'][0],
             main['locus_alignment_gwas_scatter']['title'][0],
             main['locus_alignment']['top'][0][0]['gene_symbol'],
-            1.0
+            Math.pow(10, 0.0 * -1.0)
           )
         );
       }
