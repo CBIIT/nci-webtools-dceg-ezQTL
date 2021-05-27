@@ -30,14 +30,17 @@ export function QTLsGWASResultsForm() {
     qtlKey,
     ldKey,
     gwasKey,
-    select_chromosome,
     select_qtls_samples,
     select_gwas_sample,
     genome,
     locusInformation,
   } = useSelector((state) => state.qtlsGWAS);
 
-  const { select_ref, select_position } = locusInformation[0];
+  const {
+    select_ref,
+    select_position,
+    select_chromosome,
+  } = locusInformation[0];
 
   const [_selectRef, _setSelectRef] = useState('');
 
@@ -128,7 +131,7 @@ export function QTLsGWASResultsForm() {
       qtlKey: qtlKey || false,
       ldKey: ldKey || false,
       gwasKey: gwasKey || false,
-      select_chromosome: select_chromosome.value,
+      select_chromosome: select_chromosome.value || false,
       select_position,
       genome_build: genome.value,
     };

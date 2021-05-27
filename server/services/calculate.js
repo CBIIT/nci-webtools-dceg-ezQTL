@@ -67,7 +67,7 @@ async function calculateMain(params) {
       ldKey.toString(),
       gwasKey.toString(),
       select_chromosome.toString(),
-      parseInt(select_position),
+      select_position,
       bucket.toString(),
     ]
   );

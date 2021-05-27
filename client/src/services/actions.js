@@ -438,7 +438,11 @@ const drawLocusAlignment = (response) => {
   const locus_alignment_plot_layout = {
     title: {
       text:
-        'QTLs Chromosome ' +
+        `${
+          response.data.info.inputs.association_file[0] != 'false'
+            ? 'QTLs'
+            : 'GWAS'
+        } Chromosome ` +
         response.data['locus_alignment']['top'][0][0]['chr'] +
         ' Variants',
       xref: 'paper',
@@ -1852,11 +1856,15 @@ export function qtlsGWASCalculation(params) {
         console.log('api/qtls-calculate-main response.data', response.data);
 
         const { pdata, locus_alignment_plot_layout } =
-          Object.keys(response.data['gwas']['data'][0]).length > 0
+          Object.keys(response.data['gwas']['data'][0]).length > 0 &&
+          response.data.info.inputs.association_file[0] != 'false'
             ? drawLocusAlignmentGWAS(response)
             : drawLocusAlignment(response);
 
-        if (Object.keys(response.data['gwas']['data'][0]).length > 0) {
+        if (
+          Object.keys(response.data['gwas']['data'][0]).length > 0 &&
+          response.data.info.inputs.association_file[0] != 'false'
+        ) {
           dispatch(
             drawLocusAlignmentScatter(
               response.data['locus_alignment_gwas_scatter']['data'][0],
@@ -1956,7 +1964,10 @@ export function qtlsGWASCalculation(params) {
           if (
             qtlsGWAS.gwas &&
             qtlsGWAS.gwas.data &&
-            Object.keys(qtlsGWAS.gwas.data).length > 0
+            Object.keys(qtlsGWAS.gwas.data).length > 0 &&
+            (qtlsGWAS.associationFile || qtlsGWAS.qtlKey) &&
+            (qtlsGWAS.gwasFile || qtlsGWAS.gwasKey) &&
+            (qtlsGWAS.LDFile || qtlsGWAS.ldKey)
           ) {
             dispatch(
               qtlsGWASHyprcolocLDCalculation({

@@ -16,12 +16,23 @@ import Accordions from '../../controls/accordions/accordions';
 import { PopulationSelect } from '../../controls/population-select/population-select';
 const { v1: uuidv1 } = require('uuid');
 
-function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
+function LocusInfo({
+  locusIndex,
+  attempt,
+  setLocusValid,
+  _LDFile,
+  _associationFile,
+  _gwasFile,
+}) {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
-  const { locusInformation, submitted, qtlPublic, ldPublic } = useSelector(
-    (state) => state.qtlsGWAS
-  );
+  const {
+    locusInformation,
+    submitted,
+    qtlPublic,
+    ldPublic,
+    gwasPublic,
+  } = useSelector((state) => state.qtlsGWAS);
   const {
     select_dist,
     select_position,
@@ -35,9 +46,9 @@ function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
       !select_dist ||
       select_dist < 1 ||
       select_dist > 200 ||
-      !select_position ||
       (select_ref && !/^rs\d+$/.test(select_ref)) ||
-      (ldPublic && Object.entries(select_chromosome).length) ||
+      (ldPublic &&
+        (!select_position || !Object.entries(select_chromosome).length)) ||
       (_LDFile && !select_ref)
     ) {
       setLocusValid(false);
@@ -47,12 +58,14 @@ function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
   }, [
     ldPublic,
     qtlPublic,
+    gwasPublic,
     select_dist,
     select_ref,
     select_position,
     select_chromosome,
     _LDFile,
-    ldPublic,
+    _associationFile,
+    _gwasFile,
   ]);
 
   function mergeLocusInfo(data) {
@@ -119,7 +132,7 @@ function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
             </Form.Control.Feedback>
           </Col>
         </Form.Row>
-        {ldPublic ? (
+        {qtlPublic || gwasPublic || ldPublic ? (
           <>
             <Form.Row>
               <Col>
@@ -152,8 +165,8 @@ function LocusInfo({ locusIndex, attempt, setLocusValid, _LDFile }) {
                     mergeLocusInfo({ select_chromosome: chromosome });
                   }}
                 />
-                {attempt && Object.entries(select_chromosome).length && (
-                  <div class="text-danger" style={{ fontSize: '80%' }}>
+                {attempt && Object.entries(select_chromosome).length == 0 && (
+                  <div className="text-danger" style={{ fontSize: '80%' }}>
                     Please select a chromosome
                   </div>
                 )}
@@ -746,7 +759,7 @@ export function QTLsGWASForm() {
         qtlKey: qtlKey || false,
         ldKey: ldKey,
         gwasKey: gwasKey || false,
-        select_chromosome: select_chromosome.value,
+        select_chromosome: select_chromosome.value || false,
         select_position: select_position,
         genome_build: genome.value,
       };
@@ -1185,6 +1198,8 @@ export function QTLsGWASForm() {
           attempt={attempt}
           setLocusValid={setLocusValid}
           _LDFile={_LDFile}
+          _associationFile={_associationFile}
+          _gwasFile={_gwasFile}
         />
       )),
     },

@@ -470,6 +470,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
     unique()
 
   ## read and parse association data file ###
+  qdata = NULL
   if (identical(select_qtls_samples, 'true')) {
     # load example data
     qdatafile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
@@ -555,6 +556,11 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
       errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
       # dataSourceJSON <- c(toJSON(list(info=list(messages=list(errors=errorMessages)))))
       # return(dataSourceJSON)
+    }
+    # when only gwas data is inputted
+    if (is.null(qdata)) {
+      source('server/services/query_scripts/QTLs/ezQTL_ztw.R')
+      qdata = gwas2qtl(gwasdata)
     }
   }
 

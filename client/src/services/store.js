@@ -21,7 +21,7 @@ export const getInitialState = async () => {
           select_dist: 100,
           select_ref: false,
           select_position: '',
-          select_chromosome: {},
+          select_chromosome: false,
         },
       ],
       recalculateAttempt: false,

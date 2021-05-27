@@ -104,7 +104,7 @@ export function LocusAlignmentPlot(params) {
       qtlKey: qtlKey || false,
       ldKey: ldKey || false,
       gwasKey: gwasKey || false,
-      select_chromosome: select_chromosome.value,
+      select_chromosome: select_chromosome.value || false,
       select_position,
       genome_build: genome.value,
     };
