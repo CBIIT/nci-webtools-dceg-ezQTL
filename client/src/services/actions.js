@@ -2264,11 +2264,17 @@ export function fetchResults(request) {
       // console.log('api/fetch-results', state);
 
       const { pdata, locus_alignment_plot_layout } =
-        Object.keys(main['gwas']['data'][0]).length > 0
+        state.associationFile &&
+        Object.keys(main).length &&
+        Object.keys(main.gwas.data[0]).length
           ? drawLocusAlignmentGWAS({ data: main })
           : drawLocusAlignment({ data: main });
 
-      if (Object.keys(main['gwas']['data'][0]).length > 0) {
+      if (
+        state.associationFile &&
+        Object.keys(main).length &&
+        Object.keys(main.gwas.data[0]).length
+      ) {
         dispatch(
           drawLocusAlignmentScatter(
             main['locus_alignment_gwas_scatter']['data'][0],

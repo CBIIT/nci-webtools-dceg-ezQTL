@@ -153,157 +153,160 @@ async function calculate(params) {
       },
     ],
   };
-  // qtlsCalculateMain
-  const main = JSON.parse(
-    await calculateMain({
-      workingDirectory: workingDirectory,
-      bucket: config.aws.s3.data,
-      ...newParams,
-    })
-  );
-  state = mergeState(state, {
-    openSidebar: false,
-    select_qtls_samples:
-      main['info']['select_qtls_samples'][0] === 'true' ? true : false,
-    select_gwas_sample:
-      main['info']['select_gwas_sample'][0] === 'true' ? true : false,
-    select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
-    recalculateAttempt:
-      main['info']['recalculateAttempt'][0] === 'true' ? true : false,
-    top_gene_variants: {
-      data: main['info']['top_gene_variants']['data'][0],
-    },
-    all_gene_variants: {
-      data: main['info']['all_gene_variants']['data'][0],
-    },
-    gene_list: {
-      data: main['info']['gene_list']['data'][0],
-    },
-    inputs: main['info']['inputs'],
-    messages: main['info']['messages'],
-    locus_alignment: {
-      top: main['locus_alignment']['top'][0][0],
-    },
-    locus_alignment_gwas_scatter_threshold: 0.0,
-    locus_colocalization_correlation: {
-      data: main['locus_colocalization_correlation']['data'][0],
-    },
-    gwas: {
-      data: main['gwas']['data'][0],
-    },
-    locus_table: {
-      data: main['locus_alignment']['data'][0],
-      globalFilter: '',
-    },
-    isLoading: false,
-  });
 
-  // qtlsCalculateLocusColocalizationHyprcolocLD
-  try {
-    const { hyprcoloc_ld } = main.gwas.data.length
-      ? JSON.parse(
-          await calculateHyprcolocLD({
+  let main = {};
+  if (newParams.associationFile || newParams.gwasFile) {
+    // qtlsCalculateMain
+    main = JSON.parse(
+      await calculateMain({
+        workingDirectory: workingDirectory,
+        bucket: config.aws.s3.data,
+        ...newParams,
+      })
+    );
+    state = mergeState(state, {
+      openSidebar: false,
+      select_qtls_samples:
+        main['info']['select_qtls_samples'][0] === 'true' ? true : false,
+      select_gwas_sample:
+        main['info']['select_gwas_sample'][0] === 'true' ? true : false,
+      select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
+      recalculateAttempt:
+        main['info']['recalculateAttempt'][0] === 'true' ? true : false,
+      top_gene_variants: {
+        data: main['info']['top_gene_variants']['data'][0],
+      },
+      all_gene_variants: {
+        data: main['info']['all_gene_variants']['data'][0],
+      },
+      gene_list: {
+        data: main['info']['gene_list']['data'][0],
+      },
+      inputs: main['info']['inputs'],
+      messages: main['info']['messages'],
+      locus_alignment: {
+        top: main['locus_alignment']['top'][0][0],
+      },
+      locus_alignment_gwas_scatter_threshold: 0.0,
+      locus_colocalization_correlation: {
+        data: main['locus_colocalization_correlation']['data'][0],
+      },
+      gwas: {
+        data: main['gwas']['data'][0],
+      },
+      locus_table: {
+        data: main['locus_alignment']['data'][0],
+        globalFilter: '',
+      },
+      isLoading: false,
+    });
+
+    // qtlsCalculateLocusColocalizationHyprcolocLD
+    try {
+      const { hyprcoloc_ld } = main.gwas.data.length
+        ? JSON.parse(
+            await calculateHyprcolocLD({
+              workingDirectory: workingDirectory,
+              bucket: config.aws.s3.data,
+              request: request,
+              ldfile: state.inputs.ld_file[0],
+              select_ref: state.locus_alignment.top.rsnum,
+              select_chr: state.locus_alignment.top.chr,
+              select_pos: state.locus_alignment.top.pos,
+              select_dist: state.inputs.select_dist[0] * 1000,
+            })
+          )
+        : {};
+      // qtlsCalculateLocusColocalizationHyprcoloc
+      if (Object.keys(hyprcoloc_ld).length && hyprcoloc_ld.filename) {
+        const { hyprcoloc } = JSON.parse(
+          await calculateHyprcoloc({
             workingDirectory: workingDirectory,
             bucket: config.aws.s3.data,
             request: request,
-            ldfile: state.inputs.ld_file[0],
-            select_ref: state.locus_alignment.top.rsnum,
-            select_chr: state.locus_alignment.top.chr,
-            select_pos: state.locus_alignment.top.pos,
+            select_gwas_sample: state.select_gwas_sample,
+            select_qtls_samples: state.select_qtls_samples,
             select_dist: state.inputs.select_dist[0] * 1000,
+            select_ref: state.locus_alignment.top.rsnum,
+            gwasfile: state.inputs.gwas_file[0],
+            qtlfile: state.inputs.association_file[0],
+            ldfile: hyprcoloc_ld.filename[0],
+            qtlKey: params.qtlKey,
+            select_chromosome: params.select_chromosome,
+            select_position: params.select_position,
           })
-        )
-      : {};
-    // qtlsCalculateLocusColocalizationHyprcoloc
-    if (Object.keys(hyprcoloc_ld).length && hyprcoloc_ld.filename) {
-      const { hyprcoloc } = JSON.parse(
-        await calculateHyprcoloc({
+        );
+
+        state = mergeState(state, {
+          hyprcoloc_ld: {
+            filename: hyprcoloc_ld.filename[0],
+          },
+          hyprcoloc_table: {
+            data: hyprcoloc['result_hyprcoloc']['data'][0],
+          },
+          hyprcolocSNPScore_table: {
+            data: hyprcoloc['result_snpscore']['data'][0],
+          },
+        });
+      }
+    } catch (err) {
+      logger.error(err);
+    }
+
+    // qtlsGWASECaviarCalculation
+    try {
+      const { ecaviar } = JSON.parse(
+        await calculateECAVIAR({
           workingDirectory: workingDirectory,
           bucket: config.aws.s3.data,
           request: request,
+          LDFile: state.inputs.ld_file[0],
+          associationFile: state.inputs.association_file[0],
+          gwasFile: state.inputs.gwas_file[0],
+          select_dist: state.inputs.select_dist[0] * 1000,
           select_gwas_sample: state.select_gwas_sample,
           select_qtls_samples: state.select_qtls_samples,
-          select_dist: state.inputs.select_dist[0] * 1000,
           select_ref: state.locus_alignment.top.rsnum,
-          gwasfile: state.inputs.gwas_file[0],
-          qtlfile: state.inputs.association_file[0],
-          ldfile: hyprcoloc_ld.filename[0],
-          qtlKey: params.qtlKey,
-          select_chromosome: params.select_chromosome,
-          select_position: params.select_position,
         })
       );
 
       state = mergeState(state, {
-        hyprcoloc_ld: {
-          filename: hyprcoloc_ld.filename[0],
-        },
-        hyprcoloc_table: {
-          data: hyprcoloc['result_hyprcoloc']['data'][0],
-        },
-        hyprcolocSNPScore_table: {
-          data: hyprcoloc['result_snpscore']['data'][0],
+        ecaviar_table: {
+          data: ecaviar['data'][0],
         },
       });
+    } catch (err) {
+      logger.error(err);
     }
-  } catch (err) {
-    logger.error(err);
-  }
+    // qtlsColocVisualization - summary
+    try {
+      if (
+        state.hyprcoloc_table.data.length > 0 &&
+        state.ecaviar_table.data.length > 0
+      ) {
+        const colocSummary = await calculateColocVisualize({
+          workingDirectory: workingDirectory,
+          bucket: config.aws.s3.data,
+          request: request,
+          hydata: state.hyprcoloc_table.data,
+          ecdata: state.ecaviar_table.data,
+          LDFile: state.inputs['ld_file'][0],
+          associationFile: state.inputs['association_file'][0],
+          gwasFile: state.inputs['gwas_file'][0],
+          select_dist: state.inputs['select_dist'][0] * 1000,
+          select_gwas_sample: params.select_gwas_sample,
+          select_qtls_samples: params.select_qtls_samples,
+          select_ref: state.locus_alignment['top']['rsnum'],
+          calcEcaviar: state.ecaviar_table.data.length === 0,
+        });
 
-  // qtlsGWASECaviarCalculation
-  try {
-    const { ecaviar } = JSON.parse(
-      await calculateECAVIAR({
-        workingDirectory: workingDirectory,
-        bucket: config.aws.s3.data,
-        request: request,
-        LDFile: state.inputs.ld_file[0],
-        associationFile: state.inputs.association_file[0],
-        gwasFile: state.inputs.gwas_file[0],
-        select_dist: state.inputs.select_dist[0] * 1000,
-        select_gwas_sample: state.select_gwas_sample,
-        select_qtls_samples: state.select_qtls_samples,
-        select_ref: state.locus_alignment.top.rsnum,
-      })
-    );
-
-    state = mergeState(state, {
-      ecaviar_table: {
-        data: ecaviar['data'][0],
-      },
-    });
-  } catch (err) {
-    logger.error(err);
-  }
-
-  // qtlsColocVisualization - summary
-  try {
-    if (
-      state.hyprcoloc_table.data.length > 0 &&
-      state.ecaviar_table.data.length > 0
-    ) {
-      const colocSummary = await calculateColocVisualize({
-        workingDirectory: workingDirectory,
-        bucket: config.aws.s3.data,
-        request: request,
-        hydata: state.hyprcoloc_table.data,
-        ecdata: state.ecaviar_table.data,
-        LDFile: state.inputs['ld_file'][0],
-        associationFile: state.inputs['association_file'][0],
-        gwasFile: state.inputs['gwas_file'][0],
-        select_dist: state.inputs['select_dist'][0] * 1000,
-        select_gwas_sample: params.select_gwas_sample,
-        select_qtls_samples: params.select_qtls_samples,
-        select_ref: state.locus_alignment['top']['rsnum'],
-        calcEcaviar: state.ecaviar_table.data.length === 0,
-      });
-
-      state = mergeState(state, {
-        summaryLoaded: true,
-      });
+        state = mergeState(state, {
+          summaryLoaded: true,
+        });
+      }
+    } catch (err) {
+      logger.error(err);
     }
-  } catch (err) {
-    logger.error(err);
   }
 
   // qtlsGWASLocusLDCalculation
@@ -315,10 +318,13 @@ async function calculate(params) {
         request: request,
         select_gwas_sample: state.select_gwas_sample,
         select_qtls_samples: state.select_qtls_samples,
-        gwasFile: state.inputs.gwas_file[0],
-        associationFile: state.inputs.association_file[0],
-        LDFile: state.inputs.ld_file[0],
-        leadsnp: state.locus_alignment.top.rsnum,
+        gwasFile: newParams.gwasFile,
+        associationFile: newParams.associationFile,
+        LDFile: newParams.LDFile,
+        leadsnp: state.locus_alignment
+          ? state.locus_alignment.top.rsnum
+          : newParams.select_ref,
+        position: newParams.select_position,
         ldThreshold: state.ldThreshold,
         ldAssocData: state.ldAssocData,
         genome_build: params.genome_build,
