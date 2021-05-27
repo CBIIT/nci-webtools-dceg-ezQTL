@@ -48,10 +48,7 @@ export function LocusLD() {
       select_gene: select_gene
     }));
   }
-
   const dispatch = useDispatch();
-  const [tissueOnly, viewTissueOnly] = useState(false);
-  const [attempt, setAttempt] = useState(false);
 
   return (
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
@@ -115,17 +112,17 @@ export function LocusLD() {
                   <div className="col-md-4">
                     <Form.Label className="mb-0">
                       Trait for QTL{' '}
-                      <span
+                      {ldAssocData.value === 'QTL' && <span
                         style={{
                           display: submitted && !isLoading ? 'inline' : 'none',
                           color: 'red',
                         }}
                       >
                         *
-                </span>
+                </span>}
                     </Form.Label>
                     <ReactSelect
-                      isDisabled={!submitted || ldAssocData.value === 'GWAS'}
+                      isDisabled={!submitted || ldAssocData.value !== 'QTL'}
                       inputId="qtls-results-gene-input"
                       // label=""
                       value={ldAssocData.value === 'QTL' ? select_gene : null}
