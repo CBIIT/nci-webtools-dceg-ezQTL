@@ -112,14 +112,14 @@ export function LocusAlignment() {
                   </p>
 
                   <Form className="row justify-content-center">
-                    <div className="col-md-2">
+                    <div className="col-md-3">
                       <Form.Label className="mb-0">
-                        <i>P</i>-value Threshold
+                        -log<sub>10</sub> <i>P</i>-value Threshold
                       </Form.Label>
                       <Form.Control
                         type="number"
                         min="0.0"
-                        max="1.0"
+                        // max="1.0"
                         id="locus-alignment-scatter-threshold-input"
                         disabled={!submitted}
                         value={locus_alignment_gwas_scatter_threshold}
@@ -134,7 +134,7 @@ export function LocusAlignment() {
                             })
                           );
                           console.log('threshold', threshold, '');
-                          if (threshold >= 0.0 && threshold <= 1.0) {
+                          if (threshold >= 0.0) {
                             console.log(
                               'REDRAW SCATTER?',
                               locus_alignment_gwas_scatter['raw'],
@@ -147,20 +147,19 @@ export function LocusAlignment() {
                                 locus_alignment_gwas_scatter['raw'],
                                 null,
                                 locus_alignment['top']['gene_symbol'],
-                                threshold
+                                Math.pow(10, threshold * -1.0)
                               )
                             );
                           }
                           // }
                         }}
                         isInvalid={
-                          locus_alignment_gwas_scatter_threshold < 0.0 ||
-                          locus_alignment_gwas_scatter_threshold > 1.0
+                          locus_alignment_gwas_scatter_threshold < 0.0
                         }
                         // custom
                       />
                       <Form.Control.Feedback type="invalid">
-                        Enter threshold between 0.0 and 1.0.
+                        Enter threshold {`>=`} 0.0
                       </Form.Control.Feedback>
                     </div>
                   </Form>

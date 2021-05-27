@@ -184,7 +184,7 @@ async function calculate(params) {
     locus_alignment: {
       top: main['locus_alignment']['top'][0][0],
     },
-    locus_alignment_gwas_scatter_threshold: 1.0,
+    locus_alignment_gwas_scatter_threshold: 0.0,
     locus_colocalization_correlation: {
       data: main['locus_colocalization_correlation']['data'][0],
     },
