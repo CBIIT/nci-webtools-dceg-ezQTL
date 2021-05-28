@@ -1606,6 +1606,35 @@ export function qtlsGWASECaviarCalculation(params) {
   };
 }
 
+export function qtlsGWASCalculateQuantification(params){
+  return async function (dispatch, getState){
+    console.log('quantification', params);
+    dispatch(updateQTLsGWAS({ isLoadingQuantification: true }))
+
+    axios
+      .post('api/qtls-recalculate-quantification', params)
+      .then(async function (response) {
+        console.log('1')
+        dispatch(updateQTLsGWAS({ isLoadingQuantification: false }));
+      })
+      .catch(function (error) {
+        console.log(error)
+        if (error) {
+          dispatch(updateError({ visible: true, message: error }));
+          dispatch(
+            updateQTLsGWAS({
+              isLoadingQuantification: false,
+            })
+          );
+        }
+      })
+      .then(function () {
+        console.log('hi')
+        dispatch(updateQTLsGWAS({ isLoadingQuantification: false }));
+      });
+  }
+}
+
 export function qtlsGWASLocusQCCalculation(params) {
   return async function (dispatch, getState) {
     console.log('locus qc', params);

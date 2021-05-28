@@ -12,6 +12,7 @@ const {
   qtlsCalculateQC,
   qtlsCalculateLD,
   qtlsColocVisualize,
+  qtlsCalculateQuantification
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
@@ -391,6 +392,18 @@ apiRouter.post('/qtls-locus-ld', (req, res, next) =>
       ...req.body,
       workingDirectory: workingDirectory,
       bucket: awsInfo.s3.data,
+    },
+    res,
+    next
+  )
+);
+
+apiRouter.post('/qtls-recalculate-quantification', (req, res, next) =>
+  qtlsCalculateQuantification(
+    {
+      ...req.body,
+      workingDirectory: workingDirectory,
+      bucket: awsInfo.s3.data
     },
     res,
     next

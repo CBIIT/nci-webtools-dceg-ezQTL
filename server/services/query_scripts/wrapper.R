@@ -19,9 +19,36 @@ getS3File <- function(key, bucket) {
   return(rawToChar(get_object(key, bucket)))
 }
 
-qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
+qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, traitID, genotypeID, bucket) {
   source(rfile)
-  main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket)
+  main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, traitID, genotypeID, bucket)
+}
+
+qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, exprFile, genoFile, traitID, genotypeID, log2, request, bucket){
+  source(rfile)
+
+  if (identical(select_qtls_samples, 'false')) {
+    gdatafile <- paste0('tmp/', request, '/', genoFile)
+    edatafile <- paste0('tmp/', request, '/', exprFile)
+  } else {
+    gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
+    edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
+  }
+  
+  gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
+  # check if there are multiple chromosomes in the input genotype file
+  if (length(unique(gdata$chr)) > 1) {
+    errorMessages <- c(errorMessages, "Multiple chromosomes detected in Genotype Data File, make sure data is on one chromosome only.")
+  }
+  edata <- read_delim(edatafile, delim = "\t", col_names = T)
+  # check if there are multiple chromosomes in the input expression (quantification) file
+  if (length(unique(edata$chr)) > 1) {
+    errorMessages <- c(errorMessages, "Multiple chromosomes detected in Quantification Data File, make sure data is on one chromosome only.")
+  }
+
+  qtlPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_qtl.svg')
+
+  locus_quantification_qtl(gdata,edata,gdata_queryid=genotypeID,qdata_queryid=traitID,output_plot=qtlPath,log2=log2)
 }
 
 qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, request, bucket) {
