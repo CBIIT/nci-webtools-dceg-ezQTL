@@ -34,6 +34,8 @@ async function calculateMain(params) {
     gwasKey,
     select_chromosome,
     select_position,
+    traitID,
+    genotypeID,
     bucket,
   } = params;
 
@@ -67,7 +69,9 @@ async function calculateMain(params) {
       ldKey.toString(),
       gwasKey.toString(),
       select_chromosome.toString(),
-      select_position,
+      parseInt(select_position),
+      traitID.toString(),
+      genotypeID.toString(),
       bucket.toString(),
     ]
   );
@@ -90,6 +94,57 @@ async function qtlsCalculateMain(params, req, res, next) {
     res.status(500).json(err);
   }
 }
+async function calculateQuantification(params) {
+  const {
+    request,
+    select_qtls_samples,
+    exprFile,
+    genoFile,
+    traitID,
+    genotypeID,
+    log2,
+    bucket,
+    workingDirectory
+  } = params;
+
+  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
+
+  return r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsRecalculateQuantification',
+    [
+      rfile,
+      workingDirectory,
+      select_qtls_samples,
+      exprFile,
+      genoFile,
+      traitID,
+      genotypeID,
+      log2,
+      request,
+      bucket
+    ]
+  );
+}
+
+async function qtlsCalculateQuantification(params, res, next) {
+  const { request } = params;
+
+  logger.info(`[${request}] Execute /calculate-quantification`);
+  logger.debug(
+    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  );
+
+  try {
+    const wrapper = await calculateQuantification(params);
+    logger.info(`[${request}] Finished /calculate-quantification`);
+    res.json(wrapper);
+  } catch (err) {
+    logger.error(`[${request}] Error /calculate-quantification ${err}`);
+    res.status(500).json(err);
+  }
+}
+
 
 async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   const {
@@ -542,4 +597,5 @@ module.exports = {
   qtlsCalculateLD,
   calculateColocVisualize,
   qtlsColocVisualize,
+  qtlsCalculateQuantification
 };

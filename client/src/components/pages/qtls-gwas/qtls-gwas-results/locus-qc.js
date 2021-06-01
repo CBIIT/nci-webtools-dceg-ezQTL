@@ -46,7 +46,6 @@ export function LocusQC() {
                 {locus_qc.slice(1).map((text, i) => {
                   const splitText = text.split('\n');
                   const firstLine = splitText.splice(0, 1) + '\n';
-                  console.log(splitText);
 
                   return (
                     <div
