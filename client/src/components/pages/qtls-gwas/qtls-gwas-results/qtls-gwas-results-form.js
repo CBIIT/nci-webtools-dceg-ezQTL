@@ -35,6 +35,8 @@ export function QTLsGWASResultsForm() {
     select_gwas_sample,
     genome,
     locusInformation,
+    traitID,
+    genotypeID
   } = useSelector((state) => state.qtlsGWAS);
 
   const { select_ref, select_position } = locusInformation[0];
@@ -130,7 +132,7 @@ export function QTLsGWASResultsForm() {
       gwasKey: gwasKey || false,
       select_chromosome: select_chromosome.value,
       select_position,
-      genome_build: genome.value,
+      genome_build: genome.value
     };
 
     // clear all locus colocalization results
@@ -165,24 +167,6 @@ export function QTLsGWASResultsForm() {
       <Form className="row justify-content-between">
         <div className="col-md-9">
           <Form.Group className="row">
-            <div className="col-md-4">
-              <Form.Label className="mb-0">
-                Population{' '}
-                <span
-                  style={{
-                    display: submitted && !isLoading ? 'inline' : 'none',
-                    color: 'red',
-                  }}
-                >
-                  *
-                </span>
-              </Form.Label>
-              <PopulationSelect
-                id="qtls-results-population-input"
-                disabled={!submitted || ldProject == 'UKBB'}
-                mergeState={(data) => dispatch(updateQTLsGWAS(data))}
-              />
-            </div>
             <div className="col-md-4">
               <Form.Label className="mb-0">
                 Reference Gene{' '}
@@ -242,8 +226,6 @@ export function QTLsGWASResultsForm() {
           <Button
             disabled={
               !submitted ||
-              !select_pop ||
-              select_pop.length <= 0 ||
               (_selectRef &&
                 _selectRef.length > 0 &&
                 !/^rs\d+$/.test(_selectRef))
