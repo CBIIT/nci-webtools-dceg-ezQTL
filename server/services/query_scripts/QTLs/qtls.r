@@ -427,7 +427,7 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, traitID, genotypeID, bucket) {
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -624,7 +624,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata, exprFile, genoFile, edata, gdata, traitID, genotypeID, request)
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata, exprFile, genoFile, edata, gdata, '',  '', request)
   #locus_quantification_data <- locus_quantification[[1]]
   #locus_quantification_heatmap_data <- locus_quantification[[2]]
 
