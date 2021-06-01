@@ -438,7 +438,11 @@ const drawLocusAlignment = (response) => {
   const locus_alignment_plot_layout = {
     title: {
       text:
-        'QTLs Chromosome ' +
+        `${
+          response.data.info.inputs.association_file[0] != 'false'
+            ? 'QTLs'
+            : 'GWAS'
+        } Chromosome ` +
         response.data['locus_alignment']['top'][0][0]['chr'] +
         ' Variants',
       xref: 'paper',
@@ -1606,19 +1610,18 @@ export function qtlsGWASECaviarCalculation(params) {
   };
 }
 
-export function qtlsGWASCalculateQuantification(params){
-  return async function (dispatch, getState){
+export function qtlsGWASCalculateQuantification(params) {
+  return async function (dispatch, getState) {
     console.log('quantification', params);
-    dispatch(updateQTLsGWAS({ isLoadingQuantification: true }))
+    dispatch(updateQTLsGWAS({ isLoadingQuantification: true }));
 
     axios
       .post('api/qtls-recalculate-quantification', params)
       .then(async function (response) {
-        console.log('1')
         dispatch(updateQTLsGWAS({ isLoadingQuantification: false }));
       })
       .catch(function (error) {
-        console.log(error)
+        console.log(error);
         if (error) {
           dispatch(updateError({ visible: true, message: error }));
           dispatch(
@@ -1629,10 +1632,9 @@ export function qtlsGWASCalculateQuantification(params){
         }
       })
       .then(function () {
-        console.log('hi')
         dispatch(updateQTLsGWAS({ isLoadingQuantification: false }));
       });
-  }
+  };
 }
 
 export function qtlsGWASLocusQCCalculation(params) {
@@ -1698,6 +1700,7 @@ export function qtlsGWASLocusQCCalculation(params) {
               associationFile: params.associationFile,
               LDFile: params.LDFile,
               leadsnp: params.select_ref,
+              position: params.select_position,
               genome_build: qtlsGWAS.genome.value,
               select_gene: qtlsGWAS.select_gene,
               ldThreshold: qtlsGWAS.ldThreshold,
@@ -1883,11 +1886,15 @@ export function qtlsGWASCalculation(params) {
         console.log('api/qtls-calculate-main response.data', response.data);
 
         const { pdata, locus_alignment_plot_layout } =
-          Object.keys(response.data['gwas']['data'][0]).length > 0
+          Object.keys(response.data['gwas']['data'][0]).length > 0 &&
+          response.data.info.inputs.association_file[0] != 'false'
             ? drawLocusAlignmentGWAS(response)
             : drawLocusAlignment(response);
 
-        if (Object.keys(response.data['gwas']['data'][0]).length > 0) {
+        if (
+          Object.keys(response.data['gwas']['data'][0]).length > 0 &&
+          response.data.info.inputs.association_file[0] != 'false'
+        ) {
           dispatch(
             drawLocusAlignmentScatter(
               response.data['locus_alignment_gwas_scatter']['data'][0],
@@ -1988,7 +1995,10 @@ export function qtlsGWASCalculation(params) {
           if (
             qtlsGWAS.gwas &&
             qtlsGWAS.gwas.data &&
-            Object.keys(qtlsGWAS.gwas.data).length > 0
+            Object.keys(qtlsGWAS.gwas.data).length > 0 &&
+            (qtlsGWAS.associationFile || qtlsGWAS.qtlKey) &&
+            (qtlsGWAS.gwasFile || qtlsGWAS.gwasKey) &&
+            (qtlsGWAS.LDFile || qtlsGWAS.ldKey)
           ) {
             dispatch(
               qtlsGWASHyprcolocLDCalculation({
@@ -2029,6 +2039,7 @@ export function qtlsGWASCalculation(params) {
                 associationFile: qtlsGWAS.inputs.association_file[0],
                 LDFile: qtlsGWAS.inputs.ld_file[0],
                 leadsnp: qtlsGWAS.locus_alignment.top.rsnum,
+                position: qtlsGWAS.select_position,
                 genome_build: qtlsGWAS.genome.value,
                 select_gene: qtlsGWAS.select_gene,
                 ldThreshold: qtlsGWAS.ldThreshold,
@@ -2282,34 +2293,47 @@ export function fetchResults(request) {
       const { state, main } = data;
       // console.log('api/fetch-results', state);
 
-      const { pdata, locus_alignment_plot_layout } =
-        Object.keys(main['gwas']['data'][0]).length > 0
-          ? drawLocusAlignmentGWAS({ data: main })
-          : drawLocusAlignment({ data: main });
+      if (main.locus_alignment && Object.keys(main.locus_alignment).length) {
+        const { pdata, locus_alignment_plot_layout } =
+          state.associationFile && Object.keys(main.gwas.data[0]).length
+            ? drawLocusAlignmentGWAS({ data: main })
+            : drawLocusAlignment({ data: main });
 
-      if (Object.keys(main['gwas']['data'][0]).length > 0) {
-        dispatch(
-          drawLocusAlignmentScatter(
-            main['locus_alignment_gwas_scatter']['data'][0],
-            main['locus_alignment_gwas_scatter']['title'][0],
-            main['locus_alignment']['top'][0][0]['gene_symbol'],
-            Math.pow(10, 0.0 * -1.0)
-          )
+        if (
+          state.associationFile &&
+          Object.keys(main).length &&
+          Object.keys(main.gwas.data[0]).length
+        ) {
+          dispatch(
+            drawLocusAlignmentScatter(
+              main['locus_alignment_gwas_scatter']['data'][0],
+              main['locus_alignment_gwas_scatter']['title'][0],
+              main['locus_alignment']['top'][0][0]['gene_symbol'],
+              Math.pow(10, 0.0 * -1.0)
+            )
+          );
+        }
+        await dispatch(
+          updateQTLsGWAS({
+            ...state,
+            submitted: true,
+            isLoading: false,
+            locus_alignment: {
+              ...state.locus_alignment,
+              data: pdata,
+              layout: locus_alignment_plot_layout,
+            },
+          })
+        );
+      } else {
+        await dispatch(
+          updateQTLsGWAS({
+            ...state,
+            submitted: true,
+            isLoading: false,
+          })
         );
       }
-
-      await dispatch(
-        updateQTLsGWAS({
-          ...state,
-          submitted: true,
-          locus_alignment: {
-            ...state.locus_alignment,
-            data: pdata,
-            layout: locus_alignment_plot_layout,
-          },
-          isLoading: false,
-        })
-      );
     } catch (error) {
       console.log(error);
       if (error) {

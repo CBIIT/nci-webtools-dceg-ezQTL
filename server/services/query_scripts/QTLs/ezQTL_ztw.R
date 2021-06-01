@@ -1848,3 +1848,15 @@ locus_quantification_qtl <- function(gdata,qdata,gdata_queryid=NULL,qdata_queryi
   }
   
 }
+
+
+
+# GWAS2QTL ----------------------------------------------------------------
+gwas2qtl <- function(gwas){
+  nqtl <- gwas %>% mutate(gene_id="GWAS",gene_symbol="GWAS",variant_id=paste0(chr,pos,ref,alt),tss_distance=NA_integer_) %>% 
+    select(gene_id,gene_symbol,variant_id,rsnum,chr,pos,ref,alt,tss_distance,pval_nominal=pvalue,slope=effect,slope_se=se)
+  return(nqtl)
+}
+
+
+

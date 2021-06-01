@@ -100,7 +100,7 @@ async function calculateQuantification(params) {
     genotypeID,
     log2,
     bucket,
-    workingDirectory
+    workingDirectory,
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
@@ -118,7 +118,7 @@ async function calculateQuantification(params) {
       genotypeID,
       log2,
       request,
-      bucket
+      bucket,
     ]
   );
 }
@@ -140,7 +140,6 @@ async function qtlsCalculateQuantification(params, res, next) {
     res.status(500).json(err);
   }
 }
-
 
 async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   const {
@@ -515,6 +514,7 @@ async function calculateLocusLD(params) {
     LDFile,
     genome_build,
     leadsnp,
+    position,
     ldThreshold,
     ldAssocData,
     select_gene,
@@ -547,6 +547,7 @@ async function calculateLocusLD(params) {
       genome_build.toString(),
       outputPath.toString(),
       leadsnp.toString(),
+      position,
       threshold,
       ldAssocData,
       select_gene,
@@ -591,5 +592,5 @@ module.exports = {
   qtlsCalculateLD,
   calculateColocVisualize,
   qtlsColocVisualize,
-  qtlsCalculateQuantification
+  qtlsCalculateQuantification,
 };

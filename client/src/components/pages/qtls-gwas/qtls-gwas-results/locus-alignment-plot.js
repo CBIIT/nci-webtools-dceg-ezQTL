@@ -104,7 +104,7 @@ export function LocusAlignmentPlot(params) {
       qtlKey: qtlKey || false,
       ldKey: ldKey || false,
       gwasKey: gwasKey || false,
-      select_chromosome: select_chromosome.value,
+      select_chromosome: select_chromosome.value || false,
       select_position,
       genome_build: genome.value,
     };
@@ -157,8 +157,10 @@ export function LocusAlignmentPlot(params) {
                 point &&
                 point.customdata &&
                 (gwas && gwas.data && Object.keys(gwas.data).length > 0
-                  ? point.curveNumber === 3 || point.curveNumber === 6
-                  : point.curveNumber === 2)
+                  ? point.curveNumber === 2 ||
+                    point.curveNumber === 3 ||
+                    point.curveNumber === 6
+                  : false)
               ) {
                 updateTooltip({
                   visible: true,
@@ -321,13 +323,13 @@ export function LocusAlignmentPlot(params) {
                     );
                     updateTooltip({ visible: false });
                   }}
-                  disabled={
-                    !(
-                      locus_quantification &&
-                      locus_quantification.data &&
-                      Object.keys(locus_quantification.data).length > 0
-                    )
-                  }
+                  // disabled={
+                  //   !(
+                  //     locus_quantification &&
+                  //     locus_quantification.data &&
+                  //     Object.keys(locus_quantification.data).length > 0
+                  //   )
+                  // }
                 >
                   <b>Show Boxplots</b>
                 </Button>

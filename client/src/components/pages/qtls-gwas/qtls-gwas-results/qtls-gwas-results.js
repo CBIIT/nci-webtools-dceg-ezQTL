@@ -56,11 +56,7 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        (!select_qtls_samples &&
-          !associationFile &&
-          !qtlKey &&
-          !gwasFile &&
-          !gwasKey),
+        !(locus_alignment.data && locus_alignment.data.length),
     },
     {
       component: <LocusColocalization />,
@@ -69,7 +65,12 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        !(gwas && gwas.data && Object.keys(gwas.data).length > 0),
+        !(gwas && gwas.data && Object.keys(gwas.data).length > 0) ||
+        !(
+          (associationFile || qtlKey) &&
+          (gwasFile || gwasKey) &&
+          (LDFile || ldKey)
+        ),
     },
     {
       component: <LocusTable />,
@@ -78,11 +79,8 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        (!select_qtls_samples &&
-          !associationFile &&
-          !qtlKey &&
-          !gwasFile &&
-          !gwasKey),
+        (!associationFile && !qtlKey) ||
+        (!LDFile && !ldKey),
     },
     {
       component: <LocusQuantifiation />,
