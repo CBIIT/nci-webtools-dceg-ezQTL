@@ -157,8 +157,10 @@ export function LocusAlignmentPlot(params) {
                 point &&
                 point.customdata &&
                 (gwas && gwas.data && Object.keys(gwas.data).length > 0
-                  ? point.curveNumber === 3 || point.curveNumber === 6
-                  : point.curveNumber === 2)
+                  ? point.curveNumber === 2 ||
+                    point.curveNumber === 3 ||
+                    point.curveNumber === 6
+                  : false)
               ) {
                 updateTooltip({
                   visible: true,
