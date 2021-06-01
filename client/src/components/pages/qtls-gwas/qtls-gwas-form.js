@@ -50,7 +50,7 @@ function LocusInfo({
       (ldPublic && !select_position) ||
       (_LDFile && !_gwasFile && !_associationFile && !select_ref) ||
       ((ldPublic || qtlPublic || gwasPublic) &&
-        Object.entries(select_chromosome).length)
+        Object.entries(select_chromosome).length < 2)
     ) {
       setLocusValid(false);
     } else {
