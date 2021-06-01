@@ -321,13 +321,13 @@ export function LocusAlignmentPlot(params) {
                     );
                     updateTooltip({ visible: false });
                   }}
-                  disabled={
-                    !(
-                      locus_quantification &&
-                      locus_quantification.data &&
-                      Object.keys(locus_quantification.data).length > 0
-                    )
-                  }
+                  // disabled={
+                  //   !(
+                  //     locus_quantification &&
+                  //     locus_quantification.data &&
+                  //     Object.keys(locus_quantification.data).length > 0
+                  //   )
+                  // }
                 >
                   <b>Show Boxplots</b>
                 </Button>
