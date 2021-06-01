@@ -48,11 +48,9 @@ function LocusInfo({
       select_dist > 200 ||
       (select_ref && !/^rs\d+$/.test(select_ref)) ||
       (ldPublic && !select_position) ||
-      (_LDFile && !select_ref) ||
-      !(
-        (ldPublic || qtlPublic || gwasPublic) &&
-        Object.entries(select_chromosome).length
-      )
+      (_LDFile && !_gwasFile && !_associationFile && !select_ref) ||
+      ((ldPublic || qtlPublic || gwasPublic) &&
+        Object.entries(select_chromosome).length)
     ) {
       setLocusValid(false);
     } else {
@@ -202,7 +200,10 @@ function LocusInfo({
           <Form.Row>
             <Col>
               <Form.Label className="mb-0">
-                SNP {_LDFile && <span style={{ color: 'red' }}>* </span>}
+                SNP{' '}
+                {_LDFile && !_gwasFile && !_associationFile && (
+                  <span style={{ color: 'red' }}>* </span>
+                )}
                 <small>
                   <i>(Default: lowest GWAS P-value SNP)</i>
                 </small>
@@ -1102,7 +1103,8 @@ export function QTLsGWASForm() {
           <Form.Group className="col-sm-12 mb-0">
             <div className="d-flex">
               <Form.Label className="mb-0 mr-auto">
-                LD Data <span style={{ color: 'red' }}>*</span>
+                LD Data
+                {/* <span style={{ color: 'red' }}>*</span> */}
               </Form.Label>
               <Form.Check
                 disabled={submitted || select_qtls_samples}
@@ -1182,8 +1184,8 @@ export function QTLsGWASForm() {
                     _setLDFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  isInvalid={attempt ? !_LDFile && !select_qtls_samples : false}
-                  feedback="Please upload a data file"
+                  // isInvalid={attempt ? !_LDFile && !select_qtls_samples : false}
+                  // feedback="Please upload a data file"
                   custom
                 />
               </>
