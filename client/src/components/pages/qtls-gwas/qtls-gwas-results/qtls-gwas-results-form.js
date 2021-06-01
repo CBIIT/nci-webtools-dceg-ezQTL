@@ -5,7 +5,7 @@ import ReactSelect, { createFilter } from 'react-select';
 import {
   updateAlert,
   updateQTLsGWAS,
-  qtlsGWASLocusQCCalculation,
+  qtlsGWASCalculation,
 } from '../../../../services/actions';
 import { PopulationSelect } from '../../../controls/population-select/population-select';
 
@@ -34,9 +34,7 @@ export function QTLsGWASResultsForm() {
     select_qtls_samples,
     select_gwas_sample,
     genome,
-    locusInformation,
-    traitID,
-    genotypeID
+    locusInformation
   } = useSelector((state) => state.qtlsGWAS);
 
   const { select_ref, select_position } = locusInformation[0];
@@ -117,6 +115,7 @@ export function QTLsGWASResultsForm() {
       select_gene: select_gene['gene_id'],
       select_dist: inputs['select_dist'][0],
       select_ref: _selectRef && _selectRef.length > 0 ? _selectRef : false,
+      recalculate: true,
       recalculateAttempt: false,
       recalculatePop: false,
       recalculateGene: false,
@@ -158,7 +157,7 @@ export function QTLsGWASResultsForm() {
       })
     );
 
-    dispatch(qtlsGWASLocusQCCalculation(params));
+    dispatch(qtlsGWASCalculation(params));
   }
 
   return (

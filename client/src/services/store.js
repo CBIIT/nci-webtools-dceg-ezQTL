@@ -24,6 +24,7 @@ export const getInitialState = async () => {
           select_chromosome: {},
         },
       ],
+      recalculate: false,
       recalculateAttempt: false,
       recalculatePop: false,
       recalculateGene: false,
