@@ -1610,19 +1610,18 @@ export function qtlsGWASECaviarCalculation(params) {
   };
 }
 
-export function qtlsGWASCalculateQuantification(params){
-  return async function (dispatch, getState){
+export function qtlsGWASCalculateQuantification(params) {
+  return async function (dispatch, getState) {
     console.log('quantification', params);
-    dispatch(updateQTLsGWAS({ isLoadingQuantification: true }))
+    dispatch(updateQTLsGWAS({ isLoadingQuantification: true }));
 
     axios
       .post('api/qtls-recalculate-quantification', params)
       .then(async function (response) {
-        console.log('1')
         dispatch(updateQTLsGWAS({ isLoadingQuantification: false }));
       })
       .catch(function (error) {
-        console.log(error)
+        console.log(error);
         if (error) {
           dispatch(updateError({ visible: true, message: error }));
           dispatch(
@@ -1633,10 +1632,9 @@ export function qtlsGWASCalculateQuantification(params){
         }
       })
       .then(function () {
-        console.log('hi')
         dispatch(updateQTLsGWAS({ isLoadingQuantification: false }));
       });
-  }
+  };
 }
 
 export function qtlsGWASLocusQCCalculation(params) {
@@ -2292,40 +2290,47 @@ export function fetchResults(request) {
       const { state, main } = data;
       // console.log('api/fetch-results', state);
 
-      const { pdata, locus_alignment_plot_layout } =
-        state.associationFile &&
-        Object.keys(main).length &&
-        Object.keys(main.gwas.data[0]).length
-          ? drawLocusAlignmentGWAS({ data: main })
-          : drawLocusAlignment({ data: main });
+      if (main.locus_alignment && Object.keys(main.locus_alignment).length) {
+        const { pdata, locus_alignment_plot_layout } =
+          state.associationFile && Object.keys(main.gwas.data[0]).length
+            ? drawLocusAlignmentGWAS({ data: main })
+            : drawLocusAlignment({ data: main });
 
-      if (
-        state.associationFile &&
-        Object.keys(main).length &&
-        Object.keys(main.gwas.data[0]).length
-      ) {
-        dispatch(
-          drawLocusAlignmentScatter(
-            main['locus_alignment_gwas_scatter']['data'][0],
-            main['locus_alignment_gwas_scatter']['title'][0],
-            main['locus_alignment']['top'][0][0]['gene_symbol'],
-            Math.pow(10, 0.0 * -1.0)
-          )
+        if (
+          state.associationFile &&
+          Object.keys(main).length &&
+          Object.keys(main.gwas.data[0]).length
+        ) {
+          dispatch(
+            drawLocusAlignmentScatter(
+              main['locus_alignment_gwas_scatter']['data'][0],
+              main['locus_alignment_gwas_scatter']['title'][0],
+              main['locus_alignment']['top'][0][0]['gene_symbol'],
+              Math.pow(10, 0.0 * -1.0)
+            )
+          );
+        }
+        await dispatch(
+          updateQTLsGWAS({
+            ...state,
+            submitted: true,
+            isLoading: false,
+            locus_alignment: {
+              ...state.locus_alignment,
+              data: pdata,
+              layout: locus_alignment_plot_layout,
+            },
+          })
+        );
+      } else {
+        await dispatch(
+          updateQTLsGWAS({
+            ...state,
+            submitted: true,
+            isLoading: false,
+          })
         );
       }
-
-      await dispatch(
-        updateQTLsGWAS({
-          ...state,
-          submitted: true,
-          locus_alignment: {
-            ...state.locus_alignment,
-            data: pdata,
-            layout: locus_alignment_plot_layout,
-          },
-          isLoading: false,
-        })
-      );
     } catch (error) {
       console.log(error);
       if (error) {
