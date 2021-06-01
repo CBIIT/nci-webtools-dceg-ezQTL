@@ -48,7 +48,13 @@ qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, e
 
   qtlPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_qtl.svg')
 
-  locus_quantification_qtl(gdata,edata,gdata_queryid=genotypeID,qdata_queryid=traitID,output_plot=qtlPath,log2=log2)
+  if(identical(traitID,''))
+    traitID <- NULL
+
+  if(identical(genotypeID,''))
+    genotypeID <- NULL
+
+  locus_quantification_qtl(gdata,edata,genotypeID,traitID,qtlPath,log2)
 }
 
 qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, request, bucket) {
