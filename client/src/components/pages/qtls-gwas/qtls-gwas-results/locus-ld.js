@@ -141,7 +141,7 @@ export function LocusLD() {
                     />
                   </div>
                   <div className="col-md-4">
-                    <Form.Label className="mb-0">-log~10~ Association Threshold</Form.Label>
+                    <Form.Label className="mb-0">-log<sub>10</sub> Association Threshold</Form.Label>
                     <Form.Control
                       type="number"
                       step="any"
