@@ -43,15 +43,17 @@ try {
 
   Object.keys(fileMap).forEach((sheet) => {
     fileMap[sheet].map((row) => {
-      const file = row.Biowulf_full_path;
-      const index = row.Biowulf_full_path_index;
+      if (row.Biowulf_full_path && row.Biowulf_full_path_index) {
+        const file = row.Biowulf_full_path;
+        const index = row.Biowulf_full_path_index;
 
-      include.push(
-        `--include "${file.replace(root, '')}" --include "${index.replace(
-          root,
-          ''
-        )}"`
-      );
+        include.push(
+          `--include "${file.replace(root, '')}" --include "${index.replace(
+            root,
+            ''
+          )}"`
+        );
+      }
     });
   });
 
