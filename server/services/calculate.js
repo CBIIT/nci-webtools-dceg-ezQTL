@@ -34,8 +34,8 @@ async function calculateMain(params) {
     gwasKey,
     select_chromosome,
     select_position,
-    traitID,
-    genotypeID,
+    traitID = '',
+    genotypeID = '',
     bucket,
   } = params;
 
@@ -104,7 +104,7 @@ async function calculateQuantification(params) {
     genotypeID,
     log2,
     bucket,
-    workingDirectory
+    workingDirectory,
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
@@ -122,7 +122,7 @@ async function calculateQuantification(params) {
       genotypeID,
       log2,
       request,
-      bucket
+      bucket,
     ]
   );
 }
@@ -144,7 +144,6 @@ async function qtlsCalculateQuantification(params, res, next) {
     res.status(500).json(err);
   }
 }
-
 
 async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   const {
@@ -597,5 +596,5 @@ module.exports = {
   qtlsCalculateLD,
   calculateColocVisualize,
   qtlsColocVisualize,
-  qtlsCalculateQuantification
+  qtlsCalculateQuantification,
 };
