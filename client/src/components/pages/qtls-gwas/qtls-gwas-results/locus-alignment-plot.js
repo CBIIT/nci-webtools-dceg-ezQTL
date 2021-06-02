@@ -323,13 +323,10 @@ export function LocusAlignmentPlot(params) {
                     );
                     updateTooltip({ visible: false });
                   }}
-                  // disabled={
-                  //   !(
-                  //     locus_quantification &&
-                  //     locus_quantification.data &&
-                  //     Object.keys(locus_quantification.data).length > 0
-                  //   )
-                  // }
+                  disabled={
+                    inputs['quantification_file'][0] == 'false' ||
+                    inputs['genotype_file'][0] == 'false'
+                  }
                 >
                   <b>Show Boxplots</b>
                 </Button>
