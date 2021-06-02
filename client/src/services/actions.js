@@ -1508,7 +1508,8 @@ function qtlsGWASHyprcolocLDCalculation(params) {
               ldfile: qtlsGWAS.hyprcoloc_ld.filename,
               qtlKey: qtlsGWAS.qtlKey,
               select_chromosome:
-                qtlsGWAS.locusInformation[0].select_chromosome.value,
+                qtlsGWAS.locusInformation[0].select_chromosome.value ||
+                qtlsGWAS.locusInformation[0].select_chromosome,
               select_position: qtlsGWAS.select_position,
             })
           );
@@ -1688,7 +1689,7 @@ export function qtlsGWASLocusQCCalculation(params) {
           params.gwasFile = 'ezQTL_input_gwas.txt';
         }
 
-        params.recalculate = false
+        params.recalculate = false;
 
         if (params.associationFile || params.gwasFile) {
           await dispatch(qtlsGWASCalculation(params));
