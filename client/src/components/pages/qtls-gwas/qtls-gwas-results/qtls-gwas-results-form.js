@@ -132,7 +132,7 @@ export function QTLsGWASResultsForm() {
       qtlKey: qtlKey || false,
       ldKey: ldKey || false,
       gwasKey: gwasKey || false,
-      select_chromosome: select_chromosome.value || false,
+      select_chromosome: select_chromosome || false,
       select_position,
       genome_build: genome.value
     };
