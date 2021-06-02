@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { updatePublications } from '../../../services/actions';
-import Table from '../../../components/controls/table/table';
+import Table from '../../controls/table/table';
 
-import './publications.scss';
+import './public-data-source.scss';
 
-export function Publications() {
+export function PublicDataSource() {
   // data is retrieved in components/app.js
   const dispatch = useDispatch();
   const { globalFilter, hidden, pagination, sort, ...table } = useSelector(
@@ -16,12 +16,9 @@ export function Publications() {
 
   return (
     <div className="mx-3">
-      <div className="bg-white border p-3 mx-3">
+      <div className="bg-white p-3 mx-3">
         <div className="mb-4">
-          <p>
-            An overview of published papers, tools, websites and databases
-            related to QTL analysis.
-          </p>
+          <p>An overview of public data sources related to QTL analysis.</p>
         </div>
 
         {pubMemo.data && (
