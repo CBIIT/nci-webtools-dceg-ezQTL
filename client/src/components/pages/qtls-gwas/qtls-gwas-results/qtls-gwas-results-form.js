@@ -95,6 +95,15 @@ export function QTLsGWASResultsForm() {
   };
 
   async function handleSubmit() {
+
+    let chromosome;
+
+    if(!select_chromosome)
+      chromosome = false
+    else
+      chromosome = select_chromosome
+
+    console.log(chromosome)
     const params = {
       request,
       associationFile:
@@ -132,7 +141,7 @@ export function QTLsGWASResultsForm() {
       qtlKey: qtlKey || false,
       ldKey: ldKey || false,
       gwasKey: gwasKey || false,
-      select_chromosome: select_chromosome || false,
+      select_chromosome: chromosome.value || false,
       select_position,
       genome_build: genome.value
     };
