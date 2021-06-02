@@ -5,6 +5,7 @@ import {
   UPDATE_ERROR,
   UPDATE_SUCCESS,
   UPDATE_ALERT,
+  UPDATE_PUBLICATIONS,
 } from './actions';
 import _ from 'lodash';
 
@@ -54,6 +55,14 @@ export const rootReducer = (state, action) => {
         ...state,
         alert: {
           ...state.alert,
+          ...action.data,
+        },
+      };
+    case UPDATE_PUBLICATIONS:
+      return {
+        ...state,
+        publications: {
+          ...state.publications,
           ...action.data,
         },
       };

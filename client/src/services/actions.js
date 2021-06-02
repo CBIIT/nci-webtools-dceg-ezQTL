@@ -4,6 +4,7 @@ export const UPDATE_MULTI_LOCI = 'UPDATE_MULTI_LOCI';
 export const UPDATE_ERROR = 'UPDATE_ERROR';
 export const UPDATE_SUCCESS = 'UPDATE_SUCCESS';
 export const UPDATE_ALERT = 'UPDATE_ALERT';
+export const UPDATE_PUBLICATIONS = 'UPDATE_PUBLICATIONS';
 
 const axios = require('axios');
 const FormData = require('form-data');
@@ -30,6 +31,10 @@ export function updateSuccess(data) {
 
 export function updateAlert(data) {
   return { type: UPDATE_ALERT, data };
+}
+
+export function updatePublications(data) {
+  return { type: UPDATE_PUBLICATIONS, data };
 }
 
 const getPopoverData = (geneData) => {

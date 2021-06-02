@@ -10,19 +10,21 @@ import { NCIFooter } from '@cbiitss/react-components';
 import { Home } from './components/pages/home/home';
 import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
 import { Help } from './components/pages/help/help';
+import { Publications } from './components/pages/publications/publications';
 import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
 import 'font-awesome/css/font-awesome.min.css';
 import { ErrorModal } from './components/controls/error-modal/error-modal';
 import Alert from 'react-bootstrap/Alert';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateAlert } from './services/actions';
+import { updateAlert, updatePublications } from './services/actions';
 import { SuccessModal } from './components/controls/success-modal/success-modal';
 
 export function App() {
   const dispatch = useDispatch();
 
   const alert = useSelector((state) => state.alert);
+  const publicationsState = useSelector((state) => state.publications);
 
   const links = [
     {
@@ -33,12 +35,64 @@ export function App() {
       route: '/qtls',
       title: 'Analyses',
     },
-
     {
       route: '/help',
       title: 'Documentation',
     },
+    {
+      route: '/publications',
+      title: 'Publications',
+    },
   ];
+
+  // Retrieve Publications on page load
+  useEffect(() => {
+    const getData = async () => {
+      const data = await (await fetch(`api/getPublications`)).json();
+
+      const reducer = (acc, column) => [
+        ...acc,
+        {
+          Header: column
+            .replace('_', ' ')
+            .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase()),
+          accessor: column,
+          id: column,
+          Cell: (e) => {
+            if (
+              column == 'Title' &&
+              e.row.values['Study_website'] &&
+              e.row.values['Study_website'] != 'NA'
+            ) {
+              return (
+                <a
+                  href={e.row.values['Study_website']}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {e.value}
+                </a>
+              );
+            } else {
+              return e.value || '';
+            }
+          },
+        },
+      ];
+
+      dispatch(
+        updatePublications({
+          columns: [...new Set(...data.map((row) => Object.keys(row)))].reduce(
+            reducer,
+            []
+          ),
+          data: data,
+        })
+      );
+    };
+
+    if (!publicationsState.data) getData();
+  }, [publicationsState]);
 
   return (
     <Router>
@@ -120,6 +174,7 @@ export function App() {
           <Route path="/home" exact={true} component={Home} />
           <Route path="/qtls/:request?" component={QTLsGWAS} />
           <Route path="/help" component={Help} />
+          <Route path="/publications" component={Publications} />
         </div>
       </main>
       <NCIFooter

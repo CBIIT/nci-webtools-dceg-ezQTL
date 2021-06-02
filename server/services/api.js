@@ -12,7 +12,7 @@ const {
   qtlsCalculateQC,
   qtlsCalculateLD,
   qtlsColocVisualize,
-  qtlsCalculateQuantification
+  qtlsCalculateQuantification,
 } = require('./calculate');
 const apiRouter = express.Router();
 const multer = require('multer');
@@ -20,6 +20,7 @@ const fs = require('fs-extra');
 const XLSX = require('xlsx');
 const AWS = require('aws-sdk');
 const tar = require('tar');
+const Papa = require('papaparse');
 const { validate, v1: uuidv1 } = require('uuid');
 
 const dataDir = path.resolve(config.data.folder);
@@ -28,6 +29,23 @@ const awsInfo = config.aws;
 const workingDirectory = path.resolve(config.R.workDir);
 
 AWS.config.update(awsInfo);
+
+function parseCSV(filepath) {
+  const file = fs.createReadStream(filepath);
+  return new Promise((resolve, reject) => {
+    Papa.parse(file, {
+      header: true,
+      complete(results, file) {
+        resolve(results.data);
+      },
+      error(err, file) {
+        logger.info('Error parsing ' + filepath);
+        logger.error(err);
+        reject(err);
+      },
+    });
+  });
+}
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -307,6 +325,19 @@ apiRouter.get('/fetch-sample', async (req, res, next) => {
   }
 });
 
+// Publications page data
+apiRouter.get('/getPublications', async (req, res, next) => {
+  try {
+    const csv = await parseCSV(
+      path.resolve(dataDir, 'vQTL2_resource_simple.csv')
+    );
+
+    res.json(csv);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // download work session
 apiRouter.post('/locus-download', (req, res, next) => {
   const { request } = req.body;
@@ -403,7 +434,7 @@ apiRouter.post('/qtls-recalculate-quantification', (req, res, next) =>
     {
       ...req.body,
       workingDirectory: workingDirectory,
-      bucket: awsInfo.s3.data
+      bucket: awsInfo.s3.data,
     },
     res,
     next

@@ -149,6 +149,12 @@ export const getInitialState = async () => {
       message: ``,
       variant: 'warning',
     },
+    publications: {
+      globalFilter: '',
+      hidden: ['Study_website'],
+      pagination: { pageIndex: 0, pageSize: 10 },
+      sort: [{ id: 'Year', desc: true }],
+    },
   };
 
   return initialState;
