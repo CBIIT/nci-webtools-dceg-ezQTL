@@ -34,8 +34,6 @@ async function calculateMain(params) {
     gwasKey,
     select_chromosome,
     select_position,
-    traitID = '',
-    genotypeID = '',
     bucket,
   } = params;
 
@@ -70,8 +68,6 @@ async function calculateMain(params) {
       gwasKey.toString(),
       select_chromosome.toString(),
       parseInt(select_position),
-      traitID.toString(),
-      genotypeID.toString(),
       bucket.toString(),
     ]
   );

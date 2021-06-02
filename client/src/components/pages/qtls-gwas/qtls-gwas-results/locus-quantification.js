@@ -90,7 +90,7 @@ export function LocusQuantifiation() {
 
 
               <div className="col-md-4">
-                <Form.Label className="mb-0">log~2~</Form.Label>
+                <Form.Label className="mb-0">log<sub>2</sub></Form.Label>
                 <ReactSelect
                   isDisabled={!submitted}
                   inputId="qtls-results-quantification-log2"

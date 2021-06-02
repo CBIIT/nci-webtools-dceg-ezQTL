@@ -5,7 +5,7 @@ import ReactSelect, { createFilter } from 'react-select';
 import {
   updateAlert,
   updateQTLsGWAS,
-  qtlsGWASLocusQCCalculation,
+  qtlsGWASCalculation,
 } from '../../../../services/actions';
 import { PopulationSelect } from '../../../controls/population-select/population-select';
 
@@ -33,7 +33,7 @@ export function QTLsGWASResultsForm() {
     select_qtls_samples,
     select_gwas_sample,
     genome,
-    locusInformation,
+    locusInformation
   } = useSelector((state) => state.qtlsGWAS);
 
   const {
@@ -118,6 +118,7 @@ export function QTLsGWASResultsForm() {
       select_gene: select_gene['gene_id'],
       select_dist: inputs['select_dist'][0],
       select_ref: _selectRef && _selectRef.length > 0 ? _selectRef : false,
+      recalculate: true,
       recalculateAttempt: false,
       recalculatePop: false,
       recalculateGene: false,
@@ -131,9 +132,9 @@ export function QTLsGWASResultsForm() {
       qtlKey: qtlKey || false,
       ldKey: ldKey || false,
       gwasKey: gwasKey || false,
-      select_chromosome: select_chromosome.value || false,
+      select_chromosome: select_chromosome || false,
       select_position,
-      genome_build: genome.value,
+      genome_build: genome.value
     };
 
     // clear all locus colocalization results
@@ -159,7 +160,7 @@ export function QTLsGWASResultsForm() {
       })
     );
 
-    dispatch(qtlsGWASLocusQCCalculation(params));
+    dispatch(qtlsGWASCalculation(params));
   }
 
   return (
@@ -168,24 +169,6 @@ export function QTLsGWASResultsForm() {
       <Form className="row justify-content-between">
         <div className="col-md-9">
           <Form.Group className="row">
-            <div className="col-md-4">
-              <Form.Label className="mb-0">
-                Population{' '}
-                <span
-                  style={{
-                    display: submitted && !isLoading ? 'inline' : 'none',
-                    color: 'red',
-                  }}
-                >
-                  *
-                </span>
-              </Form.Label>
-              <PopulationSelect
-                id="qtls-results-population-input"
-                disabled={!submitted || ldProject == 'UKBB'}
-                mergeState={(data) => dispatch(updateQTLsGWAS(data))}
-              />
-            </div>
             <div className="col-md-4">
               <Form.Label className="mb-0">
                 Reference Gene{' '}
@@ -245,8 +228,6 @@ export function QTLsGWASResultsForm() {
           <Button
             disabled={
               !submitted ||
-              !select_pop ||
-              select_pop.length <= 0 ||
               (_selectRef &&
                 _selectRef.length > 0 &&
                 !/^rs\d+$/.test(_selectRef))

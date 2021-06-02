@@ -1688,6 +1688,8 @@ export function qtlsGWASLocusQCCalculation(params) {
           params.gwasFile = 'ezQTL_input_gwas.txt';
         }
 
+        params.recalculate = false
+
         if (params.associationFile || params.gwasFile) {
           await dispatch(qtlsGWASCalculation(params));
         } else if (params.LDFile) {
@@ -1973,6 +1975,7 @@ export function qtlsGWASCalculation(params) {
               //   pageSize: 0
               // }
             },
+            recalculate: params.recalculate,
             isLoading: false,
           })
         );
@@ -1993,7 +1996,7 @@ export function qtlsGWASCalculation(params) {
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (!qtlsGWAS.isError) {
+        if (!qtlsGWAS.isError && !qtlsGWAS.recalculate) {
           if (
             qtlsGWAS.gwas &&
             qtlsGWAS.gwas.data &&
