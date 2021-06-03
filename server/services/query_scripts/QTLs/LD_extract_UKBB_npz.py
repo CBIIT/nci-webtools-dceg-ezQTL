@@ -32,6 +32,7 @@ import scipy.sparse as sparse
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+import boto3
 
 # def Basic_Variables():
 # ### This is the path of Alkes_group file
@@ -44,15 +45,17 @@ def Parse():
     parser = argparse.ArgumentParser()
     parser.add_argument('-q', '--query_postion',
                         required=True, type=str, help="query_postion")
-    #parser.add_argument('-l', '--LD_File_Dir', required=True, type=str, help="the Dir Path where LD files were located")
+    # parser.add_argument('-l', '--LD_File_Dir', required=True, type=str, help="the Dir Path where LD files were located")
     parser.add_argument('-o', '--output_Path', required=True,
                         type=str, help="output_Path")
-    parser.add_argument('-r', '--Path_LD_File_List',
-                        required=True, type=str, help="output_dir")
+    parser.add_argument('-b', '--bucket', required=True,
+                        type=str, help="s3_bucket")
+    # parser.add_argument('-r', '--Path_LD_File_List',
+    #                     required=True, type=str, help="output_dir")
 
     args = parser.parse_args()
     # return args.query_postion, args.LD_File_Dir, args.output_Path, args.Path_LD_File_List
-    return args.query_postion, args.output_Path, args.Path_LD_File_List
+    return args.query_postion, args.output_Path, args.bucket
 
 
 def GenerateDir(Path):
@@ -63,7 +66,7 @@ def GenerateDir(Path):
 
 
 def load_NPZ(query_Start, query_End, return_Targated_Str):
-    query_postion, LD_File_Dir, output_Path, Path_LD_File_List = Parse()
+    query_postion, LD_File_Dir, output_Path = Parse()
 
     # No output_dir is provided. Here we use "Temp" as output_dir
     output_dir = "Temp"
@@ -77,7 +80,7 @@ def load_NPZ(query_Start, query_End, return_Targated_Str):
     LD_arr = sparse.load_npz(LD_npz_Path).toarray()
 
     # 001 Parse gz file
-    #LD_gz_Path = "%s/%s" % (LD_File_Dir,return_Targated_Str)
+    # LD_gz_Path = "%s/%s" % (LD_File_Dir,return_Targated_Str)
     LD_gz_Path = "%s/%s.gz" % (LD_File_Dir, return_Targated_Str)
     LD_gz_unzip_Path = "%s/%s" % (output_dir, return_Targated_Str)
     gzip_cmd = "gunzip -c %s > %s" % (LD_gz_Path, LD_gz_unzip_Path)
@@ -140,8 +143,8 @@ def load_NPZ(query_Start, query_End, return_Targated_Str):
     # print(gz_npz_arr)
 
     gz_npz_pd = pd.DataFrame(gz_npz_arr)
-    ###########gz_npz_pd.columns = Header
-    ###########gz_npz_pd.to_csv(output_Path,sep="\t",index=False, header=False)
+    # gz_npz_pd.columns = Header
+    # gz_npz_pd.to_csv(output_Path,sep="\t",index=False, header=False)
     # gz_npz_pd.to_csv(output_Path,sep="\t",index=False,header=False)
 
     # 003 Important update: change the old Half Maxtrix to Full Maxtrix
@@ -185,10 +188,11 @@ def load_NPZ(query_Start, query_End, return_Targated_Str):
 
 
 def load_NPZ_2(query_Start, query_End, return_Targated_Str):
-    #query_postion, LD_File_Dir, output_Path, Path_LD_File_List = Parse()
-    query_postion, output_Path, Path_LD_File_List = Parse()
+    # query_postion, LD_File_Dir, output_Path, Path_LD_File_List = Parse()
+    query_postion, output_Path, bucket = Parse()
 
-    GS_URL = "https://storage.googleapis.com/broad-alkesgroup-public/UKBB_LD"
+    # GS_URL = "https://storage.googleapis.com/broad-alkesgroup-public/UKBB_LD"
+    s3 = boto3.resource('s3')
 
     # No output_dir is provided. Here we use "Temp" as output_dir
     output_dir = "Temp"
@@ -199,22 +203,26 @@ def load_NPZ_2(query_Start, query_End, return_Targated_Str):
 
     # 000 Parse npz file (using tf)
     LD_npz_File = "%s.npz" % (return_Targated_Str)
-    LD_npz_URL = "%s/%s.npz" % (GS_URL, return_Targated_Str)
-    LD_npz_Path = tf.keras.utils.get_file(LD_npz_File, LD_npz_URL)
-    print(LD_npz_URL)
+    # LD_npz_URL = "%s/%s.npz" % (GS_URL, return_Targated_Str)
+    # LD_npz_Path = tf.keras.utils.get_file(LD_npz_File, LD_npz_URL)
+    s3.meta.client.download_file(
+        bucket, 'ezQTL/UKBB_LD/%s' % (LD_npz_File), LD_npz_File)
+    # print(LD_npz_URL)
     #LD_npz_Path = "%s/%s.npz" % (LD_File_Dir,return_Targated_Str)
-    LD_arr = sparse.load_npz(LD_npz_Path).toarray()
+    LD_arr = sparse.load_npz(LD_npz_File).toarray()
 
     # 001 Parse gz file
     LD_gz_File = "%s.gz" % (return_Targated_Str)
-    LD_gz_URL = "%s/%s.gz" % (GS_URL, return_Targated_Str)
-    LD_gz_Path = tf.keras.utils.get_file(LD_gz_File, LD_gz_URL)
-    print(LD_gz_URL)
+    LD_npz_Path = LD_gz_File
+    # print(LD_gz_URL)
+    s3.meta.client.download_file(
+        bucket, 'ezQTL/UKBB_LD/%s' % (LD_gz_File), LD_gz_File)
+    # LD_gz_URL = "%s/%s.gz" % (GS_URL, return_Targated_Str)
 
-    ####LD_gz_Path = "%s/%s" % (LD_File_Dir,return_Targated_Str)
-    #LD_gz_Path = "%s/%s.gz" % (LD_File_Dir,return_Targated_Str)
+    # LD_gz_Path = "%s/%s" % (LD_File_Dir,return_Targated_Str)
+    # LD_gz_Path = "%s/%s.gz" % (LD_File_Dir,return_Targated_Str)
     LD_gz_unzip_Path = "%s/%s" % (output_dir, return_Targated_Str)
-    gzip_cmd = "gunzip -c %s > %s" % (LD_gz_Path, LD_gz_unzip_Path)
+    gzip_cmd = "gunzip -c %s > %s" % (LD_gz_File, LD_gz_unzip_Path)
     print(gzip_cmd)
     os.system(gzip_cmd)
 
@@ -274,8 +282,8 @@ def load_NPZ_2(query_Start, query_End, return_Targated_Str):
     # print(gz_npz_arr)
 
     gz_npz_pd = pd.DataFrame(gz_npz_arr)
-    ###########gz_npz_pd.columns = Header
-    ###########gz_npz_pd.to_csv(output_Path,sep="\t",index=False, header=False)
+    # gz_npz_pd.columns = Header
+    # gz_npz_pd.to_csv(output_Path,sep="\t",index=False, header=False)
     # gz_npz_pd.to_csv(output_Path,sep="\t",index=False,header=False)
 
     # 003 Important update: change the old Half Maxtrix to Full Maxtrix
@@ -315,33 +323,16 @@ def load_NPZ_2(query_Start, query_End, return_Targated_Str):
     os.system(gzip_Cmd)
 
     # Delete The output_dir
-    print(LD_gz_Path)
     print(LD_npz_Path)
+    print(LD_npz_File)
     os.system("rm -rf %s" % output_dir)
-    os.system("rm %s" % LD_gz_Path)
     os.system("rm %s" % LD_npz_Path)
+    os.system("rm %s" % LD_npz_File)
 
 
 def Process():
-    #query_postion, LD_File_Dir, output_Path, Path_LD_File_List = Parse()
-    query_postion, output_Path, Path_LD_File_List = Parse()
-
-    Targate_Path = Path_LD_File_List
-    Targate_File = open(Targate_Path)
-    Targate_Dict = {}
-
-    for line in Targate_File:
-        if re.search(r'(gz)$', line):
-            ID = line.split("/")[-1].strip("").split(".")[0]
-            ss = ID.split("_")
-            targate_Chr = ss[0]
-            targate_Start = ss[1]
-            targate_End = ss[2]
-            Value = "%s_%s" % (targate_Start, targate_End)
-            Targate_Dict.setdefault(targate_Chr, []).append(Value)
-    Targate_File.close()
-
-    # print(Tagate_Arr)
+    # query_postion, LD_File_Dir, output_Path, Path_LD_File_List = Parse()
+    query_postion, output_Path, bucket = Parse()
 
     # Check Query Postion
     # print(query_postion,output_dir)
@@ -355,7 +346,24 @@ def Process():
     query_End = query_ss[1].split("-")[1]
     query_End = int(query_End)
 
-    Targate_arr = Targate_Dict[query_Chr]
+    client = boto3.client('s3')
+
+    listBucket = client.list_objects_v2(
+        Bucket=bucket, Prefix='ezQTL/UKBB_LD/%s' % (query_Chr), MaxKeys=6000)
+
+    Targate_Dict = {}
+
+    for object in listBucket['Contents']:
+        if re.search(r'(gz)$', object['Key']):
+            ID = object['Key'].split("/")[-1].strip("").split(".")[0]
+            ss = ID.split("_")
+            targate_Chr = ss[0]
+            targate_Start = ss[1]
+            targate_End = ss[2]
+            Value = "%s_%s" % (targate_Start, targate_End)
+            Targate_Dict.setdefault(targate_Chr, []).append(Value)
+
+        Targate_arr = Targate_Dict[query_Chr]
     return_Targated_Str = "0"
 
     for i in Targate_arr:
@@ -365,7 +373,7 @@ def Process():
         t_End = i.split("_")[1]
         t_End = int(t_End)
         # print(t_Start,t_End)
-        #flag = 0
+        # flag = 0
         if query_Start >= t_Start and query_End <= t_End:
             return_Targated_Str = "%s_%s_%s" % (query_Chr, t_Start, t_End)
             break
@@ -394,10 +402,10 @@ def Test():
     from tensorflow.python.lib.io import file_io
 
     url = 'gs://broad-alkesgroup-public/UKBB_LD/chr10_38000001_41000001.npz'
-    #url = 'gs://cloud-samples-data/bigquery/us-states/us-states-by-date.csv'
-    #f = BytesIO(file_io.read_file_to_string(url, binary_mode=True))
-    #data = np.load(f)
-    #LD_arr = sparse.load_npz(url).toarray()
+    # url = 'gs://cloud-samples-data/bigquery/us-states/us-states-by-date.csv'
+    # f = BytesIO(file_io.read_file_to_string(url, binary_mode=True))
+    # data = np.load(f)
+    # LD_arr = sparse.load_npz(url).toarray()
 
     DATA_URL = 'https://storage.googleapis.com/tensorflow/tf-keras-datasets/mnist.npz'
     Test_URL = "https://storage.googleapis.com/broad-alkesgroup-public/UKBB_LD/chr10_38000001_41000001.npz"
@@ -405,7 +413,7 @@ def Test():
 
     Test_URL_gz = "https://storage.googleapis.com/broad-alkesgroup-public/UKBB_LD/chr10_10000001_13000001.gz"
 
-    #path = tf.keras.utils.get_file('mnist.npz', DATA_URL)
+    # path = tf.keras.utils.get_file('mnist.npz', DATA_URL)
     path = tf.keras.utils.get_file('chr10_10000001_13000001.npz', Test_URL)
     LD_gz_Path = tf.keras.utils.get_file(
         'chr10_10000001_13000001.gz', Test_URL_gz)
@@ -416,15 +424,15 @@ def Test():
     # test_examples = data['x_test']
     # test_labels = data['y_test']
     print(LD_gz_Path)
-    #File = open(path)
+    # File = open(path)
     # for line in File:
     # print(line)
     # File.close()
 
-    #data = np.load(path)
+    # data = np.load(path)
     # print(data)
 
-    #LD_arr = sparse.load_npz(path).toarray()
+    # LD_arr = sparse.load_npz(path).toarray()
     # print(LD_arr)
 
 
