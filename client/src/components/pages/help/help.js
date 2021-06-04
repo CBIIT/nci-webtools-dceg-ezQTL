@@ -595,7 +595,10 @@ export function Help() {
           modules. All other modules will work independently and simultaneously
           after Locus QC.
         </p>
-        <img className="w-100" src="assets/images/input_table.svg" />
+        <img
+          className="w-100"
+          src="assets/images/data_input_relationship.svg"
+        />
       </div>
       <div className="mt-5">
         <p>
@@ -647,7 +650,7 @@ export function Help() {
           to other tools at the time of the development. We are planning to
           include more features or modules in ezQTL in the future.
         </p>
-        <img className="w-100" src="assets/images/tool_compare_table.svg" />
+        <img className="w-100" src="assets/images/ezQTL_comparison.svg" />
       </div>
       <div className="mt-5">
         <p>
