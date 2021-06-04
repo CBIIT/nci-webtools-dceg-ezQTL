@@ -75,7 +75,7 @@ export function LocusAlignment() {
           </p>
           <p>
             The pink diamond in the top LocusZoom plot shows the best (most
-            significant) QTL variant for the selected “Reference Gene”. The red
+            significant) QTL variant for the selected "Reference Gene”. The red
             circle indicates the current LD reference variant, which will be
             simultaneously updated in both GWAS and QTLs LocusZoom plots when a
             different LD reference variant is selected. The circle and pink
@@ -106,10 +106,10 @@ export function LocusAlignment() {
                   <p>
                     The following scatter plot shows the correlation between
                     -log10(GWAS <i>P</i>-value) and -log10(QTLs <i>P</i>-value).
-                    The “<i>P</i>-value threshold” can be used to filter QTL and
+                    The "<i>P</i>-value threshold” can be used to filter QTL and
                     GWAS variants based on their <i>P</i>-values before
                     visualizing the <i>P</i>-value correlation. For detailed
-                    colocalization analyses, please check the “Locus
+                    colocalization analyses, please check the "Locus
                     Colocalization” sub-module.
                   </p>
 

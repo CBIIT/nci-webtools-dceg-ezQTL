@@ -528,7 +528,7 @@ export function LocusColocalization() {
             not be performed. ezQTL combines GWAS, QTL, and eCAVIAR results into
             one table as shown below. If no QTLs are found for the GWAS lead SNP
             (Lead SNP included=”N”), ezQTL will use the nearest variant as a
-            locational proxy of “GWAS lead SNP” for the eCAVIAR analysis. Only
+            locational proxy of "GWAS lead SNP” for the eCAVIAR analysis. Only
             overlapping SNPs passed QC between GWAS and QTLs are used for
             colocalization analysis.
           </p>

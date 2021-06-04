@@ -138,10 +138,10 @@ export function LocusQC() {
                   QTL and GWAS data. For the matched alleles in both the QTL and
                   GWAS datasets, we expect to observe a strong positive or
                   negative correlation for a colocalized locus. Variants marked
-                  by “X” are C/G or A/T variants that are difficult to match.
+                  by "X” are C/G or A/T variants that are difficult to match.
                   This could be useful information to check if two alleles are
                   an exact match for all overlapping variants in the QTL and
-                  GWAS datasets. Please see the “snp_not_match.txt” file from
+                  GWAS datasets. Please see the "snp_not_match.txt” file from
                   the Locus Download module for further troubleshooting. Alleles
                   are matched for the public datasets we provided. For the
                   user-provided datasets, we recommend using alternative alleles

@@ -25,7 +25,7 @@ export function LocusDownload() {
         Click the following link to download the compressed folder, which
         includes all of the datasets after QC, colocalization results, an ezQTL
         log file, and all of the high resolution figures in svg format for
-        future publication. It also includes a “snp_not_match.txt” file for the
+        future publication. It also includes a "snp_not_match.txt” file for the
         incompatible variants list among GWAS data, QTL data and LD matrix. A
         future session json file will also be included to enable loading of all
         these results in ezQTL for visualization.
