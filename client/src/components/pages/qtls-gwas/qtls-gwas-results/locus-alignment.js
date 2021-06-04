@@ -57,28 +57,30 @@ export function LocusAlignment() {
       {submitted && !isError && locus_alignment.data && (
         <>
           <p>
-            Two{' '}
+            The two{' '}
             <a href="http://locuszoom.org/" target="_blank" rel="noreferrer">
               LocusZoom
             </a>{' '}
-            plots below show the association <i>P</i>-values for QTLs (top
-            panel), and GWAS (bottom panel). If no GWAS data is uploaded, a
-            single LocusZoom plot will be shown for QTLs only.
-            <br />
-            <br />
-            On the panel above, 1000 Genomes populations and LD reference SNP
-            can be customized; by default, the LD information (r<sup>2</sup>)
-            will be calculated based on the 1000 Genomes Dataset (phase 3,
-            version 5) but can be replaced by the user uploading their own LD
-            matrix. Use the blue arrowhead on the top left corner to show or
-            hide file uploading menu on the left.
+            plots below show the association P-values for QTLs (top panel), and
+            GWAS (bottom panel). If no GWAS data is uploaded, a single LocusZoom
+            plot will be shown for QTLs only, and vice versa.
           </p>
           <p>
-            The pink diamond in the LocusZoom plot shows the best (most
-            significant) QTL variant for the selected “Reference Gene”. Red
+            In the top panel, the LD reference SNP can be customized. By
+            default, the LD information (r<sup>2</sup>) will be calculated based
+            on the 1000 Genomes Dataset (phase 3, version 5), but can be
+            replaced by selecting the UKBB dataset or a user’s own uploaded LD
+            matrix. Use the blue arrowhead in the top left corner to display or
+            hide the file uploading menu on the left.
+          </p>
+          <p>
+            The pink diamond in the top LocusZoom plot shows the best (most
+            significant) QTL variant for the selected “Reference Gene”. The red
             circle indicates the current LD reference variant, which will be
-            simultaneously updated in both GWAS and QTLs LocusZoom plots. The
-            circle and pink diamond are overlapped at the beginning.
+            simultaneously updated in both GWAS and QTLs LocusZoom plots when a
+            different LD reference variant is selected. The circle and pink
+            diamond displayed in the QTL plot overlap in the initial result
+            output.
           </p>
 
           <div style={{ overflowX: 'auto' }}>
@@ -153,9 +155,7 @@ export function LocusAlignment() {
                           }
                           // }
                         }}
-                        isInvalid={
-                          locus_alignment_gwas_scatter_threshold < 0.0
-                        }
+                        isInvalid={locus_alignment_gwas_scatter_threshold < 0.0}
                         // custom
                       />
                       <Form.Control.Feedback type="invalid">

@@ -22,14 +22,23 @@ export function LocusDownload() {
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
       <LoadingOverlay active={loading} />
       <p>
-        Download all files and images inputed and generated from this session.
+        Click the following link to download the compressed folder, which
+        includes all of the datasets after QC, colocalization results, an ezQTL
+        log file, and all of the high resolution figures in svg format for
+        future publication. It also includes a “snp_not_match.txt” file for the
+        incompatible variants list among GWAS data, QTL data and LD matrix. A
+        future session json file will also be included to enable loading of all
+        these results in ezQTL for visualization.
       </p>
       {isLoading ||
       isLoadingHyprcoloc ||
       isLoadingECaviar ||
       isLoadingSummary ||
       isLoadingQC ? (
-        <p>Disabled due to ongoing calculations, please wait for them to complete.</p>
+        <p>
+          Disabled due to ongoing calculations, please wait for them to
+          complete.
+        </p>
       ) : (
         <p></p>
       )}

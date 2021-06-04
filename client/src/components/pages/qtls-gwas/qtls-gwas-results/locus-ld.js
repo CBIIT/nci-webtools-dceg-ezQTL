@@ -9,7 +9,6 @@ import {
   qtlsGWASLocusLDCalculation,
 } from '../../../../services/actions';
 
-
 export function LocusLD() {
   const {
     submitted,
@@ -29,29 +28,29 @@ export function LocusLD() {
     request,
     isLoading,
     isLoadingLD,
-  }
-    = useSelector((state) => state.qtlsGWAS);
+  } = useSelector((state) => state.qtlsGWAS);
 
   async function handleRecalculate() {
-
-    dispatch(qtlsGWASLocusLDCalculation({
-      request: request,
-      select_gwas_sample: select_gwas_sample,
-      select_qtls_samples: select_qtls_samples,
-      gwasFile: inputs['gwas_file'][0],
-      associationFile: inputs['association_file'][0],
-      LDFile: inputs['ld_file'][0],
-      leadsnp: locus_alignment['top']['rsnum'],
-      genome_build: genome['value'],
-      ldThreshold: ldThreshold,
-      ldAssocData: ldAssocData.value,
-      select_gene: select_gene
-    }));
+    dispatch(
+      qtlsGWASLocusLDCalculation({
+        request: request,
+        select_gwas_sample: select_gwas_sample,
+        select_qtls_samples: select_qtls_samples,
+        gwasFile: inputs['gwas_file'][0],
+        associationFile: inputs['association_file'][0],
+        LDFile: inputs['ld_file'][0],
+        leadsnp: locus_alignment['top']['rsnum'],
+        genome_build: genome['value'],
+        ldThreshold: ldThreshold,
+        ldAssocData: ldAssocData.value,
+        select_gene: select_gene,
+      })
+    );
   }
   const dispatch = useDispatch();
 
   return (
-    <div className="px-3 py-2" style={{ minHeight: '500px' }}>
+    <div style={{ minHeight: '500px' }}>
       {!submitted && (
         <LoadingOverlay
           active={true}
@@ -72,114 +71,173 @@ export function LocusLD() {
       <LoadingOverlay active={isLoadingLD} />
       {submitted && !ldError && !isLoading && !isLoadingLD && (
         <>
-          <Form className="row justify-content-between" style={{minHeight: '100px'}}>
-            <LoadingOverlay
-              active={!gwasFile && !associationFile}
-              content={<b>No QTL or GWAS data. Recalculation disabled.</b>}
-            />
+          <div className="px-3 py-2">
+            <Form
+              className="row justify-content-between"
+              style={{ minHeight: '100px' }}
+            >
+              <LoadingOverlay
+                active={!gwasFile && !associationFile}
+                content={<b>No QTL or GWAS data. Recalculation disabled.</b>}
+              />
 
-            {(gwasFile || associationFile) && <>
-              <div className="col-md-9">
-                <Form.Group className="row">
-                  <Form.Group className="col-md-4">
-                    <Form.Label className="mb-0 mr-auto">
-                      LD Association Data
-                  </Form.Label>
-                    <ReactSelect
-                      isDisabled={!submitted}
-                      inputId="qtls-results-ld-association-data"
-                      placeholder="None"
-                      value={ldAssocData}
-                      onChange={(option) => {
-                        dispatch(updateQTLsGWAS({ ldAssocData: option }))
-                        if (option.value === 'GWAS')
-                          dispatch(updateQTLsGWAS({ select_gene: '' }))
-                      }}
-                      options={
-                        [
-                          { value: 'QTL', label: 'QTL' },
-                          { value: 'GWAS', label: 'GWAS' }
-                        ]
-                      }
-                      styles={{
-                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                      }}
-                      menuPortalTarget={document.body}
-                      filterOption={createFilter({ ignoreAccents: false })}
-                    />
-                  </Form.Group>
+              {(gwasFile || associationFile) && (
+                <>
+                  <div className="col-md-9">
+                    <Form.Group className="row">
+                      <Form.Group className="col-md-4">
+                        <Form.Label className="mb-0 mr-auto">
+                          LD Association Data
+                        </Form.Label>
+                        <ReactSelect
+                          isDisabled={!submitted}
+                          inputId="qtls-results-ld-association-data"
+                          placeholder="None"
+                          value={ldAssocData}
+                          onChange={(option) => {
+                            dispatch(updateQTLsGWAS({ ldAssocData: option }));
+                            if (option.value === 'GWAS')
+                              dispatch(updateQTLsGWAS({ select_gene: '' }));
+                          }}
+                          options={[
+                            { value: 'QTL', label: 'QTL' },
+                            { value: 'GWAS', label: 'GWAS' },
+                          ]}
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
+                          menuPortalTarget={document.body}
+                          filterOption={createFilter({ ignoreAccents: false })}
+                        />
+                      </Form.Group>
 
-                  <div className="col-md-4">
-                    <Form.Label className="mb-0">
-                      Trait for QTL{' '}
-                      {ldAssocData.value === 'QTL' && <span
-                        style={{
-                          display: submitted && !isLoading ? 'inline' : 'none',
-                          color: 'red',
-                        }}
-                      >
-                        *
-                </span>}
-                    </Form.Label>
-                    <ReactSelect
-                      isDisabled={!submitted || ldAssocData.value !== 'QTL'}
-                      inputId="qtls-results-gene-input"
-                      // label=""
-                      value={ldAssocData.value === 'QTL' ? select_gene : null}
-                      placeholder="None"
-                      options={gene_list ? gene_list.data : []}
-                      getOptionLabel={(option) => option.gene_symbol}
-                      getOptionValue={(option) => option.gene_id}
-                      onChange={(option) =>
-                        dispatch(updateQTLsGWAS({ select_gene: option }))
-                      }
-                      styles={{
-                        menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                      }}
-                      menuPortalTarget={document.body}
-                      filterOption={createFilter({ ignoreAccents: false })}
-                    />
+                      <div className="col-md-4">
+                        <Form.Label className="mb-0">
+                          Trait for QTL{' '}
+                          {ldAssocData.value === 'QTL' && (
+                            <span
+                              style={{
+                                display:
+                                  submitted && !isLoading ? 'inline' : 'none',
+                                color: 'red',
+                              }}
+                            >
+                              *
+                            </span>
+                          )}
+                        </Form.Label>
+                        <ReactSelect
+                          isDisabled={!submitted || ldAssocData.value !== 'QTL'}
+                          inputId="qtls-results-gene-input"
+                          // label=""
+                          value={
+                            ldAssocData.value === 'QTL' ? select_gene : null
+                          }
+                          placeholder="None"
+                          options={gene_list ? gene_list.data : []}
+                          getOptionLabel={(option) => option.gene_symbol}
+                          getOptionValue={(option) => option.gene_id}
+                          onChange={(option) =>
+                            dispatch(updateQTLsGWAS({ select_gene: option }))
+                          }
+                          styles={{
+                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                          }}
+                          menuPortalTarget={document.body}
+                          filterOption={createFilter({ ignoreAccents: false })}
+                        />
+                      </div>
+                      <div className="col-md-4">
+                        <Form.Label className="mb-0">
+                          -log<sub>10</sub> Association Threshold
+                        </Form.Label>
+                        <Form.Control
+                          type="number"
+                          step="any"
+                          min="0"
+                          id="qtls-ld-threshold"
+                          placeholder="None"
+                          disabled={!submitted}
+                          value={ldThreshold}
+                          onChange={(e) => {
+                            dispatch(
+                              updateQTLsGWAS({ ldThreshold: e.target.value })
+                            );
+                          }}
+                          // custom
+                        />
+                      </div>
+                    </Form.Group>
                   </div>
-                  <div className="col-md-4">
-                    <Form.Label className="mb-0">-log<sub>10</sub> Association Threshold</Form.Label>
-                    <Form.Control
-                      type="number"
-                      step="any"
-                      min="0"
-                      id="qtls-ld-threshold"
-                      placeholder='None'
+                  <div className="col-md-auto">
+                    <Form.Label className="mb-0"></Form.Label>
+                    <Button
                       disabled={!submitted}
-                      value={ldThreshold}
-                      onChange={(e) => {
-                        dispatch(updateQTLsGWAS({ ldThreshold: e.target.value }));
-                      }}
-                    // custom
-                    />
+                      className="d-block"
+                      variant="primary"
+                      type="button"
+                      onClick={() => handleRecalculate()}
+                    >
+                      Recalculate
+                    </Button>
                   </div>
-                </Form.Group>
-              </div>
-              <div className="col-md-auto">
-                <Form.Label className="mb-0"></Form.Label>
-                <Button
-                  disabled={
-                    !submitted
-                  }
-                  className="d-block"
-                  variant="primary"
-                  type="button"
-                  onClick={() => handleRecalculate()}
-                >
-                  Recalculate
-                </Button>
-              </div>
-            </>}
-          </Form>
+                </>
+              )}
+            </Form>
+          </div>
           <hr />
-          <Zoom
-            plotURL={`api/results/${request}/LD_Output.png`}
-            className="border rounded p-3"
-            maxHeight="100%"
-          />
+          <div className="px-3 py-2">
+            <p>
+              Locus LD will integratively visualize association data with gene
+              structures and linkage disequilibrium matrices from the user-input
+              or public datasets including{' '}
+              <a
+                href="https://www.internationalgenome.org/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                1000 genomes
+              </a>{' '}
+              and{' '}
+              <a
+                href="https://www.ukbiobank.ac.uk/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                UK biobank
+              </a>
+              . Locus LD can work independently without any additional input
+              dataset. The visualization function is adapted from the
+              IntRegionaPlot function in the IntAssoPlot R package. A maximum 5
+              Mbp locus is allowed for this LD visualization. The LD reference
+              SNP and the LD reference populations are based on what is defined
+              in the input file uploading menu. LD plot will be generated
+              without any (QTL/GWAS) association data and can be downloaded.
+            </p>
+            <p>
+              <u>LD Association data</u>: Select the association files for
+              displaying the p-values. If no association file is provided, by
+              default, it will only highlight the LD reference SNP.
+            </p>
+            <p>
+              <u>Trait for QTL</u>: If a QTL is selected as the LD Association
+              data, select the trait in the QTL association file for displaying
+              the p-values.
+            </p>
+            <p>
+              <u>Association threshold</u>: A threshold will be applied to
+              -log10(P-value) in order to highlight the top significant variants
+              in association data.
+            </p>
+          </div>
+          <hr />
+          <div className="px-3 py-2">
+            <Zoom
+              plotURL={`api/results/${request}/LD_Output.png`}
+              className="border rounded p-3"
+              maxHeight="100%"
+            />
+          </div>
         </>
       )}
     </div>

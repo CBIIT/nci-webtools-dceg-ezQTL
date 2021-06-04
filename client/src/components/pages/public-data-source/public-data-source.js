@@ -17,7 +17,11 @@ export function PublicDataSource() {
   return (
     <div className="mx-2 bg-white">
       <div className="mb-4">
-        <p>An overview of public data sources related to QTL analysis.</p>
+        <p>
+          The following table shows the public data sources (LD matrix, QTL
+          associations, and GWAS summary statistics ) contributed to our ezQTL
+          website:
+        </p>
       </div>
 
       {pubMemo.data && (
