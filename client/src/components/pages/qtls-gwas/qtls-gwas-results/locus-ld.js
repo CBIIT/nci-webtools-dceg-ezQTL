@@ -72,10 +72,7 @@ export function LocusLD() {
       {submitted && !ldError && !isLoading && !isLoadingLD && (
         <>
           <div className="px-3 py-2">
-            <Form
-              className="row justify-content-between"
-              style={{ minHeight: '100px' }}
-            >
+            <Form className="row justify-content-between">
               <LoadingOverlay
                 active={!gwasFile && !associationFile}
                 content={<b>No QTL or GWAS data. Recalculation disabled.</b>}
@@ -85,7 +82,7 @@ export function LocusLD() {
                 <>
                   <div className="col-md-9">
                     <Form.Group className="row">
-                      <Form.Group className="col-md-4">
+                      <div className="col-md-4">
                         <Form.Label className="mb-0 mr-auto">
                           LD Association Data
                         </Form.Label>
@@ -109,8 +106,7 @@ export function LocusLD() {
                           menuPortalTarget={document.body}
                           filterOption={createFilter({ ignoreAccents: false })}
                         />
-                      </Form.Group>
-
+                      </div>
                       <div className="col-md-4">
                         <Form.Label className="mb-0">
                           Trait for QTL{' '}
