@@ -33,7 +33,7 @@ export function QTLsGWASResultsForm() {
     select_qtls_samples,
     select_gwas_sample,
     genome,
-    locusInformation
+    locusInformation,
   } = useSelector((state) => state.qtlsGWAS);
 
   const {
@@ -95,15 +95,12 @@ export function QTLsGWASResultsForm() {
   };
 
   async function handleSubmit() {
-
     let chromosome;
 
-    if(!select_chromosome)
-      chromosome = false
-    else
-      chromosome = select_chromosome
+    if (!select_chromosome) chromosome = false;
+    else chromosome = select_chromosome;
 
-    console.log(chromosome)
+    console.log(chromosome);
     const params = {
       request,
       associationFile:
@@ -138,12 +135,12 @@ export function QTLsGWASResultsForm() {
       qtlPublic,
       gwasPublic,
       ldPublic,
-      qtlKey: qtlKey || false,
-      ldKey: ldKey || false,
-      gwasKey: gwasKey || false,
+      qtlKey: qtlPublic ? qtlKey : false,
+      ldKey: ldPublic ? ldKey : false,
+      gwasKey: gwasPublic ? gwasKey : false,
       select_chromosome: chromosome.value || false,
       select_position,
-      genome_build: genome.value
+      genome_build: genome.value,
     };
 
     // clear all locus colocalization results
