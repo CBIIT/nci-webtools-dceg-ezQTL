@@ -299,7 +299,8 @@ export function LocusAlignmentPlot(params) {
                       '-' +
                       tooltip.data.ref +
                       '-' +
-                      tooltip.data.alt
+                      tooltip.data.alt +
+                      `${genome.value === 'GRCh38' ? '?dataset=gnomad_r3' : ''}`
                     }
                     target="_blank"
                     rel="noreferrer"
