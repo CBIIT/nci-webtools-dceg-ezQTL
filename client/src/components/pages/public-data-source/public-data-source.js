@@ -15,31 +15,29 @@ export function PublicDataSource() {
   const pubMemo = useMemo(() => table, [table]) || {};
 
   return (
-    <div className="mx-3">
-      <div className="bg-white p-3 mx-3">
-        <div className="mb-4">
-          <p>An overview of public data sources related to QTL analysis.</p>
-        </div>
-
-        {pubMemo.data && (
-          <Table
-            title=""
-            columns={pubMemo.columns}
-            data={pubMemo.data}
-            hidden={hidden}
-            globalFilter={globalFilter}
-            pagination={pagination}
-            defaultSort={sort}
-            mergeState={(state) => dispatch(updatePublications({ state }))}
-          />
-        )}
-
-        <div className="mb-4">
-          <h3>Citations</h3>
-        </div>
-
-        <p>Last update: 01 JUN 2021.</p>
+    <div className="mx-2 bg-white">
+      <div className="mb-4">
+        <p>
+          The following table shows the public data sources (LD matrix, QTL
+          associations, and GWAS summary statistics ) contributed to our ezQTL
+          website:
+        </p>
       </div>
+
+      {pubMemo.data && (
+        <Table
+          title=""
+          columns={pubMemo.columns}
+          data={pubMemo.data}
+          hidden={hidden}
+          globalFilter={globalFilter}
+          pagination={pagination}
+          defaultSort={sort}
+          mergeState={(state) => dispatch(updatePublications({ state }))}
+        />
+      )}
+
+      <p>Last update: 01 JUN 2021.</p>
     </div>
   );
 }

@@ -60,13 +60,27 @@ export function App() {
           id: column,
           Cell: (e) => {
             if (
-              column == 'Title' &&
+              column == 'Study_website' &&
               e.row.values['Study_website'] &&
               e.row.values['Study_website'] != 'NA'
             ) {
               return (
                 <a
                   href={e.row.values['Study_website']}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {e.value}
+                </a>
+              );
+            } else if (
+              column == 'Title' &&
+              e.row.values['Pubmed'] &&
+              e.row.values['Pubmed'] != 'NA'
+            ) {
+              return (
+                <a
+                  href={`https://pubmed.ncbi.nlm.nih.gov/${e.row.values['Pubmed']}`}
                   target="_blank"
                   rel="noreferrer"
                 >

@@ -78,7 +78,7 @@ RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 't
 RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = FALSE);"
 
 # install python packages
-RUN pip3 install scipy pandas numpy tensorflow
+RUN pip3 install scipy pandas numpy tensorflow boto3
 
 RUN mkdir -p /deploy/server /deploy/logs
 

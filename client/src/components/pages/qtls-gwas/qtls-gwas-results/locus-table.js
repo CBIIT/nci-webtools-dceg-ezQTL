@@ -196,10 +196,10 @@ export function LocusTable() {
   return (
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
       <p>
-        QTL results of the locus are annotated with linkage disequilibrium to
-        the LD reference SNP and links to multiple external databases (LDlink,
-        GWAS Catalog, gnomAD). The "R2 to LD reference" column will be updated
-        according to the selected LD reference.
+        QTL association results of the locus are annotated with linkage
+        disequilibrium to the LD reference SNP and linked to multiple external
+        databases (LDlink, GWAS Catalog, gnomAD). The "R2 to LD reference"
+        column will be updated according to the selected LD reference.
       </p>
 
       {locus_table && locus_table.data && locus_table.data.length > 0 && (

@@ -8,15 +8,27 @@ export function Help() {
       </div>
       <div className="mt-3">
         <p>
-          <b>Data format for GWAS-QTL module</b>
+          ezQTL is designed to be an easy and intuitive tool for colocalization
+          analysis between QTL and GWAS data. This documentation page provides
+          detailed descriptions of input and output file formats and answers to
+          typical questions we collected. The source code of ezQTL can be found
+          on GitHub. The documentation is divided into the following sections:{' '}
+        </p>
+      </div>
+      <div className="mt-3">
+        <p>
+          <b>Input file format of ezQTL</b>
         </p>
         <p>
+          On the left panel of the "Analyses” tab, you can click{' '}
           <a href="assets/files/MX2.examples.gz" download>
             Downloaded example files
           </a>
-          , or load them automatically in the module by clicking “load Samples”.
-          The QTLs association input files for vQTL can have a very general
-          format of QTL (e.g.. QTL downloaded from the{' '}
+          to download the example files for a locus in a melanoma GWAS study.
+          Also, you could load them automatically in the ezQTL and check results
+          by clicking "load Sample Data”. The QTLs association input files for
+          ezQTL can have a very general format of QTL (e.g. QTL downloaded from
+          the{' '}
           <a
             href="https://www.gtexportal.org/home/"
             target="_blank"
@@ -31,7 +43,7 @@ export function Help() {
             rel="noreferrer"
           >
             Matrix eQTL
-          </a>
+          </a>{' '}
           and{' '}
           <a
             href="http://fastqtl.sourceforge.net/"
@@ -40,23 +52,32 @@ export function Help() {
           >
             FastQTL
           </a>
-          ). vQTLs need the specific column names and the input files need to be
-          in Unix format. Please make sure you have exactly the same header
-          names in the input files. The following sections show examples of each
-          input file for vQTL.
+          ). ezQTL requires a few specific column names in any order. Warnings
+          will be given in Locus QC if the file formats don’t not match. For the
+          colocalization analysis, ezQTL will use the "rsnum” as the key to link
+          the three input datasets (QTL/GWAS/LD Matrix). Missing values in the
+          "rsnum” column of these three input dataset will be replaced by the
+          "chr:pos:ref:alt”. The input genomic coordinates of each input dataset
+          should match the genome build specified in the left panel. The
+          following description shows examples of each input file format for
+          ezQTL.
         </p>
-      </div>
-      <div className="mt-5">
+        <br />
         <p>
-          <b>QTLs Data</b>
+          <b>QTL Association Data</b>
         </p>
         <p>
-          Association data need to be prepared in the following format.
-          “gene_id” is used as index gene identification number to filter the
-          QTL data for the locuszoom plot and colocalization analysis. The
-          “gene_symbol” will be used for gene selection. The “rsnum” is used to
-          index the QTL data and can be used as the LD reference variants in
-          locuszoom plot.
+          "gene_id” is used as an index identification in order to filter the
+          QTL data for the LocusZoom-style plot and colocalization analysis. The
+          "gene_symbol” will be used for the selection and display of each
+          trait. "gene_id” can be identical to "gene_symbol”. The "rsnum” is
+          used to index the QTL data and can be used as the LD reference
+          variants in the Locus Alignment. The minimal columns required for the
+          QTL dataset include gene_id, gene_symbol, variant_id, rsnum, chr, pos,
+          ref, alt, tss_distance (a standard GTEx pipeline includes
+          "tss_distance” but you can add any number here to make the program run
+          if you do not have this information in the input file), pval_nominal,
+          slop and slop_se. Here is a example table for QTL Data:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
@@ -150,12 +171,16 @@ export function Help() {
             </tbody>
           </table>
         </div>
+        <br />
         <p>
-          Quantification data need to be prepared in the following format. The
-          “gene_id” column was used as the index id to link to other data. The
-          column names after “gene_id” are the sample names and the values can
-          be raw data, normalized data or log transformed data; each will have
-          different visualization for the QTL boxplot and locus quantification.
+          <b>Quantification Data</b>
+        </p>
+        <p>
+          The "gene_id” column is used as the index identification to link the
+          quantification data to QTL data. The column names after "gene_id” are
+          the individual sample names and the values can be raw data, normalized
+          data or log transformed data or residuals after regressing on the
+          variables; Here is an example table for Quantification Data:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
@@ -225,12 +250,19 @@ export function Help() {
             </tbody>
           </table>
         </div>
+        <br />
         <p>
-          Genotype data need to be prepared in the following format. The sample
-          name (starting at 5th column) should be the same as quantification
-          data. The genotype can be in different format (for example, “0/1” or
-          “CT”) (0=reference allele and 1=alternative allele). The chr, pos, ref
-          and alt information are used as index id link to association data.
+          <b>Genotype Data</b>
+        </p>
+        <p>
+          The individual sample names (starting at the 5th column) should be the
+          same as Quantification Data (but they do not need to be in the same
+          order). The genotype can be in different formats (for example, "0/1”
+          or "CT”) (0=reference allele and 1=alternative allele). The chr, pos,
+          ref and alt information are used as index id linked to QTL data. Chr
+          and pos should match the genome build specified in the left panel. Ref
+          and alt alleles should match ref and alt alleles in the QTL data. Here
+          is an example table for Genotype Data:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
@@ -300,12 +332,17 @@ export function Help() {
             </tbody>
           </table>
         </div>
+        <br />
         <p>
-          LD data should not include the column name. The first 5 columns are
-          chr, pos, rsnum, ref and alt, respectively, which record the basic
+          <b>LD Matrix Data</b>
+        </p>
+        <p>
+          No column name is allowed in the LD Matrix Data. The first 5 columns
+          are chr, pos, rsnum, ref and alt, respectively, which record the basic
           information for the LD among all the variants in the locus of
           interest. The remaining columns are the pairwise matrix, representing
-          the LD (R value) between two variants.
+          the LD (R value) between two variants. Here is an example table for LD
+          Matrix Data:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
@@ -376,117 +413,192 @@ export function Help() {
           </table>
         </div>
       </div>
-      <div className="mt-5">
-        <p>
-          <b>GWAS Data</b>
-        </p>
-        <p>
-          GWAS data should follow the following format. The “rsnum” is used as
-          index id linking to QTL data. “zscore” can be calculated based on the
-          effect size (“effect”) and standard error (“se”): zscore=effect/se.
-        </p>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th scope="col">chr</th>
-                <th scope="col">pos</th>
-                <th scope="col">ref</th>
-                <th scope="col">alt</th>
-                <th scope="col">rsnum</th>
-                <th scope="col">pvalue</th>
-                <th scope="col">zscore</th>
-                <th scope="col">effect</th>
-                <th scope="col">se</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>21</td>
-                <td>42642038</td>
-                <td>A</td>
-                <td>G</td>
-                <td>rs8133778</td>
-                <td>0.806</td>
-                <td>-0.246</td>
-                <td>-0.003</td>
-                <td>0.011</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642093</td>
-                <td>C</td>
-                <td>T</td>
-                <td>rs771407982</td>
-                <td>0.206</td>
-                <td>-1.264</td>
-                <td>-1.455</td>
-                <td>1.152</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642096</td>
-                <td>A</td>
-                <td>G</td>
-                <td>rs68087522</td>
-                <td>0.330</td>
-                <td>0.974</td>
-                <td>0.018</td>
-                <td>0.018</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642322</td>
-                <td>C</td>
-                <td>T</td>
-                <td>rs73368336</td>
-                <td>0.543</td>
-                <td>-0.608</td>
-                <td>-0.181</td>
-                <td>0.298</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642405</td>
-                <td>G</td>
-                <td>A</td>
-                <td>rs77240271</td>
-                <td>0.078</td>
-                <td>-1.761</td>
-                <td>-0.047</td>
-                <td>0.027</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <br />
+      <p>
+        The following example command can be used to extract this information
+        from the raw genotype data of a custom LD reference dataset in vcf
+        format using{' '}
+        <a
+          href="https://github.com/statgen/emeraLD"
+          target="_blank"
+          rel="noreferrer"
+        >
+          emeraLD
+        </a>
+        : <br />
+        <code>
+          emeraLD --matrix -i input.vcf.gz --stdout --extra --phased |sed
+          's/:/\t/' |bgzip > output.LD.gz
+        </code>
+      </p>
+      <br />
+      <p>
+        <b>GWAS Data</b>
+      </p>
+      <p>
+        The "rsnum” is used as index id linking GWAS data to QTL Data and LD
+        Matrix Data. An example script has been included in the ezQTL{' '}
+        <a
+          href="https://github.com/CBIIT/nci-webtools-dceg-vQTL"
+          target="_blank"
+          rel="noreferrer"
+        >
+          GitHub
+        </a>{' '}
+        to transfer the GWAS summary statistics from NHGRI GWAS catalog into
+        ezQTL GWAS Data format. The minimal columns required for GWAS Data
+        include chr, pos, ref, alt, rsnum, pvalue, zscore, effect and se. Here
+        is an example table for GWAS Data Data:
+      </p>
+      <div style={{ overflowX: 'auto' }}>
+        <table className="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th scope="col">chr</th>
+              <th scope="col">pos</th>
+              <th scope="col">ref</th>
+              <th scope="col">alt</th>
+              <th scope="col">rsnum</th>
+              <th scope="col">pvalue</th>
+              <th scope="col">zscore</th>
+              <th scope="col">effect</th>
+              <th scope="col">se</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>21</td>
+              <td>42642038</td>
+              <td>A</td>
+              <td>G</td>
+              <td>rs8133778</td>
+              <td>0.806</td>
+              <td>-0.246</td>
+              <td>-0.003</td>
+              <td>0.011</td>
+            </tr>
+            <tr>
+              <td>21</td>
+              <td>42642093</td>
+              <td>C</td>
+              <td>T</td>
+              <td>rs771407982</td>
+              <td>0.206</td>
+              <td>-1.264</td>
+              <td>-1.455</td>
+              <td>1.152</td>
+            </tr>
+            <tr>
+              <td>21</td>
+              <td>42642096</td>
+              <td>A</td>
+              <td>G</td>
+              <td>rs68087522</td>
+              <td>0.330</td>
+              <td>0.974</td>
+              <td>0.018</td>
+              <td>0.018</td>
+            </tr>
+            <tr>
+              <td>21</td>
+              <td>42642322</td>
+              <td>C</td>
+              <td>T</td>
+              <td>rs73368336</td>
+              <td>0.543</td>
+              <td>-0.608</td>
+              <td>-0.181</td>
+              <td>0.298</td>
+            </tr>
+            <tr>
+              <td>21</td>
+              <td>42642405</td>
+              <td>G</td>
+              <td>A</td>
+              <td>rs77240271</td>
+              <td>0.078</td>
+              <td>-1.761</td>
+              <td>-0.047</td>
+              <td>0.027</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+      <p>
+        Check{' '}
+        <a
+          href="https://huwenboshi.github.io/data%20management/2017/11/23/tips-for-formatting-gwas-summary-stats.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          here
+        </a>{' '}
+        for details about the relationship for Z-score, p-value, effect size or
+        odds ratio for association studies, which will be useful to prepare GWAS
+        Data.
+      </p>
       <div className="mt-5">
         <p>
-          <b>Understanding Linkage Disequilibrium (LD)</b>
+          <b>Public data source</b>
         </p>
         <p>
+          We aim to collect as many published QTL datasets with full association
+          data available as possible. However, due to the file size limitation,
+          most studies only make the genome-wide significant QTL dataset
+          available for downloading and could not be used as part of our data
+          sources. For the GWAS summary data, we mostly downloaded the formatted
+          datasets using the{' '}
           <a
-            href="https://ldlink.nci.nih.gov/?tab=help#Understanding_Linkage_Disequilibrium"
-            target="_target"
-          >
-            View background information on how to understand linkage
-            disequilibrium.{' '}
-          </a>
-          For vQTL, all population genotype data originates from Phase 3
-          (Version 5) of the{' '}
-          <a
-            href="http://www.internationalgenome.org/"
+            href="https://github.com/mikegloudemans/gwas-download"
             target="_blank"
             rel="noreferrer"
           >
-            1000 Genomes Project
+            bash script
           </a>{' '}
-          and variant RS numbers are indexed based on dbSNP 151. Where
-          coordinates are specified, GRCH37/hg19 is used. Only bi-allelic
-          variants are permitted as input. <a href="https://github.com/statgen/emeraLD" target="_blank" rel="noreferrer">emeraLD</a> was 
-          used to calculate the phased haplotype LD.
-          The LD information will be used in the colocalization analysis.
+          from the{' '}
+          <a href="http://locuscompare.com/" target="_blank" rel="noreferrer">
+            locuscompare
+          </a>
+          . In addition, we include most publicly available cancer related GWAS
+          summary data from{' '}
+          <a
+            href="https://www.ebi.ac.uk/gwas/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GWAS Catalog
+          </a>{' '}
+          and other web sources. For the LD Matrix Data, the current build of
+          1000 genomes VCF data (both GRCh37 and GRCh38 available) and
+          pre-calculated UK BioBank LD (GRCh37 only) reference are included.
+          Check the ‘Public Data Source’ table for the detailed public data
+          sources.
         </p>
+        <p>
+          Please <a href="mailto:http://tongwu.zhang@nih.gov">contact us</a> if
+          you have any public full association data not included here.
+        </p>
+      </div>
+      <div className="mt-5">
+        <p>
+          <b>Relationship between input datasets and module functions</b>
+        </p>
+        <p>
+          The following table shows the data requirement for each module in
+          ezQTL. Only Locus Colocalization requires three major input datasets
+          together (QTL/GWAS/LD Matrix). All other modules require at least one
+          major data input as indicated in this table. Locus Table and Locus
+          Quantification require at least two input datasets as highlighted in
+          the red box. Locus QC will be the first step for data processing and
+          generate modified post-QC datasets (including QTL/GWAS/LD Matrix
+          depending on input datasets) as input files for the rest of the
+          modules. All other modules will work independently and simultaneously
+          after Locus QC.
+        </p>
+        <img
+          className="w-100"
+          src="assets/images/data_input_relationship.svg"
+        />
       </div>
       <div className="mt-5">
         <p>
@@ -494,48 +606,113 @@ export function Help() {
         </p>
         <p>
           Three methods are used in colocalization analyses between GWAS and all
-          QTLs (including all phenotypes in QTLs such as all genes in eQTL
-          files) in the “Locus Colocalization” sub-module.{' '}
-          The first method is similar to <a href="http://locuscompare.com/" target="_blank" rel="noreferrer">LocusCompare</a>
+          QTLs (including all phenotypes/traits in QTLs such as all genes in
+          eQTL files) in the "Locus Colocalization” sub-modules and the "Locus
+          Alignment” module. The first method is similar to{' '}
+          <a href="http://locuscompare.com/" target="_blank" rel="noreferrer">
+            LocusCompare
+          </a>
           , which investigates the correlation between the GWAS -log10(p-value)
-          and QTL log10(p-value), which is visualized in “Locus Alignment”
-          sub-modules. Both Pearson and Spearman correlation coefficients and
-          p-value are calculated for each phenotype. An association p-value
-          threshold can be applied to this regression module.
-          The second method uses <a href="https://github.com/jrs95/hyprcoloc" target="_blank" rel="noreferrer">HyPrColoc</a> to 
-          prioritize causal variants for the shared genetic etiology across
-          multiple related traits. Two tables were generated including the
-          colocalized traits information, potential causal variant and variant
-          ranked score. The third method is <a href="http://genetics.cs.ucla.edu/caviar/" target="_blank" rel="noreferrer">eCAVIAR</a>, 
-          a statistical framework that quantifies the probability of the
+          and QTL -log10(p-value), and is visualized separately in the "Locus
+          Alignment” module. Both Pearson and Spearman correlation coefficients
+          and p-values are calculated for each phenotype. An association p-value
+          threshold can be applied to this regression module. The second method
+          uses{' '}
+          <a
+            href="https://github.com/jrs95/hyprcoloc"
+            target="_blank"
+            rel="noreferrer"
+          >
+            HyPrColoc
+          </a>{' '}
+          to prioritize the common "causal” variants for the shared genetic
+          etiology across multiple related traits. Two tables were generated
+          including the colocalized traits information, potential causal
+          variants and variant ranked scores. The third method is{' '}
+          <a
+            href="http://genetics.cs.ucla.edu/caviar/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            eCAVIAR
+          </a>
+          , a statistical framework that quantifies the probability of the
           variant to be causal both in GWAS and eQTL studies, while allowing the
           arbitrary number of causal variants.
         </p>
       </div>
       <div className="mt-5">
         <p>
-          <b>Note on Computing Z-scores</b>
+          <b>Comparison between ezQTL and other tools</b>
         </p>
         <p>
-          Check{' '}
-          <a
-            href="https://huwenboshi.github.io/data%20management/2017/11/23/tips-for-formatting-gwas-summary-stats.html"
-            target="_blank"
-            rel="noreferrer"
-          >
-            here
-          </a>{' '}
-          for details about the relationship for Z-score, p-value, effect size
-          or odds ratio for association studies.
+          The table below summarizes the major features of ezQTL and comparisons
+          to other tools at the time of the development. We are planning to
+          include more features or modules in ezQTL in the future.
         </p>
+        <img className="w-100" src="assets/images/ezQTL_comparison.svg" />
       </div>
       <div className="mt-5">
         <p>
-          <b>Contact</b>
+          <b>Frequently Asked Questions</b>
         </p>
         <p>
-          Still have questions about vQTL or would like to report an issue?
-          Contact us via <a href="mailto:http://tongwu.zhang@nih.gov">email</a>.
+          <i>
+            What is a colocalization analysis, and are there any other
+            approaches to perform colocalization analysis than what is provided
+            by ezQTL?
+          </i>
+        </p>
+        <p>
+          Colocalization is a statistical method examining if the same "causal”
+          variant is underlying both eQTL and GWAS signals, as opposed to some
+          SNPs showing significant P-values in both assays by chance. Two major
+          challenges for performing colocalization analysis between GWAS and
+          eQTL are the linkage disequilibrium and multiple causal variants for
+          some loci. There have been extensive efforts in developing and
+          applying different colocalization approaches. Currently, ezQTL only
+          includes two widely used algorithms eCAVIAR and HyPrColoc based on
+          their performance. We may include more colocalization algorithms in
+          the future.
+        </p>
+        <p>
+          <i>
+            What is the LD Matrix data? Should I calculate LD matrix data from
+            my own GWAS or QTL samples?
+          </i>
+        </p>
+        <p>
+          Linkage Disequilibrium (LD) refers to the non-random association of
+          alleles at two or more loci in the general population. For the
+          colocalization analysis between GWAS and QTL, the LD produces an
+          inherent ambiguity in interpreting the results. Most colocalization
+          algorithms (including eCAVIAR and HyPrColoc) require LD matrix data
+          for integrating GWAS and eQTL, ideally from the same population or a
+          reference population of matching genetic ancestry. For ezQTL, the LD
+          matrix data can be pre-calculated from a large-scale public study with
+          known population ancestry (i.e. we provide LD matrices from 1000
+          genomes and UK BioBank reference sets) or calculated from the user
+          study (typically GWAS data). If the samples used in QTL and GWAS
+          studies are from the same ancestry but of different ancestry from the
+          provided public LD datasets, we recommend to calculate the LD Mattix
+          from the user study (individual-level genotype data from > 500
+          individuals are recommended to be used). Users can visualize the
+          difference of LD Matrices between user’s study and public study by
+          using the Locus LD module.
+        </p>
+        <p>
+          <i>What is the genome build version for the public data source?</i>
+        </p>
+        <p>
+          For the LD matrices in public data source, the 1000 genomes support
+          both GRCh37 and GRCh38 for all the populations. The UK BioBank only
+          supports the GRCh37 for now. For QTL in public data source, both GTEx
+          sQTL and eQTL support both GRCh37 and GRh38. The rest of the QTL data
+          mostly support GRCh38. For the GWAS, almost all the GWAS studies only
+          support GRCh37. The genome build should be matched among QTL, GWAS and
+          LD Matrix datasets. A liftover module will be developed in the future
+          to support conversion of genome build versions between GRCh37 and
+          GRCh38 for all datasets.
         </p>
       </div>
     </div>

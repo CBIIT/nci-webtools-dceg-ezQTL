@@ -24,7 +24,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
   } else if (ldProject == 'UKBB') {
-    cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -r ', wd, '/data/Alkes_group.txt -o ', wd, '/', LDFile)
+    cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -b ', bucket, ' -o ', wd, '/', LDFile)
     system(cmd)
 
     out <- read_delim(LDFile, delim = '\t', col_names = F, col_types = cols('X2' = 'c')) %>% rename(id = X1, chr = X2, pos = X3, ref = X4, alt = X5) %>% relocate(chr, pos, id)
@@ -371,10 +371,10 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   # check to see if boxplot data files are present
   if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
 
-    if(identical(genotypeID, ''))
+    if (identical(genotypeID, ''))
       genotypeID = NULL
 
-    if(identical(traitID, ''))
+    if (identical(traitID, ''))
       traitID = NULL
 
     corPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_cor.svg')
@@ -630,7 +630,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata, exprFile, genoFile, edata, gdata, '',  '', request)
+  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata, exprFile, genoFile, edata, gdata, '', '', request)
   #locus_quantification_data <- locus_quantification[[1]]
   #locus_quantification_heatmap_data <- locus_quantification[[2]]
 

@@ -101,9 +101,9 @@ export function LocusAlignmentPlot(params) {
       qtlPublic,
       gwasPublic,
       ldPublic,
-      qtlKey: qtlKey || false,
-      ldKey: ldKey || false,
-      gwasKey: gwasKey || false,
+      qtlKey: qtlPublic ? qtlKey : false,
+      ldKey: ldPublic ? ldKey : false,
+      gwasKey: gwasPublic ? gwasKey : false,
       select_chromosome: select_chromosome.value || false,
       select_position,
       genome_build: genome.value,
@@ -323,13 +323,10 @@ export function LocusAlignmentPlot(params) {
                     );
                     updateTooltip({ visible: false });
                   }}
-                  // disabled={
-                  //   !(
-                  //     locus_quantification &&
-                  //     locus_quantification.data &&
-                  //     Object.keys(locus_quantification.data).length > 0
-                  //   )
-                  // }
+                  disabled={
+                    inputs['quantification_file'][0] == 'false' ||
+                    inputs['genotype_file'][0] == 'false'
+                  }
                 >
                   <b>Show Boxplots</b>
                 </Button>

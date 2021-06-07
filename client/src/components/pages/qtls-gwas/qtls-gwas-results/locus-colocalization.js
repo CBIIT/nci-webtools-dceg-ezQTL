@@ -31,7 +31,7 @@ export function LocusColocalization() {
     select_gwas_sample,
     select_qtls_samples,
     locus_alignment,
-    submitted
+    submitted,
   } = useSelector((state) => state.qtlsGWAS);
 
   const radios = [
@@ -361,10 +361,39 @@ export function LocusColocalization() {
             >
               HyPrColoc
             </a>
-            ) analyses (Foley <i>et al</i>. 2019 bioRxiv 592238). The first
-            table shows the colocalization results including the following
-            information:
+            ) analyses (Foley <i>et al</i>. 2021 Nature Communications).
+            HyPrColoc analysis will be performed based on the user-defined
+            cis-QTL Distance on the left input parameters panel. Only final
+            overlapping SNPs after QC between GWAS and QTLs are used for
+            colocalization analysis.
           </p>
+          <p>
+            The barplot and table below show the colocalization results, which
+            include the following information:
+          </p>
+          <p>
+            A summary plot of HyPrColoc analysis for all the tested QTL traits
+            (e.g. genes) in the locus. The green solid line indicates our own
+            suggested threshold for the colocalization using HyPrColoc. We
+            strongly encourage the users to refer to the original publication to
+            set their own cutoff suitable for their analysis. Any traits that
+            exceed this threshold will be highlighted with a candidate SNP
+          </p>
+
+          <LoadingOverlay
+            active={isLoadingHyprcoloc || hyprcolocError}
+            content={hyprcolocError}
+          />
+          {hyprcoloc_table.data.length > 0 && (
+            <div className="mb-2">
+              <Zoom
+                plotURL={`api/results/${request}/hyprcoloc_table.svg`}
+                className="border rounded p-3"
+                maxHeight="650px"
+              />
+            </div>
+          )}
+          <p>Summary of colocalized traits:</p>
           <ul>
             <li>
               Traits: a cluster of putatively colocalized traits. The last
@@ -388,49 +417,29 @@ export function LocusColocalization() {
               HyPrColoc multi-trait fine-mapping probability).
             </li>
           </ul>
-          <p>
-            HyPrColoc analysis will be performed based on the user-defined
-            cis-QTL Distance on the input file loading page. Only overlapping
-            SNPs between GWAS and QTLs are used for colocalization analysis.
-          </p>
-
-          <div>
-            <LoadingOverlay
-              active={isLoadingHyprcoloc || hyprcolocError}
-              content={hyprcolocError}
-            />
-            {hyprcoloc_table.data.length > 0 && (
-              <div className="mb-2">
-                <Zoom
-                  plotURL={`api/results/${request}/hyprcoloc_table.svg`}
-                  className="border rounded p-3"
-                  maxHeight="650px"
-                />
-              </div>
-            )}
-            <Table
-              controlId="hyprcoloc-table"
-              title=""
-              columns={hyprcolocColumns}
-              data={hyprcoloc_table.data}
-              hidden={hyprcoloc_table.hidden}
-              globalFilter={hyprcoloc_table.globalFilter}
-              // pagination={locus_table.pagination}
-              mergeState={(state) =>
-                dispatch(
-                  updateQTLsGWAS({
-                    hyprcoloc_table: { ...hyprcoloc_table, ...state },
-                  })
-                )
-              }
-              defaultSort={[{ id: 'posterior_prob', desc: true }]}
-              exportFilename={'hyprcoloc_table.csv'}
-            />
-          </div>
+          <Table
+            controlId="hyprcoloc-table"
+            title=""
+            columns={hyprcolocColumns}
+            data={hyprcoloc_table.data}
+            hidden={hyprcoloc_table.hidden}
+            globalFilter={hyprcoloc_table.globalFilter}
+            // pagination={locus_table.pagination}
+            mergeState={(state) =>
+              dispatch(
+                updateQTLsGWAS({
+                  hyprcoloc_table: { ...hyprcoloc_table, ...state },
+                })
+              )
+            }
+            defaultSort={[{ id: 'posterior_prob', desc: true }]}
+            exportFilename={'hyprcoloc_table.csv'}
+          />
 
           <p>
             The second table outputs the SNP score of all variants for each pair
-            of colocalized traits. For detailed information, please check the
+            of colocalized traits. If no colocalized traits are found, no SNP
+            score will be calculated. For detailed information, please check the
             manual of{' '}
             <a
               href="https://github.com/jrs95/hyprcoloc"
@@ -456,6 +465,14 @@ export function LocusColocalization() {
                 />
               </div>
             )}
+            <p>
+              The green solid line indicates our own suggested threshold. We
+              strongly encourage the users to refer to the original publication
+              to set their own cutoff suitable for their analysis. Any SNP pass
+              this threshold for each trait will be highlighted with the SNP rs
+              number
+            </p>
+            <br />
             <Table
               controlId="hyprcoloc-snpscore-table"
               title=""
@@ -490,7 +507,7 @@ export function LocusColocalization() {
             This approach can quantify the strength between a causal variant and
             its associated signals in both studies, and it can be used to
             colocalize variants that pass the genome-wide significance threshold
-            in GWAS. For detailed information, please check the{' '}
+            in GWAS. For detailed information, please see the{' '}
             <a
               href="http://zarlab.cs.ucla.edu/tag/ecaviar/"
               target="_blank"
@@ -501,19 +518,19 @@ export function LocusColocalization() {
             .
           </p>
           <p>
-            vQTL performs the eCAVIAR analysis for each gene in QTL data
+            ezQTL performs the eCAVIAR analysis for each gene in QTL data
             together with GWAS data. Two results will be reported based on the
             number of SNPs tested: SNPs in up to +/- 100 kb range as specified
             in cis-QTL Distance (CLPP and Prob_in_pCausalSet) or +/- 50 SNPs
             (CLPP2 and Prob_in_pCausalSet2) around the GWAS lead SNP. If there
             are less than +/- 10 SNPs around the GWAS lead SNP (or LD reference
             SNP) within the user-specified cis-QTL Distance, the analysis will
-            not be performed. vQTL combines GWAS, QTL, and eCAVIAR results into
-            one table as shown below. If no QTLs are found for GWAS lead SNP
-            (Lead SNP included=”N”), vQTL will use the nearest variant as a
-            locational proxy of “GWAS lead SNP” for the eCAVIAR analysis. Only
-            overlapping SNPs between GWAS and QTLs are used for colocalization
-            analysis.
+            not be performed. ezQTL combines GWAS, QTL, and eCAVIAR results into
+            one table as shown below. If no QTLs are found for the GWAS lead SNP
+            (Lead SNP included=”N”), ezQTL will use the nearest variant as a
+            locational proxy of "GWAS lead SNP” for the eCAVIAR analysis. Only
+            overlapping SNPs passed QC between GWAS and QTLs are used for
+            colocalization analysis.
           </p>
 
           <div>
@@ -531,14 +548,41 @@ export function LocusColocalization() {
                   plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
+                  descAbove={
+                    <p>
+                      The barplot below shows the colocalization results based
+                      on different windows as described above. The green solid
+                      line indicates the suggested threshold (CLPP > 0.01) for
+                      the colocalization using eCAVIAR. Any traits that pass
+                      this threshold will be highlighted with the best candidate
+                      SNP.
+                    </p>
+                  }
                 />
+                <br />
                 <Zoom
                   plotURL={`api/results/${request}/ecaviar_table_boxplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
+                  descAbove={
+                    <p>
+                      The scatter plot below shows the colocalization posterior
+                      probability of all tested variants for each trait. The
+                      green solid line indicates a suggested threshold by the
+                      eCAVIAR publication and any variants for each trait that
+                      pass this threshold will be labelled with the variant rs
+                      number.{' '}
+                    </p>
+                  }
                 />
+                <br />
               </div>
             )}{' '}
+            <p>
+              The combined table outputs colocalization results based on two
+              windows as described above (CLPP using window=100kb; CLPP2 using
+              window=50 SNPs).
+            </p>
             <Table
               controlId="ecaviar-table"
               title=""
@@ -582,6 +626,18 @@ export function LocusColocalization() {
                 plotURL={`api/results/${request}/${request}_Summary.svg`}
                 className="border rounded p-3 mb-2"
                 maxHeight="1000px"
+                descAbove={
+                  <p>
+                    The following two bar plots are used to compare the
+                    colocalization results between HyPrColoc and eCAVIAR. The
+                    green solid line indicates the suggested threshold for the
+                    colocalization based on different approaches. Any traits
+                    that pass this threshold will be highlighted with best
+                    candidate SNP. For the eCAVIAR results, the best CLPP values
+                    from two different windows criteria are selected for each
+                    trait.
+                  </p>
+                }
               />
             )}
           </div>
