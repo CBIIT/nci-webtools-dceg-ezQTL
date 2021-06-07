@@ -477,9 +477,10 @@ const drawLocusAlignment = (response) => {
       autorange: true,
       automargin: true,
       // overlaying: 'y3',
-      title:
-        'QTLs -log10(<i>P</i>-value), ' +
-        response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+      title: `${
+        response.data.info.inputs.association_file[0] != 'false' ? 'QTLs' : ''
+      } -log10(<i>P</i>-value), 
+        ${response.data['locus_alignment']['top'][0][0]['gene_symbol']}`,
       domain: [0.05, 1],
       zeroline: false,
       linecolor: 'black',
@@ -495,7 +496,9 @@ const drawLocusAlignment = (response) => {
       autorange: true,
       automargin: true,
       overlaying: 'y2',
-      title: 'QTLs Recombination Rate (cM/Mb)',
+      title: `${
+        response.data.info.inputs.association_file[0] != 'false' ? 'QTLs' : ''
+      } Recombination Rate (cM/Mb)`,
       titlefont: {
         color: 'blue',
       },
