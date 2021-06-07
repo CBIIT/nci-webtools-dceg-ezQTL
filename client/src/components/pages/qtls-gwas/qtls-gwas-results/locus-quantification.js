@@ -85,9 +85,10 @@ export function LocusQuantifiation() {
           <div className="col-md-9">
             <Form.Group className="row">
               <Form.Group className="col-md-4">
-                <Form.Label className="mb-0 mr-auto">Trait ID</Form.Label>
+                <Form.Label id="quantification-trait" className="mb-0 mr-auto">Trait ID</Form.Label>
                 <Form.Control
                   type="text"
+                  aria-labelledby="quantification-trait"
                   id="qtls-quantification-trait"
                   placeholder="None"
                   disabled={!submitted}
@@ -99,9 +100,10 @@ export function LocusQuantifiation() {
               </Form.Group>
 
               <Form.Group className="col-md-4">
-                <Form.Label className="mb-0 mr-auto">Genotype ID</Form.Label>
+                <Form.Label id="quantification-genotype" className="mb-0 mr-auto">Genotype ID</Form.Label>
                 <Form.Control
                   type="text"
+                  aria-labelledby="quantification-genotype"
                   id="qtls-quantification-genotype"
                   placeholder="None"
                   disabled={!submitted}
@@ -113,11 +115,12 @@ export function LocusQuantifiation() {
               </Form.Group>
 
               <div className="col-md-4">
-                <Form.Label className="mb-0">
+                <Form.Label id="quantification-log" className="mb-0">
                   log<sub>2</sub>
                 </Form.Label>
                 <ReactSelect
                   isDisabled={!submitted}
+                  aria-labelledby="quantification-log"
                   inputId="qtls-results-quantification-log2"
                   value={log2}
                   onChange={(option) => {
@@ -137,7 +140,6 @@ export function LocusQuantifiation() {
             </Form.Group>
           </div>
           <div className="col-md-auto">
-            <Form.Label className="mb-0"></Form.Label>
             <Button
               disabled={!submitted}
               className="d-block"

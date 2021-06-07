@@ -176,7 +176,7 @@ export function QTLsGWASResultsForm() {
         <div className="col-md-9">
           <Form.Group className="row">
             <div className="col-md-4">
-              <Form.Label className="mb-0">
+              <Form.Label id="recalculate-reference" className="mb-0">
                 Reference Gene{' '}
                 <span
                   style={{
@@ -192,6 +192,7 @@ export function QTLsGWASResultsForm() {
                 inputId="qtls-results-gene-input"
                 // label=""
                 value={select_gene}
+                aria-labelledby="recalculate-reference"
                 options={gene_list ? gene_list.data : []}
                 getOptionLabel={(option) => option.gene_symbol}
                 getOptionValue={(option) => option.gene_id}
@@ -206,9 +207,10 @@ export function QTLsGWASResultsForm() {
               />
             </div>
             <div className="col-md-4">
-              <Form.Label className="mb-0">LD Reference SNP</Form.Label>
+              <Form.Label id="recalculate-snp" className="mb-0">LD Reference SNP</Form.Label>
               <Form.Control
                 id="qtls-results-snp-input"
+                aria-labelledby="recalculate-snp"
                 disabled={!submitted}
                 value={_selectRef ? _selectRef : ''}
                 onChange={(e) => {
@@ -230,7 +232,6 @@ export function QTLsGWASResultsForm() {
           </Form.Group>
         </div>
         <div className="col-md-auto">
-          <Form.Label className="mb-0"></Form.Label>
           <Button
             disabled={
               !submitted ||

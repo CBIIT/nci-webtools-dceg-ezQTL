@@ -1147,11 +1147,12 @@ export function QTLsGWASForm() {
                   <Col>
                     {ldProject.value != 'UKBB' ? (
                       <>
-                        <Form.Label className="mb-0">
+                        <Form.Label id="population-select" className="mb-0">
                           Population <span style={{ color: 'red' }}>*</span>{' '}
                         </Form.Label>
                         <PopulationSelect
                           id="qtls-results-population-input-asdf"
+                          ariaLabel="population-select"
                           mergeState={(data) => dispatch(updateQTLsGWAS(data))}
                           disabled={
                             submitted || !ldPublic || ldProject.value == 'UKBB'

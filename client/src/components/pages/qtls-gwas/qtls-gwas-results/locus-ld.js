@@ -83,11 +83,12 @@ export function LocusLD() {
                   <div className="col-md-9">
                     <Form.Group className="row">
                       <div className="col-md-4">
-                        <Form.Label className="mb-0 mr-auto">
+                        <Form.Label id="ld-association-data" className="mb-0 mr-auto">
                           LD Association Data
                         </Form.Label>
                         <ReactSelect
                           isDisabled={!submitted}
+                          aria-labelledby="ld-association-data"
                           inputId="qtls-results-ld-association-data"
                           placeholder="None"
                           value={ldAssocData}
@@ -144,11 +145,12 @@ export function LocusLD() {
                         />
                       </div>
                       <div className="col-md-4">
-                        <Form.Label className="mb-0">
+                        <Form.Label id="ld-association-threshold" className="mb-0">
                           -log<sub>10</sub> Association Threshold
                         </Form.Label>
                         <Form.Control
                           type="number"
+                          aria-labelledby="ld-association-threshold"
                           step="any"
                           min="0"
                           id="qtls-ld-threshold"
@@ -166,7 +168,6 @@ export function LocusLD() {
                     </Form.Group>
                   </div>
                   <div className="col-md-auto">
-                    <Form.Label className="mb-0"></Form.Label>
                     <Button
                       disabled={!submitted}
                       className="d-block"
