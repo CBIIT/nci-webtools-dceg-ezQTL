@@ -135,11 +135,13 @@ export function QTLsGWASResultsForm() {
       qtlPublic,
       gwasPublic,
       ldPublic,
-      qtlKey: qtlPublic ? qtlKey : false,
-      ldKey: ldPublic ? ldKey : false,
-      gwasKey: gwasPublic ? gwasKey : false,
-      select_chromosome: chromosome.value || false,
-      select_position,
+      qtlKey: qtlKey,
+      ldKey: ldKey,
+      gwasKey: gwasKey,
+      select_chromosome:
+        qtlPublic || ldPublic || gwasPublic ? select_chromosome.value : false,
+      select_position:
+        qtlPublic || ldPublic || gwasPublic ? select_position : false,
       genome_build: genome.value,
     };
 

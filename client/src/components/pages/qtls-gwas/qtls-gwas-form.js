@@ -499,29 +499,6 @@ export function QTLsGWASForm() {
       project.value,
       xQtlOptions[0].value
     );
-    const qtlKey = tissueOnly
-      ? data
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Tissue == tissueOptions[0].value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : data
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Project == project.value &&
-              row.xQTL == xQtlOptions[0].value &&
-              row.Tissue == tissueOptions[0].value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          );
 
     dispatch(
       updateQTLsGWAS({
@@ -530,7 +507,6 @@ export function QTLsGWASForm() {
         xQtlOptions: xQtlOptions,
         tissue: tissueOptions[0],
         tissueOptions: tissueOptions,
-        qtlKey: qtlKey,
       })
     );
   }
@@ -538,35 +514,12 @@ export function QTLsGWASForm() {
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
     const phenotypeOptions = getPhenotypeOptions(data, project.value);
-    const gwasKey = phenotypeOnly
-      ? data
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Phenotype == phenotypeOptions[0].value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : data
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Project == project.value &&
-              row.Phenotype == phenotypeOptions[0].value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          );
 
     dispatch(
       updateQTLsGWAS({
         gwasProject: project,
         phenotype: phenotypeOptions[0],
         phenotypeOptions: phenotypeOptions,
-        gwasKey: gwasKey,
       })
     );
   }
@@ -579,78 +532,22 @@ export function QTLsGWASForm() {
   function handleXqtl(xQtl) {
     const data = publicGTEx['cis-QTL dataset'];
     const tissueOptions = getTissueOptions(data, qtlProject.value, xQtl.value);
-    const qtlKey = data
-      .filter(
-        (row) =>
-          row.Genome_build == genome.value &&
-          row.Project == qtlProject.value &&
-          row.xQTL == xQtl.value &&
-          row.Tissue == tissueOptions[0].value
-      )[0]
-      .Biowulf_full_path.replace('/data/Brown_lab/ZTW_KB_Datasets/vQTL2/', '');
 
     dispatch(
       updateQTLsGWAS({
         xQtl: xQtl,
         tissue: tissueOptions[0],
         tissueOptions: tissueOptions,
-        qtlKey: qtlKey,
       })
     );
   }
 
   function handleTissue(tissue) {
-    const qtlKey = tissueOnly
-      ? publicGTEx['cis-QTL dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value && row.Tissue == tissue.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : publicGTEx['cis-QTL dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Project == qtlProject.value &&
-              row.xQTL == xQtl.value &&
-              row.Tissue == tissue.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          );
-
-    dispatch(updateQTLsGWAS({ tissue: tissue, qtlKey: qtlKey }));
+    dispatch(updateQTLsGWAS({ tissue: tissue }));
   }
 
   function handlePhenotype(phenotype) {
-    const gwasKey = phenotypeOnly
-      ? publicGTEx['GWAS dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Phenotype == phenotype.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          )
-      : publicGTEx['GWAS dataset']
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value &&
-              row.Project == gwasProject.value &&
-              row.Phenotype == phenotype.value
-          )[0]
-          .Biowulf_full_path.replace(
-            '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
-            ''
-          );
-
-    dispatch(updateQTLsGWAS({ phenotype: phenotype, gwasKey: gwasKey }));
+    dispatch(updateQTLsGWAS({ phenotype: phenotype }));
   }
 
   const handleReset = () => {
@@ -714,6 +611,56 @@ export function QTLsGWASForm() {
         select_chromosome,
       } = locusInfo;
 
+      const qtlKey = qtlPublic
+        ? tissueOnly
+          ? publicGTEx['cis-QTL dataset']
+              .filter(
+                (row) =>
+                  row.Genome_build == genome.value && row.Tissue == tissue.value
+              )[0]
+              .Biowulf_full_path.replace(
+                '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+                ''
+              )
+          : publicGTEx['cis-QTL dataset']
+              .filter(
+                (row) =>
+                  row.Genome_build == genome.value &&
+                  row.Project == qtlProject.value &&
+                  row.xQTL == xQtl.value &&
+                  row.Tissue == tissue.value
+              )[0]
+              .Biowulf_full_path.replace(
+                '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+                ''
+              )
+        : false;
+
+      const gwasKey = gwasPublic
+        ? phenotypeOnly
+          ? publicGTEx['GWAS dataset']
+              .filter(
+                (row) =>
+                  row.Genome_build == genome.value &&
+                  row.Phenotype == phenotype.value
+              )[0]
+              .Biowulf_full_path.replace(
+                '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+                ''
+              )
+          : publicGTEx['GWAS dataset']
+              .filter(
+                (row) =>
+                  row.Genome_build == genome.value &&
+                  row.Project == gwasProject.value &&
+                  row.Phenotype == phenotype.value
+              )[0]
+              .Biowulf_full_path.replace(
+                '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
+                ''
+              )
+        : false;
+
       const ldKey =
         ldPublic && Object.entries(select_chromosome).length
           ? ldProject.value == '1000genome'
@@ -731,7 +678,9 @@ export function QTLsGWASForm() {
             : true
           : false;
 
-      dispatch(updateQTLsGWAS({ ldKey: ldKey }));
+      dispatch(
+        updateQTLsGWAS({ qtlKey: qtlKey, gwasKey: gwasKey, ldKey: ldKey })
+      );
 
       return {
         jobName: jobName
@@ -763,11 +712,13 @@ export function QTLsGWASForm() {
         qtlPublic,
         gwasPublic,
         ldPublic,
-        qtlKey: qtlPublic ? qtlKey : false,
-        ldKey: ldPublic ? ldKey : false,
-        gwasKey: gwasPublic ? gwasKey : false,
-        select_chromosome: select_chromosome.value || false,
-        select_position: select_position,
+        qtlKey: qtlKey,
+        ldKey: ldKey,
+        gwasKey: gwasKey,
+        select_chromosome:
+          qtlPublic || ldPublic || gwasPublic ? select_chromosome.value : false,
+        select_position:
+          qtlPublic || ldPublic || gwasPublic ? select_position : false,
         genome_build: genome.value,
       };
     });
@@ -1359,6 +1310,13 @@ export function QTLsGWASForm() {
         </Row>
       </div>
       <Row className="mt-2">
+        {attempt && !valid && (
+          <Col sm="12">
+            <div className="text-danger" style={{ fontSize: '80%' }}>
+              Please enter Association, GWAS, or LD data
+            </div>
+          </Col>
+        )}
         <Col sm="6">
           <Button
             // disabled={loading.active}
