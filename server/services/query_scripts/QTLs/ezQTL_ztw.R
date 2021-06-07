@@ -1314,10 +1314,14 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   ld.matrix <- ld.matrix %>% dplyr::select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
   rownames(ld.matrix) <- ld.info$Seq
   colnames(ld.matrix) <- ld.info$Seq
-  
-  if(is.null(association_file) && !(leadsnp %in% ld.info$rsnum) && !(leadsnp_pos %in% ld.info$pos)){
-    stop("The input SNP informaiton does not existed in LD file")
+
+    if(is.null(association_file) & !isTRUE(leadsnp %in% ld.info$rsnum) & !isTRUE(leadsnp_pos %in% ld.info$pos)){
+    #stop("The input SNP information does not existed in LD file")
+    print('Warning, the reference position is not existed in the LD file. Use the middle position as reference position\n')
+    nrowt <- floor(dim(ld.info)[1]/2)
+    leadsnp_pos <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(pos)
   }
+  
   
   if(is.null(association_file)){
     
