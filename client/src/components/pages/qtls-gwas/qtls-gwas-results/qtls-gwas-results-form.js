@@ -231,7 +231,7 @@ export function QTLsGWASResultsForm() {
             </div>
           </Form.Group>
         </div>
-        <div className="col-md-auto">
+        <div className="col-md-auto mt-4">
           <Button
             disabled={
               !submitted ||
