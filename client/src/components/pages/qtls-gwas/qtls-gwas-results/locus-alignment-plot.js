@@ -32,6 +32,9 @@ export function LocusAlignmentPlot(params) {
     ldKey,
     genome,
     locusInformation,
+    associationFile,
+    gwasFile,
+    LDFile,
   } = useSelector((state) => state.qtlsGWAS);
 
   const { select_position, select_chromosome } = locusInformation[0];
@@ -159,10 +162,12 @@ export function LocusAlignmentPlot(params) {
                 point &&
                 point.customdata &&
                 (gwas && gwas.data && Object.keys(gwas.data).length > 0
-                  ? point.curveNumber === 2 ||
-                    point.curveNumber === 3 ||
-                    point.curveNumber === 6
-                  : false)
+                  ? point.curveNumber === 3 ||
+                    point.curveNumber === 6 ||
+                    (point.curveNumber === 2 &&
+                      ((gwasFile && !associationFile && !LDFile) ||
+                        (gwasPublic && !qtlPublic && !ldPublic)))
+                  : point.curveNumber === 2)
               ) {
                 updateTooltip({
                   visible: true,
