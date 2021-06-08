@@ -1672,14 +1672,10 @@ export function qtlsGWASLocusQCCalculation(params) {
           qtlsGWAS.qtlKey ||
           qtlsGWAS.select_qtls_samples
         ) {
-          await dispatch(
-            updateQTLsGWAS({ associationFile: 'ezQTL_input_qtl.txt' })
-          );
           params.associationFile = 'ezQTL_input_qtl.txt';
         }
 
         if (qtlsGWAS.LDFile || qtlsGWAS.ldKey || qtlsGWAS.select_qtls_samples) {
-          await dispatch(updateQTLsGWAS({ LDFile: 'ezQTL_input_ld.gz' }));
           params.LDFile = 'ezQTL_input_ld.gz';
         }
 
@@ -1688,7 +1684,6 @@ export function qtlsGWASLocusQCCalculation(params) {
           qtlsGWAS.gwasKey ||
           qtlsGWAS.select_gwas_sample
         ) {
-          await dispatch(updateQTLsGWAS({ gwasFile: 'ezQTL_input_gwas.txt' }));
           params.gwasFile = 'ezQTL_input_gwas.txt';
         }
 

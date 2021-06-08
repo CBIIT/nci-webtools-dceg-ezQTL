@@ -129,13 +129,13 @@ async function calculate(params) {
   summary = summary.replace(/#/g, '\u2022');
   summary = summary.split('\n\n');
 
-  let newParams = params;
+  let newParams = { ...params };
   if (params.associationFile || params.qtlKey || params.select_qtls_samples)
-    newParams.associationFile = 'ezQTL_input_qtl.txt';
+    params.associationFile = 'ezQTL_input_qtl.txt';
   if (params.LDFile || params.ldKey || params.select_qtls_samples)
-    newParams.LDFile = 'ezQTL_input_ld.gz';
+    params.LDFile = 'ezQTL_input_ld.gz';
   if (params.gwasFile || params.gwasKey || params.select_gwas_sample)
-    newParams.gwasFile = 'ezQTL_input_gwas.txt';
+    params.gwasFile = 'ezQTL_input_gwas.txt';
 
   let state = {
     ...newParams,
@@ -155,13 +155,13 @@ async function calculate(params) {
   };
 
   let main = {};
-  if (newParams.associationFile || newParams.gwasFile) {
+  if (params.associationFile || params.gwasFile) {
     // qtlsCalculateMain
     main = JSON.parse(
       await calculateMain({
         workingDirectory: workingDirectory,
         bucket: config.aws.s3.data,
-        ...newParams,
+        ...params,
       })
     );
     state = mergeState(state, {
@@ -318,9 +318,9 @@ async function calculate(params) {
         request: request,
         select_gwas_sample: state.select_gwas_sample,
         select_qtls_samples: state.select_qtls_samples,
-        gwasFile: newParams.gwasFile,
-        associationFile: newParams.associationFile,
-        LDFile: newParams.LDFile,
+        gwasFile: params.gwasFile,
+        associationFile: params.associationFile,
+        LDFile: params.LDFile,
         leadsnp: state.locus_alignment
           ? state.locus_alignment.top.rsnum
           : newParams.select_ref,
