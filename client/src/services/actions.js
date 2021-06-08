@@ -2257,7 +2257,7 @@ export function submitQueue(params) {
       dispatch(
         updateSuccess({
           visible: true,
-          message: `Your job was successfully submitted to the queue. You will recieve an email at ${params.email} with your results.`,
+          message: `Your job was successfully submitted to the queue. You will recieve an email at ${params.params.email} with your results.`,
         })
       );
       dispatch(updateQTLsGWAS({ isLoading: false }));
