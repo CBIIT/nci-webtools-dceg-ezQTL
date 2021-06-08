@@ -32,6 +32,9 @@ export function LocusAlignmentPlot(params) {
     ldKey,
     genome,
     locusInformation,
+    associationFile,
+    gwasFile,
+    LDFile,
   } = useSelector((state) => state.qtlsGWAS);
 
   const { select_position, select_chromosome } = locusInformation[0];
@@ -101,11 +104,13 @@ export function LocusAlignmentPlot(params) {
       qtlPublic,
       gwasPublic,
       ldPublic,
-      qtlKey: qtlPublic ? qtlKey : false,
-      ldKey: ldPublic ? ldKey : false,
-      gwasKey: gwasPublic ? gwasKey : false,
-      select_chromosome: select_chromosome.value || false,
-      select_position,
+      qtlKey: qtlKey,
+      ldKey: ldKey,
+      gwasKey: gwasKey,
+      select_chromosome:
+        qtlPublic || ldPublic || gwasPublic ? select_chromosome.value : false,
+      select_position:
+        qtlPublic || ldPublic || gwasPublic ? select_position : false,
       genome_build: genome.value,
     };
 
@@ -157,10 +162,12 @@ export function LocusAlignmentPlot(params) {
                 point &&
                 point.customdata &&
                 (gwas && gwas.data && Object.keys(gwas.data).length > 0
-                  ? point.curveNumber === 2 ||
-                    point.curveNumber === 3 ||
-                    point.curveNumber === 6
-                  : false)
+                  ? point.curveNumber === 3 ||
+                    point.curveNumber === 6 ||
+                    (point.curveNumber === 2 &&
+                      ((gwasFile && !associationFile && !LDFile) ||
+                        (gwasPublic && !qtlPublic && !ldPublic)))
+                  : point.curveNumber === 2)
               ) {
                 updateTooltip({
                   visible: true,
@@ -297,7 +304,8 @@ export function LocusAlignmentPlot(params) {
                       '-' +
                       tooltip.data.ref +
                       '-' +
-                      tooltip.data.alt
+                      tooltip.data.alt +
+                      `${genome.value === 'GRCh38' ? '?dataset=gnomad_r3' : ''}`
                     }
                     target="_blank"
                     rel="noreferrer"

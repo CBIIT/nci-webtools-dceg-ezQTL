@@ -477,9 +477,10 @@ const drawLocusAlignment = (response) => {
       autorange: true,
       automargin: true,
       // overlaying: 'y3',
-      title:
-        'QTLs -log10(<i>P</i>-value), ' +
-        response.data['locus_alignment']['top'][0][0]['gene_symbol'],
+      title: `${
+        response.data.info.inputs.association_file[0] != 'false' ? 'QTLs' : ''
+      } -log10(<i>P</i>-value), 
+        ${response.data['locus_alignment']['top'][0][0]['gene_symbol']}`,
       domain: [0.05, 1],
       zeroline: false,
       linecolor: 'black',
@@ -495,7 +496,9 @@ const drawLocusAlignment = (response) => {
       autorange: true,
       automargin: true,
       overlaying: 'y2',
-      title: 'QTLs Recombination Rate (cM/Mb)',
+      title: `${
+        response.data.info.inputs.association_file[0] != 'false' ? 'QTLs' : ''
+      } Recombination Rate (cM/Mb)`,
       titlefont: {
         color: 'blue',
       },
@@ -1669,14 +1672,10 @@ export function qtlsGWASLocusQCCalculation(params) {
           qtlsGWAS.qtlKey ||
           qtlsGWAS.select_qtls_samples
         ) {
-          await dispatch(
-            updateQTLsGWAS({ associationFile: 'ezQTL_input_qtl.txt' })
-          );
           params.associationFile = 'ezQTL_input_qtl.txt';
         }
 
         if (qtlsGWAS.LDFile || qtlsGWAS.ldKey || qtlsGWAS.select_qtls_samples) {
-          await dispatch(updateQTLsGWAS({ LDFile: 'ezQTL_input_ld.gz' }));
           params.LDFile = 'ezQTL_input_ld.gz';
         }
 
@@ -1685,7 +1684,6 @@ export function qtlsGWASLocusQCCalculation(params) {
           qtlsGWAS.gwasKey ||
           qtlsGWAS.select_gwas_sample
         ) {
-          await dispatch(updateQTLsGWAS({ gwasFile: 'ezQTL_input_gwas.txt' }));
           params.gwasFile = 'ezQTL_input_gwas.txt';
         }
 

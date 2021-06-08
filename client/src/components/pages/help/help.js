@@ -1,4 +1,6 @@
 import React from 'react';
+import { ListGroup, ListGroupItem } from 'react-bootstrap';
+import { HashLink } from 'react-router-hash-link';
 
 export function Help() {
   return (
@@ -12,10 +14,47 @@ export function Help() {
           analysis between QTL and GWAS data. This documentation page provides
           detailed descriptions of input and output file formats and answers to
           typical questions we collected. The source code of ezQTL can be found
-          on GitHub. The documentation is divided into the following sections:{' '}
+          on GitHub. The documentation is divided into the following sections:
         </p>
+        <ListGroup>
+          {[
+            { title: 'Input File Format of ezQTL', hash: '#input-file-format' },
+            { title: 'QTL Association Data', hash: '#qtl-association-data' },
+            { title: 'Quantification Data', hash: '#quantification-data' },
+            { title: 'Genotype Data', hash: '#genotype-data' },
+            { title: 'LD Matrix Data', hash: '#ld-matrix-data' },
+            { title: 'GWAS Data', hash: '#gwas-data' },
+            { title: 'Public Data Source', hash: '#public-data-source' },
+            {
+              title: 'Relationship Between Input Datasets and Module Functions',
+              hash: '#relationship',
+            },
+            {
+              title: 'Colocalization Analysis',
+              hash: '#colocalization-analysis',
+            },
+            {
+              title: 'Comparison Between ezQTL and Other Tools',
+              hash: '#comparison',
+            },
+            { title: 'Frequently Asked Questions', hash: '#faq' },
+          ].map(({ title, hash }) => (
+            <ListGroupItem>
+              <HashLink
+                smooth
+                to={{
+                  pathname: '/help',
+                  hash: hash,
+                  state: { fromDashboard: true },
+                }}
+              >
+                {title}
+              </HashLink>
+            </ListGroupItem>
+          ))}
+        </ListGroup>
       </div>
-      <div className="mt-3">
+      <div className="mt-5" id="input-file-format">
         <p>
           <b>Input file format of ezQTL</b>
         </p>
@@ -62,7 +101,9 @@ export function Help() {
           following description shows examples of each input file format for
           ezQTL.
         </p>
-        <br />
+      </div>
+      <br />
+      <div id="qtl-association-data">
         <p>
           <b>QTL Association Data</b>
         </p>
@@ -172,97 +213,290 @@ export function Help() {
           </table>
         </div>
         <br />
-        <p>
-          <b>Quantification Data</b>
-        </p>
-        <p>
-          The "gene_id” column is used as the index identification to link the
-          quantification data to QTL data. The column names after "gene_id” are
-          the individual sample names and the values can be raw data, normalized
-          data or log transformed data or residuals after regressing on the
-          variables; Here is an example table for Quantification Data:
-        </p>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th scope="col">chr</th>
-                <th scope="col">start</th>
-                <th scope="col">end</th>
-                <th scope="col">gene_id</th>
-                <th scope="col">C56_1</th>
-                <th scope="col">C136_1</th>
-                <th scope="col">C10_1</th>
-                <th scope="col">C171_1</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>21</td>
-                <td>42520059</td>
-                <td>42520060</td>
-                <td>ENSG00000226496.1</td>
-                <td>3.99</td>
-                <td>3.37</td>
-                <td>5.42</td>
-                <td>4.03</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42539727</td>
-                <td>42539728</td>
-                <td>ENSG00000182240.11</td>
-                <td>13014.08</td>
-                <td>13268.56</td>
-                <td>17585.04</td>
-                <td>13436.05</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42733869</td>
-                <td>42733870</td>
-                <td>ENSG00000183486.8</td>
-                <td>322.94</td>
-                <td>2014.49</td>
-                <td>1364.76</td>
-                <td>2135.06</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42792230</td>
-                <td>42792231</td>
-                <td>ENSG00000157601.9</td>
-                <td>484.53</td>
-                <td>1555.70</td>
-                <td>2100.77</td>
-                <td>2204.26</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42814668</td>
-                <td>42814669</td>
-                <td>ENSG00000228318.1</td>
-                <td>0.05</td>
-                <td>3.61</td>
-                <td>1.26</td>
-                <td>2.93</td>
-              </tr>
-            </tbody>
-          </table>
+        <div id="quantification-data">
+          <p>
+            <b>Quantification Data</b>
+          </p>
+          <p>
+            The "gene_id” column is used as the index identification to link the
+            quantification data to QTL data. The column names after "gene_id”
+            are the individual sample names and the values can be raw data,
+            normalized data or log transformed data or residuals after
+            regressing on the variables; Here is an example table for
+            Quantification Data:
+          </p>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">chr</th>
+                  <th scope="col">start</th>
+                  <th scope="col">end</th>
+                  <th scope="col">gene_id</th>
+                  <th scope="col">C56_1</th>
+                  <th scope="col">C136_1</th>
+                  <th scope="col">C10_1</th>
+                  <th scope="col">C171_1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>21</td>
+                  <td>42520059</td>
+                  <td>42520060</td>
+                  <td>ENSG00000226496.1</td>
+                  <td>3.99</td>
+                  <td>3.37</td>
+                  <td>5.42</td>
+                  <td>4.03</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42539727</td>
+                  <td>42539728</td>
+                  <td>ENSG00000182240.11</td>
+                  <td>13014.08</td>
+                  <td>13268.56</td>
+                  <td>17585.04</td>
+                  <td>13436.05</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42733869</td>
+                  <td>42733870</td>
+                  <td>ENSG00000183486.8</td>
+                  <td>322.94</td>
+                  <td>2014.49</td>
+                  <td>1364.76</td>
+                  <td>2135.06</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42792230</td>
+                  <td>42792231</td>
+                  <td>ENSG00000157601.9</td>
+                  <td>484.53</td>
+                  <td>1555.70</td>
+                  <td>2100.77</td>
+                  <td>2204.26</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42814668</td>
+                  <td>42814669</td>
+                  <td>ENSG00000228318.1</td>
+                  <td>0.05</td>
+                  <td>3.61</td>
+                  <td>1.26</td>
+                  <td>2.93</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
         <br />
+        <div id="genotype-data">
+          <p>
+            <b>Genotype Data</b>
+          </p>
+          <p>
+            The individual sample names (starting at the 5th column) should be
+            the same as Quantification Data (but they do not need to be in the
+            same order). The genotype can be in different formats (for example,
+            "0/1” or "CT”) (0=reference allele and 1=alternative allele). The
+            chr, pos, ref and alt information are used as index id linked to QTL
+            data. Chr and pos should match the genome build specified in the
+            left panel. Ref and alt alleles should match ref and alt alleles in
+            the QTL data. Here is an example table for Genotype Data:
+          </p>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">chr</th>
+                  <th scope="col">pos</th>
+                  <th scope="col">ref</th>
+                  <th scope="col">alt</th>
+                  <th scope="col">C56_1</th>
+                  <th scope="col">C136_1</th>
+                  <th scope="col">C10_1</th>
+                  <th scope="col">C171_1</th>
+                  <th scope="col">C104_1</th>
+                  <th scope="col">C72_1</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>21</td>
+                  <td>42642038</td>
+                  <td>A</td>
+                  <td>G</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/0</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42642096</td>
+                  <td>A</td>
+                  <td>G</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                  <td>0/1</td>
+                  <td>0/1</td>
+                  <td>0/0</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42642405</td>
+                  <td>G</td>
+                  <td>A</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                  <td>0/0</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42642642</td>
+                  <td>A</td>
+                  <td>G</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>1/1</td>
+                  <td>0/1</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <br />
+        <div id="ld-matrix-data">
+          <p>
+            <b>LD Matrix Data</b>
+          </p>
+          <p>
+            No column name is allowed in the LD Matrix Data. The first 5 columns
+            are chr, pos, rsnum, ref and alt, respectively, which record the
+            basic information for the LD among all the variants in the locus of
+            interest. The remaining columns are the pairwise matrix,
+            representing the LD (R value) between two variants. Here is an
+            example table for LD Matrix Data:
+          </p>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table table-bordered table-striped">
+              <thead>
+                <tr>
+                  <th scope="col">21</th>
+                  <th scope="col">42642038</th>
+                  <th scope="col">rs8133778</th>
+                  <th scope="col">A</th>
+                  <th scope="col">G</th>
+                  <th scope="col">1.000</th>
+                  <th scope="col">0.198</th>
+                  <th scope="col">-0.051</th>
+                  <th scope="col">0.020</th>
+                  <th scope="col">0.101</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>21</td>
+                  <td>42642096</td>
+                  <td>rs68087522</td>
+                  <td>A</td>
+                  <td>G</td>
+                  <td>0.198</td>
+                  <td>1.000</td>
+                  <td>-0.010</td>
+                  <td>-0.010</td>
+                  <td>-0.052</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42642110</td>
+                  <td>rs542372488</td>
+                  <td>T</td>
+                  <td>C</td>
+                  <td>-0.051</td>
+                  <td>-0.010</td>
+                  <td>1.000</td>
+                  <td>-0.001</td>
+                  <td>-0.005</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42642322</td>
+                  <td>rs73368336</td>
+                  <td>C</td>
+                  <td>T</td>
+                  <td>0.020</td>
+                  <td>-0.010</td>
+                  <td>-0.001</td>
+                  <td>1.000</td>
+                  <td>-0.005</td>
+                </tr>
+                <tr>
+                  <td>21</td>
+                  <td>42642405</td>
+                  <td>rs77240271</td>
+                  <td>G</td>
+                  <td>A</td>
+                  <td>0.101</td>
+                  <td>-0.052</td>
+                  <td>-0.005</td>
+                  <td>-0.005</td>
+                  <td>1.000</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
         <p>
-          <b>Genotype Data</b>
+          The following example command can be used to extract this information
+          from the raw genotype data of a custom LD reference dataset in vcf
+          format using{' '}
+          <a
+            href="https://github.com/statgen/emeraLD"
+            target="_blank"
+            rel="noreferrer"
+          >
+            emeraLD
+          </a>
+          : <br />
+          <code>
+            emeraLD --matrix -i input.vcf.gz --stdout --extra --phased |sed
+            's/:/\t/' |bgzip > output.LD.gz
+          </code>
+        </p>
+      </div>
+      <br />
+      <div id="gwas-data">
+        <p>
+          <b>GWAS Data</b>
         </p>
         <p>
-          The individual sample names (starting at the 5th column) should be the
-          same as Quantification Data (but they do not need to be in the same
-          order). The genotype can be in different formats (for example, "0/1”
-          or "CT”) (0=reference allele and 1=alternative allele). The chr, pos,
-          ref and alt information are used as index id linked to QTL data. Chr
-          and pos should match the genome build specified in the left panel. Ref
-          and alt alleles should match ref and alt alleles in the QTL data. Here
-          is an example table for Genotype Data:
+          The "rsnum” is used as index id linking GWAS data to QTL Data and LD
+          Matrix Data. An example script has been included in the ezQTL{' '}
+          <a
+            href="https://github.com/CBIIT/nci-webtools-dceg-vQTL"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub
+          </a>{' '}
+          to transfer the GWAS summary statistics from NHGRI GWAS catalog into
+          ezQTL GWAS Data format. The minimal columns required for GWAS Data
+          include chr, pos, ref, alt, rsnum, pvalue, zscore, effect and se. Here
+          is an example table for GWAS Data Data:
         </p>
         <div style={{ overflowX: 'auto' }}>
           <table className="table table-bordered table-striped">
@@ -272,12 +506,11 @@ export function Help() {
                 <th scope="col">pos</th>
                 <th scope="col">ref</th>
                 <th scope="col">alt</th>
-                <th scope="col">C56_1</th>
-                <th scope="col">C136_1</th>
-                <th scope="col">C10_1</th>
-                <th scope="col">C171_1</th>
-                <th scope="col">C104_1</th>
-                <th scope="col">C72_1</th>
+                <th scope="col">rsnum</th>
+                <th scope="col">pvalue</th>
+                <th scope="col">zscore</th>
+                <th scope="col">effect</th>
+                <th scope="col">se</th>
               </tr>
             </thead>
             <tbody>
@@ -286,260 +519,77 @@ export function Help() {
                 <td>42642038</td>
                 <td>A</td>
                 <td>G</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/0</td>
+                <td>rs8133778</td>
+                <td>0.806</td>
+                <td>-0.246</td>
+                <td>-0.003</td>
+                <td>0.011</td>
               </tr>
               <tr>
                 <td>21</td>
-                <td>42642096</td>
-                <td>A</td>
-                <td>G</td>
-                <td>0/0</td>
-                <td>0/0</td>
-                <td>0/0</td>
-                <td>0/1</td>
-                <td>0/1</td>
-                <td>0/0</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642405</td>
-                <td>G</td>
-                <td>A</td>
-                <td>0/0</td>
-                <td>0/0</td>
-                <td>0/0</td>
-                <td>0/0</td>
-                <td>0/0</td>
-                <td>0/0</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642642</td>
-                <td>A</td>
-                <td>G</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>1/1</td>
-                <td>0/1</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <br />
-        <p>
-          <b>LD Matrix Data</b>
-        </p>
-        <p>
-          No column name is allowed in the LD Matrix Data. The first 5 columns
-          are chr, pos, rsnum, ref and alt, respectively, which record the basic
-          information for the LD among all the variants in the locus of
-          interest. The remaining columns are the pairwise matrix, representing
-          the LD (R value) between two variants. Here is an example table for LD
-          Matrix Data:
-        </p>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="table table-bordered table-striped">
-            <thead>
-              <tr>
-                <th scope="col">21</th>
-                <th scope="col">42642038</th>
-                <th scope="col">rs8133778</th>
-                <th scope="col">A</th>
-                <th scope="col">G</th>
-                <th scope="col">1.000</th>
-                <th scope="col">0.198</th>
-                <th scope="col">-0.051</th>
-                <th scope="col">0.020</th>
-                <th scope="col">0.101</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>21</td>
-                <td>42642096</td>
-                <td>rs68087522</td>
-                <td>A</td>
-                <td>G</td>
-                <td>0.198</td>
-                <td>1.000</td>
-                <td>-0.010</td>
-                <td>-0.010</td>
-                <td>-0.052</td>
-              </tr>
-              <tr>
-                <td>21</td>
-                <td>42642110</td>
-                <td>rs542372488</td>
-                <td>T</td>
+                <td>42642093</td>
                 <td>C</td>
-                <td>-0.051</td>
-                <td>-0.010</td>
-                <td>1.000</td>
-                <td>-0.001</td>
-                <td>-0.005</td>
+                <td>T</td>
+                <td>rs771407982</td>
+                <td>0.206</td>
+                <td>-1.264</td>
+                <td>-1.455</td>
+                <td>1.152</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td>42642096</td>
+                <td>A</td>
+                <td>G</td>
+                <td>rs68087522</td>
+                <td>0.330</td>
+                <td>0.974</td>
+                <td>0.018</td>
+                <td>0.018</td>
               </tr>
               <tr>
                 <td>21</td>
                 <td>42642322</td>
-                <td>rs73368336</td>
                 <td>C</td>
                 <td>T</td>
-                <td>0.020</td>
-                <td>-0.010</td>
-                <td>-0.001</td>
-                <td>1.000</td>
-                <td>-0.005</td>
+                <td>rs73368336</td>
+                <td>0.543</td>
+                <td>-0.608</td>
+                <td>-0.181</td>
+                <td>0.298</td>
               </tr>
               <tr>
                 <td>21</td>
                 <td>42642405</td>
-                <td>rs77240271</td>
                 <td>G</td>
                 <td>A</td>
-                <td>0.101</td>
-                <td>-0.052</td>
-                <td>-0.005</td>
-                <td>-0.005</td>
-                <td>1.000</td>
+                <td>rs77240271</td>
+                <td>0.078</td>
+                <td>-1.761</td>
+                <td>-0.047</td>
+                <td>0.027</td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-      <br />
-      <p>
-        The following example command can be used to extract this information
-        from the raw genotype data of a custom LD reference dataset in vcf
-        format using{' '}
-        <a
-          href="https://github.com/statgen/emeraLD"
-          target="_blank"
-          rel="noreferrer"
-        >
-          emeraLD
-        </a>
-        : <br />
-        <code>
-          emeraLD --matrix -i input.vcf.gz --stdout --extra --phased |sed
-          's/:/\t/' |bgzip > output.LD.gz
-        </code>
-      </p>
-      <br />
-      <p>
-        <b>GWAS Data</b>
-      </p>
-      <p>
-        The "rsnum” is used as index id linking GWAS data to QTL Data and LD
-        Matrix Data. An example script has been included in the ezQTL{' '}
-        <a
-          href="https://github.com/CBIIT/nci-webtools-dceg-vQTL"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub
-        </a>{' '}
-        to transfer the GWAS summary statistics from NHGRI GWAS catalog into
-        ezQTL GWAS Data format. The minimal columns required for GWAS Data
-        include chr, pos, ref, alt, rsnum, pvalue, zscore, effect and se. Here
-        is an example table for GWAS Data Data:
-      </p>
-      <div style={{ overflowX: 'auto' }}>
-        <table className="table table-bordered table-striped">
-          <thead>
-            <tr>
-              <th scope="col">chr</th>
-              <th scope="col">pos</th>
-              <th scope="col">ref</th>
-              <th scope="col">alt</th>
-              <th scope="col">rsnum</th>
-              <th scope="col">pvalue</th>
-              <th scope="col">zscore</th>
-              <th scope="col">effect</th>
-              <th scope="col">se</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>21</td>
-              <td>42642038</td>
-              <td>A</td>
-              <td>G</td>
-              <td>rs8133778</td>
-              <td>0.806</td>
-              <td>-0.246</td>
-              <td>-0.003</td>
-              <td>0.011</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642093</td>
-              <td>C</td>
-              <td>T</td>
-              <td>rs771407982</td>
-              <td>0.206</td>
-              <td>-1.264</td>
-              <td>-1.455</td>
-              <td>1.152</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642096</td>
-              <td>A</td>
-              <td>G</td>
-              <td>rs68087522</td>
-              <td>0.330</td>
-              <td>0.974</td>
-              <td>0.018</td>
-              <td>0.018</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642322</td>
-              <td>C</td>
-              <td>T</td>
-              <td>rs73368336</td>
-              <td>0.543</td>
-              <td>-0.608</td>
-              <td>-0.181</td>
-              <td>0.298</td>
-            </tr>
-            <tr>
-              <td>21</td>
-              <td>42642405</td>
-              <td>G</td>
-              <td>A</td>
-              <td>rs77240271</td>
-              <td>0.078</td>
-              <td>-1.761</td>
-              <td>-0.047</td>
-              <td>0.027</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        Check{' '}
-        <a
-          href="https://huwenboshi.github.io/data%20management/2017/11/23/tips-for-formatting-gwas-summary-stats.html"
-          target="_blank"
-          rel="noreferrer"
-        >
-          here
-        </a>{' '}
-        for details about the relationship for Z-score, p-value, effect size or
-        odds ratio for association studies, which will be useful to prepare GWAS
-        Data.
-      </p>
-      <div className="mt-5">
         <p>
-          <b>Public data source</b>
+          Check{' '}
+          <a
+            href="https://huwenboshi.github.io/data%20management/2017/11/23/tips-for-formatting-gwas-summary-stats.html"
+            target="_blank"
+            rel="noreferrer"
+          >
+            here
+          </a>{' '}
+          for details about the relationship for Z-score, p-value, effect size
+          or odds ratio for association studies, which will be useful to prepare
+          GWAS Data.
+        </p>
+      </div>
+      <br />
+      <div id="public-data-source">
+        <p>
+          <b>Public Data Source</b>
         </p>
         <p>
           We aim to collect as many published QTL datasets with full association
@@ -579,9 +629,10 @@ export function Help() {
           you have any public full association data not included here.
         </p>
       </div>
-      <div className="mt-5">
+      <br />
+      <div id="relationship">
         <p>
-          <b>Relationship between input datasets and module functions</b>
+          <b>Relationship Between Input Datasets and Module Functions</b>
         </p>
         <p>
           The following table shows the data requirement for each module in
@@ -601,7 +652,9 @@ export function Help() {
           alt="Relationship between input datasets and module functions"
         />
       </div>
-      <div className="mt-5">
+      <br />
+      <br />
+      <div id="colocalization-analysis">
         <p>
           <b>Colocalization Analysis</b>
         </p>
@@ -642,9 +695,10 @@ export function Help() {
           arbitrary number of causal variants.
         </p>
       </div>
-      <div className="mt-5">
+      <br />
+      <div id="comparison">
         <p>
-          <b>Comparison between ezQTL and other tools</b>
+          <b>Comparison Between ezQTL and Other Tools</b>
         </p>
         <p>
           The table below summarizes the major features of ezQTL and comparisons
@@ -653,18 +707,20 @@ export function Help() {
         </p>
         <img className="w-100" alt="Comparison between ezQTL and other tools" src="assets/images/ezQTL_comparison.svg" />
       </div>
-      <div className="mt-5">
+      <br />
+      <br />
+      <div id="faq">
         <p>
           <b>Frequently Asked Questions</b>
         </p>
-        <p>
+        <p className="ml-3">
           <i>
             What is a colocalization analysis, and are there any other
             approaches to perform colocalization analysis than what is provided
             by ezQTL?
           </i>
         </p>
-        <p>
+        <p className="ml-5">
           Colocalization is a statistical method examining if the same "causal”
           variant is underlying both eQTL and GWAS signals, as opposed to some
           SNPs showing significant P-values in both assays by chance. Two major
@@ -676,13 +732,13 @@ export function Help() {
           their performance. We may include more colocalization algorithms in
           the future.
         </p>
-        <p>
+        <p className="ml-3">
           <i>
             What is the LD Matrix data? Should I calculate LD matrix data from
             my own GWAS or QTL samples?
           </i>
         </p>
-        <p>
+        <p className="ml-5">
           Linkage Disequilibrium (LD) refers to the non-random association of
           alleles at two or more loci in the general population. For the
           colocalization analysis between GWAS and QTL, the LD produces an
@@ -701,10 +757,10 @@ export function Help() {
           difference of LD Matrices between user’s study and public study by
           using the Locus LD module.
         </p>
-        <p>
+        <p className="ml-3">
           <i>What is the genome build version for the public data source?</i>
         </p>
-        <p>
+        <p className="ml-5">
           For the LD matrices in public data source, the 1000 genomes support
           both GRCh37 and GRCh38 for all the populations. The UK BioBank only
           supports the GRCh37 for now. For QTL in public data source, both GTEx
