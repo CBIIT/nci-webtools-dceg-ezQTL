@@ -172,7 +172,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   }
   
   if(!is.null(leadsnp)) {
-    cat(paste0("\nReference SNP using for filtering SNPs based on the snp: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
+    cat(paste0("\nLocus summary\nReference SNP and the window size for input SNPs selection: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
     if(!is.null(gwasfile)){
       leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
       if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
@@ -215,7 +215,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     }
     
   }else {
-    cat("No Reference SNP using for filtering SNPs based on the distance",file=logfile,sep="\n",append = T)
+    cat("\nLocus summary\nNo Reference SNP using for filtering SNPs based on the distance",file=logfile,sep="\n",append = T)
   }
   
   ## QTL plots
@@ -230,14 +230,14 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       slice(1:50) %>% 
       arrange(desc(pval_nominal))
     
-    pall0 <- qtl %>% filter(gene_id %in% qtl_min$gene_id) %>% 
-      mutate(gene_id=factor(gene_id,levels = qtl_min$gene_id)) %>% 
-      ggplot(aes(-log10(pval_nominal),gene_id,fill=-log10(pval_nominal)))+
+    pall0 <- qtl %>% filter(gene_symbol %in% qtl_min$gene_symbol) %>% 
+      mutate(gene_symbol=factor(gene_symbol,levels = qtl_min$gene_symbol)) %>% 
+      ggplot(aes(-log10(pval_nominal),gene_symbol,fill=-log10(pval_nominal)))+
       geom_point(pch=21,stroke=0.2,col="black",size=3)+
       geom_point(data = qtl_min,pch=21,stroke=0.5,col="red",size=3)+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XYx",axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill="minmal p-value",y='',x='QTL P-value (-log10)')+
-      theme(legend.position = 'none',panel.background = element_blank())+
+      labs(title = "Summary of QTL traits in the input data",fill="minmal p-value",y='',x='QTL P-value (-log10)')+
+      theme(legend.position = 'none',panel.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_viridis_c(direction = -1)+
       scale_x_continuous(breaks = pretty_breaks(),expand = expansion(mult = c(0.01, .12)))+
       ggrepel::geom_text_repel(data=qtl_min,aes(label=rsnum),hjust=0,vjust=1,nudge_y = -0.1,segment.size=0.2,segment.color="black",segment.curvature = -0.1,segment.ncp = 3,segment.angle = 30)+
@@ -249,7 +249,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = xleng)
   }else{
     labeltext="No qtl input detected. No plot of QTL minimal P will be shown"
-    pall0 <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=6)+theme_nothing()
+    pall0 <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
     #pall0 <- ggplot()
     ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = 4)
   }
@@ -320,8 +320,8 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     qtl_ref <- paste0(qtl_ref$rsnum, ' (',qtl_ref$chr,':',qtl_ref$pos,':',qtl_ref$ref,':',qtl_ref$alt,') QTL P=', qtl_ref$pval_nominal,' for ',qtl_ref$gene_id,":",qtl_ref$gene_symbol)
     
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
-    cat(paste0('Best GWAS overlapped snp: ',gwas_ref),file=logfile,sep="\n",append = T)
-    cat(paste0('Best QTL overlapped snp: ',qtl_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best GWAS snp among overlapped SNPs: ',gwas_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best QTL snp among overlapped SNPs: ',qtl_ref),file=logfile,sep="\n",append = T)
     
     ## additional filter for the QTL traits
     # recalculate the LD
@@ -344,6 +344,9 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     
     ## overlap plot 1
+    xmino <- (min(c(qtl$pos,gwas$pos,ld.data$pos))-10)/1000000
+    xmaxo <- (max(c(qtl$pos,gwas$pos,ld.data$pos))+10)/1000000
+    
     qtl2 <- qtl %>% group_by(rsnum,pos) %>% arrange(pval_nominal) %>% summarise(pvalue=min(pval_nominal),n=n()) %>% ungroup()
     ndifgene <- qtl %>% count(gene_id) %>% count(n) %>% dim() %>% .[[1]]
     
@@ -352,16 +355,18 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ggplot(aes(pos/1000000,-log10(pvalue),fill=if_else(rsnum %in% orsnum,"TRUE","FALSE")))+
       geom_point(aes(size=n),pch=21,stroke=0.3,col="black")+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
-      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank())+
+      labs(title = 'Variant overlap summary',fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
+      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = qtl2 %>% filter(rsnum==leadsnp),aes(label=rsnum))+
       geom_point(data = qtl2 %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,fill=NA,stroke=1)
     
     if(ndifgene > 1 ){
-      p1 <- p1 +  scale_size_binned(breaks = pretty_breaks())
+      p1 <- p1 +scale_size_continuous(breaks = breaks_extended(5),labels = scales::number_format(accuracy = 0.1))
+      #scale_size_binned(breaks = pretty_breaks())+      
+      
     }
     
     p2 <- gwas %>% 
@@ -371,7 +376,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       labs(fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
       theme(legend.position = 'none',panel.background = element_blank())+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = gwas %>% filter(rsnum==leadsnp),aes(label=rsnum) )+
       geom_point(data = gwas %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
@@ -381,15 +386,15 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ggplot(aes(pos/1000000,(LD)^2,fill=rsnum %in% orsnum))+
       geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill="Overlapped Variants",x=paste0('Chromosome ',leadchr,'\n'),y="LD Matrix (R^2)")+
+      labs(fill="Overlapped Variants",x=paste0('Chromosome ',leadchr,' (Mb)\n'),y="LD Matrix (R^2)")+
       theme(legend.position = 'none',panel.background = element_blank())+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = ld.data %>% filter(rsnum==leadsnp),aes(label=rsnum))+
       geom_point(data = ld.data %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
     
-    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p2+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.3,1,1))
+    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p2+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.4,1,1))
     
     # effect size plot # 
     
@@ -420,8 +425,8 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
       geom_point(data=qdata %>% filter(ambiguous_snp=="Y"),pch=4,stroke=0.5,col="black",size=1)+
       # theme_ipsum_rc(axis_title_just = 'm',grid = F,axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill="LD to GWAS Leadsnp\n",x='GWAS-Zscore',y='QTL-Zscore')+
-      theme(legend.position = 'top',legend.key.width = unit(2,'cm'),panel.spacing = unit(0.5, "lines"),panel.background = element_blank(),panel.grid = element_blank(),strip.background = element_blank())+
+      labs(title = 'GWAS-QTL allele match summary',fill="LD to GWAS Leadsnp\n",x='GWAS-Zscore',y='QTL-Zscore')+
+      theme(legend.position = 'top',legend.key.width = unit(2,'cm'),panel.spacing = unit(0.5, "lines"),panel.background = element_blank(),panel.grid = element_blank(),strip.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_gsea(limits=c(-1,1))+
       panel_border(color = 'black')+
       geom_point(data = qdata %>% filter(rsnum==leadsnp),pch=2,col="black",size=2,stroke=0.5)+
@@ -519,10 +524,13 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     qtl_ref <- paste0(qtl_ref$rsnum, ' (',qtl_ref$chr,':',qtl_ref$pos,':',qtl_ref$ref,':',qtl_ref$alt,') QTL P=', qtl_ref$pval_nominal,' for ',qtl_ref$gene_id,":",qtl_ref$gene_symbol)
     
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
-    cat(paste0('Best GWAS overlapped snp: ',gwas_ref),file=logfile,sep="\n",append = T)
-    cat(paste0('Best QTL overlapped snp: ',qtl_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best GWAS snp among overlapped SNPs: ',gwas_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best QTL snp among overlapped SNPs: ',qtl_ref),file=logfile,sep="\n",append = T)
     
     ## overlap plot 1
+    xmino <- (min(c(qtl$pos,gwas$pos))-10)/1000000
+    xmaxo <- (max(c(qtl$pos,gwas$pos))+10)/1000000
+    
     qtl2 <- qtl %>% group_by(rsnum,pos) %>% arrange(pval_nominal) %>% summarise(pvalue=min(pval_nominal),n=n()) %>% ungroup()
     ndifgene <- qtl %>% count(gene_id) %>% count(n) %>% dim() %>% .[[1]]
     
@@ -531,16 +539,16 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ggplot(aes(pos/1000000,-log10(pvalue),fill=if_else(rsnum %in% orsnum,"TRUE","FALSE")))+
       geom_point(aes(size=n),pch=21,stroke=0.3,col="black")+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
-      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank())+
+      labs(title = 'Variant overlap summary',fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
+      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = qtl2 %>% filter(rsnum==leadsnp),aes(label=rsnum))+
       geom_point(data = qtl2 %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,fill=NA,stroke=1)
     
     if(ndifgene > 1 ){
-      p1 <- p1 +  scale_size_binned(breaks = pretty_breaks())
+      p1 <- p1 +scale_size_continuous(breaks = breaks_extended(5),labels = scales::number_format(accuracy = 0.1))
     }
     
     p2 <- gwas %>% 
@@ -550,12 +558,12 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       labs(fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
       theme(legend.position = 'none',panel.background = element_blank())+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = gwas %>% filter(rsnum==leadsnp),aes(label=rsnum) )+
       geom_point(data = gwas %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
     
-    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p2+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.3,1))
+    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p2+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.4,1))
     
     # effect size plot # 
     
@@ -583,8 +591,8 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       geom_point(pch=21,stroke=0.2,col="black",size=2.5,fill="#cccccc")+
       geom_point(data=qdata %>% filter(ambiguous_snp=="Y"),pch=4,stroke=0.5,col="black",size=1)+
       # theme_ipsum_rc(axis_title_just = 'm',grid = F,axis = F,ticks = T,axis_title_size= 14)+
-      labs(x='GWAS-Zscore',y='QTL-Zscore')+
-      theme(legend.position = 'top',legend.key.width = unit(2,'cm'),panel.spacing = unit(0.5, "lines"),panel.background = element_blank(),panel.grid = element_blank(),strip.background = element_blank())+
+      labs(title = 'GWAS-QTL allele match summary',x='GWAS-Zscore',y='QTL-Zscore')+
+      theme(legend.position = 'top',legend.key.width = unit(2,'cm'),panel.spacing = unit(0.5, "lines"),panel.background = element_blank(),panel.grid = element_blank(),strip.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_gsea(limits=c(-1,1))+
       panel_border(color = 'black')+
       geom_point(data = qdata %>% filter(rsnum==leadsnp),pch=2,col="black",size=2,stroke=0.5)+
@@ -675,7 +683,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     qtl_ref <- paste0(qtl_ref$rsnum, ' (',qtl_ref$chr,':',qtl_ref$pos,':',qtl_ref$ref,':',qtl_ref$alt,') QTL P=', qtl_ref$pval_nominal,' for ',qtl_ref$gene_id,":",qtl_ref$gene_symbol)
     
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
-    cat(paste0('Best QTL overlapped snp: ',qtl_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best QTL snp among overlapped SNPs: ',qtl_ref),file=logfile,sep="\n",append = T)
     
     
     # recalculate the LD
@@ -697,6 +705,9 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     
     ## overlap plot 1
+    xmino <- (min(c(qtl$pos,ld.data$pos))-10)/1000000
+    xmaxo <- (max(c(qtl$pos,ld.data$pos))+10)/1000000
+    
     qtl2 <- qtl %>% group_by(rsnum,pos) %>% arrange(pval_nominal) %>% summarise(pvalue=min(pval_nominal),n=n()) %>% ungroup()
     ndifgene <- qtl %>% count(gene_id) %>% count(n) %>% dim() %>% .[[1]]
     
@@ -705,16 +716,16 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ggplot(aes(pos/1000000,-log10(pvalue),fill=if_else(rsnum %in% orsnum,"TRUE","FALSE")))+
       geom_point(aes(size=n),pch=21,stroke=0.3,col="black")+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
-      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank())+
+      labs(title = 'Variant overlap summary',fill=paste0("Overlapped Variants: ",length(orsnum)),x='',y='Minimal QTL P-value (-log10)',size="QTL-n")+
+      theme(legend.position = 'top',panel.background = element_blank(),legend.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = qtl2 %>% filter(rsnum==leadsnp),aes(label=rsnum))+
       geom_point(data = qtl2 %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,fill=NA,stroke=1)
     
     if(ndifgene > 1 ){
-      p1 <- p1 +  scale_size_binned(breaks = pretty_breaks())
+      p1 +scale_size_continuous(breaks = breaks_extended(5),labels = scales::number_format(accuracy = 0.1))
     }
     
     p3 <- ld.data %>% mutate(tmp=rsnum %in% orsnum) %>% arrange(tmp) %>% 
@@ -724,12 +735,12 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       labs(fill="Overlapped Variants",x=paste0('Chromosome ',leadchr,'\n'),y="LD Matrix (R^2)")+
       theme(legend.position = 'none',panel.background = element_blank())+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = ld.data %>% filter(rsnum==leadsnp),aes(label=rsnum))+
       geom_point(data = ld.data %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
     
-    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.3,1))
+    pall1 <- plot_grid(p1+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.4,1))
     
     if(is.null(output_plot_prefix)){
       return(list(pall1,pall2))
@@ -812,7 +823,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     leadsnp=gwas_ref$rsnum
     gwas_ref <- paste0(gwas_ref$rsnum, ' (',gwas_ref$chr,':',gwas_ref$pos,':',gwas_ref$ref,':',gwas_ref$alt,') GWAS P=', gwas_ref$pvalue)
     cat('\nConsider the following snp as the reference snp in ezQTL: ',file=logfile,sep="\n",append = T)
-    cat(paste0('Best GWAS overlapped snp: ',gwas_ref),file=logfile,sep="\n",append = T)
+    cat(paste0('Best GWAS snp among overlapped SNPs: ',gwas_ref),file=logfile,sep="\n",append = T)
     
     ## additional filter for the QTL traits
     # recalculate the LD
@@ -834,15 +845,17 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     ## overlap plot 1
     pcol <- c("FALSE"='#cccccc',"TRUE"='#1a9850')
+    xmino <- (min(c(gwas$pos,ld.data$pos))-10)/1000000
+    xmaxo <- (max(c(gwas$pos,ld.data$pos))+10)/1000000
     
     p2 <- gwas %>% 
       ggplot(aes(pos/1000000,-log10(pvalue),fill=if_else(rsnum %in% orsnum,"TRUE","FALSE")))+
       geom_point(pch=21,stroke=0.2,col="black",size=2.5)+
       theme_ipsum_rc(axis_title_just = 'm',grid = "XY",axis = F,ticks = T,axis_title_size= 14)+
-      labs(fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
-      theme(legend.position = 'none',panel.background = element_blank())+
+      labs(title = 'Variant overlap summary',fill="Overlapped Variants",x='',y='GWAS P-value (-log10)')+
+      theme(legend.position = 'none',panel.background = element_blank(),plot.title = element_text(hjust = 0.5))+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = gwas %>% filter(rsnum==leadsnp),aes(label=rsnum) )+
       geom_point(data = gwas %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
@@ -855,12 +868,12 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       labs(fill="Overlapped Variants",x=paste0('Chromosome ',leadchr,'\n'),y="LD Matrix (R^2)")+
       theme(legend.position = 'none',panel.background = element_blank())+
       scale_fill_manual(values = pcol)+
-      scale_x_continuous(breaks = pretty_breaks())+
+      scale_x_continuous(breaks = pretty_breaks(),limits = c(xmino,xmaxo))+
       panel_border(color = 'black')+
       ggrepel::geom_text_repel(data = ld.data %>% filter(rsnum==leadsnp),aes(label=rsnum))+
       geom_point(data = ld.data %>% filter(rsnum==leadsnp),pch=2,col="red",size=2,stroke=1)
     
-    pall1 <- plot_grid(p2+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.3,1))
+    pall1 <- plot_grid(p2+theme(plot.margin = margin(b = 2)),p3+theme(plot.margin = margin(b = 2)),align = 'v',axis = 'lr',ncol = 1,rel_heights = c(1.4,1))
     
     
     if(is.null(output_plot_prefix)){
@@ -961,7 +974,7 @@ hycoloc_barplot <- function(hydata,output_plot=NULL,plot_width=NULL,plot_height=
 hycoloc_boxplot <- function(hydata_score,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   if(dim(hydata_score)[1]==0){
     labeltext="No colocalization traits found by HyPrColoc. No SNP score will be calculated"
-    p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=6)+theme_nothing()
+    p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
     ngene <- 2
   }else{
     
@@ -1314,14 +1327,15 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   ld.matrix <- ld.matrix %>% dplyr::select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
   rownames(ld.matrix) <- ld.info$Seq
   colnames(ld.matrix) <- ld.info$Seq
-
-    if(is.null(association_file) & !isTRUE(leadsnp %in% ld.info$rsnum) & !isTRUE(leadsnp_pos %in% ld.info$pos)){
-    #stop("The input SNP information does not existed in LD file")
-    print('Warning, the reference position is not existed in the LD file. Use the middle position as reference position\n')
-    nrowt <- floor(dim(ld.info)[1]/2)
-    leadsnp_pos <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(pos)
-  }
   
+  #is.null(association_file) & !isTRUE(leadsnp %in% ld.info$rsnum) & !isTRUE(leadsnp_pos %in% ld.info$pos)
+  if(!isTRUE(leadsnp %in% ld.info$rsnum) & !isTRUE(leadsnp_pos %in% ld.info$pos)){
+    #stop("The input SNP information does not existed in LD file")
+    print('Warning, the provided reference snp is not existed in the LD file. Use the middle position of input snp list as reference snp\n')
+    nrowt <- floor(dim(ld.info)[1]/2)
+    #leadsnp_pos <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(pos)
+    leadsnp <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(rsnum)
+  }
   
   if(is.null(association_file)){
     
@@ -1385,7 +1399,6 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
     cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' -D > ',regionfile)
     system(cmd_ztw)
     gtf <- read_delim(regionfile,delim = '\t',col_names = FALSE)
-    colnames(gtf) <- paste0('V',1:9)
     unlink(x = regionfile,force = TRUE)
     
     R2 <- Site <- Site2 <- V4 <- V5 <- V9 <- group <- p <- NULL
@@ -1393,20 +1406,27 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
     pvalue_range <- pretty(-log10(transcript_association$p))
     fold <- ((transcript_max - transcript_min) * 2/3)/max(pvalue_range)
     n_pvalue_range <- length(pvalue_range)
-    gene_list <- gtf[gtf$V1 == chr & grepl("exon",gtf$V3,ignore.case = TRUE),]
-    gene_list$V9 <- gsub("\"|;", "", gene_list$V9)
-    gene_list$V9 <- sub(".*gene_name (\\S+) .+", "\\1", gene_list$V9)
-    gene_list_start <- aggregate(V4 ~ V9, data = gene_list, FUN = min)
-    gene_list_end <- aggregate(V5 ~ V9, data = gene_list, FUN = max)
-    gene_list$V4 <- NULL
-    gene_list$V5 <- NULL
-    gene_list <- merge(gene_list, gene_list_start, by = "V9")
-    gene_list <- merge(gene_list, gene_list_end, by = "V9")
-    gene_list <- gene_list[!duplicated(gene_list$V9), ]
-    gene_list <- gene_list[gene_list$V4 >= transcript_min & gene_list$V5 <= 
-                             transcript_max, ]
-    gene_for <- gene_list[gene_list$V7 == "+", ]
-    gene_rev <- gene_list[gene_list$V7 == "-", ]
+    
+    if(dim(gtf)[1]>0){
+      colnames(gtf) <- paste0('V',1:9)
+      gene_list <- gtf[gtf$V1 == chr & grepl("exon",gtf$V3,ignore.case = TRUE),]
+      gene_list$V9 <- gsub("\"|;", "", gene_list$V9)
+      gene_list$V9 <- sub(".*gene_name (\\S+) .+", "\\1", gene_list$V9)
+      gene_list_start <- aggregate(V4 ~ V9, data = gene_list, FUN = min)
+      gene_list_end <- aggregate(V5 ~ V9, data = gene_list, FUN = max)
+      gene_list$V4 <- NULL
+      gene_list$V5 <- NULL
+      gene_list <- merge(gene_list, gene_list_start, by = "V9")
+      gene_list <- merge(gene_list, gene_list_end, by = "V9")
+      gene_list <- gene_list[!duplicated(gene_list$V9), ]
+      gene_list <- gene_list[gene_list$V4 >= transcript_min & gene_list$V5 <= 
+                               transcript_max, ]
+      gene_for <- gene_list[gene_list$V7 == "+", ]
+      gene_rev <- gene_list[gene_list$V7 == "-", ]
+    }else{
+      gene_for <- tibble()
+      gene_rev <- tibble()
+    }
     if (nrow(gene_for) >= 1) {
       # plot forward strand gene
       gene_for_seg <- list(geom_segment(data = gene_for, aes(x = V4, y = -(transcript_max -  transcript_min)/30, xend = V5, yend = -(transcript_max - transcript_min)/30), arrow = arrow(length = unit(0.1, "cm"))))
@@ -1506,6 +1526,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
                        Var2 = c(as.character(ld$Var2), as.character(ld$Var1)), 
                        value = rep(ld$value, 2), stringsAsFactors = FALSE)
       ld0 <- ld
+      
       marker_pos <- transcript_association[, c("Marker", "Site")]
       ld$Site1 <- marker_pos$Site[match(ld$Var1, marker_pos$Marker)]
       ld$Site2 <- marker_pos$Site[match(ld$Var2, marker_pos$Marker)]
@@ -1526,7 +1547,6 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
         ld_leadsnp$R2 <- as.character(ld_leadsnp$R2)
         ld_leadsnp$R2[ld_leadsnp$R2 == "0"] = "0.2"
         ld_leadsnp$R2[ld_leadsnp$R2 == "1.2"] = "1"
-        
         
         if(is.null(association_file)){
           ld_leadsnp_colour <- list(scale_fill_manual(values = c(`0.2` = colour02, `0.4` = colour04, `0.6` = colour06, `0.8` = colour08, `1` = colour10), labels = c("0-0.2","0.2-0.4", "0.4-0.6", "0.6-0.8", "0.8-1.0"), name = lengend_name))
@@ -1751,6 +1771,8 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
       theme_bw() + 
       theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
     
+    if(dim(ld_leadsnp)[1]==0){ plot <- plot + geom_point(data = transcript_association, aes(Site, -log10(p) * fold), shape = 21, colour = "black", fill = "white",size=2) }
+    
   } else{
     plot <- ggplot() + 
       threshold_line +
@@ -1776,6 +1798,8 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
       marker2label_list +
       theme_bw() + 
       theme(legend.key = element_rect(colour = "black"), axis.ticks = element_blank(), panel.border = element_blank(), panel.grid = element_blank(), axis.text = element_blank(), axis.title = element_blank(), text = element_text(size = 15, face = "bold"))
+    
+    if(dim(ld_leadsnp)[1]==0){ plot <- plot + geom_point(data = transcript_association, aes(Site, -log10(p) * fold), shape = 21, colour = "black", fill = "white",size=2)}
   }
   
   if(is.null(output_file)){
@@ -1838,12 +1862,20 @@ locus_quantification_qtl <- function(gdata,qdata,gdata_queryid=NULL,qdata_queryi
   
   tmpdata <- gdata_tmp %>% left_join(qdata_tmp)
   
-  p <- ggbetweenstats(
-    data = tmpdata,
-    x = Genotype,
-    y = Quantification,
-    #ggtheme = hrbrthemes::theme_ipsum_pub(),
-  )
+  tmpdata <- tmpdata %>% filter(!is.na(gene_id),!is.na(Quantification))
+  
+  if(dim(tmpdata)[1]<1){
+    labeltext="The input Trait ID or Genotype ID is incorrect.\nTrait ID should be gene_id in the quantification data\nGenotype ID should be in the format of chr:pos:ref:alt."
+    p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
+  }else{
+    p <- ggbetweenstats(
+      data = tmpdata,
+      x = Genotype,
+      y = Quantification,
+      #ggtheme = hrbrthemes::theme_ipsum_pub(),
+    )
+    
+  }
   
   if(is.null(output_plot)){
     return(p)

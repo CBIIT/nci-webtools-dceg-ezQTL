@@ -649,6 +649,7 @@ export function Help() {
         <img
           className="w-100"
           src="assets/images/data_input_relationship.svg"
+          alt="Relationship between input datasets and module functions"
         />
       </div>
       <br />
@@ -704,7 +705,7 @@ export function Help() {
           to other tools at the time of the development. We are planning to
           include more features or modules in ezQTL in the future.
         </p>
-        <img className="w-100" src="assets/images/ezQTL_comparison.svg" />
+        <img className="w-100" alt="Comparison between ezQTL and other tools" src="assets/images/ezQTL_comparison.svg" />
       </div>
       <br />
       <br />

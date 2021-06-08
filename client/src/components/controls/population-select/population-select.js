@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactSelect, { components } from 'react-select';
 import { useSelector } from 'react-redux';
 
-export const PopulationSelect = ({ id, disabled, mergeState }) => {
+export const PopulationSelect = ({ id, disabled, ariaLabel, mergeState }) => {
   const { inputs } = useSelector((state) => state.qtlsGWAS);
   const [_selectPop, _setSelectPop] = useState([]);
 
@@ -243,6 +243,7 @@ export const PopulationSelect = ({ id, disabled, mergeState }) => {
         // console.log("onChange", item);
         _setSelectPop(item);
       }}
+      aria-labelledby={ariaLabel}
       inputId={id}
       isMulti={true}
       options={allPopulationsGrouped}
