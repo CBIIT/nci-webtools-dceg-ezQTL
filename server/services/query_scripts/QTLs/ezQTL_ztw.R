@@ -1111,7 +1111,7 @@ ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plo
 
 coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
-  if(dim(ecdata)[1]==0 && im(hydata)[1]==0){
+  if(dim(ecdata)[1]==0 && dim(hydata)[1]==0){
     
     labeltext="No eCAVIAR and HyPerColoc results found. please check the Locus QC or inputs."
     p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
