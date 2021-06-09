@@ -86,22 +86,24 @@ export function LocusQC() {
               </div>
             </div>
           )}
-          <Zoom
-            plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
-            className="border rounded p-3 mb-2"
-            maxHeight="800px"
-            descAbove={
-              <p>
-                The following barplot shows the summary of association P-value
-                of each trait in the QTL dataset. The QTL traits are sorted
-                according to the most significant P-value. The top significant
-                associated variants for each trait are highlighted and labeled
-                with the rs number. The color-coding of the variants was based
-                on P-value scale. Due to figure size limitation, only the top 50
-                traits are included in this figure.
-              </p>
-            }
-          />
+          {request && (
+            <Zoom
+              plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
+              className="border rounded p-3 mb-2"
+              maxHeight="800px"
+              descAbove={
+                <p>
+                  The following barplot shows the summary of association P-value
+                  of each trait in the QTL dataset. The QTL traits are sorted
+                  according to the most significant P-value. The top significant
+                  associated variants for each trait are highlighted and labeled
+                  with the rs number. The color-coding of the variants was based
+                  on P-value scale. Due to figure size limitation, only the top
+                  50 traits are included in this figure.
+                </p>
+              }
+            />
+          )}
 
           {gwasFile || gwasKey ? (
             <Zoom

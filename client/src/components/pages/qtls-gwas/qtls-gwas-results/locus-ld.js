@@ -83,7 +83,10 @@ export function LocusLD() {
                   <div className="col-md-9">
                     <Form.Group className="row">
                       <div className="col-md-4">
-                        <Form.Label id="ld-association-data" className="mb-0 mr-auto">
+                        <Form.Label
+                          id="ld-association-data"
+                          className="mb-0 mr-auto"
+                        >
                           LD Association Data
                         </Form.Label>
                         <ReactSelect
@@ -145,7 +148,10 @@ export function LocusLD() {
                         />
                       </div>
                       <div className="col-md-4">
-                        <Form.Label id="ld-association-threshold" className="mb-0">
+                        <Form.Label
+                          id="ld-association-threshold"
+                          className="mb-0"
+                        >
                           -log<sub>10</sub> Association Threshold
                         </Form.Label>
                         <Form.Control
@@ -229,11 +235,13 @@ export function LocusLD() {
           </div>
           <hr />
           <div className="px-3 py-2">
-            <Zoom
-              plotURL={`api/results/${request}/LD_Output.png`}
-              className="border rounded p-3"
-              maxHeight="100%"
-            />
+            {request && (
+              <Zoom
+                plotURL={`api/results/${request}/LD_Output.png`}
+                className="border rounded p-3"
+                maxHeight="100%"
+              />
+            )}
           </div>
         </>
       )}

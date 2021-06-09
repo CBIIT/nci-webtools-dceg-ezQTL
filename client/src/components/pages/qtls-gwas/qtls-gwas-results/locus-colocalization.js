@@ -457,14 +457,17 @@ export function LocusColocalization() {
                 !isLoadingHyprcoloc && hyprcolocError ? hyprcolocError : null
               }
             />
-            {submitted && !isLoadingHyprcoloc && !hyprcolocError && (
-              <div className="mb-2">
-                <Zoom
-                  plotURL={`api/results/${request}/hyprcoloc_snpscore_table.svg`}
-                  className="border rounded p-3"
-                />
-              </div>
-            )}
+            {hyprcolocSNPScore_table &&
+              Object.entries(hyprcolocSNPScore_table.data).length &&
+              !isLoadingHyprcoloc &&
+              !hyprcolocError && (
+                <div className="mb-2">
+                  <Zoom
+                    plotURL={`api/results/${request}/hyprcoloc_snpscore_table.svg`}
+                    className="border rounded p-3"
+                  />
+                </div>
+              )}
             <p>
               The green solid line indicates our own suggested threshold. We
               strongly encourage the users to refer to the original publication
