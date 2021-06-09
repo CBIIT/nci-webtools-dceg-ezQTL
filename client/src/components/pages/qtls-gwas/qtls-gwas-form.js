@@ -217,11 +217,8 @@ function LocusInfo({
                 value={select_ref ? select_ref : ''}
                 isInvalid={
                   attempt &&
-                  ((select_ref &&
-                    !_gwasFile &&
-                    !_associationFile &&
-                    !/^rs\d+$/.test(select_ref)) ||
-                    (_LDFile && !select_ref))
+                  ((select_ref && !/^rs\d+$/.test(select_ref)) ||
+                    (_LDFile && !_gwasFile && !_associationFile && !select_ref))
                 }
               />
               <Form.Control.Feedback type="invalid">
