@@ -1458,71 +1458,10 @@ export function uploadFile(params) {
   };
 }
 
-function qtlsGWASHyprcolocLDCalculation(params) {
-  return async function (dispatch, getState) {
-    dispatch(
-      updateQTLsGWAS({
-        isLoadingHyprcoloc: true,
-      })
-    );
-
-    axios
-      .post('api/qtls-locus-colocalization-hyprcoloc-ld', params)
-      .then(function (response) {
-        console.log(
-          'api/qtls-locus-colocalization-hyprcoloc-ld response.data',
-          response.data
-        );
-
-        dispatch(
-          updateQTLsGWAS({
-            hyprcoloc_ld: {
-              filename: response.data['hyprcoloc_ld']['filename'][0],
-            },
-          })
-        );
-      })
-      .catch(function (error) {
-        console.log(error);
-        if (error) {
-          dispatch(updateError({ visible: true }));
-          dispatch(
-            updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
-          );
-        }
-      })
-      .then(function () {
-        // execute if no error and gwas data exists
-        const qtlsGWAS = getState().qtlsGWAS;
-        if (
-          !qtlsGWAS.isError &&
-          qtlsGWAS.hyprcoloc_ld &&
-          qtlsGWAS.hyprcoloc_ld.filename
-        ) {
-          dispatch(
-            qtlsGWASHyprcolocCalculation({
-              request: qtlsGWAS.request,
-              select_gwas_sample: qtlsGWAS.select_gwas_sample,
-              select_qtls_samples: qtlsGWAS.select_qtls_samples,
-              select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-              select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-              gwasfile: qtlsGWAS.inputs.gwas_file[0],
-              qtlfile: qtlsGWAS.inputs.association_file[0],
-              ldfile: qtlsGWAS.hyprcoloc_ld.filename,
-              qtlKey: qtlsGWAS.qtlKey,
-              select_chromosome:
-                qtlsGWAS.locusInformation[0].select_chromosome.value ||
-                qtlsGWAS.locusInformation[0].select_chromosome,
-              select_position: qtlsGWAS.select_position,
-            })
-          );
-        }
-      });
-  };
-}
-
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
+    const qtlsGWAS = getState().qtlsGWAS;
+
     axios
       .post('api/qtls-locus-colocalization-hyprcoloc', params)
       .then(function (response) {
@@ -2005,13 +1944,20 @@ export function qtlsGWASCalculation(params) {
             (qtlsGWAS.LDFile || qtlsGWAS.ldKey)
           ) {
             dispatch(
-              qtlsGWASHyprcolocLDCalculation({
+              qtlsGWASHyprcolocCalculation({
                 request: qtlsGWAS.request,
-                ldfile: qtlsGWAS.inputs.ld_file[0],
-                select_ref: qtlsGWAS.locus_alignment.top.rsnum,
-                select_chr: qtlsGWAS.locus_alignment.top.chr,
-                select_pos: qtlsGWAS.locus_alignment.top.pos,
+                select_gwas_sample: qtlsGWAS.select_gwas_sample,
+                select_qtls_samples: qtlsGWAS.select_qtls_samples,
                 select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
+                select_ref: qtlsGWAS.locus_alignment.top.rsnum,
+                gwasfile: qtlsGWAS.inputs.gwas_file[0],
+                qtlfile: qtlsGWAS.inputs.association_file[0],
+                ldfile: qtlsGWAS.inputs.ld_file[0],
+                qtlKey: qtlsGWAS.qtlKey,
+                select_chromosome:
+                  qtlsGWAS.locusInformation[0].select_chromosome.value ||
+                  qtlsGWAS.locusInformation[0].select_chromosome,
+                select_position: qtlsGWAS.select_position,
               })
             );
 

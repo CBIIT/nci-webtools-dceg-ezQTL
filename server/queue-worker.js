@@ -201,24 +201,9 @@ async function calculate(params) {
       isLoading: false,
     });
 
-    // qtlsCalculateLocusColocalizationHyprcolocLD
+    // qtlsCalculateLocusColocalizationHyprcoloc
     try {
-      const { hyprcoloc_ld } = main.gwas.data.length
-        ? JSON.parse(
-            await calculateHyprcolocLD({
-              workingDirectory: workingDirectory,
-              bucket: config.aws.s3.data,
-              request: request,
-              ldfile: state.inputs.ld_file[0],
-              select_ref: state.locus_alignment.top.rsnum,
-              select_chr: state.locus_alignment.top.chr,
-              select_pos: state.locus_alignment.top.pos,
-              select_dist: state.inputs.select_dist[0] * 1000,
-            })
-          )
-        : {};
-      // qtlsCalculateLocusColocalizationHyprcoloc
-      if (Object.keys(hyprcoloc_ld).length && hyprcoloc_ld.filename) {
+      if (params.LDFile) {
         const { hyprcoloc } = JSON.parse(
           await calculateHyprcoloc({
             workingDirectory: workingDirectory,
@@ -230,7 +215,7 @@ async function calculate(params) {
             select_ref: state.locus_alignment.top.rsnum,
             gwasfile: state.inputs.gwas_file[0],
             qtlfile: state.inputs.association_file[0],
-            ldfile: hyprcoloc_ld.filename[0],
+            ldfile: state.inputs.ld_file[0],
             qtlKey: params.qtlKey,
             select_chromosome: params.select_chromosome,
             select_position: params.select_position,
@@ -238,9 +223,6 @@ async function calculate(params) {
         );
 
         state = mergeState(state, {
-          hyprcoloc_ld: {
-            filename: hyprcoloc_ld.filename[0],
-          },
           hyprcoloc_table: {
             data: hyprcoloc['result_hyprcoloc']['data'][0],
           },

@@ -181,68 +181,6 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   }
 }
 
-async function calculateHyprcolocLD(params) {
-  const {
-    request,
-    ldfile,
-    select_ref,
-    select_chr,
-    select_pos,
-    select_dist,
-    workingDirectory,
-    bucket,
-  } = params;
-
-  const rfile = path.resolve(
-    __dirname,
-    'query_scripts',
-    'QTLs',
-    'qtls-locus-colocalization-hyprcoloc-ld.r'
-  );
-  return r(
-    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-    'qtlsCalculateLocusColocalizationHyprcolocLD',
-    [
-      rfile,
-      workingDirectory.toString(),
-      ldfile.toString(),
-      select_ref.toString(),
-      select_chr.toString(),
-      select_pos.toString(),
-      select_dist.toString(),
-      request.toString(),
-      bucket.toString(),
-    ]
-  );
-}
-
-async function qtlsCalculateLocusColocalizationHyprcolocLD(
-  params,
-  req,
-  res,
-  next
-) {
-  const { request } = params;
-
-  logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc-ld`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
-
-  try {
-    const wrapper = await calculateHyprcolocLD(params);
-    logger.info(
-      `[${request}] Finished /qtls-locus-colocalization-hyprcoloc-ld`
-    );
-    res.json(JSON.parse(wrapper));
-  } catch (err) {
-    logger.error(
-      `[${request}] Error /qtls-locus-colocalization-hyprcoloc-ld ${err}`
-    );
-    res.status(500).json(err);
-  }
-}
-
 async function calculateHyprcoloc(params) {
   const {
     request,
@@ -580,8 +518,6 @@ module.exports = {
   calculateMain,
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
-  calculateHyprcolocLD,
-  qtlsCalculateLocusColocalizationHyprcolocLD,
   calculateHyprcoloc,
   qtlsCalculateLocusColocalizationHyprcoloc,
   calculateECAVIAR,

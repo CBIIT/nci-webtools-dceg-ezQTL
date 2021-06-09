@@ -27,7 +27,7 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   } else {
     qtlfile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
 
-    ld.matrix <- read_delim(ldfile, delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
+    ld.matrix <- read_delim(paste0('tmp/', request, '/', ldfile), delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
   }
 
 
@@ -137,6 +137,6 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
 
   #save.image(file=paste0(prefix,".hyprcoloc.RData"))
   dataSourceJSON <- c(toJSON(list(hyprcoloc = list(request = request, result_hyprcoloc = list(data = result_hyprcoloc_data), result_snpscore = list(data = result_snpscore_data)))))
-    return(dataSourceJSON)
+  return(dataSourceJSON)
 }
 ### LEAVE EMPTY LINE BELOW ###
