@@ -964,13 +964,19 @@ export function QTLsGWASForm() {
             <Col>
               <Button
                 variant="link"
-                onClick={() => toggleQuantification(!useQuantification)}
+                onClick={() => {
+                  toggleQuantification(!useQuantification);
+                  _setQuantificationFile('');
+                  _setGenotypeFile('');
+                }}
+                disabled={submitted}
               >
                 {useQuantification ? '- Remove ' : '+ Add '} QTL Raw Data
               </Button>
             </Col>
           </Row>
-          {useQuantification && (
+          {(useQuantification ||
+            (submitted && _quantificationFile && _genotypeFile)) && (
             <>
               <Row>
                 <Form.Group className="col-sm-12">
@@ -1000,8 +1006,6 @@ export function QTLsGWASForm() {
                       useQuantification &&
                       !_quantificationFile &&
                       _genotypeFile
-                        ? true
-                        : false
                     }
                     feedback="Please input accompanying Quantification Data File with
           Genotype Data File."
@@ -1034,8 +1038,6 @@ export function QTLsGWASForm() {
                       useQuantification &&
                       _quantificationFile &&
                       !_genotypeFile
-                        ? true
-                        : false
                     }
                     feedback="Please input accompanying Genotype Data File with
           Quantification Data File."
