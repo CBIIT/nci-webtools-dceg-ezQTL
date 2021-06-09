@@ -323,6 +323,7 @@ export function LocusColocalization() {
                   !isError &&
                   !summaryLoaded &&
                   hyprcoloc_table.data.length > 0 &&
+                  ecaviar_table.data.length > 0 &&
                   !isLoadingSummary &&
                   !isLoadingECaviar
                 ) {
@@ -619,7 +620,7 @@ export function LocusColocalization() {
               content={
                 !isLoadingSummary &&
                 (ecaviar_table.data.length === 0 || summaryError)
-                  ? 'No data available'
+                  ? 'Summary currently unavailable. Pending HyPrColoc and eCAVIAR results.'
                   : null
               }
             />

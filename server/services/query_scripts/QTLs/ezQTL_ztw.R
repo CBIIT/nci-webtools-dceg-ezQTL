@@ -1016,6 +1016,23 @@ hycoloc_boxplot <- function(hydata_score,output_plot=NULL,plot_width=NULL,plot_h
 
 ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plot_height=NULL){
   
+  
+  if(dim(ecdata)[1]==0){
+    
+    labeltext="No eCAVIAR result found. please check the Locus QC or inputs."
+    p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
+    if(is.null(output_plot_prefix)){
+      return(list(p,p))
+    }else{
+      output_plot <- paste0(output_plot_prefix,"_barplot.svg")
+      ggsave(filename = output_plot,plot = p,width = 10,height = 2)
+      output_plot <- paste0(output_plot_prefix,"_boxplot.svg")
+      ggsave(filename = output_plot,plot = p,width = 10,height = 2)
+      return(NULL)
+    }
+  }
+  
+  
   ecdata2 <- ecdata %>% 
     mutate(CLPP=as.numeric(CLPP),CLPP2=as.numeric(CLPP2)) %>% 
     select(gene_symbol,rsnum,Leadsnp,leadsnp_included,CLPP,CLPP2) %>% 
@@ -1093,6 +1110,18 @@ ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plo
 
 
 coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
+  
+  if(dim(ecdata)[1]==0 && dim(hydata)[1]==0){
+    
+    labeltext="No eCAVIAR and HyPerColoc results found. please check the Locus QC or inputs."
+    p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
+    if(is.null(output_plot)){
+      return(list(p))
+    }else{
+      ggsave(filename = output_plot,plot = p,width = 10,height = 2)
+      return(NULL)
+    }
+  }
   
   hydata <- hydata %>% mutate(posterior_prob=as.numeric(posterior_prob),candidate_snp=as.character(candidate_snp))
   hydata <- hydata %>%  mutate(posterior_prob=if_else(is.na(posterior_prob),0,posterior_prob)) 
