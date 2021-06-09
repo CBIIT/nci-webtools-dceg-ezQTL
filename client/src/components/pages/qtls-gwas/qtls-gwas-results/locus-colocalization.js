@@ -459,7 +459,7 @@ export function LocusColocalization() {
               }
             />
             {hyprcolocSNPScore_table &&
-              Object.entries(hyprcolocSNPScore_table.data).length &&
+              Object.entries(hyprcolocSNPScore_table.data).length > 0 &&
               !isLoadingHyprcoloc &&
               !hyprcolocError && (
                 <div className="mb-2">
