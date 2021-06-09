@@ -619,7 +619,7 @@ export function LocusColocalization() {
               content={
                 !isLoadingSummary &&
                 (ecaviar_table.data.length === 0 || summaryError)
-                  ? 'No data available'
+                  ? 'Summary currently unavailable. Pending HyPrColoc and eCAVIAR results.'
                   : null
               }
             />
