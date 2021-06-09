@@ -1460,8 +1460,12 @@ export function uploadFile(params) {
 
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
-    const qtlsGWAS = getState().qtlsGWAS;
-
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingHyprcoloc: true,
+      })
+    );
+    
     axios
       .post('api/qtls-locus-colocalization-hyprcoloc', params)
       .then(function (response) {
