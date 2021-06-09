@@ -36,7 +36,7 @@ export function LocusQC() {
       )}
       {submitted && locus_qc && !qcError && !isLoading && !isLoadingQC && (
         <>
-          {locus_qc.length && (
+          {locus_qc.length > 0 && (
             <div>
               <p>
                 Locus QC will systematically check, format and visualize all
