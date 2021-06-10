@@ -44,7 +44,7 @@ export default function Zoom({
 
       if (!response.ok) {
         const { msg } = await response.json();
-        console.log(msg);
+        // console.log(msg);
       } else {
         const file = await response.blob();
         const objectURL = URL.createObjectURL(file);

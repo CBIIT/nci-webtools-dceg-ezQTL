@@ -327,7 +327,7 @@ export function LocusColocalization() {
                   !isLoadingSummary &&
                   !isLoadingECaviar
                 ) {
-                  console.log('run summary');
+                  // console.log('run summary');
                   dispatch(
                     qtlsGWASColocVisualize({
                       hydata: hyprcoloc_table.data,
