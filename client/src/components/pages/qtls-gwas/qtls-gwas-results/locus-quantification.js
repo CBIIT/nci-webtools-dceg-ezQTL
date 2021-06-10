@@ -40,7 +40,7 @@ export function LocusQuantifiation() {
 
   return (
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
-      {genotypeFile && quantificationFile && (
+      {request && genotypeFile && quantificationFile && (
         <div>
           <LoadingOverlay active={isLoadingQuantification} />
           <Zoom

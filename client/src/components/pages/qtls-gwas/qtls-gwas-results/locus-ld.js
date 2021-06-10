@@ -69,7 +69,7 @@ export function LocusLD() {
         />
       )}
       <LoadingOverlay active={isLoadingLD} />
-      {submitted && !ldError && !isLoading && !isLoadingLD && (
+      {submitted && request && !ldError && !isLoading && !isLoadingLD && (
         <>
           <div className="px-3 py-2">
             <Form className="row justify-content-between">
@@ -235,13 +235,11 @@ export function LocusLD() {
           </div>
           <hr />
           <div className="px-3 py-2">
-            {request && (
-              <Zoom
-                plotURL={`api/results/${request}/LD_Output.png`}
-                className="border rounded p-3"
-                maxHeight="100%"
-              />
-            )}
+            <Zoom
+              plotURL={`api/results/${request}/LD_Output.png`}
+              className="border rounded p-3"
+              maxHeight="100%"
+            />
           </div>
         </>
       )}
