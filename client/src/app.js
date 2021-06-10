@@ -80,7 +80,7 @@ export function App() {
             ) {
               return (
                 <a
-                  href={`${e.row.values['Pubmed']}`}
+                  href={`https://pubmed.ncbi.nlm.nih.gov/${e.row.values['Pubmed']}`}
                   target="_blank"
                   rel="noreferrer"
                 >
