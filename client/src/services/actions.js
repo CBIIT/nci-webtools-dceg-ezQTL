@@ -1939,7 +1939,7 @@ export function qtlsGWASCalculation(params) {
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (!qtlsGWAS.isError && !qtlsGWAS.recalculate) {
+        if (!qtlsGWAS.isError ) {
           if (
             qtlsGWAS.gwas &&
             qtlsGWAS.gwas.data &&
@@ -1981,9 +1981,10 @@ export function qtlsGWASCalculation(params) {
           }
 
           if (
-            qtlsGWAS.LDFile ||
+            (qtlsGWAS.LDFile ||
             qtlsGWAS.ldKey ||
-            qtlsGWAS.select_qtls_samples
+            qtlsGWAS.select_qtls_samples) &&
+            !qtlsGWAS.recalculate
           ) {
             dispatch(
               qtlsGWASLocusLDCalculation({
