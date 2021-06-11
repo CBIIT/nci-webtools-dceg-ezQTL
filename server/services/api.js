@@ -339,6 +339,7 @@ apiRouter.get('/getPublications', async (req, res, next) => {
 // download work session
 apiRouter.post('/locus-download', (req, res, next) => {
   const { request } = req.body;
+  if (!validate(request)) next(new Error(`Invalid request`));
 
   try {
     tar.c({ sync: true, gzip: true, cwd: tmpDir }, [request]).pipe(res);
