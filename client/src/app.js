@@ -73,12 +73,22 @@ export function App() {
                   {e.value}
                 </a>
               );
-            } else if (
+            }
+            else if(
+              column == 'Study_website'
+            ) {
+              return(
+                <span>NA</span>
+              )
+            }
+            
+            else if (
               column == 'Title' &&
               e.row.values['Pubmed'] &&
               e.row.values['Pubmed'] != 'NA'
             ) {
               return (
+                e.row.values['Pubmed'].includes('pubmed') ?
                 <a
                   href={`${e.row.values['Pubmed']}`}
                   target="_blank"
@@ -86,8 +96,31 @@ export function App() {
                 >
                   {e.value}
                 </a>
+                :
+                <a
+                  href={`https://pubmed.ncbi.nlm.nih.gov/${e.row.values['Pubmed']}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {e.value}
+                </a>
               );
-            } else {
+            }else if(
+              column == 'Title'
+            ) {
+              return (
+                <span>NA</span>
+              )
+            }
+            else if(
+              column == 'Pubmed'  &&
+              !e.row.values['Pubmed']
+            ){
+              return(
+                <span>NA</span>
+              )
+            }
+            else {
               return e.value || '';
             }
           },

@@ -152,7 +152,7 @@ export const getInitialState = async () => {
     },
     publications: {
       globalFilter: '',
-      hidden: ['Study_website'],
+      hidden: ['Study_website', 'Pubmed'],
       pagination: { pageIndex: 0, pageSize: 10 },
       sort: [{ id: 'Year', desc: true }],
     },
