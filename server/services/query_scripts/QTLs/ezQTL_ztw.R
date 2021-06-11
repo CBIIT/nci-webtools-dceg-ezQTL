@@ -279,7 +279,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     if(dim(snpalltmp)[1]>0){
       pertmp <- dim(snpalltmp)[1]/dim(snpall)[1]
       pertmp2 <- percent_format(accuracy = 0.01)(pertmp)
-      cat(paste0('\nWarning: found ',pertmp2,' SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and allels information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID for colocalization analyses.'),file=logfile,sep="\n",append = T)
+      cat(paste0('\nWarning: found ',pertmp2,' SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and alleles information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID for colocalization analyses.'),file=logfile,sep="\n",append = T)
       snpalltmp %>% write_delim('snp_not_match.txt',delim = '\t',col_names = T)
       if(pertmp > 0.9){
         cat(paste0('Warning: align GWAS and QTL dataset based on LD information'),file=logfile,sep="\n",append = T)
@@ -1364,11 +1364,12 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
     nrowt <- floor(dim(ld.info)[1]/2)
     #leadsnp_pos <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(pos)
     leadsnp <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(rsnum)
+    leadsnp_pos <- NULL
+    #leadsnp_pos <- ld.info %>% arrange(pos) %>% dplyr::slice(1:nrowt) %>% tail(1) %>% pull(pos)
   }
   
   if(is.null(association_file)){
-    
-    threshold=9
+    threshold=8
     if(!is.null(leadsnp)) {association <- ld.info %>% dplyr::mutate(p=if_else((rsnum==leadsnp),1e-10,0.05)) %>% dplyr::select(Marker=rsnum,Locus=chr,Site=pos,p)}
     if(!is.null(leadsnp_pos)) {association <- ld.info %>% dplyr::mutate(p=if_else((pos==leadsnp_pos),1e-10,0.05)) %>% dplyr::select(Marker=rsnum,Locus=chr,Site=pos,p)}
     
