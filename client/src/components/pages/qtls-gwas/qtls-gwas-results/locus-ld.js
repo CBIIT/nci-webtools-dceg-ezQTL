@@ -75,7 +75,11 @@ export function LocusLD() {
           <div className="px-3 py-2">
             <Form className="row justify-content-between">
               <LoadingOverlay
-                active={!gwasFile && !associationFile}
+                active={
+                  !inputs ||
+                  (inputs.association_file[0] == 'false' &&
+                    inputs.gwas_file[0] == 'false')
+                }
                 content={<b>No QTL or GWAS data. Recalculation disabled.</b>}
               />
               <>

@@ -1665,6 +1665,7 @@ export function qtlsGWASLocusQCCalculation(params) {
               qcError: 'Error occured in QC calculation',
               isLoading: false,
               isLoadingQC: false,
+              isError: true,
               // activeResultsTab: 'locus-qc',
             })
           );
