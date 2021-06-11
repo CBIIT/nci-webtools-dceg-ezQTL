@@ -293,7 +293,7 @@ export function Home() {
         </p>
         <p>
           Questions or comments? Contact us via{' '}
-          <a href="mailto:http://tongwu.zhang@nih.gov">email</a>.
+          <a href="mailto:tongwu.zhang@nih.gov">email</a>.
         </p>
       </div>
     </div>

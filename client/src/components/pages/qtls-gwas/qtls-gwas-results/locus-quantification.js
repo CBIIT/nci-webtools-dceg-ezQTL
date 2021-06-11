@@ -71,7 +71,7 @@ export function LocusQuantifiation() {
           />
           <br />
           <p>
-            A typical QTL barplot is shown below with statistical tests in the
+            A typical QTL boxplot is shown below with statistical tests in the
             subtitles. This plot is created by the ggbetweenstats function from
             ggstatsplot package. Check the original ggstatsplot for the details
             of the statistical tests. You could use the residuals as the
