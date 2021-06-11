@@ -152,7 +152,6 @@ apiRouter.post('/getPublicGTEx', async (req, res, next) => {
       })
       .on('error', next);
   } catch (error) {
-    console.log(error);
     next(error);
   }
 });

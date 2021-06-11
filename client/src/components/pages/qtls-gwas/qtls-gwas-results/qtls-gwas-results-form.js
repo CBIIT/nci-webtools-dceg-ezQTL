@@ -100,7 +100,6 @@ export function QTLsGWASResultsForm() {
     if (!select_chromosome) chromosome = false;
     else chromosome = select_chromosome;
 
-    console.log(chromosome);
     const params = {
       request,
       associationFile:
@@ -209,7 +208,9 @@ export function QTLsGWASResultsForm() {
               />
             </div>
             <div className="col-md-4">
-              <Form.Label id="recalculate-snp" className="mb-0">LD Reference SNP</Form.Label>
+              <Form.Label id="recalculate-snp" className="mb-0">
+                LD Reference SNP
+              </Form.Label>
               <Form.Control
                 id="qtls-results-snp-input"
                 aria-labelledby="recalculate-snp"

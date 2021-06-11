@@ -1460,15 +1460,19 @@ export function uploadFile(params) {
 
 function qtlsGWASHyprcolocCalculation(params) {
   return async function (dispatch, getState) {
-    const qtlsGWAS = getState().qtlsGWAS;
+    dispatch(
+      updateQTLsGWAS({
+        isLoadingHyprcoloc: true,
+      })
+    );
 
     axios
       .post('api/qtls-locus-colocalization-hyprcoloc', params)
       .then(function (response) {
-        console.log(
-          'api/qtls-locus-colocalization-hyprcoloc response.data',
-          response.data
-        );
+        // console.log(
+        //   'api/qtls-locus-colocalization-hyprcoloc response.data',
+        //   response.data
+        // );
 
         if (response.data.error) {
           dispatch(
@@ -1515,7 +1519,7 @@ function qtlsGWASHyprcolocCalculation(params) {
 
 export function qtlsGWASECaviarCalculation(params) {
   return async function (dispatch, getState) {
-    console.log('ecaviar', params);
+    // console.log('ecaviar', params);
     dispatch(
       updateQTLsGWAS({
         isLoadingECaviar: true,
@@ -1525,10 +1529,10 @@ export function qtlsGWASECaviarCalculation(params) {
     axios
       .post('api/qtls-locus-colocalization-ecaviar', params)
       .then(function (response) {
-        console.log(
-          'api/qtls-locus-colocalization-ecaviar response.data',
-          response.data
-        );
+        // console.log(
+        //   'api/qtls-locus-colocalization-ecaviar response.data',
+        //   response.data
+        // );
 
         dispatch(
           updateQTLsGWAS({
@@ -1560,7 +1564,7 @@ export function qtlsGWASECaviarCalculation(params) {
 
 export function qtlsGWASCalculateQuantification(params) {
   return async function (dispatch, getState) {
-    console.log('quantification', params);
+    // console.log('quantification', params);
     dispatch(updateQTLsGWAS({ isLoadingQuantification: true }));
 
     axios
@@ -1587,7 +1591,7 @@ export function qtlsGWASCalculateQuantification(params) {
 
 export function qtlsGWASLocusQCCalculation(params) {
   return async function (dispatch, getState) {
-    console.log('locus qc', params);
+    // console.log('locus qc', params);
     dispatch(
       updateQTLsGWAS({
         submitted: true,
@@ -1599,7 +1603,7 @@ export function qtlsGWASLocusQCCalculation(params) {
     axios
       .post('api/qtls-locus-qc', params)
       .then(async function (response) {
-        console.log('api/qtls-locus-qc response.data', response);
+        // console.log('api/qtls-locus-qc response.data', response);
         await dispatch(
           updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
         );
@@ -1671,7 +1675,7 @@ export function qtlsGWASLocusQCCalculation(params) {
 
 export function qtlsGWASLocusLDCalculation(params) {
   return async function (dispatch, getState) {
-    console.log('locus ld', params);
+    // console.log('locus ld', params);
     dispatch(
       updateQTLsGWAS({
         isLoadingLD: true,
@@ -1680,7 +1684,7 @@ export function qtlsGWASLocusLDCalculation(params) {
     axios
       .post('api/qtls-locus-ld', params)
       .then(function (response) {
-        console.log('api/qtls-locus-ld response.data', response);
+        // console.log('api/qtls-locus-ld response.data', response);
       })
       .catch(function (error) {
         console.log(error);
@@ -1702,7 +1706,7 @@ export function qtlsGWASLocusLDCalculation(params) {
 
 export function qtlsGWASColocVisualize(params) {
   return async function (dispatch, getState) {
-    console.log('coloc visualize', params);
+    // console.log('coloc visualize', params);
     dispatch(
       updateQTLsGWAS({
         isLoadingSummary: true,
@@ -1712,7 +1716,7 @@ export function qtlsGWASColocVisualize(params) {
     var ecaviarData;
 
     if (params.calcEcaviar) {
-      console.log('ecaviar', params);
+      // console.log('ecaviar', params);
       dispatch(
         updateQTLsGWAS({
           isLoadingECaviar: true,
@@ -1722,10 +1726,10 @@ export function qtlsGWASColocVisualize(params) {
       axios
         .post('api/qtls-locus-colocalization-ecaviar', params)
         .then(function (response) {
-          console.log(
-            'api/qtls-locus-colocalization-ecaviar response.data',
-            response.data
-          );
+          // console.log(
+          //   'api/qtls-locus-colocalization-ecaviar response.data',
+          //   response.data
+          // );
 
           ecaviarData = response.data['ecaviar']['data'][0];
 
@@ -1755,15 +1759,15 @@ export function qtlsGWASColocVisualize(params) {
           dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
 
           const newParams = { ...params, ecdata: ecaviarData };
-          console.log(newParams);
+          // console.log(newParams);
 
           axios
             .post('api/qtls-coloc-visualize', newParams)
             .then(function (response) {
-              console.log(
-                'api/qtls-locus-visualize response.data',
-                response.data
-              );
+              // console.log(
+              //   'api/qtls-locus-visualize response.data',
+              //   response.data
+              // );
             })
             .catch(function (error) {
               console.log(error);
@@ -1787,7 +1791,7 @@ export function qtlsGWASColocVisualize(params) {
       axios
         .post('api/qtls-coloc-visualize', params)
         .then(function (response) {
-          console.log('api/qtls-coloc-visualize response.data', response.data);
+          // console.log('api/qtls-coloc-visualize response.data', response.data);
         })
         .catch(function (error) {
           console.log(error);
@@ -1826,7 +1830,7 @@ export function qtlsGWASCalculation(params) {
     axios
       .post('api/qtls-calculate-main', params)
       .then(function (response) {
-        console.log('api/qtls-calculate-main response.data', response.data);
+        // console.log('api/qtls-calculate-main response.data', response.data);
 
         const { pdata, locus_alignment_plot_layout } =
           Object.keys(response.data['gwas']['data'][0]).length > 0 &&
@@ -2124,10 +2128,10 @@ export function qtlsGWASBoxplotsCalculation(params) {
     axios
       .post('api/qtls-locus-alignment-boxplots', params)
       .then(function (response) {
-        console.log(
-          'api/qtls-locus-alignment-boxplots response.data',
-          response.data
-        );
+        // console.log(
+        //   'api/qtls-locus-alignment-boxplots response.data',
+        //   response.data
+        // );
 
         const {
           pdata,
@@ -2199,7 +2203,7 @@ export function submitQueue(params) {
 
     try {
       const response = await axios.post('api/queue', params);
-      console.log('api/queue', response);
+      // console.log('api/queue', response);
       dispatch(
         updateSuccess({
           visible: true,
@@ -2233,7 +2237,7 @@ export function fetchResults(request) {
         submitted: true,
       })
     );
-    console.log(request);
+
     try {
       const { data } =
         request.request == 'sample'

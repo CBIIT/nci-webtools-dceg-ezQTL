@@ -6,7 +6,7 @@ import { updateQTLsGWAS } from '../../../../services/actions';
 export function LocusTable() {
   const dispatch = useDispatch();
 
-  const { locus_alignment, locus_table, inputs } = useSelector(
+  const { locus_alignment, locus_table, inputs, genome } = useSelector(
     (state) => state.qtlsGWAS
   );
 
@@ -145,7 +145,8 @@ export function LocusTable() {
             '-' +
             row.value.ref +
             '-' +
-            row.value.alt
+            row.value.alt +
+            `${genome.value === 'GRCh38' ? '?dataset=gnomad_r3' : ''}`
           }
           target="_blank"
           rel="noreferrer"

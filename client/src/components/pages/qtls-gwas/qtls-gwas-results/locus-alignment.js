@@ -135,15 +135,15 @@ export function LocusAlignment() {
                               locus_alignment_gwas_scatter_threshold: threshold,
                             })
                           );
-                          console.log('threshold', threshold, '');
+                          // console.log('threshold', threshold, '');
                           if (threshold >= 0.0) {
-                            console.log(
-                              'REDRAW SCATTER?',
-                              locus_alignment_gwas_scatter['raw'],
-                              null,
-                              locus_alignment['top']['gene_symbol'],
-                              threshold
-                            );
+                            // console.log(
+                            //   'REDRAW SCATTER?',
+                            //   locus_alignment_gwas_scatter['raw'],
+                            //   null,
+                            //   locus_alignment['top']['gene_symbol'],
+                            //   threshold
+                            // );
                             dispatch(
                               drawLocusAlignmentScatter(
                                 locus_alignment_gwas_scatter['raw'],
