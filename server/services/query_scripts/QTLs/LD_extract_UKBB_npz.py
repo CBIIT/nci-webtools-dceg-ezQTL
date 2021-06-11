@@ -363,7 +363,7 @@ def Process():
             Value = "%s_%s" % (targate_Start, targate_End)
             Targate_Dict.setdefault(targate_Chr, []).append(Value)
 
-        Targate_arr = Targate_Dict[query_Chr]
+    Targate_arr = Targate_Dict[query_Chr]
     return_Targated_Str = "0"
 
     for i in Targate_arr:
