@@ -74,118 +74,130 @@ export function LocusLD() {
           <div className="px-3 py-2">
             <Form className="row justify-content-between">
               <LoadingOverlay
-                active={!gwasFile && !associationFile}
+                active={
+                  !inputs ||
+                  (inputs.association_file[0] == 'false' &&
+                    inputs.gwas_file[0] == 'false')
+                }
                 content={<b>No QTL or GWAS data. Recalculation disabled.</b>}
               />
 
-              {(gwasFile || associationFile) && (
-                <>
-                  <div className="col-md-9">
-                    <Form.Group className="row">
-                      <div className="col-md-4">
-                        <Form.Label
-                          id="ld-association-data"
-                          className="mb-0 mr-auto"
-                        >
-                          LD Association Data
-                        </Form.Label>
-                        <ReactSelect
-                          isDisabled={!submitted}
-                          aria-labelledby="ld-association-data"
-                          inputId="qtls-results-ld-association-data"
-                          placeholder="None"
-                          value={ldAssocData}
-                          onChange={(option) => {
-                            dispatch(updateQTLsGWAS({ ldAssocData: option }));
-                            if (option.value === 'GWAS')
-                              dispatch(updateQTLsGWAS({ select_gene: '' }));
-                          }}
-                          options={[
-                            { value: 'QTL', label: 'QTL' },
-                            { value: 'GWAS', label: 'GWAS' },
-                          ]}
-                          styles={{
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                          }}
-                          menuPortalTarget={document.body}
-                          filterOption={createFilter({ ignoreAccents: false })}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <Form.Label className="mb-0">
-                          Trait for QTL{' '}
-                          {ldAssocData.value === 'QTL' && (
-                            <span
-                              style={{
-                                display:
-                                  submitted && !isLoading ? 'inline' : 'none',
-                                color: 'red',
-                              }}
-                            >
-                              *
-                            </span>
-                          )}
-                        </Form.Label>
-                        <ReactSelect
-                          isDisabled={!submitted || ldAssocData.value !== 'QTL'}
-                          inputId="qtls-results-gene-input"
-                          // label=""
-                          value={
-                            ldAssocData.value === 'QTL' ? select_gene : null
-                          }
-                          placeholder="None"
-                          options={gene_list ? gene_list.data : []}
-                          getOptionLabel={(option) => option.gene_symbol}
-                          getOptionValue={(option) => option.gene_id}
-                          onChange={(option) =>
-                            dispatch(updateQTLsGWAS({ select_gene: option }))
-                          }
-                          styles={{
-                            menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                          }}
-                          menuPortalTarget={document.body}
-                          filterOption={createFilter({ ignoreAccents: false })}
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <Form.Label
-                          id="ld-association-threshold"
-                          className="mb-0"
-                        >
-                          -log<sub>10</sub> Association Threshold
-                        </Form.Label>
-                        <Form.Control
-                          type="number"
-                          aria-labelledby="ld-association-threshold"
-                          step="any"
-                          min="0"
-                          id="qtls-ld-threshold"
-                          placeholder="None"
-                          disabled={!submitted}
-                          value={ldThreshold}
-                          onChange={(e) => {
-                            dispatch(
-                              updateQTLsGWAS({ ldThreshold: e.target.value })
-                            );
-                          }}
-                          // custom
-                        />
-                      </div>
-                    </Form.Group>
-                  </div>
-                  <div className="col-md-auto mt-4">
-                    <Button
-                      disabled={!submitted}
-                      className="d-block"
-                      variant="primary"
-                      type="button"
-                      onClick={() => handleRecalculate()}
-                    >
-                      Recalculate
-                    </Button>
-                  </div>
-                </>
-              )}
+              {inputs &&
+                (inputs.association_file[0] != 'false' ||
+                  inputs.gwas_file[0] != 'false') && (
+                  <>
+                    <div className="col-md-9">
+                      <Form.Group className="row">
+                        <div className="col-md-4">
+                          <Form.Label
+                            id="ld-association-data"
+                            className="mb-0 mr-auto"
+                          >
+                            LD Association Data
+                          </Form.Label>
+                          <ReactSelect
+                            isDisabled={!submitted}
+                            aria-labelledby="ld-association-data"
+                            inputId="qtls-results-ld-association-data"
+                            placeholder="None"
+                            value={ldAssocData}
+                            onChange={(option) => {
+                              dispatch(updateQTLsGWAS({ ldAssocData: option }));
+                              if (option.value === 'GWAS')
+                                dispatch(updateQTLsGWAS({ select_gene: '' }));
+                            }}
+                            options={[
+                              { value: 'QTL', label: 'QTL' },
+                              { value: 'GWAS', label: 'GWAS' },
+                            ]}
+                            styles={{
+                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            }}
+                            menuPortalTarget={document.body}
+                            filterOption={createFilter({
+                              ignoreAccents: false,
+                            })}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <Form.Label className="mb-0">
+                            Trait for QTL{' '}
+                            {ldAssocData.value === 'QTL' && (
+                              <span
+                                style={{
+                                  display:
+                                    submitted && !isLoading ? 'inline' : 'none',
+                                  color: 'red',
+                                }}
+                              >
+                                *
+                              </span>
+                            )}
+                          </Form.Label>
+                          <ReactSelect
+                            isDisabled={
+                              !submitted || ldAssocData.value !== 'QTL'
+                            }
+                            inputId="qtls-results-gene-input"
+                            // label=""
+                            value={
+                              ldAssocData.value === 'QTL' ? select_gene : null
+                            }
+                            placeholder="None"
+                            options={gene_list ? gene_list.data : []}
+                            getOptionLabel={(option) => option.gene_symbol}
+                            getOptionValue={(option) => option.gene_id}
+                            onChange={(option) =>
+                              dispatch(updateQTLsGWAS({ select_gene: option }))
+                            }
+                            styles={{
+                              menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                            }}
+                            menuPortalTarget={document.body}
+                            filterOption={createFilter({
+                              ignoreAccents: false,
+                            })}
+                          />
+                        </div>
+                        <div className="col-md-4">
+                          <Form.Label
+                            id="ld-association-threshold"
+                            className="mb-0"
+                          >
+                            -log<sub>10</sub> Association Threshold
+                          </Form.Label>
+                          <Form.Control
+                            type="number"
+                            aria-labelledby="ld-association-threshold"
+                            step="any"
+                            min="0"
+                            id="qtls-ld-threshold"
+                            placeholder="None"
+                            disabled={!submitted}
+                            value={ldThreshold}
+                            onChange={(e) => {
+                              dispatch(
+                                updateQTLsGWAS({ ldThreshold: e.target.value })
+                              );
+                            }}
+                            // custom
+                          />
+                        </div>
+                      </Form.Group>
+                    </div>
+                    <div className="col-md-auto mt-4">
+                      <Button
+                        disabled={!submitted}
+                        className="d-block"
+                        variant="primary"
+                        type="button"
+                        onClick={() => handleRecalculate()}
+                      >
+                        Recalculate
+                      </Button>
+                    </div>
+                  </>
+                )}
             </Form>
           </div>
           <hr />
