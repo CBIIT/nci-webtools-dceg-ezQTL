@@ -349,7 +349,7 @@ def Process():
     client = boto3.client('s3')
 
     listBucket = client.list_objects_v2(
-        Bucket=bucket, Prefix='ezQTL/UKBB_LD/%s' % (query_Chr), MaxKeys=6000)
+        Bucket=bucket, Prefix='ezQTL/UKBB_LD/%s_' % (query_Chr), MaxKeys=6000)
 
     Targate_Dict = {}
 
