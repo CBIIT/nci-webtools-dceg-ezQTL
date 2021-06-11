@@ -56,16 +56,16 @@ export function Help() {
       </div>
       <div className="mt-5" id="input-file-format">
         <p>
-          <b>Input file format of ezQTL</b>
+          <b>Input File Format of ezQTL</b>
         </p>
         <p>
           On the left panel of the "Analyses” tab, you can click{' '}
           <a href="assets/files/MX2.examples.gz" download>
             Downloaded example files
-          </a>
+          </a>{' '}
           to download the example files for a locus in a melanoma GWAS study.
           Also, you could load them automatically in the ezQTL and check results
-          by clicking "load Sample Data”. The QTLs association input files for
+          by clicking "Load Sample Data”. The QTLs association input files for
           ezQTL can have a very general format of QTL (e.g. QTL downloaded from
           the{' '}
           <a
@@ -625,7 +625,7 @@ export function Help() {
           sources.
         </p>
         <p>
-          Please <a href="mailto:http://tongwu.zhang@nih.gov">contact us</a> if
+          Please <a href="mailto:tongwu.zhang@nih.gov">contact us (tongwu.zhang@nih.gov)</a> if
           you have any public full association data not included here.
         </p>
       </div>
@@ -680,7 +680,7 @@ export function Help() {
             HyPrColoc
           </a>{' '}
           to prioritize the common "causal” variants for the shared genetic
-          etiology across multiple related traits. Two tables were generated
+          etiology across multiple related traits. Two tables are generated
           including the colocalized traits information, potential causal
           variants and variant ranked scores. The third method is{' '}
           <a
@@ -729,7 +729,7 @@ export function Help() {
           some loci. There have been extensive efforts in developing and
           applying different colocalization approaches. Currently, ezQTL only
           includes two widely used algorithms eCAVIAR and HyPrColoc based on
-          their performance. We may include more colocalization algorithms in
+          their performance. We may include additional colocalization algorithms in
           the future.
         </p>
         <p className="ml-3">

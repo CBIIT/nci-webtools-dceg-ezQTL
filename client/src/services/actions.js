@@ -1662,7 +1662,7 @@ export function qtlsGWASLocusQCCalculation(params) {
           dispatch(updateError({ visible: true }));
           dispatch(
             updateQTLsGWAS({
-              qcError: 'Error occured in QC calculation',
+              qcError: 'Error occurred in QC calculation',
               isLoading: false,
               isLoadingQC: false,
               isError: true,
@@ -1693,7 +1693,7 @@ export function qtlsGWASLocusLDCalculation(params) {
           dispatch(updateError({ visible: true }));
           dispatch(
             updateQTLsGWAS({
-              ldError: 'Error occured in LD calculation',
+              ldError: 'Error occurred in LD calculation',
               activeResultsTab: 'locus-qc',
             })
           );
