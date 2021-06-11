@@ -40,7 +40,7 @@ export const getInitialState = async () => {
       gene_list: null,
       traitID: '',
       genotypeID: '',
-      log2: true,
+      log2: false,
       inputs: null,
       messages: null,
       locus_quantification: null,
@@ -152,7 +152,7 @@ export const getInitialState = async () => {
     },
     publications: {
       globalFilter: '',
-      hidden: ['Study_website', 'Pubmed'],
+      hidden: ['Pubmed'],
       pagination: { pageIndex: 0, pageSize: 10 },
       sort: [{ id: 'Year', desc: true }],
     },

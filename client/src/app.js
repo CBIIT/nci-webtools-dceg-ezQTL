@@ -83,7 +83,7 @@ export function App() {
             }
             
             else if (
-              column == 'Title' &&
+              (column == 'Title' || column == 'Pubmed') &&
               e.row.values['Pubmed'] &&
               e.row.values['Pubmed'] != 'NA'
             ) {
