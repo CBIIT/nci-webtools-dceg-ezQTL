@@ -53,6 +53,11 @@ qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, e
 
   if(identical(genotypeID,''))
     genotypeID <- NULL
+  
+  if(identical(log2,'true'))
+    log2 <- TRUE
+  else
+    log2 <- FALSE
 
   locus_quantification_qtl(gdata,edata,genotypeID,traitID,qtlPath,log2)
 }

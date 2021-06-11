@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overlay';
 import { Form, Button } from 'react-bootstrap';
@@ -22,9 +22,21 @@ export function LocusQuantifiation() {
     isLoadingQuantification,
   } = useSelector((state) => state.qtlsGWAS);
 
+  const [_log2, setLog2] = useState({ value: false, label: 'False' });
+
+  useEffect(() => {
+    if(log2)
+      setLog2({ value: true, label: 'True' })
+    else
+      setLog2({ value: false, label: 'False' })
+  }, []);
+
   const dispatch = useDispatch();
 
   async function handleRecalculate() {
+
+    dispatch( updateQTLsGWAS({ log2: _log2.value }))
+
     dispatch(
       qtlsGWASCalculateQuantification({
         request: request,
@@ -33,7 +45,7 @@ export function LocusQuantifiation() {
         genoFile: genotypeFile,
         traitID: traitID,
         genotypeID: genotypeID,
-        log2: log2.value,
+        log2: _log2.value
       })
     );
   }
@@ -136,9 +148,9 @@ export function LocusQuantifiation() {
                       isDisabled={!submitted}
                       aria-labelledby="quantification-log"
                       inputId="qtls-results-quantification-log2"
-                      value={log2}
+                      value={_log2}
                       onChange={(option) => {
-                        dispatch(updateQTLsGWAS({ log2: option }));
+                        setLog2(option)
                       }}
                       options={[
                         { value: true, label: 'True' },

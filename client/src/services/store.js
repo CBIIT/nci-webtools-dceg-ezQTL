@@ -40,7 +40,7 @@ export const getInitialState = async () => {
       gene_list: null,
       traitID: '',
       genotypeID: '',
-      log2: true,
+      log2: false,
       inputs: null,
       messages: null,
       locus_quantification: null,
