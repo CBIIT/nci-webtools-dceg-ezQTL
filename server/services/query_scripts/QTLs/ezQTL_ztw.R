@@ -769,9 +769,13 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       count(gene_id,gene_symbol) %>% 
       filter(n<100) 
     
-    if(dim(qtl_rm)[1]>0){
+     if(dim(qtl_rm)[1]>0){
       qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
-      cat(paste0('# number of QTL traits are removed due to low number of SNPs: ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+      cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+      if( dim(qtl)[1] == 0){
+        cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
+        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
+      }
     }
     
     qtl %>% write_delim(file=paste0(output_prefix,"_qtl.txt"),delim = '\t',col_names = T)
