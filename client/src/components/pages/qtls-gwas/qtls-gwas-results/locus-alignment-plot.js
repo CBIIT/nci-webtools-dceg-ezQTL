@@ -6,7 +6,7 @@ import { Button } from 'react-bootstrap';
 import {
   updateQTLsGWAS,
   qtlsGWASBoxplotsCalculation,
-  qtlsGWASLocusQCCalculation,
+  qtlsGWASCalculation,
 } from '../../../../services/actions';
 
 export function LocusAlignmentPlot(params) {
@@ -94,6 +94,7 @@ export function LocusAlignmentPlot(params) {
       select_gene: inputs['select_gene'][0],
       select_dist: inputs['select_dist'][0],
       select_ref: recalcRSNum,
+      recalculate: false,
       recalculateAttempt: false,
       recalculatePop: false,
       recalculateGene: false,
@@ -137,7 +138,7 @@ export function LocusAlignmentPlot(params) {
       })
     );
 
-    dispatch(qtlsGWASLocusQCCalculation(params));
+    dispatch(qtlsGWASCalculation(params));
   }
 
   return (
