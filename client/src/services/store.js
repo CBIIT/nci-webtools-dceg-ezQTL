@@ -138,7 +138,7 @@ export const getInitialState = async () => {
     errorModal: {
       visible: false,
       details: ``,
-      message: `An error occurred when requesting data. If this problem persists, please contact the administrator at <a href="mailto:NCIvQTLWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
+      message: `An error occurred when requesting data. If this problem persists, please contact the administrator at <a href="mailto:NCIezQTLWebAdmin@mail.nih.gov">NCIezQTLWebAdmin@mail.nih.gov</a>.`,
     },
     successModal: {
       visible: false,

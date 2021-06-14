@@ -487,7 +487,7 @@ export function Help() {
           The "rsnum” is used as index id linking GWAS data to QTL Data and LD
           Matrix Data. An example script has been included in the ezQTL{' '}
           <a
-            href="https://github.com/CBIIT/nci-webtools-dceg-vQTL"
+            href="https://github.com/CBIIT/nci-webtools-dceg-ezQTL"
             target="_blank"
             rel="noreferrer"
           >
@@ -625,7 +625,7 @@ export function Help() {
           sources.
         </p>
         <p>
-          Please <a href="mailto:tongwu.zhang@nih.gov">contact us (tongwu.zhang@nih.gov)</a> if
+          Please <a href="mailto:ezQTLWebAdmin@cancer.gov">contact us (ezQTLWebAdmin@cancer.gov)</a> if
           you have any public full association data not included here.
         </p>
       </div>

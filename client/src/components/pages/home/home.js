@@ -271,7 +271,7 @@ export function Home() {
         <p>
           ezQTL’s{' '}
           <a
-            href="https://github.com/CBIIT/nci-webtools-dceg-vQTL"
+            href="https://github.com/CBIIT/nci-webtools-dceg-ezQTL"
             target="_blank"
             rel="noreferrer"
           >
@@ -293,7 +293,7 @@ export function Home() {
         </p>
         <p>
           Questions or comments? Contact us via{' '}
-          <a href="mailto:tongwu.zhang@nih.gov">email</a>.
+          <a href="mailto:ezQTLWebAdmin@cancer.gov">email</a>.
         </p>
       </div>
     </div>
