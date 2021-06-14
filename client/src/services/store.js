@@ -18,7 +18,7 @@ export const getInitialState = async () => {
       select_gene: false,
       locusInformation: [
         {
-          select_dist: 50,
+          select_dist: 75,
           select_ref: false,
           select_position: '',
           select_chromosome: false,
