@@ -8,12 +8,21 @@ export function ErrorModal(props) {
   const errorModal = useSelector((state) => state.errorModal);
   const closeErrorModal = () => dispatch(updateError({ visible: false }));
 
+  function handleClose() {
+    closeErrorModal();
+    dispatch(
+      updateError({
+        message: `An error occurred when requesting data. If this problem persists, please contact the administrator at <a href="mailto:NCIvQTLWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
+      })
+    );
+  }
+
   return (
     <Modal
       data-testid="ErrorModal"
       show={errorModal.visible}
-      onHide={closeErrorModal}
-      style={{zIndex: '999999'}}
+      onHide={() => handleClose()}
+      style={{ zIndex: '999999' }}
     >
       <Modal.Header closeButton>
         <Modal.Title>Internal Server Error</Modal.Title>
@@ -28,7 +37,7 @@ export function ErrorModal(props) {
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="secondary" onClick={closeErrorModal}>
+        <Button variant="secondary" onClick={() => handleClose()}>
           Close
         </Button>
       </Modal.Footer>

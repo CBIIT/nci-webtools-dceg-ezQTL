@@ -1656,20 +1656,26 @@ export function qtlsGWASLocusQCCalculation(params) {
           );
         }
       })
-      .catch(function (error) {
-        console.log(error);
-        if (error) {
-          dispatch(updateError({ visible: true }));
-          dispatch(
-            updateQTLsGWAS({
-              qcError: 'Error occurred in QC calculation',
-              isLoading: false,
-              isLoadingQC: false,
-              isError: true,
-              // activeResultsTab: 'locus-qc',
-            })
-          );
-        }
+      .catch(function ({ response }) {
+        console.error(response);
+
+        dispatch(
+          updateError({
+            visible: true,
+            message:
+              response.data.error ||
+              `An error occurred when requesting data. If this problem persists, please contact the administrator at <a href="mailto:NCIvQTLWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
+          })
+        );
+        dispatch(
+          updateQTLsGWAS({
+            qcError: response.data.error || 'Error occurred in QC calculation',
+            isLoading: false,
+            isLoadingQC: false,
+            isError: true,
+            // activeResultsTab: 'locus-qc',
+          })
+        );
       });
   };
 }
@@ -1939,7 +1945,7 @@ export function qtlsGWASCalculation(params) {
       .then(function () {
         // execute if no error and gwas data exists
         const qtlsGWAS = getState().qtlsGWAS;
-        if (!qtlsGWAS.isError ) {
+        if (!qtlsGWAS.isError) {
           if (
             qtlsGWAS.gwas &&
             qtlsGWAS.gwas.data &&
@@ -1982,8 +1988,8 @@ export function qtlsGWASCalculation(params) {
 
           if (
             (qtlsGWAS.LDFile ||
-            qtlsGWAS.ldKey ||
-            qtlsGWAS.select_qtls_samples) &&
+              qtlsGWAS.ldKey ||
+              qtlsGWAS.select_qtls_samples) &&
             !qtlsGWAS.recalculate
           ) {
             dispatch(

@@ -416,7 +416,7 @@ async function calculateQC(params) {
 async function qtlsCalculateQC(params, res, next) {
   const { request, workingDirectory } = params;
 
-  logger.info(`[${request}] Execute /ezQTL_ztw`);
+  logger.info(`[${request}] Execute /qtlsCalculateQC`);
   logger.debug(
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
@@ -425,19 +425,23 @@ async function qtlsCalculateQC(params, res, next) {
 
   try {
     const wrapper = await calculateQC(params);
+    const data = JSON.parse(wrapper);
+    if (data.error) {
+      res.status(418).json({ ...data });
+    } else {
+      let summary = '';
+      if (fs.existsSync(logPath)) {
+        summary = String(await fs.promises.readFile(logPath));
+      }
 
-    let summary = '';
-    if (fs.existsSync(logPath)) {
-      summary = String(await fs.promises.readFile(logPath));
+      summary = summary.replace(/#/g, '\u2022');
+      summary = summary.split('\n\n');
+
+      logger.info(`[${request}] Finished /qtlsCalculateQC`);
+      res.json(summary);
     }
-
-    summary = summary.replace(/#/g, '\u2022');
-    summary = summary.split('\n\n');
-
-    logger.info(`[${request}] Finished /ezqTL_ztw`);
-    res.json(summary);
   } catch (err) {
-    logger.error(`[${request}] Error /ezqTL_ztw ${err}`);
+    logger.error(`[${request}] Error /qtlsCalculateQC ${err}`);
     res.status(500).json(err);
   }
 }

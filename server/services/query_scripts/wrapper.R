@@ -24,7 +24,7 @@ qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, sele
   main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket)
 }
 
-qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, exprFile, genoFile, traitID, genotypeID, log2, request, bucket){
+qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, exprFile, genoFile, traitID, genotypeID, log2, request, bucket) {
   source(rfile)
 
   if (identical(select_qtls_samples, 'false')) {
@@ -34,7 +34,7 @@ qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, e
     gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
     edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
   }
-  
+
   gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
   # check if there are multiple chromosomes in the input genotype file
   if (length(unique(gdata$chr)) > 1) {
@@ -48,18 +48,18 @@ qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, e
 
   qtlPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_qtl.svg')
 
-  if(identical(traitID,''))
+  if (identical(traitID, ''))
     traitID <- NULL
 
-  if(identical(genotypeID,''))
+  if (identical(genotypeID, ''))
     genotypeID <- NULL
-  
-  if(identical(log2,'true'))
+
+  if (identical(log2, 'true'))
     log2 <- TRUE
   else
     log2 <- FALSE
 
-  locus_quantification_qtl(gdata,edata,genotypeID,traitID,qtlPath,log2)
+  locus_quantification_qtl(gdata, edata, genotypeID, traitID, qtlPath, log2)
 }
 
 qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, request, bucket) {
@@ -188,9 +188,13 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   else
     gwasPublic <- TRUE
 
-
-  print(ldFile)
-  coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
+  tryCatch({
+    coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
+  }, error = function(e) {
+    library(jsonlite)
+    print(e)
+    return(toJSON(list(error = e$message), pretty = TRUE, auto_unbox = TRUE))
+  })
 }
 
 qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {

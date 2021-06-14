@@ -26,7 +26,7 @@ formatM_input<- function(tfile){
 
 
 coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub=FALSE, ldfile=NULL,ldfile_pub=FALSE, leadsnp=NULL,leadpos=NULL, distance=100000,zscore_gene=NULL,output_plot_prefix=NULL, output_prefix="./ezQTL_input", logfile="ezQTL.log"){
-  
+
   ainfo <- paste0("ezQTL Analysis Starting QC at ",Sys.time())
   cat(ainfo,file=logfile,sep="\n",append = FALSE)
   
@@ -442,21 +442,25 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     ## output final dataset
     qtl <- qtl %>% filter(rsnum %in% orsnum)
-    total_traits <- qtl %>% count(gene_id,gene_symbol) %>% dim() %>% .[[1]]
-    total_traits <- ceiling(total_traits*0.2)
-    total_traits <- if_else(total_traits>50,50,total_traits)
+    total_snp <- qtl %>% count(rsnum) %>% dim() %>% .[[1]]
+    total_snp <- ceiling(total_snp*0.2)
+    total_snp <- if_else(total_snp>25,25,total_snp)
     qtl_rm <- qtl %>% mutate(diff=abs(pos-leadpos),direction=if_else(pos>leadpos,"+","-")) %>%
       filter(diff!=0) %>% 
       group_by(gene_symbol,gene_id,direction) %>%
       arrange(diff) %>% 
-      slice(1:total_traits) %>% 
+      slice(1:total_snp) %>% 
       ungroup() %>% 
       count(gene_id,gene_symbol) %>% 
-      filter(n<2*total_traits) 
-    
+      filter(n<2*total_snp) 
+
     if(dim(qtl_rm)[1]>0){
       qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
-      cat(paste0('# number of QTL traits are removed due to low number of SNPs: ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+      cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+      if( dim(qtl)[1] == 0){
+        cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
+        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
+      }
     }
     
     qtl %>% write_delim(file=paste0(output_prefix,"_qtl.txt"),delim = '\t',col_names = T)
@@ -608,21 +612,25 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     
     ## output final dataset
     qtl <- qtl %>% filter(rsnum %in% orsnum)
-    total_traits <- qtl %>% count(gene_id,gene_symbol) %>% dim() %>% .[[1]]
-    total_traits <- ceiling(total_traits*0.2)
-    total_traits <- if_else(total_traits>50,50,total_traits)
+    total_snp <- qtl %>% count(rsnum) %>% dim() %>% .[[1]]
+    total_snp <- ceiling(total_snp*0.2)
+    total_snp <- if_else(total_snp>50,50,total_snp)
     qtl_rm <- qtl %>% mutate(diff=abs(pos-leadpos),direction=if_else(pos>leadpos,"+","-")) %>%
       filter(diff!=0) %>% 
       group_by(gene_symbol,gene_id,direction) %>%
       arrange(diff) %>% 
-      slice(1:total_traits) %>% 
+      slice(1:total_snp) %>% 
       ungroup() %>% 
       count(gene_id,gene_symbol) %>% 
-      filter(n<2*total_traits) 
-    
+      filter(n<2*total_snp) 
+
     if(dim(qtl_rm)[1]>0){
       qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
-      cat(paste0('# number of QTL traits are removed due to low number of SNPs: ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+      cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
+      if(dim(qtl)[1]==0){
+        cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
+        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
+      }
     }
     
     qtl %>% write_delim(file=paste0(output_prefix,"_qtl.txt"),delim = '\t',col_names = T)
@@ -1111,7 +1119,7 @@ ecaviar_visualize <- function(ecdata,output_plot_prefix=NULL,plot_width=NULL,plo
 
 coloc_visualize <- function(hydata,ecdata,output_plot=NULL,plot_width=NULL,plot_height=NULL){
   
-  if(dim(ecdata)[1]==0 && dim(hydata)[1]==0){
+  if(dim(ecdata)[1]==0 & dim(hydata)[1]==0){
     
     labeltext="No eCAVIAR and HyPerColoc results found. please check the Locus QC or inputs."
     p <- ggplot()+geom_text(aes(x=1,y=1,label=labeltext),family="Roboto Condensed",size=5)+theme_nothing()
@@ -1347,7 +1355,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
                             marker2label_size = 1) {
   
   
-  if(is.null(association_file) && is.null(leadsnp) && is.null(leadsnp_pos)){
+  if(is.null(association_file) & is.null(leadsnp) & is.null(leadsnp_pos)){
     stop("You have to input the SNP in the locus informaiton for the LD visualization.")
   }
   
