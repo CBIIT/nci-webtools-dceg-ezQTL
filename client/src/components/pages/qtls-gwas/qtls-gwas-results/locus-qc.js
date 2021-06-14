@@ -31,7 +31,7 @@ export function LocusQC() {
       {submitted && qcError && (
         <LoadingOverlay
           active={true}
-          content={<b className="text-danger text-center">{qcError}</b>}
+          content={<b className="text-danger">{qcError}</b>}
         />
       )}
       {submitted && locus_qc && !qcError && !isLoading && !isLoadingQC && (
