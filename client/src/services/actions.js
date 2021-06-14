@@ -1604,72 +1604,83 @@ export function qtlsGWASLocusQCCalculation(params) {
       .post('api/qtls-locus-qc', params)
       .then(async function (response) {
         // console.log('api/qtls-locus-qc response.data', response);
-        await dispatch(
-          updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
-        );
 
-        const qtlsGWAS = getState().qtlsGWAS;
-
-        if (
-          qtlsGWAS.associationFile ||
-          qtlsGWAS.qtlKey ||
-          qtlsGWAS.select_qtls_samples
-        ) {
-          params.associationFile = 'ezQTL_input_qtl.txt';
-        }
-
-        if (qtlsGWAS.LDFile || qtlsGWAS.ldKey || qtlsGWAS.select_qtls_samples) {
-          params.LDFile = 'ezQTL_input_ld.gz';
-        }
-
-        if (
-          qtlsGWAS.gwasFile ||
-          qtlsGWAS.gwasKey ||
-          qtlsGWAS.select_gwas_sample
-        ) {
-          params.gwasFile = 'ezQTL_input_gwas.txt';
-        }
-
-        params.recalculate = false;
-
-        if (params.associationFile || params.gwasFile) {
-          await dispatch(qtlsGWASCalculation(params));
-        } else if (params.LDFile) {
-          await dispatch(
-            updateQTLsGWAS({ isLoading: false, request: params.request })
-          );
-          await dispatch(
-            qtlsGWASLocusLDCalculation({
-              request: params.request,
-              select_gwas_sample: qtlsGWAS.select_gwas_sample,
-              select_qtls_samples: qtlsGWAS.select_qtls_samples,
-              gwasFile: params.gwasFile,
-              associationFile: params.associationFile,
-              LDFile: params.LDFile,
-              leadsnp: params.select_ref,
-              position: params.select_position,
-              genome_build: qtlsGWAS.genome.value,
-              select_gene: qtlsGWAS.select_gene,
-              ldThreshold: qtlsGWAS.ldThreshold,
-              ldAssocData: qtlsGWAS.ldAssocData,
+        if (response.data.error) {
+          dispatch(
+            updateQTLsGWAS({
+              qcError:
+                response.data.error || 'Error occurred in QC calculation',
+              isLoading: false,
+              isLoadingQC: false,
+              isError: true,
+              // activeResultsTab: 'locus-qc',
             })
           );
+        } else {
+          await dispatch(
+            updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
+          );
+
+          const qtlsGWAS = getState().qtlsGWAS;
+
+          if (
+            qtlsGWAS.associationFile ||
+            qtlsGWAS.qtlKey ||
+            qtlsGWAS.select_qtls_samples
+          ) {
+            params.associationFile = 'ezQTL_input_qtl.txt';
+          }
+
+          if (
+            qtlsGWAS.LDFile ||
+            qtlsGWAS.ldKey ||
+            qtlsGWAS.select_qtls_samples
+          ) {
+            params.LDFile = 'ezQTL_input_ld.gz';
+          }
+
+          if (
+            qtlsGWAS.gwasFile ||
+            qtlsGWAS.gwasKey ||
+            qtlsGWAS.select_gwas_sample
+          ) {
+            params.gwasFile = 'ezQTL_input_gwas.txt';
+          }
+
+          params.recalculate = false;
+
+          if (params.associationFile || params.gwasFile) {
+            await dispatch(qtlsGWASCalculation(params));
+          } else if (params.LDFile) {
+            await dispatch(
+              updateQTLsGWAS({ isLoading: false, request: params.request })
+            );
+            await dispatch(
+              qtlsGWASLocusLDCalculation({
+                request: params.request,
+                select_gwas_sample: qtlsGWAS.select_gwas_sample,
+                select_qtls_samples: qtlsGWAS.select_qtls_samples,
+                gwasFile: params.gwasFile,
+                associationFile: params.associationFile,
+                LDFile: params.LDFile,
+                leadsnp: params.select_ref,
+                position: params.select_position,
+                genome_build: qtlsGWAS.genome.value,
+                select_gene: qtlsGWAS.select_gene,
+                ldThreshold: qtlsGWAS.ldThreshold,
+                ldAssocData: qtlsGWAS.ldAssocData,
+              })
+            );
+          }
         }
       })
       .catch(function ({ response }) {
         console.error(response);
 
-        dispatch(
-          updateError({
-            visible: true,
-            message:
-              response.data.error ||
-              `An error occurred when requesting data. If this problem persists, please contact the administrator at <a href="mailto:NCIvQTLWebAdmin@cancer.gov">ezQTLWebAdmin@cancer.gov</a>.`,
-          })
-        );
+        dispatch(updateError({ visible: true }));
         dispatch(
           updateQTLsGWAS({
-            qcError: response.data.error || 'Error occurred in QC calculation',
+            qcError: 'Error occurred in QC calculation',
             isLoading: false,
             isLoadingQC: false,
             isError: true,

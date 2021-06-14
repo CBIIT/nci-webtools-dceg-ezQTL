@@ -194,7 +194,7 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   }, error = function(e) {
     library(jsonlite)
     print(e)
-    return(toJSON(list(error = e$message), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list(error = e$message, stack = deparse(sys.calls())), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 

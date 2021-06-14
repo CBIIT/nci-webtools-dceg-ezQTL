@@ -427,7 +427,7 @@ async function qtlsCalculateQC(params, res, next) {
     const wrapper = await calculateQC(params);
     const data = JSON.parse(wrapper);
     if (data.error) {
-      res.status(400).json({ ...data });
+      res.json(data);
     } else {
       let summary = '';
       if (fs.existsSync(logPath)) {
