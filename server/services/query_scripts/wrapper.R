@@ -173,6 +173,11 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   if (identical(leadsnp, 'false'))
     leadsnp <- NULL
 
+  if (identical(select_position, 'false'))
+    leadpos <- NULL
+  else
+    leadpos <- select_position
+
   if (identical(qtlPublic, 'false'))
     qtlPublic <- FALSE
   else
@@ -188,13 +193,15 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   else
     gwasPublic <- TRUE
 
+
+
   tryCatch({
-    coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, NULL, cedistance, NULL, plotPath, inputPath, logPath)
+    coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, leadpos, cedistance, NULL, plotPath, inputPath, logPath)
     return('{}')
   }, error = function(e) {
     library(jsonlite)
     print(e)
-    return(toJSON(list(error = e$message, stack = deparse(sys.calls())), pretty = TRUE, auto_unbox = TRUE))
+    return(toJSON(list(error = e$message), pretty = TRUE, auto_unbox = TRUE))
   })
 }
 
