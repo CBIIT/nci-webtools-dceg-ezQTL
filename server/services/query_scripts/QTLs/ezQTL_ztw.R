@@ -283,6 +283,20 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     ggsave(filename = paste0(output_plot_prefix,"_QC_QTLminP.svg"),plot = pall0,width = 12,height = 4)
   }
   
+  # check the chromosome 
+  chr_gwas <- chr_qtl <- chr_ld <- NULL
+  if(!is.null(gwasfile)){ chr_gwas=gwas %>% slice(1) %>% pull(chr)}
+  if(!is.null(qtlfile)){ chr_qtl=qtl %>% slice(1) %>% pull(chr)}
+  if(!is.null(ldfile)){ chr_ld=ld.info %>% slice(1) %>% pull(chr)}
+  
+  if(
+    (!is.null(gwasfile) & !is.null(qtlfile) & isTRUE(chr_gwas != chr_qtl)) | (!is.null(gwasfile) & !is.null(ldfile) & isTRUE(chr_gwas != chr_ld)) | (!is.null(ldfile) & !is.null(qtlfile) & isTRUE(chr_ld != chr_qtl))
+  ){
+    errinfo <- "ERROR: found different chromosomes among GWAS/QTL/LD datasets, please check the inputs"
+    stop(errinfo)
+  }
+  
+  
   
   # Summary of the dataset --------------------------------------------------
   
