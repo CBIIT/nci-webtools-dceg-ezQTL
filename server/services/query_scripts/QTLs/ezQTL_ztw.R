@@ -26,7 +26,7 @@ formatM_input<- function(tfile){
 
 
 coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub=FALSE, ldfile=NULL,ldfile_pub=FALSE, leadsnp=NULL,leadpos=NULL, distance=100000,zscore_gene=NULL,output_plot_prefix=NULL, output_prefix="./ezQTL_input", logfile="ezQTL.log"){
-
+  
   ainfo <- paste0("ezQTL Analysis Starting QC at ",Sys.time())
   cat(ainfo,file=logfile,sep="\n",append = FALSE)
   
@@ -172,23 +172,42 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   }
   
   if(!is.null(leadsnp)) {
-    cat(paste0("\nLocus summary\nReference SNP and the window size for input SNPs selection: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
+    cat(paste0("\nLocus summary"),file=logfile,sep="\n",append = T)
     if(!is.null(gwasfile)){
+      if(!leadsnp %in% gwas$rsnum){ 
+        leadsnp0 <- gwas %>% arrange(pvalue) %>% slice(1) %>% pull(rsnum)
+        cat(paste0("Reference SNP ",leadsnp,' does not exist in GWAS file. Use the most significant SNP ',leadsnp0, ' as the reference SNP'),file=logfile,sep="\n",append = T)
+        leadsnp <- leadsnp0
+      }
+      
       leadchr <- gwas %>% filter(rsnum==leadsnp) %>% pull(chr)
       if(is.null(leadpos)) {leadpos <- gwas %>% filter(rsnum==leadsnp) %>% pull(pos)}
       
     }else{
       if(!is.null(qtlfile)) {
+        if(!leadsnp %in% qtl$rsnum){ 
+          leadsnp0 <- qtl %>% arrange(pval_nominal) %>% slice(1) %>% pull(rsnum)
+          cat(paste0("Reference SNP ",leadsnp,' does not exist in QTL file. Use the most significant SNP ',leadsnp0, ' as the reference SNP'),file=logfile,sep="\n",append = T)
+          leadsnp <- leadsnp0
+        }
+        
         leadchr <- qtl %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(chr) 
         if(is.null(leadpos)) {leadpos <- qtl %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(pos)}
       }else{
         if(!is.null(ldfile)){
+          if(!leadsnp %in% ld.info$rsnum){ 
+            leadsnp0 <- ld.info %>% arrange(pos) %>% slice(ceiling(n()/2))%>% pull(rsnum)
+            cat(paste0("Reference SNP ",leadsnp,' does not exist in LD file. Use the middle SNP ',leadsnp0, ' as the reference SNP'),file=logfile,sep="\n",append = T)
+            leadsnp <- leadsnp0
+          }
+          
           leadchr <- ld.info %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(chr) 
           if(is.null(leadpos)) {leadpos <- ld.info %>% filter(rsnum==leadsnp) %>% slice(1) %>% pull(pos)}
         }
       }
     }
     
+    cat(paste0("Reference SNP and the window size for input SNPs selection: ",leadsnp,' and distance: ',distance),file=logfile,sep="\n",append = T)
     
     leadpos1 <- leadpos - distance
     leadpos2 <- leadpos + distance
@@ -453,7 +472,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ungroup() %>% 
       count(gene_id,gene_symbol) %>% 
       filter(n<2*total_snp) 
-
+    
     if(dim(qtl_rm)[1]>0){
       qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
       cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
@@ -623,7 +642,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       ungroup() %>% 
       count(gene_id,gene_symbol) %>% 
       filter(n<2*total_snp) 
-
+    
     if(dim(qtl_rm)[1]>0){
       qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
       cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
@@ -769,13 +788,9 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       count(gene_id,gene_symbol) %>% 
       filter(n<100) 
     
-     if(dim(qtl_rm)[1]>0){
+    if(dim(qtl_rm)[1]>0){
       qtl <- qtl %>% filter(!(gene_id %in% qtl_rm$gene_id))
-      cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
-      if( dim(qtl)[1] == 0){
-        cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
-        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
-      }
+      cat(paste0('# number of QTL traits are removed due to low number of SNPs: ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
     }
     
     qtl %>% write_delim(file=paste0(output_prefix,"_qtl.txt"),delim = '\t',col_names = T)
