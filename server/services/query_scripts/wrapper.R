@@ -194,9 +194,8 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
     gwasPublic <- TRUE
 
 
-
   tryCatch({
-    coloc_QC(gwasFile, gwasPublic, associationFile, qtlPublic, ldFile, ldPublic, leadsnp, leadpos, cedistance, NULL, plotPath, inputPath, logPath)
+    coloc_QC(gwasfile = gwasFile, gwasfile_pub = gwasPublic, qtlfile = associationFile, qtlfile_pub = qtlPublic, ldfile = ldFile, ldfile_pub = ldPublic, leadsnp = leadsnp, leadpos = leadpos, distance = cedistance, zscore_gene = NULL, output_plot_prefix = plotPath, output_prefix = inputPath, logfile = logPath)
     return('{}')
   }, error = function(e) {
     library(jsonlite)
