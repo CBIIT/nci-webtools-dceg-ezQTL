@@ -292,8 +292,8 @@ export function Home() {
           approved license.
         </p>
         <p>
-          Questions or comments? Contact us via{' '}
-          <a href="mailto:ezQTLWebAdmin@cancer.gov">email</a>.
+          Questions or comments? Contact {' '}
+          <a href="mailto:tongwu.zhang@nih.gov">tongwu.zhang@nih.gov</a>.
         </p>
       </div>
     </div>
