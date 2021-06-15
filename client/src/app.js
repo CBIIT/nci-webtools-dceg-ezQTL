@@ -234,6 +234,85 @@ export function App() {
             <div className="h6">at the National Cancer Institute</div>
           </div>
         }
+        columns={
+          [
+            {
+              title: "CONTACT INFORMATION", 
+              links: [
+                {
+                  title: "Contact Us", 
+                  href: "https://www.cancer.gov/contact"
+                },
+                {
+                  title: "Support", 
+                  href: "mailto:NCIezQTLWebAdmin@mail.nih.gov"
+                }
+              ]
+            },
+            {
+              title: "MORE INFORMATION", 
+              links: [
+                {
+                  title: "About This Website", 
+                  href: "https://www.cancer.gov/about-website"
+                },
+                {
+                  title: "Multimedia", 
+                  href: "https://www.cancer.gov/multimedia"
+                },
+                {
+                  title: "Publications", 
+                  href: "https://www.cancer.gov/publications"
+                },
+                {
+                  title: "Site Map", 
+                  href: "https://www.cancer.gov/about-website/sitemap"
+                },
+                {
+                  title: "Digital Standards for NCI Websites", 
+                  href: "https://www.cancer.gov/digital-standards"
+                }
+              ]
+            },
+            {
+              title: "POLICIES", 
+              links: [
+                {
+                  title: "Accessibility", 
+                  href: "https://www.cancer.gov/policies/accessibility"
+                },
+                {
+                  title: "Content Policy", 
+                  href: "https://www.cancer.gov/policies/comments"
+                },
+                {
+                  title: "Disclaimer", 
+                  href: "https://www.cancer.gov/policies/disclaimer"
+                },
+                {
+                  title: "FOIA", 
+                  href: "https://www.cancer.gov/policies/foia"
+                },
+                {
+                  title: "Privacy & Security", 
+                  href: "https://www.cancer.gov/policies/privacy-security"
+                },
+                {
+                  title: "Reuse & Copyright", 
+                  href: "https://www.cancer.gov/policies/copyright-reuse"
+                },
+                {
+                  title: "Syndication Services", 
+                  href: "https://www.cancer.gov/syndication"
+                },
+                {
+                  title: "Website Linking", 
+                  href: "https://www.cancer.gov/policies/linking"
+                }
+              ]
+            }
+          ]
+        }
       />
     </Router>
   );

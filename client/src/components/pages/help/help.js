@@ -625,7 +625,7 @@ export function Help() {
           sources.
         </p>
         <p>
-          Please <a href="mailto:tongwu.zhang@nih.gov">contact us (tongwu.zhang@nih.gov)</a> if
+          Please contact <a href="mailto:NCIezQTLWebAdmin@mail.nih.gov">support</a> if
           you have any public full association data not included here.
         </p>
       </div>
