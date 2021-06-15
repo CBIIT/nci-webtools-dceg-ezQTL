@@ -149,12 +149,23 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     }
   }
   
+  cat(paste0("\nLocus summary"),file=logfile,sep="\n",append = T)
   
   if(!is.null(leadpos)){
     if(!is.null(gwasfile)){
+      if(!leadpos %in% gwas$pos){ 
+        leadpos0 <- gwas %>% arrange(pvalue) %>% slice(1) %>% pull(pos)
+        cat(paste0("Reference position ",leadpos,' does not exist in GWAS file. Use the postion of most significant SNP ',leadpos0, ' as the reference position'),file=logfile,sep="\n",append = T)
+        leadpos <- leadpos0
+      }
       leadsnp <- gwas %>% filter(pos==leadpos)%>% pull(rsnum) %>% unique() 
     }else{
       if(!is.null(qtlfile)){
+        if(!leadpos %in% qtl$pos){ 
+          leadpos0 <- qtl %>% arrange(pval_nominal) %>% slice(1) %>% pull(pos)
+          cat(paste0("Reference position ",leadpos,' does not exist in qtl file. Use the postion of most significant SNP ',leadpos0, ' as the reference position'),file=logfile,sep="\n",append = T)
+          leadpos <- leadpos0
+        }
         leadsnp <- qtl %>% filter(pos==leadpos) %>% pull(rsnum) %>% unique()
       }
     }
@@ -172,7 +183,6 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   }
   
   if(!is.null(leadsnp)) {
-    cat(paste0("\nLocus summary"),file=logfile,sep="\n",append = T)
     if(!is.null(gwasfile)){
       if(!leadsnp %in% gwas$rsnum){ 
         leadsnp0 <- gwas %>% arrange(pvalue) %>% slice(1) %>% pull(rsnum)
@@ -234,7 +244,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     }
     
   }else {
-    cat("\nLocus summary\nNo Reference SNP using for filtering SNPs based on the distance",file=logfile,sep="\n",append = T)
+    cat("No Reference SNP using for filtering SNPs based on the distance",file=logfile,sep="\n",append = T)
   }
   
   ## QTL plots
