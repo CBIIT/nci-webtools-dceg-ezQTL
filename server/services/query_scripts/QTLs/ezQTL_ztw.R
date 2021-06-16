@@ -290,10 +290,10 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   if(!is.null(ldfile)){ chr_ld=ld.info %>% slice(1) %>% pull(chr)}
   
   if(
-    (!is.null(gwasfile) & !is.null(qtlfile) & isTRUE(chr_gwas != chr_qtl)) | (!is.null(gwasfile) & !is.null(ldfile) & isTRUE(chr_gwas != chr_ld)) | (!is.null(ldfile) & !is.null(qtlfile) & isTRUE(chr_ld != chr_qtl))
+    (!is.null(chr_gwas) & !is.null(chr_qtl) & isTRUE(chr_gwas != chr_qtl)) | (!is.null(chr_gwas) & !is.null(chr_ld) & isTRUE(chr_gwas != chr_ld)) | (!is.null(chr_ld) & !is.null(chr_qtl) & isTRUE(chr_ld != chr_qtl))
   ){
     errinfo <- "ERROR: found different chromosomes among GWAS/QTL/LD datasets, please check the inputs"
-    stop(errinfo)
+    return(errinfo)
   }
   
   
