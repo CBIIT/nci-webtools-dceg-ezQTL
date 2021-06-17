@@ -1873,7 +1873,6 @@ export function qtlsGWASCalculation(params) {
         dispatch(
           updateQTLsGWAS({
             request: response.data['info']['inputs']['request'][0],
-            openSidebar: false,
             select_qtls_samples:
               response.data['info']['select_qtls_samples'][0] === 'true'
                 ? true
