@@ -50,7 +50,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       cat(errinfo,file=logfile,sep="\n",append = T)
       stop("ezQTL QC failed: GWAS data format")
     }else{
-      gwas <-gwas %>% select(one_of(gwas_colnames))
+      gwas <-gwas %>% select(one_of(gwas_colnames)) %>% unique() 
       gwas_nchr <- gwas %>% count(chr) %>% dim() %>% .[[1]]
       if(gwas_nchr!=1){
         errinfo <- "ERROR: Number of chromosome in GWAS file large than 1"
@@ -59,7 +59,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       }
       
       cat("\nGWAS summary",file=logfile,sep="\n",append = T)
-      gwastmp <- gwas %>% select(rsnum,chr,pos,ref,alt) %>% unique() 
+      gwastmp <- gwas %>% select(rsnum,chr,pos,ref,alt) 
       cat(paste0('# number of variants included: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
       gwastmp <- gwastmp %>% filter(str_detect(rsnum,'^rs'))
       cat(paste0('# number of variants with rsnum: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
@@ -83,7 +83,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       cat(errinfo,file=logfile,sep="\n",append = T)
       stop("ezQTL QC failed: QTL data format")
     }else{
-      qtl <-qtl %>% select(one_of(qtl_colnames))
+      qtl <-qtl %>% select(one_of(qtl_colnames)) %>% unique()
       
       qtl_nchr <- qtl %>% count(chr) %>% dim() %>% .[[1]]
       if(qtl_nchr!=1){
@@ -286,17 +286,19 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   # check the chromosome 
   chr_gwas <- chr_qtl <- chr_ld <- NULL
   if(!is.null(gwasfile)){ chr_gwas=gwas %>% slice(1) %>% pull(chr)}
+  #if(!is.null(qtlfile)){ chr_qtl=qtl %>% slice(1) %>% pull(chr)}
   if (!is.null(qtlfile)) { chr_qtl = ifelse(dim(qtl)[1] > 0, qtl %>% slice(1) %>% pull(chr), FALSE) }
   if(!is.null(ldfile)){ chr_ld=ld.info %>% slice(1) %>% pull(chr)}
-
+  
   if(
     (!is.null(chr_gwas) & !is.null(chr_qtl) & isTRUE(chr_gwas != chr_qtl)) | (!is.null(chr_gwas) & !is.null(chr_ld) & isTRUE(chr_gwas != chr_ld)) | (!is.null(chr_ld) & !is.null(chr_qtl) & isTRUE(chr_ld != chr_qtl))
   ){
     errinfo <- "ERROR: found different chromosomes among GWAS/QTL/LD datasets, please check the inputs"
+    return(errinfo)
     stop(errinfo)
   }
   
-  
+
   
   # Summary of the dataset --------------------------------------------------
   
