@@ -433,7 +433,7 @@ export function QTLsGWASForm() {
           .map((row) => ({ value: row.Tissue, label: row.Tissue }))
       : data
           .filter((row) => row['Genome_build'] == genome.value)
-          .map((row) => ({ value: row.Tissue, label: row.Full_Name }));
+          .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
   }
 
   function getPhenotypeOptions(data, project) {
@@ -446,7 +446,7 @@ export function QTLsGWASForm() {
           .map((row) => ({ value: row.Phenotype, label: row.Phenotype }))
       : data
           .filter((row) => row['Genome_build'] == genome.value)
-          .map((row) => ({ value: row.Phenotype, label: row.Full_Name }));
+          .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
   }
 
   function populatePublicParameters() {
@@ -613,7 +613,8 @@ export function QTLsGWASForm() {
           ? publicGTEx['cis-QTL dataset']
               .filter(
                 (row) =>
-                  row.Genome_build == genome.value && row.Tissue == tissue.value
+                  row.Genome_build == genome.value &&
+                  row.Full_Name == tissue.value
               )[0]
               .Biowulf_full_path.replace(
                 '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
@@ -639,7 +640,7 @@ export function QTLsGWASForm() {
               .filter(
                 (row) =>
                   row.Genome_build == genome.value &&
-                  row.Phenotype == phenotype.value
+                  row.Full_Name == phenotype.value
               )[0]
               .Biowulf_full_path.replace(
                 '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
