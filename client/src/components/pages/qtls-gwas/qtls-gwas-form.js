@@ -660,7 +660,7 @@ export function QTLsGWASForm() {
 
       const ldKey =
         ldPublic && Object.entries(select_chromosome).length
-          ? ldProject.value == '1000genome'
+          ? ldProject.value == '1000genomes'
             ? publicGTEx['LD dataset']
                 .filter(
                   (row) =>
@@ -672,7 +672,7 @@ export function QTLsGWASForm() {
                   '/data/Brown_lab/ZTW_KB_Datasets/vQTL2/',
                   ''
                 )
-            : true
+            : false
           : false;
 
       dispatch(

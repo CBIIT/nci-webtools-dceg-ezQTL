@@ -10,7 +10,7 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
 getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject) {
   LDFile = paste0('tmp/', request, '/', request, '.LD.gz')
   wd = getwd()
-  if (ldProject == '1000genome') {
+  if (ldProject == '1000genomes') {
     ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
 
     cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
