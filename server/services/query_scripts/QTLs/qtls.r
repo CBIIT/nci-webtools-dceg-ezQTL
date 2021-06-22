@@ -62,19 +62,19 @@ createExtractedPanel <- function(select_pop, kgpanel, request) {
 
 }
 
-locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
-  if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
-    cmd <- paste0('bcftools view -S tmp/', request, '/', request, '.', 'extracted', '.panel -R ', paste0('tmp/', request, '/', request, '.', 'locus.bed'), ' -O z  ', in_path, '|bcftools sort -O z -o tmp/', request, '/', request, '.', 'input', '.vcf.gz')
-    system(cmd)
-    cmd <- paste0('bcftools index -t tmp/', request, '/', request, '.', 'input', '.vcf.gz')
-    system(cmd)
-    regionLD <- paste0(chromosome, ":", min(qdata_region_pos), "-", max(qdata_region_pos))
-    in_bin <- '/usr/local/bin/emeraLD'
-    getLD <- emeraLD2R(path = paste0('tmp/', request, '/', request, '.', 'input', '.vcf.gz'), bin = in_bin)
-    ld_data <- getLD(region = regionLD)
-    saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
-  }
-}
+# locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
+#   if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || (identical(recalculateAttempt, 'true') && identical(recalculatePop, 'true'))) {
+#     cmd <- paste0('bcftools view -S tmp/', request, '/', request, '.', 'extracted', '.panel -R ', paste0('tmp/', request, '/', request, '.', 'locus.bed'), ' -O z  ', in_path, '|bcftools sort -O z -o tmp/', request, '/', request, '.', 'input', '.vcf.gz')
+#     system(cmd)
+#     cmd <- paste0('bcftools index -t tmp/', request, '/', request, '.', 'input', '.vcf.gz')
+#     system(cmd)
+#     regionLD <- paste0(chromosome, ":", min(qdata_region_pos), "-", max(qdata_region_pos))
+#     in_bin <- '/usr/local/bin/emeraLD'
+#     getLD <- emeraLD2R(path = paste0('tmp/', request, '/', request, '.', 'input', '.vcf.gz'), bin = in_bin)
+#     ld_data <- getLD(region = regionLD)
+#     saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
+#   }
+# }
 
 gwas_example <- function(gwasdata, qdata_region) {
   gwasdata <- merge(x = qdata_region, y = gwasdata, by = c("pos", "rsnum"), all.x = TRUE) %>%
@@ -295,12 +295,17 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
 
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
     if (identical(ldKey, 'false')) {
-      locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
+      # locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
+      # do not auto generate LD if no LD data input provided
+      # empty ld_data
+      # ld_data <-
+      ld_data <- list("Sigma" = as.double(1), "info" = data.frame(chr=integer(), pos=integer(), id=character(), ref=character(), alt=character()))
     } else {
       #getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
-      LDFile = paste0(request, '.input.vcf.gz')
+      # LDFile = paste0(request, '.input.vcf.gz')
+      ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
     }
-    ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
+    # ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
   }
 
   index <- which(ld_data$info$id == rsnum | str_detect(ld_data$info$id, paste0(";", rsnum)) | str_detect(ld_data$info$id, paste0(rsnum, ";")))
