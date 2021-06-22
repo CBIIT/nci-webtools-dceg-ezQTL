@@ -41,7 +41,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     # format file, remove the CR/^M characters from windows 
     if(!gwasfile_pub){ formatM_input(gwasfile) }
     # read orignal file 
-    gwas <- read_delim(gwasfile,delim = '\t',col_names = T,col_types = c('chr'='c','pos'='i','ref'='c','alt'='c','rsnum'='c','pvalue'='d','zscore'='d','effect'='d','se'='d'))
+    gwas <- read_delim(gwasfile,delim = '\t',col_names = T,col_types = c('chr'='c','pos'='n','ref'='c','alt'='c','rsnum'='c','pvalue'='d','zscore'='d','effect'='d','se'='d'))
     # check file format, and select only requeired columns
     gwas_colnames <- c('chr','pos','ref','alt','rsnum','pvalue','zscore','effect','se')
     gwas_colname_diff <- gwas_colnames[!gwas_colnames %in% colnames(gwas)]
@@ -74,7 +74,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     # format file, remove the CR/^M characters from windows 
     if(!qtlfile_pub){ formatM_input(qtlfile) }
     # read orignal file 
-    qtl <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = c('gene_id'='c','gene_symbol'='c','variant_id'='c','rsnum'='c','chr'='c','pos'='i','ref'='c','alt'='c','pval_nominal'='d','slope'='d','slope_se'='d'))
+    qtl <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = c('gene_id'='c','gene_symbol'='c','variant_id'='c','rsnum'='c','chr'='c','pos'='n','ref'='c','alt'='c','pval_nominal'='d','slope'='d','slope_se'='d'))
     # check file format, and select only requeired columns
     qtl_colnames <- c('gene_id','gene_symbol','variant_id','rsnum','chr','pos','ref','alt','tss_distance','pval_nominal','slope','slope_se')
     qtl_colname_diff <- qtl_colnames[!qtl_colnames %in% colnames(qtl)]
