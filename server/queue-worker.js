@@ -216,9 +216,6 @@ async function calculate(params) {
             gwasfile: state.inputs.gwas_file[0],
             qtlfile: state.inputs.association_file[0],
             ldfile: state.inputs.ld_file[0],
-            qtlKey: params.qtlKey,
-            select_chromosome: params.select_chromosome,
-            select_position: params.select_position,
           })
         );
 

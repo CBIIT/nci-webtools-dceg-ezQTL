@@ -1974,11 +1974,6 @@ export function qtlsGWASCalculation(params) {
                 gwasfile: qtlsGWAS.inputs.gwas_file[0],
                 qtlfile: qtlsGWAS.inputs.association_file[0],
                 ldfile: qtlsGWAS.inputs.ld_file[0],
-                qtlKey: qtlsGWAS.qtlKey,
-                select_chromosome:
-                  qtlsGWAS.locusInformation[0].select_chromosome.value ||
-                  qtlsGWAS.locusInformation[0].select_chromosome,
-                select_position: qtlsGWAS.select_position,
               })
             );
 

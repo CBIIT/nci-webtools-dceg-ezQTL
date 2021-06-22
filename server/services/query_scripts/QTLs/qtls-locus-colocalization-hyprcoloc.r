@@ -1,4 +1,4 @@
-locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, qtlKey, select_chromosome, select_position, bucket) {
+locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, bucket) {
   source('services/query_scripts/QTLs/ezQTL_ztw.R')
   setwd(workDir)
   .libPaths(c(.libPaths(), "~/R"))

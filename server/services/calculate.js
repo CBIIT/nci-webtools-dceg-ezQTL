@@ -192,9 +192,6 @@ async function calculateHyprcoloc(params) {
     qtlfile,
     ldfile,
     workingDirectory,
-    qtlKey,
-    select_chromosome,
-    select_position,
     bucket,
   } = params;
 
@@ -219,9 +216,6 @@ async function calculateHyprcoloc(params) {
       qtlfile.toString(),
       ldfile.toString(),
       request.toString(),
-      qtlKey.toString(),
-      select_chromosome.toString(),
-      parseInt(select_position),
       bucket.toString(),
     ]
   );
