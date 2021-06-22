@@ -371,6 +371,7 @@ const drawLocusAlignment = (response) => {
   const trace1R2NA = {
     x: xDataR2NA,
     y: yDataR2NA,
+    customdata: geneDataR2NA,
     text: hoverDataR2NA,
     hoverinfo: 'text',
     mode: 'markers',
@@ -670,6 +671,7 @@ const drawLocusAlignmentGWAS = (response) => {
   const trace1R2NA = {
     x: xDataR2NA,
     y: yGWASDataR2NA,
+    customdata: geneGWASDataR2NA,
     text: hoverDataGWASR2NA,
     hoverinfo: 'text',
     mode: 'markers',
@@ -723,6 +725,7 @@ const drawLocusAlignmentGWAS = (response) => {
   const trace3R2NA = {
     x: xDataR2NA,
     y: yDataR2NA,
+    customdata: geneDataR2NA,
     text: hoverDataR2NA,
     hoverinfo: 'text',
     mode: 'markers',
