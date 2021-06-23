@@ -132,11 +132,11 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
 
   result_hyprcoloc_filename <- paste0(request, ".hyprcoloc.txt")
   result_snpscore_filename <- paste0(request, ".hyprcoloc_snpscore.txt")
-  result_hyprcoloc %>% write_delim(paste0('tmp/', request, '/', result_hyprcoloc_filename), delim = '\t', col_names = T)  
+  result_hyprcoloc %>% write_delim(paste0('tmp/', request, '/', result_hyprcoloc_filename), delim = '\t', col_names = T)
   result_snpscore %>% write_delim(paste0('tmp/', request, '/', result_snpscore_filename), delim = '\t', col_names = T)
 
   #save.image(file=paste0(prefix,".hyprcoloc.RData"))
-  dataSourceJSON <- c(toJSON(list(hyprcoloc = list(request = request, result_hyprcoloc = list(data = result_hyprcoloc_data), result_snpscore = list(data = result_snpscore_data)))))
+  dataSourceJSON <- c(toJSON(list(hyprcoloc = list(request = request, result_hyprcoloc = list(data = result_hyprcoloc_data), result_snpscore = list(data = result_snpscore_data))), na = 'string'))
   return(dataSourceJSON)
 }
 ### LEAVE EMPTY LINE BELOW ###
