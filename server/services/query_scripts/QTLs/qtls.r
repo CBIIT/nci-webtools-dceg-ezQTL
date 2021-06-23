@@ -20,22 +20,33 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > tmp/', request, '/', request, '.LD.gz')
     system(cmd, intern = TRUE)
 
-    out <- fread(input = LDFile, header = FALSE, showProgress = FALSE)
-    info <- out[, 1:5]
-    colnames(info) <- c("chr", "pos", "id", "ref", "alt")
+    out <- read_delim(LDFile, delim = '\t', col_names = F)
+    if (dim(out)[1] > 0) {
+      info <- out[, 1:5]
+    } else {
+      info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
+    }
   } else if (ldProject == 'UKBB') {
     cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -b ', bucket, ' -o ', wd, '/', LDFile)
     system(cmd)
 
-    out <- read_delim(LDFile, delim = '\t', col_names = F, col_types = cols('X2' = 'c')) %>% rename(id = X1, chr = X2, pos = X3, ref = X4, alt = X5) %>% relocate(chr, pos, id)
-    out %>% write_delim(LDFile, delim = '\t', col_names = F)
-    info <- out[, 1:5]
+    out <- read_delim(LDFile, delim = '\t', col_names = F, col_types = cols('X2' = 'c'))
+    if (dim(out)[1] > 0) {
+      out %>% rename(id = X1, chr = X2, pos = X3, ref = X4, alt = X5) %>% relocate(chr, pos, id) %>% write_delim(LDFile, delim = '\t', col_names = F)
+      info <- out[, 1:5]
+    } else {
+      info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
+    }
   }
   if (length(unique(info$chr)) > 1) {
     errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
   } else {
-    out <- as.matrix(out[, - (1:5)]);
-    colnames(out) <- NULL
+    if (dim(out)[2] > 5) {
+      out <- as.matrix(out[, - (1:5)]);
+      colnames(out) <- NULL
+    } else {
+      out <- as.double(1)
+    }
     ld_data <- list("Sigma" = out, "info" = info)
   }
   saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
@@ -299,7 +310,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
       # do not auto generate LD if no LD data input provided
       # empty ld_data
       # ld_data <-
-      ld_data <- list("Sigma" = as.double(1), "info" = data.frame(chr=integer(), pos=integer(), id=character(), ref=character(), alt=character()))
+      ld_data <- list("Sigma" = as.double(1), "info" = data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character()))
     } else {
       #getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
       # LDFile = paste0(request, '.input.vcf.gz')
