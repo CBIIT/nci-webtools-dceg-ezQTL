@@ -151,7 +151,7 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
       }
     }
 
-    if (identical(ldKey, 'false')) {
+    if (identical(ldPublic, 'false')) {
       if (identical(ldFile, 'false'))
         ldFile = NULL
       else

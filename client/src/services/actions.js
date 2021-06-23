@@ -1636,7 +1636,7 @@ export function qtlsGWASLocusQCCalculation(params) {
 
           if (
             qtlsGWAS.LDFile ||
-            qtlsGWAS.ldKey ||
+            qtlsGWAS.ldPublic ||
             qtlsGWAS.select_qtls_samples
           ) {
             params.LDFile = 'ezQTL_input_ld.gz';

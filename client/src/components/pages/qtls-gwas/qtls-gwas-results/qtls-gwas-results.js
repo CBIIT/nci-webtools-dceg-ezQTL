@@ -25,9 +25,9 @@ export function QTLsGWASResults({ queueRequest }) {
     associationFile,
     gwasFile,
     LDFile,
-    qtlKey,
-    gwasKey,
-    ldKey,
+    qtlPublic,
+    gwasPublic,
+    ldPublic,
     select_qtls_samples,
     quantificationFile,
     genotypeFile,
@@ -47,7 +47,7 @@ export function QTLsGWASResults({ queueRequest }) {
       key: 'locus-ld',
       title: 'Locus LD',
       disabled:
-        !submitted || isError || (!select_qtls_samples && !LDFile && !ldKey),
+        !submitted || isError || !(select_qtls_samples || LDFile || ldPublic),
     },
     {
       component: <LocusAlignment />,
@@ -67,9 +67,9 @@ export function QTLsGWASResults({ queueRequest }) {
         isError ||
         !(gwas && gwas.data && Object.keys(gwas.data).length > 0) ||
         !(
-          (associationFile || qtlKey) &&
-          (gwasFile || gwasKey) &&
-          (LDFile || ldKey)
+          (associationFile || qtlPublic) &&
+          (gwasFile || gwasPublic) &&
+          (LDFile || ldPublic)
         ),
     },
     {
@@ -79,8 +79,8 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        (!associationFile && !qtlKey) ||
-        (!LDFile && !ldKey),
+        !(associationFile || qtlPublic) ||
+        !(LDFile || ldPublic),
     },
     {
       component: <LocusQuantifiation />,

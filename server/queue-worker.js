@@ -132,7 +132,7 @@ async function calculate(params) {
   let newParams = { ...params };
   if (params.associationFile || params.qtlKey || params.select_qtls_samples)
     params.associationFile = 'ezQTL_input_qtl.txt';
-  if (params.LDFile || params.ldKey || params.select_qtls_samples)
+  if (params.LDFile || params.ldPublic || params.select_qtls_samples)
     params.LDFile = 'ezQTL_input_ld.gz';
   if (params.gwasFile || params.gwasKey || params.select_gwas_sample)
     params.gwasFile = 'ezQTL_input_gwas.txt';
