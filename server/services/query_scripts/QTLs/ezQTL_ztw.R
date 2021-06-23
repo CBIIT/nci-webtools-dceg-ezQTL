@@ -53,7 +53,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       gwas <-gwas %>% select(one_of(gwas_colnames)) %>% unique() 
       gwas_nchr <- gwas %>% count(chr) %>% dim() %>% .[[1]]
       if(gwas_nchr!=1){
-        errinfo <- "ERROR: Number of chromosome in GWAS file large than 1"
+        errinfo <- "ERROR: Number of chromosome in GWAS file not equal to 1"
         cat(errinfo,file=logfile,sep="\n",append = T)
         stop("ezQTL QC failed: GWAS data format")
       }
@@ -87,7 +87,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       
       qtl_nchr <- qtl %>% count(chr) %>% dim() %>% .[[1]]
       if(qtl_nchr!=1){
-        errinfo <- "ERROR: Number of chromosome in QTL file large than 1"
+        errinfo <- "ERROR: Number of chromosome in QTL file not equal to 1"
         cat(errinfo,file=logfile,sep="\n",append = T)
         stop("ezQTL QC failed: QTL data format")
       }
