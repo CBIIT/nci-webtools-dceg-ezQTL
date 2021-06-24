@@ -74,7 +74,9 @@ async function calculateMain(params) {
 }
 
 async function qtlsCalculateMain(params, req, res, next) {
-  req.setTimeout(900000);
+  res.setTimeout(900000, () => {
+    res.status(504).send('Calculation Timed Out');
+  });
   const { request } = params;
   logger.info(`[${request}] Execute /qtls-calculate-main`);
   logger.debug(
@@ -286,7 +288,9 @@ function calculateECAVIAR(params) {
 }
 
 async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
-  req.setTimeout(900000);
+  res.setTimeout(900000, () => {
+    res.status(504).send('Calculation Timed Out');
+  });
   const { request } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-ecaviar`);

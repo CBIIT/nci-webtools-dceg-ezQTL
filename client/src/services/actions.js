@@ -1548,15 +1548,19 @@ export function qtlsGWASECaviarCalculation(params) {
       })
       .catch(function (error) {
         console.log(error);
-        if (error) {
-          dispatch(updateError({ visible: true, message: error }));
+
+        if (error.response.status === 504) {
           dispatch(
-            updateQTLsGWAS({
-              // isError: true,
-              // activeResultsTab: 'locus-qc',
-              isLoadingECaviar: false,
+            updateError({
+              visible: true,
+              message:
+                'eCAVIAR calculation has timed out. Try submitting this job to the queue instead.',
             })
           );
+          dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
+        } else {
+          dispatch(updateError({ visible: true, message: error }));
+          dispatch(updateQTLsGWAS({ isLoadingECaviar: false }));
         }
       })
       .then(function () {
