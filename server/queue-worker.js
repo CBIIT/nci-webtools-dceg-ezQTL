@@ -381,7 +381,7 @@ async function processSingleLocus(requestData) {
     // send user success email
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
-      from: config.email.sender,
+      from: config.email.admin,
       to: params.email,
       subject: `ezQTL Results - ${timestamp} EST`,
       html: await readTemplate(
@@ -410,8 +410,8 @@ async function processSingleLocus(requestData) {
     // send admin error email
     logger.info(`Sending admin error email`);
     const adminEmailResults = await mailer.sendMail({
-      from: config.email.sender,
-      to: config.email.admin,
+      from: config.email.admin,
+      to: config.email.support,
       subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
@@ -423,7 +423,7 @@ async function processSingleLocus(requestData) {
     if (params.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
-        from: config.email.sender,
+        from: config.email.admin,
         to: params.email,
         subject: 'ezQTL Error',
         html: await readTemplate(
@@ -540,7 +540,7 @@ async function processMultiLoci(data) {
     // send user success email
     logger.info(`Sending user multi results email`);
     const userEmailResults = await mailer.sendMail({
-      from: config.email.sender,
+      from: config.email.admin,
       to: email,
       subject: `ezQTL Results - ${timestamp} EST`,
       html: await readTemplate(
@@ -568,8 +568,8 @@ async function processMultiLoci(data) {
       logger.info(`Sending admin multi results email`);
 
       const adminEmailResults = await mailer.sendMail({
-        from: config.email.sender,
-        to: config.email.admin,
+        from: config.email.admin,
+        to: config.email.support,
         subject: `ezQTL Results - ${timestamp} EST`,
         html: await readTemplate(
           __dirname + '/templates/admin-multi-failure.html',
@@ -601,8 +601,8 @@ async function processMultiLoci(data) {
     // send admin error email
     logger.info(`Sending admin error email`);
     const adminEmailResults = await mailer.sendMail({
-      from: config.email.sender,
-      to: config.email.admin,
+      from: config.email.admin,
+      to: config.email.support,
       subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
@@ -614,7 +614,7 @@ async function processMultiLoci(data) {
     if (params.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
-        from: config.email.sender,
+        from: config.email.admin,
         to: params.email,
         subject: 'ezQTL Error',
         html: await readTemplate(
