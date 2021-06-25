@@ -33,6 +33,8 @@ export function QTLsGWASResults({ queueRequest }) {
     genotypeFile,
     locus_alignment,
     locus_table,
+    locus_qc,
+    inputs,
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -40,14 +42,17 @@ export function QTLsGWASResults({ queueRequest }) {
       component: <LocusQC />,
       key: 'locus-qc',
       title: 'Locus QC',
-      disabled: !submitted || isError,
+      disabled: !submitted || isError || !locus_qc || !inputs,
     },
     {
       component: <LocusLD />,
       key: 'locus-ld',
       title: 'Locus LD',
       disabled:
-        !submitted || isError || !(select_qtls_samples || LDFile || ldPublic),
+        !submitted ||
+        isError ||
+        !inputs ||
+        !(select_qtls_samples || LDFile || ldPublic),
     },
     {
       component: <LocusAlignment />,
@@ -56,6 +61,7 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
+        !inputs ||
         !(locus_alignment.data && locus_alignment.data.length),
     },
     {
@@ -65,6 +71,7 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
+        !inputs ||
         !(gwas && gwas.data && Object.keys(gwas.data).length > 0) ||
         !(
           (associationFile || qtlPublic) &&
@@ -79,6 +86,7 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
+        !inputs ||
         !(associationFile || qtlPublic) ||
         !(LDFile || ldPublic),
     },
@@ -89,13 +97,14 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
+        !inputs ||
         !((quantificationFile && genotypeFile) || select_qtls_samples),
     },
     {
       component: <LocusDownload />,
       key: 'locus-download',
       title: 'Locus Download',
-      disabled: !submitted || isError,
+      disabled: !submitted || isError || !inputs,
     },
   ];
 

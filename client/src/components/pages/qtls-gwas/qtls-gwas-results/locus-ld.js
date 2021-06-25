@@ -14,10 +14,7 @@ export function LocusLD() {
     submitted,
     select_gwas_sample,
     select_qtls_samples,
-    gwasFile,
-    associationFile,
     inputs,
-    LDFile,
     genome,
     locus_alignment,
     gene_list,
@@ -70,7 +67,6 @@ export function LocusLD() {
       )}
       <LoadingOverlay active={isLoadingLD} />
       {submitted && request && !ldError && !isLoading && !isLoadingLD && (
-
         <>
           <div className="px-3 py-2">
             <Form className="row justify-content-between">
@@ -133,9 +129,7 @@ export function LocusLD() {
                         isDisabled={!submitted || ldAssocData.value !== 'QTL'}
                         inputId="qtls-results-gene-input"
                         // label=""
-                        value={
-                          ldAssocData.value === 'QTL' ? select_gene : null
-                        }
+                        value={ldAssocData.value === 'QTL' ? select_gene : null}
                         placeholder="None"
                         options={gene_list ? gene_list.data : []}
                         getOptionLabel={(option) => option.gene_symbol}
@@ -171,7 +165,7 @@ export function LocusLD() {
                             updateQTLsGWAS({ ldThreshold: e.target.value })
                           );
                         }}
-                      // custom
+                        // custom
                       />
                     </div>
                   </Form.Group>
@@ -188,7 +182,6 @@ export function LocusLD() {
                   </Button>
                 </div>
               </>
-
             </Form>
           </div>
           <hr />

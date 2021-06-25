@@ -13,6 +13,7 @@ export function LocusQC() {
     gwasFile,
     gwasKey,
     isLoadingQC,
+    isQueue,
   } = useSelector((state) => state.qtlsGWAS);
 
   return (
@@ -34,6 +35,17 @@ export function LocusQC() {
           content={<b className="text-danger">{qcError}</b>}
         />
       )}
+      {submitted &&
+        isQueue &&
+        !locus_qc &&
+        !qcError &&
+        !isLoading &&
+        !isLoadingQC && (
+          <LoadingOverlay
+            active={true}
+            content={<>Reset the left panel to continue.</>}
+          />
+        )}
       {submitted && locus_qc && !qcError && !isLoading && !isLoadingQC && (
         <>
           {locus_qc.length > 0 && (
