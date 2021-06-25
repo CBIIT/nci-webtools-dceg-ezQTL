@@ -2314,7 +2314,7 @@ export function fetchResults(request) {
         dispatch(
           updateError({
             visible: true,
-            message: 'Failed to retrieve queue results.',
+            message: 'Failed to retrieve queued submission. Invalid or expired results link.',
           })
         );
         dispatch(
