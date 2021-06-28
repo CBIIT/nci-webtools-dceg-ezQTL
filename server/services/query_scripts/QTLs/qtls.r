@@ -1,6 +1,11 @@
-locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos) {
+locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build) {
   if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || identical(recalculatePop, 'true')) {
-    cmd <- paste0('bcftools view -O z -o ', in_path, ' ', kgvcfpath, ' ', chromosome, ":", minpos, '-', maxpos)
+    idx_path_grch37 <- 'data/1kginfo'
+    idx_path_grch38 <- 'data/1kginfo_GRCh38'
+
+    idx_path <- ifelse(genome_build == 'GRCh37', idx_path_grch37, idx_path_grch38)
+
+    cmd <- paste0('cd ', idx_path,'; bcftools view -O z -o ', in_path, ' ', kgvcfpath, ' ', chromosome, ":", minpos, '-', maxpos)
     system(cmd)
     cmd <- paste0('bcftools index ', in_path)
     system(cmd)
@@ -157,7 +162,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey) {
+locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build) {
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -193,11 +198,15 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   ## subset gene variant with cis-QTL Distance window
   qdata <- subset(qdata, pos > minpos & pos < maxpos)
 
-  kgvcfpath <- paste0('s3://', bucket, '/ezQTL/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
+  kgvcfpath_grch37 <- paste0('s3://', bucket, '/ezQTL/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
+  kgvcfpath_grch38 <- paste0('s3://', bucket, '/ezQTL/1kginfo_GRCh38/ALL.chr', chromosome, '.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz')
+
+  kgvcfpath <- ifelse(genome_build == 'GRCh37', kgvcfpath_grch37, kgvcfpath_grch38)
+
   in_path <- paste0(workDir, '/tmp/', request, '/', request, '.', 'chr', chromosome, '_', minpos, '_', maxpos, '.vcf.gz')
 
   if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
-    locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos)
+    locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build)
   }
 
   # popshort <- "CEU"  ### need to find the superpop recomendation data 
@@ -443,7 +452,7 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket) {
+main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -635,7 +644,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey)
+  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]

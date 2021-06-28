@@ -35,6 +35,7 @@ async function calculateMain(params) {
     select_chromosome,
     select_position,
     bucket,
+    genome_build
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
@@ -69,6 +70,7 @@ async function calculateMain(params) {
       select_chromosome.toString(),
       parseInt(select_position),
       bucket.toString(),
+      genome_build.toString(),
     ]
   );
 }

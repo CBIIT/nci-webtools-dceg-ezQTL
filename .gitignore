@@ -17,7 +17,8 @@ false
 server/ezQTL.log
 server/snp_match.txt
 server/snp_not_match.txt
-data_old
+data.old
+data.zip
 
 # server
 server/config.json
