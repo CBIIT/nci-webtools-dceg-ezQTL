@@ -58,7 +58,7 @@ export function LocusAlignmentPlot(params) {
     toImageButtonOptions: {
       format: 'svg', // one of png, svg, jpeg, webp
       filename: 'locus_alignment_manhattan_gwas',
-      height: 1100,
+      height: Object.keys(gwas['data']).length > 0 ? 1100 : 800,
       width: 1000,
       scale: 1, // Multiply title/legend/axis/canvas sizes by this factor
     },
