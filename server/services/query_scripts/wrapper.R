@@ -253,6 +253,9 @@ qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   tabixFile <- ifelse(genome_build == 'GRCh37', 'gencode.v19.annotation.gtf.gz', 'gencode.v37.annotation.gtf.gz')
   tabixPath = paste0('s3://', bucket, '/ezQTL/tabix/', tabixFile)
 
+  # change work directory to tabix index directory
+  setwd(paste0(workDir, '/data/tabix'))
+
   if (identical(ldAssocData, 'GWAS') & !is.null(gwasFile))
     IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
   else if (identical(ldAssocData, 'QTL') & !is.null(associationFile))
