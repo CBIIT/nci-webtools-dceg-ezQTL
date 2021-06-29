@@ -17,10 +17,6 @@ export function updateQTLsGWAS(data) {
   return { type: UPDATE_QTLS_GWAS, data };
 }
 
-export function updateMultiLoci(data) {
-  return { type: UPDATE_MULTI_LOCI, data };
-}
-
 export function updateError(data) {
   return { type: UPDATE_ERROR, data };
 }
