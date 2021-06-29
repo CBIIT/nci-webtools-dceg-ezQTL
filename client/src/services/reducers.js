@@ -29,11 +29,6 @@ export const rootReducer = (state, action) => {
         ...state,
         qtlsGWAS: { ...mergeObject(state.qtlsGWAS, action) },
       };
-    case UPDATE_MULTI_LOCI:
-      return {
-        ...state,
-        multiLoci: { ...mergeObject(state.multiLoci, action) },
-      };
     case UPDATE_ERROR:
       return {
         ...state,
