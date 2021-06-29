@@ -18,6 +18,7 @@ export default function Zoom({
   className,
   descAbove,
   descBelow,
+  plotId,
   ...rest
 }) {
   const [loading, setLoading] = useState(false);
@@ -90,7 +91,7 @@ export default function Zoom({
                           href={plotURL}
                           download={downloadName || true}
                         >
-                          Download Plot
+                          {plotId ? `Download Plot ${plotId}` : 'Download Plot'}
                         </a>
                         {txtPath && (
                           <Button
