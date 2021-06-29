@@ -177,7 +177,7 @@ export function QTLsGWASResultsForm() {
         <div className="col-md-9">
           <Form.Group className="row">
             <div className="col-md-4">
-              <Form.Label id="recalculate-reference" className="mb-0">
+              <Form.Label id="recalculate-reference-label" className="mb-0">
                 Reference Gene{' '}
                 <span
                   style={{
@@ -208,7 +208,7 @@ export function QTLsGWASResultsForm() {
               />
             </div>
             <div className="col-md-4">
-              <Form.Label id="recalculate-snp" className="mb-0">
+              <Form.Label id="recalculate-snp-label" className="mb-0">
                 LD Reference SNP
               </Form.Label>
               <Form.Control
