@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "start-queue-worker": "node queue-worker.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --single-quote --write \"**/*.{js,json}\""
   },
   "author": "",
   "license": "ISC",
@@ -26,5 +27,8 @@
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0",
     "xlsx": "^0.16.9"
+  },
+  "devDependencies": {
+    "prettier": "^2.3.2"
   }
 }
