@@ -57,6 +57,7 @@ export function LocusQuantifiation() {
           <LoadingOverlay active={isLoadingQuantification} />
           <Zoom
             plotURL={`api/results/${request}/quantification_cor.svg`}
+            plotId='1'
             className="border rounded p-3 mb-2"
             maxHeight="800px"
             descAbove={
@@ -71,6 +72,7 @@ export function LocusQuantifiation() {
           <br />
           <Zoom
             plotURL={`api/results/${request}/quantification_dis.svg`}
+            plotId='2'
             className="border rounded p-3 mb-2"
             maxHeight="800px"
             descAbove={
@@ -180,6 +182,7 @@ export function LocusQuantifiation() {
           </Form>
           <Zoom
             plotURL={`api/results/${request}/quantification_qtl.svg`}
+            plotId='3'
             className="border rounded p-3 mb-2"
             maxHeight="800px"
           />
