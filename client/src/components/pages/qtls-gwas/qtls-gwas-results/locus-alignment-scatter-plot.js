@@ -2,18 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 // import { Button } from 'react-bootstrap';
-import { 
-  updateQTLsGWAS, 
-} from '../../../../services/actions';
+import { updateQTLsGWAS } from '../../../../services/actions';
 
 export function LocusAlignmentScatterPlot(params) {
   const dispatch = useDispatch();
 
   const plotContainer = useRef(null);
 
-  const {
-    locus_alignment_gwas_scatter,
-  } = useSelector((state) => state.qtlsGWAS);
+  const { locus_alignment_gwas_scatter } = useSelector(
+    (state) => state.qtlsGWAS
+  );
 
   const config = {
     responsive: true,
@@ -45,8 +43,7 @@ export function LocusAlignmentScatterPlot(params) {
             layout={locus_alignment_gwas_scatter.layout}
             config={config}
           />
-      )}
-
+        )}
       </div>
     </>
   );

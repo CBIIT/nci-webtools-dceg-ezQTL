@@ -625,8 +625,9 @@ export function Help() {
           sources.
         </p>
         <p>
-          Please contact <a href="mailto:NCIezQTLWebAdmin@mail.nih.gov">support</a> if
-          you have any public full association data not included here.
+          Please contact{' '}
+          <a href="mailto:NCIezQTLWebAdmin@mail.nih.gov">support</a> if you have
+          any public full association data not included here.
         </p>
       </div>
       <br />
@@ -705,7 +706,11 @@ export function Help() {
           to other tools at the time of the development. We are planning to
           include more features or modules in ezQTL in the future.
         </p>
-        <img className="w-100" alt="Comparison between ezQTL and other tools" src="assets/images/ezQTL_comparison.svg" />
+        <img
+          className="w-100"
+          alt="Comparison between ezQTL and other tools"
+          src="assets/images/ezQTL_comparison.svg"
+        />
       </div>
       <br />
       <br />
@@ -729,8 +734,8 @@ export function Help() {
           some loci. There have been extensive efforts in developing and
           applying different colocalization approaches. Currently, ezQTL only
           includes two widely used algorithms eCAVIAR and HyPrColoc based on
-          their performance. We may include additional colocalization algorithms in
-          the future.
+          their performance. We may include additional colocalization algorithms
+          in the future.
         </p>
         <p className="ml-3">
           <i>

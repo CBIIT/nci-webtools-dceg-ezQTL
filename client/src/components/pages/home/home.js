@@ -292,7 +292,7 @@ export function Home() {
           approved license.
         </p>
         <p>
-          Questions or comments? Contact {' '}
+          Questions or comments? Contact{' '}
           <a href="mailto:NCIezQTLWebAdmin@mail.nih.gov">support</a>.
         </p>
       </div>

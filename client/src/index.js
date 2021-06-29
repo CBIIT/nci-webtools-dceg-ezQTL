@@ -6,23 +6,24 @@ import { getStore } from './services/store';
 import { App } from './app';
 
 export const RootContext = createContext({
-  getInitialState: _ => { }
+  getInitialState: (_) => {},
 });
 
-getStore().then(store => {
+getStore().then((store) => {
   // disconnect initialState from store state
   const initialState = clonedeep(store.getState());
 
   ReactDOM.render(
-    <RootContext.Provider value={{
-      // always return new references
-      getInitialState: _ => clonedeep(initialState)
-    }}>
+    <RootContext.Provider
+      value={{
+        // always return new references
+        getInitialState: (_) => clonedeep(initialState),
+      }}
+    >
       <Provider store={store}>
         <App />
       </Provider>
-  </RootContext.Provider>,
+    </RootContext.Provider>,
     document.getElementById('root')
   );
-})
-
+});

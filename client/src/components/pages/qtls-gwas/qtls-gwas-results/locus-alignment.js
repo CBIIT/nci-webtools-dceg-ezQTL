@@ -32,8 +32,8 @@ export function LocusAlignment() {
         onHide={() =>
           dispatch(
             updateQTLsGWAS({
-              locus_alignment_boxplots: getInitialState().qtlsGWAS
-                .locus_alignment_boxplots,
+              locus_alignment_boxplots:
+                getInitialState().qtlsGWAS.locus_alignment_boxplots,
             })
           )
         }

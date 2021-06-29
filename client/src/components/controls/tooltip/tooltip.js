@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export const Tooltip = props => {
+export const Tooltip = (props) => {
   // link state to props (to use as a controlled component)
   const [visible, setVisible] = useState(false);
   useEffect(() => setVisible(props.visible), [props.visible]);
@@ -17,7 +17,7 @@ export const Tooltip = props => {
     backgroundColor: 'white',
     zIndex: 9999,
     opacity: 0.9,
-    ...props.style
+    ...props.style,
   };
 
   const closeButtonStyle = {
@@ -28,7 +28,7 @@ export const Tooltip = props => {
     position: 'absolute',
     top: 0,
     right: 0,
-    cursor: 'pointer'
+    cursor: 'pointer',
   };
 
   return (
@@ -37,10 +37,11 @@ export const Tooltip = props => {
         <button
           data-testid="TooltipCloseButton"
           style={closeButtonStyle}
-          onClick={e => {
+          onClick={(e) => {
             setVisible(false);
             if (props.onClose) props.onClose();
-          }}>
+          }}
+        >
           &times;
         </button>
       )}

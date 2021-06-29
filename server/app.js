@@ -6,8 +6,7 @@ const { apiRouter } = require('./services/api');
 const { forkCluster } = require('./services/cluster');
 
 // returns true if in master process
-if (forkCluster())
-    return;
+if (forkCluster()) return;
 
 logger.info(`[${process.pid}] Started worker process`);
 
@@ -20,11 +19,11 @@ app.use(express.static(config.server.client));
 
 // global error handler
 app.use((error, request, response, next) => {
-    const { name, message, stack } = error;
-    logger.error({ message, stack });
-    response.status(500).json(`${name}: ${message}`);
+  const { name, message, stack } = error;
+  logger.error({ message, stack });
+  response.status(500).json(`${name}: ${message}`);
 });
 
 app.listen(config.server.port, () => {
-    logger.info(`Application is running on port: ${config.server.port}`)
+  logger.info(`Application is running on port: ${config.server.port}`);
 });

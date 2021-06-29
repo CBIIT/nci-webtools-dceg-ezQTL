@@ -28,7 +28,6 @@ export function QTLsGWASResults({ queueRequest }) {
     qtlPublic,
     gwasPublic,
     ldPublic,
-    select_qtls_samples,
     quantificationFile,
     genotypeFile,
     locus_alignment,
@@ -48,11 +47,7 @@ export function QTLsGWASResults({ queueRequest }) {
       component: <LocusLD />,
       key: 'locus-ld',
       title: 'Locus LD',
-      disabled:
-        !submitted ||
-        isError ||
-        !inputs ||
-        !(select_qtls_samples || LDFile || ldPublic),
+      disabled: !submitted || isError || !inputs || !(LDFile || ldPublic),
     },
     {
       component: <LocusAlignment />,
@@ -98,7 +93,7 @@ export function QTLsGWASResults({ queueRequest }) {
         !submitted ||
         isError ||
         !inputs ||
-        !((quantificationFile && genotypeFile) || select_qtls_samples),
+        !(quantificationFile && genotypeFile),
     },
     {
       component: <LocusDownload />,
@@ -142,7 +137,7 @@ export function QTLsGWASResults({ queueRequest }) {
                 !isError && (
                   <>
                     <div className="px-3 py-2">
-                      <QTLsGWASResultsForm tab={item.key}/>
+                      <QTLsGWASResultsForm tab={item.key} />
                     </div>
                     <hr />
                   </>

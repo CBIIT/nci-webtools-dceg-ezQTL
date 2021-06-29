@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { Tooltip } from './tooltip';
 
-describe('Tooltip Module', function() {
+describe('Tooltip Module', function () {
   test('Tooltip renders correctly', () => {
     const tooltipContent = 'Test';
     render(

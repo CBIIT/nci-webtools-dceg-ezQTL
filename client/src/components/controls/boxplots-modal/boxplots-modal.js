@@ -30,8 +30,9 @@ export function BoxplotsModal(props) {
         <LoadingOverlay active={props.isLoading} />
         <div
           className="text-center my-3 position-relative mw-100"
-          ref={plotContainer}>
-          <div style={{overflowX: 'auto'}}>
+          ref={plotContainer}
+        >
+          <div style={{ overflowX: 'auto' }}>
             <LocusAlignmentBoxplotsPlot />
           </div>
         </div>

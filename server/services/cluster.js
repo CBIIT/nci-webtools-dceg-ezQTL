@@ -2,20 +2,17 @@ const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 
 function forkCluster(numProcesses) {
-    if (!cluster.isMaster)
-        return false;
+  if (!cluster.isMaster) return false;
 
-    if (!numProcesses)
-        numProcesses = numCPUs;
-    
-    for (let i = 0; i < numCPUs; i++)
-        cluster.fork();
+  if (!numProcesses) numProcesses = numCPUs;
 
-    cluster.on('exit', (worker, code, signal) => {
-        cluster.fork();
-    });
+  for (let i = 0; i < numCPUs; i++) cluster.fork();
 
-    return true;
+  cluster.on('exit', (worker, code, signal) => {
+    cluster.fork();
+  });
+
+  return true;
 }
 
 module.exports = { forkCluster };

@@ -542,7 +542,7 @@ export function LocusColocalization() {
                   plotURL={`api/results/${request}/ecaviar_table_barplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
-                  plotId='1'
+                  plotId="1"
                   descAbove={
                     <p>
                       The barplot below shows the colocalization results based
@@ -559,7 +559,7 @@ export function LocusColocalization() {
                   plotURL={`api/results/${request}/ecaviar_table_boxplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
-                  plotId='2'
+                  plotId="2"
                   descAbove={
                     <p>
                       The scatter plot below shows the colocalization posterior

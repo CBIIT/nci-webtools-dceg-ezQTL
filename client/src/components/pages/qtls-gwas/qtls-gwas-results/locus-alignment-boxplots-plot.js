@@ -7,21 +7,19 @@ import { PlotlyWrapper as Plot } from '../../../plots/plotly/plotly-wrapper';
 export function LocusAlignmentBoxplotsPlot(params) {
   const plotContainer = useRef(null);
 
-  const {
-    locus_alignment_boxplots,
-  } = useSelector((state) => state.qtlsGWAS);
+  const { locus_alignment_boxplots } = useSelector((state) => state.qtlsGWAS);
 
   // use local state to reset tooltip when this component unmounts
   const [tooltip, setTooltip] = useState({
     visible: false,
-    data: {}
+    data: {},
   });
 
-  const updateTooltip = state =>
+  const updateTooltip = (state) =>
     setTooltip({
       ...tooltip,
-      ...state
-  });
+      ...state,
+    });
 
   useEffect(() => updateTooltip({ visible: false }), []);
 
@@ -55,7 +53,7 @@ export function LocusAlignmentBoxplotsPlot(params) {
             layout={locus_alignment_boxplots.layout}
             config={config}
           />
-      )}
+        )}
       </div>
     </>
   );
