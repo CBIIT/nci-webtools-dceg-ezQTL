@@ -142,7 +142,7 @@ export function QTLsGWASResults({ queueRequest }) {
                 !isError && (
                   <>
                     <div className="px-3 py-2">
-                      <QTLsGWASResultsForm />
+                      <QTLsGWASResultsForm tab={item.key}/>
                     </div>
                     <hr />
                   </>

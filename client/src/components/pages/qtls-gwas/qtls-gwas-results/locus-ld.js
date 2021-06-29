@@ -127,7 +127,7 @@ export function LocusLD() {
                       </Form.Label>
                       <ReactSelect
                         isDisabled={!submitted || ldAssocData.value !== 'QTL'}
-                        inputId="qtls-results-gene-input"
+                        inputId="qtls-results-ld-gene-input"
                         // label=""
                         value={ldAssocData.value === 'QTL' ? select_gene : null}
                         placeholder="None"

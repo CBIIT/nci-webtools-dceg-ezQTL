@@ -9,7 +9,7 @@ import {
 } from '../../../../services/actions';
 import { PopulationSelect } from '../../../controls/population-select/population-select';
 
-export function QTLsGWASResultsForm() {
+export function QTLsGWASResultsForm(props) {
   const dispatch = useDispatch();
 
   const {
@@ -177,7 +177,7 @@ export function QTLsGWASResultsForm() {
         <div className="col-md-9">
           <Form.Group className="row">
             <div className="col-md-4">
-              <Form.Label id="recalculate-reference" className="mb-0">
+              <Form.Label id={'recalculate-reference-' + props.tab} className="mb-0">
                 Reference Gene{' '}
                 <span
                   style={{
@@ -190,10 +190,10 @@ export function QTLsGWASResultsForm() {
               </Form.Label>
               <ReactSelect
                 isDisabled={!submitted}
-                inputId="qtls-results-gene-input"
+                inputId={'qtls-results-gene-input-' + props.tab}
                 // label=""
                 value={select_gene}
-                aria-labelledby="recalculate-reference"
+                aria-labelledby={'recalculate-reference-' + props.tab} 
                 options={gene_list ? gene_list.data : []}
                 getOptionLabel={(option) => option.gene_symbol}
                 getOptionValue={(option) => option.gene_id}
@@ -208,12 +208,12 @@ export function QTLsGWASResultsForm() {
               />
             </div>
             <div className="col-md-4">
-              <Form.Label id="recalculate-snp" className="mb-0">
+              <Form.Label id={'recalculate-snp-' + props.tab} className="mb-0">
                 LD Reference SNP
               </Form.Label>
               <Form.Control
-                id="qtls-results-snp-input"
-                aria-labelledby="recalculate-snp"
+                id={"qtls-results-snp-input-" + props.tab}
+                aria-labelledby={'recalculate-snp-' + props.tab}
                 disabled={!submitted}
                 value={_selectRef ? _selectRef : ''}
                 onChange={(e) => {
