@@ -11,8 +11,6 @@ AWS.config.update(awsInfo);
 async function calculateMain(params) {
   const {
     request,
-    select_qtls_samples,
-    select_gwas_sample,
     associationFile,
     quantificationFile,
     genotypeFile,
@@ -35,7 +33,7 @@ async function calculateMain(params) {
     select_chromosome,
     select_position,
     bucket,
-    genome_build
+    genome_build,
   } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
@@ -46,8 +44,6 @@ async function calculateMain(params) {
     [
       rfile,
       workingDirectory.toString(),
-      select_qtls_samples.toString(),
-      select_gwas_sample.toString(),
       associationFile.toString(),
       quantificationFile.toString(),
       genotypeFile.toString(),
@@ -98,7 +94,6 @@ async function qtlsCalculateMain(params, req, res, next) {
 async function calculateQuantification(params) {
   const {
     request,
-    select_qtls_samples,
     exprFile,
     genoFile,
     traitID,
@@ -116,7 +111,6 @@ async function calculateQuantification(params) {
     [
       rfile,
       workingDirectory,
-      select_qtls_samples,
       exprFile,
       genoFile,
       traitID,
@@ -149,7 +143,6 @@ async function qtlsCalculateQuantification(params, res, next) {
 async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   const {
     request,
-    select_qtls_samples,
     quantificationFile,
     genotypeFile,
     info,
@@ -170,7 +163,6 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
       [
         rfile,
         workingDirectory.toString(),
-        select_qtls_samples.toString(),
         quantificationFile.toString(),
         genotypeFile.toString(),
         JSON.stringify(info),
@@ -189,8 +181,6 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
 async function calculateHyprcoloc(params) {
   const {
     request,
-    select_gwas_sample,
-    select_qtls_samples,
     select_dist,
     select_ref,
     gwasfile,
@@ -213,8 +203,6 @@ async function calculateHyprcoloc(params) {
     [
       rfile,
       workingDirectory.toString(),
-      select_gwas_sample.toString(),
-      select_qtls_samples.toString(),
       select_dist.toString(),
       select_ref.toString(),
       gwasfile.toString(),
@@ -254,8 +242,6 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(
 function calculateECAVIAR(params) {
   const {
     request,
-    select_gwas_sample,
-    select_qtls_samples,
     gwasFile,
     associationFile,
     LDFile,
@@ -277,8 +263,6 @@ function calculateECAVIAR(params) {
     [
       rfile,
       workingDirectory.toString(),
-      select_gwas_sample.toString(),
-      select_qtls_samples.toString(),
       gwasFile.toString(),
       associationFile.toString(),
       LDFile.toString(),
@@ -349,8 +333,6 @@ async function qtlsColocVisualize(params, res, next) {
 async function calculateQC(params) {
   const {
     request,
-    select_gwas_sample,
-    select_qtls_samples,
     gwasFile,
     associationFile,
     LDFile,
@@ -387,8 +369,6 @@ async function calculateQC(params) {
     'qtlsCalculateQC',
     [
       rfile,
-      select_gwas_sample.toString(),
-      select_qtls_samples.toString(),
       gwasFile.toString(),
       associationFile.toString(),
       LDFile.toString(),
@@ -451,8 +431,6 @@ async function qtlsCalculateQC(params, res, next) {
 async function calculateLocusLD(params) {
   const {
     request,
-    select_gwas_sample,
-    select_qtls_samples,
     associationFile,
     gwasFile,
     LDFile,
@@ -483,8 +461,6 @@ async function calculateLocusLD(params) {
     'qtlsCalculateLD',
     [
       rfile,
-      select_gwas_sample.toString(),
-      select_qtls_samples.toString(),
       gwasFile.toString(),
       associationFile.toString(),
       LDFile.toString(),

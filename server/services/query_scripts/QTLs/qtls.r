@@ -5,7 +5,7 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
 
     idx_path <- ifelse(genome_build == 'GRCh37', idx_path_grch37, idx_path_grch38)
 
-    cmd <- paste0('cd ', idx_path,'; bcftools view -O z -o ', in_path, ' ', kgvcfpath, ' ', chromosome, ":", minpos, '-', maxpos)
+    cmd <- paste0('cd ', idx_path, '; bcftools view -O z -o ', in_path, ' ', kgvcfpath, ' ', chromosome, ":", minpos, '-', maxpos)
     system(cmd)
     cmd <- paste0('bcftools index ', in_path)
     system(cmd)
@@ -162,7 +162,7 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data));
 }
 
-locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build) {
+locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build) {
   if (identical(select_ref, 'false')) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -363,7 +363,7 @@ locus_alignment <- function(workDir, select_gwas_sample, qdata, qdata_tmp, gwasd
   # initialize colocalization data as empty until data file detected
   locus_colocalization_data <- list(c())
   # if GWAS data file is loaded
-  if (!identical(gwasFile, 'false') || !identical(gwasKey, 'false') || identical(select_gwas_sample, 'true')) {
+  if (!identical(gwasFile, 'false') || !identical(gwasKey, 'false')) {
     ## return relevent gwas data ##
     gwas_example_data <- gwas_example(gwasdata, qdata_region)
     ## return locus alignment gwas scatter data
@@ -384,7 +384,7 @@ locus_quantification_heatmap <- function(edata_boxplot) {
   return(list(setNames(as.data.frame(tmpdata), tmpdata_colnames)))
 }
 
-locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, genoFile, edata, gdata, traitID, genotypeID, request) {
+locus_quantification <- function(workDir, tmp, exprFile, genoFile, edata, gdata, traitID, genotypeID, request) {
   library(ggasym)
   library(ggridges)
   library(ggstatsplot)
@@ -394,7 +394,7 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   # initialize heatmap data as empty until data file detected
   locus_quantification_heatmap_data <- list(c())
   # check to see if boxplot data files are present
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false'))) {
 
     if (identical(genotypeID, ''))
       genotypeID = NULL
@@ -412,21 +412,16 @@ locus_quantification <- function(workDir, select_qtls_samples, tmp, exprFile, ge
   #return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
-locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, genoFile, info, request, bucket) {
+locus_alignment_boxplots <- function(workDir, exprFile, genoFile, info, request, bucket) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
   # initialize locus alignment boxplots data as empty until data file detected
   locus_alignment_boxplots_data <- list(c())
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
-    if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('tmp/', request, '/', genoFile)
-      edatafile <- paste0('tmp/', request, '/', exprFile)
-    } else {
-      gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
-      edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
-    }
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false'))) {
+    gdatafile <- paste0('tmp/', request, '/', genoFile)
+    edatafile <- paste0('tmp/', request, '/', exprFile)
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
     edata <- read_delim(edatafile, delim = "\t", col_names = T)
@@ -452,7 +447,7 @@ locus_alignment_boxplots <- function(workDir, select_qtls_samples, exprFile, gen
   return(dataSourceJSON)
 }
 
-main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
+main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
   setwd(workDir)
   library(tidyverse)
   # library(forcats)
@@ -502,22 +497,16 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## read and parse association data file ###
   qdata = NULL
-  if (identical(select_qtls_samples, 'true')) {
-    # load example data
-    qdatafile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
 
-    LDFile <- 'ezQTL/MX2.examples/MX2.LD.gz'
+  # load association data from user upload
+  if (!identical(assocFile, 'false') || !identical(qtlKey, 'false')) {
+    qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
     qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-  } else {
-    # load association data from user upload 
-    if (!identical(assocFile, 'false') || !identical(qtlKey, 'false')) {
-      qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
-      qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-    }
-    if (!identical(LDFile, 'false')) {
-      LDFile <- paste0('tmp/', request, '/', LDFile)
-    }
   }
+  if (!identical(LDFile, 'false')) {
+    LDFile <- paste0('tmp/', request, '/', LDFile)
+  }
+
 
   # check if there are multiple chromosomes in the input assoc file
   if (length(unique(qdata$chr)) > 1) {
@@ -529,14 +518,10 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   # if boxplot data files are loaded
   edata <- 'false'
   gdata <- 'false'
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false')) || identical(select_qtls_samples, 'true')) {
-    if (identical(select_qtls_samples, 'false')) {
-      gdatafile <- paste0('tmp/', request, '/', genoFile)
-      edatafile <- paste0('tmp/', request, '/', exprFile)
-    } else {
-      gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
-      edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
-    }
+  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false'))) {
+    gdatafile <- paste0('tmp/', request, '/', genoFile)
+    edatafile <- paste0('tmp/', request, '/', exprFile)
+
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
     # check if there are multiple chromosomes in the input genotype file
@@ -557,11 +542,8 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   ## if LD File is loaded
   ld_data <- 'false'
   if (!identical(LDFile, 'false')) {
-    if (identical(select_qtls_samples, 'true')) {
-      out = s3read_using(fread, header = FALSE, showProgress = FALSE, object = LDFile, bucket = bucket)
-    } else {
-      out <- fread(input = paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz'), header = FALSE, showProgress = FALSE)
-    }
+    out <- fread(input = paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz'), header = FALSE, showProgress = FALSE)
+
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
     if (length(unique(info$chr)) > 1) {
@@ -575,12 +557,9 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## if GWAS File is loaded
   gwasdata <- 'false'
-  if (!identical(gwasFile, 'false') || identical(select_gwas_sample, 'true') || !identical(gwasKey, 'false')) {
-    if (identical(select_gwas_sample, 'false')) {
-      gwasdatafile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
-    } else {
-      gwasdatafile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
-    }
+  if (!identical(gwasFile, 'false') || !identical(gwasKey, 'false')) {
+    gwasdatafile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
+
     gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
     # check if there are multiple chromosomes in the input GWAS file
     if (length(unique(gwasdata$chr)) > 1) {
@@ -644,7 +623,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, select_gwas_sample, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build)
+  locus_alignment <- locus_alignment(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build)
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
@@ -655,7 +634,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, select_qtls_samples, qdata, exprFile, genoFile, edata, gdata, '', '', request)
+  locus_quantification <- locus_quantification(workDir, qdata, exprFile, genoFile, edata, gdata, '', '', request)
   #locus_quantification_data <- locus_quantification[[1]]
   #locus_quantification_heatmap_data <- locus_quantification[[2]]
 
@@ -665,7 +644,7 @@ main <- function(workDir, select_qtls_samples, select_gwas_sample, assocFile, ex
   }
 
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, select_qtls_samples = select_qtls_samples, select_gwas_sample = select_gwas_sample, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))

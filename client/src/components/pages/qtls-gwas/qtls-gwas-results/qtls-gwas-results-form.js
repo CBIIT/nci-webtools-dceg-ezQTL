@@ -30,17 +30,12 @@ export function QTLsGWASResultsForm(props) {
     qtlKey,
     ldKey,
     gwasKey,
-    select_qtls_samples,
-    select_gwas_sample,
     genome,
     locusInformation,
   } = useSelector((state) => state.qtlsGWAS);
 
-  const {
-    select_ref,
-    select_position,
-    select_chromosome,
-  } = locusInformation[0];
+  const { select_ref, select_position, select_chromosome } =
+    locusInformation[0];
 
   const [_selectRef, _setSelectRef] = useState('');
 
@@ -117,8 +112,6 @@ export function QTLsGWASResultsForm(props) {
       gwasFile:
         inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
       LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
-      select_qtls_samples,
-      select_gwas_sample,
       select_pop: select_pop,
       select_gene: select_gene['gene_id'],
       select_dist: inputs['select_dist'][0],
@@ -177,7 +170,10 @@ export function QTLsGWASResultsForm(props) {
         <div className="col-md-9">
           <Form.Group className="row">
             <div className="col-md-4">
-              <Form.Label id={'recalculate-reference-' + props.tab} className="mb-0">
+              <Form.Label
+                id={'recalculate-reference-' + props.tab}
+                className="mb-0"
+              >
                 Reference Gene{' '}
                 <span
                   style={{
@@ -193,7 +189,7 @@ export function QTLsGWASResultsForm(props) {
                 inputId={'qtls-results-gene-input-' + props.tab}
                 // label=""
                 value={select_gene}
-                aria-labelledby={'recalculate-reference-' + props.tab} 
+                aria-labelledby={'recalculate-reference-' + props.tab}
                 options={gene_list ? gene_list.data : []}
                 getOptionLabel={(option) => option.gene_symbol}
                 getOptionValue={(option) => option.gene_id}
@@ -212,7 +208,7 @@ export function QTLsGWASResultsForm(props) {
                 LD Reference SNP
               </Form.Label>
               <Form.Control
-                id={"qtls-results-snp-input-" + props.tab}
+                id={'qtls-results-snp-input-' + props.tab}
                 aria-labelledby={'recalculate-snp-' + props.tab}
                 disabled={!submitted}
                 value={_selectRef ? _selectRef : ''}

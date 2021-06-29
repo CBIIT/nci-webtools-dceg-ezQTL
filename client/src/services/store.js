@@ -6,8 +6,6 @@ export const getInitialState = async () => {
   let initialState = {
     qtlsGWAS: {
       openSidebar: true,
-      select_qtls_samples: false,
-      select_gwas_sample: false,
       associationFile: null,
       quantificationFile: null,
       genotypeFile: null,

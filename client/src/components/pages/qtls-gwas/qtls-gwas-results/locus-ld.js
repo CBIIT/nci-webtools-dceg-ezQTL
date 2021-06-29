@@ -12,8 +12,6 @@ import {
 export function LocusLD() {
   const {
     submitted,
-    select_gwas_sample,
-    select_qtls_samples,
     inputs,
     genome,
     locus_alignment,
@@ -31,8 +29,6 @@ export function LocusLD() {
     dispatch(
       qtlsGWASLocusLDCalculation({
         request: request,
-        select_gwas_sample: select_gwas_sample,
-        select_qtls_samples: select_qtls_samples,
         gwasFile: inputs['gwas_file'][0],
         associationFile: inputs['association_file'][0],
         LDFile: inputs['ld_file'][0],

@@ -28,8 +28,6 @@ export function LocusColocalization() {
     isError,
     request,
     inputs,
-    select_gwas_sample,
-    select_qtls_samples,
     locus_alignment,
     submitted,
   } = useSelector((state) => state.qtlsGWAS);
@@ -305,13 +303,10 @@ export function LocusColocalization() {
                       gwasFile: inputs['gwas_file'][0],
                       request,
                       select_dist: inputs['select_dist'][0] * 1000,
-                      select_gwas_sample,
-                      select_qtls_samples,
                       select_ref: locus_alignment['top']['rsnum'],
                     })
                     // qtlsGWASBoxplotsCalculation({
                     //   request,
-                    //   select_qtls_samples,
                     //   quantificationFile: inputs['quantification_file'][0],
                     //   genotypeFile: inputs['genotype_file'][0],
                     //   info: tooltip.data
@@ -337,8 +332,6 @@ export function LocusColocalization() {
                       associationFile: inputs['association_file'][0],
                       gwasFile: inputs['gwas_file'][0],
                       select_dist: inputs['select_dist'][0] * 1000,
-                      select_gwas_sample,
-                      select_qtls_samples,
                       select_ref: locus_alignment['top']['rsnum'],
                       calcEcaviar: ecaviar_table.data.length === 0,
                     })

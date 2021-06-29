@@ -1,4 +1,4 @@
-locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, bucket) {
+locus_colocalization_hyprcoloc <- function(workDir, select_dist, select_ref, gwasfile, qtlfile, ldfile, request, bucket) {
   source('services/query_scripts/QTLs/ezQTL_ztw.R')
   setwd(workDir)
   .libPaths(c(.libPaths(), "~/R"))
@@ -14,21 +14,10 @@ locus_colocalization_hyprcoloc <- function(workDir, select_gwas_sample, select_q
   ##  ldfile <- args[3]
   ##  prefix <- args[4]
 
-  if (identical(select_gwas_sample, 'true')) {
-    gwasfile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
-  } else {
-    gwasfile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
-  }
-  if (identical(select_qtls_samples, 'true')) {
-    qtlfile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
-    ldfile <- 'ezQTL/MX2.examples/MX2.LD.gz'
 
-    ld.matrix <- s3read_using(read_delim, delim = '\t', col_names = F, col_types = cols('X1' = 'c'), object = ldfile, bucket = bucket) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
-  } else {
-    qtlfile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
-
-    ld.matrix <- read_delim(paste0('tmp/', request, '/', ldfile), delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
-  }
+  gwasfile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
+  qtlfile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
+  ld.matrix <- read_delim(paste0('tmp/', request, '/', ldfile), delim = '\t', col_names = F, col_types = cols('X1' = 'c')) %>% rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5)
 
 
   ## for jiyeon ##

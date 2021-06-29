@@ -130,11 +130,10 @@ async function calculate(params) {
   summary = summary.split('\n\n');
 
   let newParams = { ...params };
-  if (params.associationFile || params.qtlKey || params.select_qtls_samples)
+  if (params.associationFile || params.qtlKey)
     params.associationFile = 'ezQTL_input_qtl.txt';
-  if (params.LDFile || params.ldPublic || params.select_qtls_samples)
-    params.LDFile = 'ezQTL_input_ld.gz';
-  if (params.gwasFile || params.gwasKey || params.select_gwas_sample)
+  if (params.LDFile || params.ldPublic) params.LDFile = 'ezQTL_input_ld.gz';
+  if (params.gwasFile || params.gwasKey)
     params.gwasFile = 'ezQTL_input_gwas.txt';
 
   let state = {
@@ -166,10 +165,6 @@ async function calculate(params) {
     );
     state = mergeState(state, {
       openSidebar: false,
-      select_qtls_samples:
-        main['info']['select_qtls_samples'][0] === 'true' ? true : false,
-      select_gwas_sample:
-        main['info']['select_gwas_sample'][0] === 'true' ? true : false,
       select_ref: main['locus_alignment']['top'][0][0]['rsnum'],
       recalculateAttempt:
         main['info']['recalculateAttempt'][0] === 'true' ? true : false,
@@ -209,8 +204,6 @@ async function calculate(params) {
             workingDirectory: workingDirectory,
             bucket: config.aws.s3.data,
             request: request,
-            select_gwas_sample: state.select_gwas_sample,
-            select_qtls_samples: state.select_qtls_samples,
             select_dist: state.inputs.select_dist[0] * 1000,
             select_ref: state.locus_alignment.top.rsnum,
             gwasfile: state.inputs.gwas_file[0],
@@ -243,8 +236,6 @@ async function calculate(params) {
           associationFile: state.inputs.association_file[0],
           gwasFile: state.inputs.gwas_file[0],
           select_dist: state.inputs.select_dist[0] * 1000,
-          select_gwas_sample: state.select_gwas_sample,
-          select_qtls_samples: state.select_qtls_samples,
           select_ref: state.locus_alignment.top.rsnum,
         })
       );
@@ -273,8 +264,6 @@ async function calculate(params) {
           associationFile: state.inputs['association_file'][0],
           gwasFile: state.inputs['gwas_file'][0],
           select_dist: state.inputs['select_dist'][0] * 1000,
-          select_gwas_sample: params.select_gwas_sample,
-          select_qtls_samples: params.select_qtls_samples,
           select_ref: state.locus_alignment['top']['rsnum'],
           calcEcaviar: state.ecaviar_table.data.length === 0,
         });
@@ -290,13 +279,11 @@ async function calculate(params) {
 
   // qtlsGWASLocusLDCalculation
   try {
-    if (params.LDFile || params.ldKey || params.select_qtls_samples) {
+    if (params.LDFile || params.ldKey) {
       const locusLD = await calculateLocusLD({
         workingDirectory: workingDirectory,
         bucket: config.aws.s3.data,
         request: request,
-        select_gwas_sample: state.select_gwas_sample,
-        select_qtls_samples: state.select_qtls_samples,
         gwasFile: params.gwasFile,
         associationFile: params.associationFile,
         LDFile: params.LDFile,

@@ -20,8 +20,6 @@ export function LocusAlignmentPlot(params) {
     inputs,
     gwas,
     request,
-    select_qtls_samples,
-    select_gwas_sample,
     ldProject,
     phenotype,
     qtlPublic,
@@ -88,8 +86,6 @@ export function LocusAlignmentPlot(params) {
       gwasFile:
         inputs['gwas_file'][0] === 'false' ? false : inputs['gwas_file'][0],
       LDFile: inputs['ld_file'][0] === 'false' ? false : inputs['ld_file'][0],
-      select_qtls_samples,
-      select_gwas_sample,
       select_pop: inputs['select_pop'][0],
       select_gene: inputs['select_gene'][0],
       select_dist: inputs['select_dist'][0],
@@ -159,10 +155,7 @@ export function LocusAlignmentPlot(params) {
               const xOffset = xaxis.l2p(point.x) + xaxis._offset + 5;
               const yOffset = yaxis.l2p(point.y) + yaxis._offset - 155;
 
-              if (
-                point &&
-                point.customdata 
-              ) {
+              if (point && point.customdata) {
                 updateTooltip({
                   visible: true,
                   data: point.customdata,
@@ -317,7 +310,6 @@ export function LocusAlignmentPlot(params) {
                     dispatch(
                       qtlsGWASBoxplotsCalculation({
                         request,
-                        select_qtls_samples,
                         quantificationFile: inputs['quantification_file'][0],
                         genotypeFile: inputs['genotype_file'][0],
                         info: tooltip.data,

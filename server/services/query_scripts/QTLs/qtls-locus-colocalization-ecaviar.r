@@ -1,4 +1,4 @@
-locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtls_samples, gwasFile, assocFile, LDFile, select_ref, select_dist, request, bucket) {
+locus_colocalization_eCAVIAR <- function(workDir, gwasFile, assocFile, LDFile, select_ref, select_dist, request, bucket) {
   source('services/query_scripts/QTLs/ezQTL_ztw.R')
   setwd(workDir)
   library(jsonlite)
@@ -6,31 +6,12 @@ locus_colocalization_eCAVIAR <- function(workDir, select_gwas_sample, select_qtl
   library(ggrepel)
   library(aws.s3)
 
-  ## use sample data files or user-uploaded data files
-  if (identical(select_gwas_sample, 'true')) {
-    publicGWASFile = 'ezQTL/MX2.examples/MX2.GWAS.rs.txt'
-    gwasFile <- paste0(workDir, '/tmp/', request, '/MX2.GWAS.rs.txt')
-
-    # download example files from s3 and save to request dir
-    save_object(publicGWASFile, bucket, file = gwasFile)
-  } else {
-    gwasFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_gwas.txt')
+  gwasFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_gwas.txt')
+  assocFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_qtl.txt')
+  if (!identical(LDFile, 'false')) {
+    LDFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_ld.gz')
   }
-  if (identical(select_qtls_samples, 'true')) {
-    publicAssocFile = 'ezQTL/MX2.examples/MX2.eQTL.txt'
-    publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    assocFile <- paste0(workDir, '/tmp/', request, '/MX2.eQTL.txt')
-    LDFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
 
-    # download example files from s3 and save to request dir
-    save_object(publicAssocFile, bucket, file = assocFile)
-    save_object(publicLDFile, bucket, file = LDFile)
-  } else {
-    assocFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_qtl.txt')
-    if (!identical(LDFile, 'false')) {
-      LDFile <- paste0(workDir, '/', 'tmp/', request, '/ezQTL_input_ld.gz')
-    }
-  }
 
   ## execute eCAVIAR calculation: shell script
   if (identical(LDFile, 'false')) {

@@ -26,19 +26,10 @@ function LocusInfo({
 }) {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
-  const {
-    locusInformation,
-    submitted,
-    qtlPublic,
-    ldPublic,
-    gwasPublic,
-  } = useSelector((state) => state.qtlsGWAS);
-  const {
-    select_dist,
-    select_position,
-    select_ref,
-    select_chromosome,
-  } = locusInformation[locusIndex];
+  const { locusInformation, submitted, qtlPublic, ldPublic, gwasPublic } =
+    useSelector((state) => state.qtlsGWAS);
+  const { select_dist, select_position, select_ref, select_chromosome } =
+    locusInformation[locusIndex];
 
   // check form validity for locus info params
   useEffect(() => {
@@ -272,8 +263,6 @@ export function QTLsGWASForm() {
   const [locusValid, setLocusValid] = useState(false);
 
   const {
-    select_qtls_samples,
-    select_gwas_sample,
     associationFile,
     quantificationFile,
     genotypeFile,
@@ -318,16 +307,13 @@ export function QTLsGWASForm() {
   } = useSelector((state) => state.qtlsGWAS);
 
   useEffect(() => _setAssociationFile(associationFile), [associationFile]);
-  useEffect(() => _setQuantificationFile(quantificationFile), [
-    quantificationFile,
-  ]);
+  useEffect(
+    () => _setQuantificationFile(quantificationFile),
+    [quantificationFile]
+  );
   useEffect(() => _setGenotypeFile(genotypeFile), [genotypeFile]);
   useEffect(() => _setLDFile(LDFile), [LDFile]);
   useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
-  useEffect(() => {
-    if (select_qtls_samples || select_gwas_sample) toggleQuantification(true);
-    else toggleQuantification(false);
-  }, [select_qtls_samples, select_gwas_sample]);
   useEffect(() => {
     if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx());
   }, [publicGTEx]);
@@ -352,8 +338,7 @@ export function QTLsGWASForm() {
   // check form validity for file uploads
   useEffect(() => {
     if (
-      (!select_qtls_samples &&
-        !_associationFile &&
+      (!_associationFile &&
         !_gwasFile &&
         !_LDFile &&
         !qtlPublic &&
@@ -367,7 +352,6 @@ export function QTLsGWASForm() {
       setValid(true);
     }
   }, [
-    select_qtls_samples,
     _associationFile,
     _gwasFile,
     _LDFile,
@@ -387,9 +371,9 @@ export function QTLsGWASForm() {
 
   function getGenomeOptions() {
     const data = publicGTEx['cis-QTL dataset'];
-    const genomeOptions = [
-      ...new Set(data.map((row) => row.Genome_build)),
-    ].map((genome) => ({ value: genome, label: genome }));
+    const genomeOptions = [...new Set(data.map((row) => row.Genome_build))].map(
+      (genome) => ({ value: genome, label: genome })
+    );
 
     dispatch(
       updateQTLsGWAS({
@@ -601,12 +585,8 @@ export function QTLsGWASForm() {
     );
 
     const params = locusInformation.map((locusInfo, locusIndex) => {
-      const {
-        select_dist,
-        select_ref,
-        select_position,
-        select_chromosome,
-      } = locusInfo;
+      const { select_dist, select_ref, select_position, select_chromosome } =
+        locusInfo;
 
       const qtlKey = qtlPublic
         ? tissueOnly
@@ -694,8 +674,6 @@ export function QTLsGWASForm() {
         genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
         gwasFile: (_gwasFile && _gwasFile.name) || false,
         LDFile: (_LDFile && _LDFile.name) || false,
-        select_qtls_samples,
-        select_gwas_sample,
         select_pop,
         select_gene,
         select_dist,
@@ -748,7 +726,7 @@ export function QTLsGWASForm() {
                 </Form.Label>
                 <Form.Check
                   title="Association (QTL) Public Data Checkbox"
-                  disabled={submitted || select_qtls_samples}
+                  disabled={submitted}
                   inline
                   id="qtlSource"
                   label="Public"
@@ -831,15 +809,13 @@ export function QTLsGWASForm() {
                 <Form.File
                   title="Association (QTL) Data User File Upload Input"
                   id="qtls-association-file"
-                  disabled={submitted || select_qtls_samples}
+                  disabled={submitted}
                   key={_associationFile}
                   label={
                     _associationFile
                       ? _associationFile.name ||
                         _associationFile.filename ||
                         _associationFile
-                      : select_qtls_samples
-                      ? 'MX2.eQTL.txt'
                       : 'Choose File'
                   }
                   onChange={(e) => {
@@ -847,7 +823,7 @@ export function QTLsGWASForm() {
                   }}
                   // accept=".tsv, .txt"
                   // isInvalid={
-                  //   attempt ? !_associationFile && !select_qtls_samples : false
+                  //   attempt ? !_associationFile  : false
                   // }
                   // feedback="Please upload a data file"
                   custom
@@ -859,7 +835,7 @@ export function QTLsGWASForm() {
                 <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
                 <Form.Check
                   title="GWAS Public Data Checkbox"
-                  disabled={submitted || select_qtls_samples}
+                  disabled={submitted}
                   inline
                   id="gwasSource"
                   label="Public"
@@ -936,13 +912,11 @@ export function QTLsGWASForm() {
                 <Form.File
                   title="GWAS Data User File Upload Input"
                   id="qtls-gwas-file"
-                  disabled={submitted || select_gwas_sample}
+                  disabled={submitted}
                   key={_gwasFile}
                   label={
                     _gwasFile
                       ? _gwasFile.name || _gwasFile.filename || _gwasFile
-                      : select_gwas_sample
-                      ? 'MX2.GWAS.rs.txt'
                       : 'Choose File'
                   }
                   onChange={(e) => {
@@ -950,7 +924,7 @@ export function QTLsGWASForm() {
                   }}
                   // accept=".tsv, .txt"
                   // isInvalid={
-                  //   attempt ? !_gwasFile && !select_qtls_samples : false
+                  //   attempt ? !_gwasFile : false
                   // }
                   // feedback="Please upload a data file"
                   custom
@@ -986,15 +960,13 @@ export function QTLsGWASForm() {
                     title="Quantification Data User File Upload Input"
                     ref={quantificationFileControl}
                     id="qtls-quantification-file"
-                    disabled={submitted || select_qtls_samples}
+                    disabled={submitted}
                     key={_quantificationFile}
                     label={
                       _quantificationFile
                         ? _quantificationFile.name ||
                           _quantificationFile.filename ||
                           _quantificationFile
-                        : select_qtls_samples
-                        ? 'MX2.quantification.txt'
                         : 'Choose File'
                     }
                     custom
@@ -1018,15 +990,13 @@ export function QTLsGWASForm() {
                     title="Genotype Data User File Upload Input"
                     ref={genotypeFileControl}
                     id="qtls-genotype-file"
-                    disabled={submitted || select_qtls_samples}
+                    disabled={submitted}
                     key={_genotypeFile}
                     label={
                       _genotypeFile
                         ? _genotypeFile.name ||
                           _genotypeFile.filename ||
                           _genotypeFile
-                        : select_qtls_samples
-                        ? 'MX2.genotyping.txt'
                         : 'Choose File'
                     }
                     onChange={(e) => {
@@ -1061,7 +1031,7 @@ export function QTLsGWASForm() {
                 {/* <span style={{ color: 'red' }}>*</span> */}
               </Form.Label>
               <Form.Check
-                disabled={submitted || select_qtls_samples}
+                disabled={submitted}
                 inline
                 id="ldSource"
                 label="Public"
@@ -1126,20 +1096,18 @@ export function QTLsGWASForm() {
               <>
                 <Form.File
                   id="qtls-ld-file"
-                  disabled={submitted || select_qtls_samples}
+                  disabled={submitted}
                   key={_LDFile}
                   label={
                     _LDFile
                       ? _LDFile.name || _LDFile.filename || _LDFile
-                      : select_qtls_samples
-                      ? 'MX2.LD.gz'
                       : 'Choose File'
                   }
                   onChange={(e) => {
                     _setLDFile(e.target.files[0]);
                   }}
                   // accept=".tsv, .txt"
-                  // isInvalid={attempt ? !_LDFile && !select_qtls_samples : false}
+                  // isInvalid={attempt ? !_LDFile : false}
                   // feedback="Please upload a data file"
                   custom
                 />
@@ -1171,7 +1139,7 @@ export function QTLsGWASForm() {
         <Col>
           <Select
             className="border rounded p-2"
-            disabled={!genomeOptions.length || select_qtls_samples || submitted}
+            disabled={!genomeOptions.length || submitted}
             id="genomeBuild"
             label="Genome Build"
             value={genome}
@@ -1197,36 +1165,6 @@ export function QTLsGWASForm() {
             <span className="sr-only">Load Sample Data</span>
             Load Sample Data
           </Link>
-          {/* <Button
-            className="p-0 font-14"
-            variant="link"
-            onClick={() => {
-              _setGwasFile('');
-              if (!select_qtls_samples) {
-                dispatch(
-                  updateQTLsGWAS({
-                    select_qtls_samples: true,
-                    select_gwas_sample: true,
-                    qtlPublic: false,
-                    gwasPublic: false,
-                    ldPublic: false,
-                    select_pop: false,
-                    genome: { value: 'GRCh37', label: 'GRCh37' },
-                  })
-                );
-              } else {
-                dispatch(
-                  updateQTLsGWAS({
-                    select_qtls_samples: false,
-                    select_gwas_sample: false,
-                  })
-                );
-              }
-            }}
-            disabled={submitted}
-          >
-            {!select_gwas_sample ? 'Load' : 'Unload'} Sample Data
-          </Button> */}
         </Col>
 
         <Col sm="6" className="d-flex">

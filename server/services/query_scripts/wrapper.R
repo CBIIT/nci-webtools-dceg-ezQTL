@@ -19,21 +19,17 @@ getS3File <- function(key, bucket) {
   return(rawToChar(get_object(key, bucket)))
 }
 
-qtlsCalculateMain <- function(rfile, workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
+qtlsCalculateMain <- function(rfile, workingDirectory, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
   source(rfile)
-  main(workingDirectory, select_qtls_samples, select_gwas_sample, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build)
+  main(workingDirectory, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build)
 }
 
-qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, exprFile, genoFile, traitID, genotypeID, log2, request, bucket) {
+qtlsRecalculateQuantification <- function(rfile, workDir, exprFile, genoFile, traitID, genotypeID, log2, request, bucket) {
   source(rfile)
+  setwd(workDir)
 
-  if (identical(select_qtls_samples, 'false')) {
-    gdatafile <- paste0('tmp/', request, '/', genoFile)
-    edatafile <- paste0('tmp/', request, '/', exprFile)
-  } else {
-    gdatafile <- getS3File('ezQTL/MX2.examples/MX2.genotyping.txt', bucket)
-    edatafile <- getS3File('ezQTL/MX2.examples/MX2.quantification.txt', bucket)
-  }
+  gdatafile <- paste0('tmp/', request, '/', genoFile)
+  edatafile <- paste0('tmp/', request, '/', exprFile)
 
   gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
   # check if there are multiple chromosomes in the input genotype file
@@ -62,22 +58,22 @@ qtlsRecalculateQuantification <- function(rfile, workDir, select_qtls_samples, e
   locus_quantification_qtl(gdata, edata, genotypeID, traitID, qtlPath, log2)
 }
 
-qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, request, bucket) {
+qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, quantificationFile, genotypeFile, info, request, bucket) {
   source(rfile)
-  locus_alignment_boxplots(workingDirectory, select_qtls_samples, quantificationFile, genotypeFile, info, request, bucket)
+  locus_alignment_boxplots(workingDirectory, quantificationFile, genotypeFile, info, request, bucket)
 }
 
-qtlsCalculateLocusColocalizationECAVIAR <- function(rfile, workingDirectory, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, select_ref, select_dist, request, bucket) {
+qtlsCalculateLocusColocalizationECAVIAR <- function(rfile, workingDirectory, gwasFile, associationFile, LDFile, select_ref, select_dist, request, bucket) {
   source(rfile)
-  locus_colocalization_eCAVIAR(workingDirectory, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, LDFile, select_ref, select_dist, request, bucket)
+  locus_colocalization_eCAVIAR(workingDirectory, gwasFile, associationFile, LDFile, select_ref, select_dist, request, bucket)
 }
 
-qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket) {
+qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket) {
   source(rfile)
-  locus_colocalization_hyprcoloc(workingDirectory, select_gwas_sample, select_qtls_samples, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket)
+  locus_colocalization_hyprcoloc(workingDirectory, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket)
 }
 
-qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, gwasPhenotype, request, plotPath, inputPath, logPath, qtlPublic, gwasPublic, ldPublic, workDir, bucket) {
+qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, gwasPhenotype, request, plotPath, inputPath, logPath, qtlPublic, gwasPublic, ldPublic, workDir, bucket) {
   source(rfile)
   library(data.table)
   setwd(workDir)
@@ -97,78 +93,67 @@ qtlsCalculateQC <- function(rfile, select_gwas_sample, select_qtls_samples, gwas
   minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
   maxpos = select_position + cedistance
 
-  if (identical(select_gwas_sample, 'true')) {
-    gwasFile <- getS3File('ezQTL/MX2.examples/MX2.GWAS.rs.txt', bucket)
-  } else {
-    if (identical(gwasKey, 'false')) {
-      if (identical(gwasFile, 'false'))
-        gwasFile <- NULL
-      else
-        gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
-    }
-    else {
-      gwasFile = paste0(workDir, '/tmp/', request, '/', request, '.gwas_temp.txt')
-      if (!file.exists(gwasFile)) {
-        loadAWS()
-        gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
-        cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", gwasFile)
-        system(cmd)
+  if (identical(gwasKey, 'false')) {
+    if (identical(gwasFile, 'false'))
+      gwasFile <- NULL
+    else
+      gwasFile <- paste0(workDir, '/tmp/', request, '/', gwasFile)
+  }
+  else {
+    gwasFile = paste0(workDir, '/tmp/', request, '/', request, '.gwas_temp.txt')
+    if (!file.exists(gwasFile)) {
+      loadAWS()
+      gwasPathS3 = paste0('s3://', bucket, '/ezQTL/', gwasKey)
+      cmd = paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", gwasFile)
+      system(cmd)
 
-        gdata <- read_delim(paste0('tmp/', request, '/', request, '.gwas_temp.txt'), delim = "\t", col_names = T)
-        names(gdata)[names(gdata) == "#trait"] <- "trait"
-        gdata %>% filter(trait == gwasPhenotype) %>% write_delim(paste0('tmp/', request, '/', request, '.gwas_temp.txt'), delim = '\t', col_names = T)
-      }
+      gdata <- read_delim(paste0('tmp/', request, '/', request, '.gwas_temp.txt'), delim = "\t", col_names = T)
+      names(gdata)[names(gdata) == "#trait"] <- "trait"
+      gdata %>% filter(trait == gwasPhenotype) %>% write_delim(paste0('tmp/', request, '/', request, '.gwas_temp.txt'), delim = '\t', col_names = T)
     }
   }
-  if (identical(select_qtls_samples, 'true')) {
-    associationFile <- getS3File('ezQTL/MX2.examples/MX2.eQTL.txt', bucket)
 
-    publicLDFile = 'ezQTL/MX2.examples/MX2.LD.gz'
-    ldFile <- paste0(workDir, '/tmp/', request, '/MX2.LD.gz')
 
-    save_object(publicLDFile, bucket, file = ldFile)
-  } else {
+  if (identical(qtlKey, 'false')) {
 
-    if (identical(qtlKey, 'false')) {
+    if (identical(associationFile, 'false'))
+      associationFile = NULL
+    else
+      associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
+  }
+  else {
+    associationFile = paste0(workDir, '/tmp/', request, '/', request, '.qtl_temp.txt')
+    if (!file.exists(associationFile)) {
+      loadAWS()
+      qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
+      cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", associationFile)
+      system(cmd)
 
-      if (identical(associationFile, 'false'))
-        associationFile = NULL
-      else
-        associationFile <- paste0(workDir, '/tmp/', request, '/', associationFile)
+      # rename #gene_id to gene_id
+      qdata <- read_delim(paste0('tmp/', request, '/', request, '.qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
+      names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
+      qdata %>% write_delim(paste0('tmp/', request, '/', request, '.qtl_temp.txt'), delim = '\t', col_names = T)
     }
-    else {
-      associationFile = paste0(workDir, '/tmp/', request, '/', request, '.qtl_temp.txt')
-      if (!file.exists(associationFile)) {
-        loadAWS()
-        qtlPathS3 = paste0('s3://', bucket, '/ezQTL/', qtlKey)
-        cmd = paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, '-', maxpos, " -Dh >", associationFile)
-        system(cmd)
+  }
 
-        # rename #gene_id to gene_id
-        qdata <- read_delim(paste0('tmp/', request, '/', request, '.qtl_temp.txt'), delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
-        names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
-        qdata %>% write_delim(paste0('tmp/', request, '/', request, '.qtl_temp.txt'), delim = '\t', col_names = T)
-      }
-    }
-
-    if (identical(ldPublic, 'false')) {
-      if (identical(ldFile, 'false'))
-        ldFile = NULL
-      else
-        ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
-    }
-    else {
-      ldFile = paste0(workDir, '/tmp/', request, '/', request, '.LD.gz')
-      if (!file.exists(ldFile)) {
-        kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
-        kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
+  if (identical(ldPublic, 'false')) {
+    if (identical(ldFile, 'false'))
+      ldFile = NULL
+    else
+      ldFile <- paste0(workDir, '/tmp/', request, '/', ldFile)
+  }
+  else {
+    ldFile = paste0(workDir, '/tmp/', request, '/', request, '.LD.gz')
+    if (!file.exists(ldFile)) {
+      kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
+      kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
         select(sample:gender)
 
-        createExtractedPanel(select_pop, kgpanel, request)
-        getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
-      }
+      createExtractedPanel(select_pop, kgpanel, request)
+      getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
     }
   }
+
 
   if (identical(leadsnp, 'false'))
     leadsnp <- NULL
@@ -214,34 +199,26 @@ qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
 
-qtlsCalculateLD <- function(rfile, select_gwas_sample, select_qtls_samples, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, position, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
+qtlsCalculateLD <- function(rfile, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, position, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
   source(rfile)
   loadAWS()
 
-  if (identical(select_gwas_sample, 'true')) {
-    gwasFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_gwas.txt')
-  } else {
-    if (identical(gwasFile, 'false'))
-      gwasFile <- NULL
-    else
-      gwasFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_gwas.txt')
-  }
 
-  if (identical(select_qtls_samples, 'true')) {
+  if (identical(gwasFile, 'false'))
+    gwasFile <- NULL
+  else
+    gwasFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_gwas.txt')
+
+  if (identical(associationFile, 'false'))
+    associationFile = NULL
+  else
     associationFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_qtl.txt')
+
+  if (identical(ldFile, 'false'))
+    ldFile = NULL
+  else
     ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
 
-  } else {
-    if (identical(associationFile, 'false'))
-      associationFile = NULL
-    else
-      associationFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_qtl.txt')
-
-    if (identical(ldFile, 'false'))
-      ldFile = NULL
-    else
-      ldFile <- paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz')
-  }
 
   if (identical(ldThreshold, ''))
     ldThreshold = NULL

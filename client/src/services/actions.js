@@ -1626,27 +1626,15 @@ export function qtlsGWASLocusQCCalculation(params) {
 
           const qtlsGWAS = getState().qtlsGWAS;
 
-          if (
-            qtlsGWAS.associationFile ||
-            qtlsGWAS.qtlKey ||
-            qtlsGWAS.select_qtls_samples
-          ) {
+          if (qtlsGWAS.associationFile || qtlsGWAS.qtlKey) {
             params.associationFile = 'ezQTL_input_qtl.txt';
           }
 
-          if (
-            qtlsGWAS.LDFile ||
-            qtlsGWAS.ldPublic ||
-            qtlsGWAS.select_qtls_samples
-          ) {
+          if (qtlsGWAS.LDFile || qtlsGWAS.ldPublic) {
             params.LDFile = 'ezQTL_input_ld.gz';
           }
 
-          if (
-            qtlsGWAS.gwasFile ||
-            qtlsGWAS.gwasKey ||
-            qtlsGWAS.select_gwas_sample
-          ) {
+          if (qtlsGWAS.gwasFile || qtlsGWAS.gwasKey) {
             params.gwasFile = 'ezQTL_input_gwas.txt';
           }
 
@@ -1661,8 +1649,6 @@ export function qtlsGWASLocusQCCalculation(params) {
             await dispatch(
               qtlsGWASLocusLDCalculation({
                 request: params.request,
-                select_gwas_sample: qtlsGWAS.select_gwas_sample,
-                select_qtls_samples: qtlsGWAS.select_qtls_samples,
                 gwasFile: params.gwasFile,
                 associationFile: params.associationFile,
                 LDFile: params.LDFile,
@@ -1876,14 +1862,6 @@ export function qtlsGWASCalculation(params) {
         dispatch(
           updateQTLsGWAS({
             request: response.data['info']['inputs']['request'][0],
-            select_qtls_samples:
-              response.data['info']['select_qtls_samples'][0] === 'true'
-                ? true
-                : false,
-            select_gwas_sample:
-              response.data['info']['select_gwas_sample'][0] === 'true'
-                ? true
-                : false,
             select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
             recalculateAttempt:
               response.data['info']['recalculateAttempt'][0] === 'true'
@@ -1923,8 +1901,9 @@ export function qtlsGWASCalculation(params) {
             },
             locus_alignment_gwas_scatter_threshold: 0.0,
             locus_colocalization_correlation: {
-              data:
-                response.data['locus_colocalization_correlation']['data'][0],
+              data: response.data['locus_colocalization_correlation'][
+                'data'
+              ][0],
             },
             gwas: {
               data: response.data['gwas']['data'][0],
@@ -1970,8 +1949,6 @@ export function qtlsGWASCalculation(params) {
             dispatch(
               qtlsGWASHyprcolocCalculation({
                 request: qtlsGWAS.request,
-                select_gwas_sample: qtlsGWAS.select_gwas_sample,
-                select_qtls_samples: qtlsGWAS.select_qtls_samples,
                 select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
                 select_ref: qtlsGWAS.locus_alignment.top.rsnum,
                 gwasfile: qtlsGWAS.inputs.gwas_file[0],
@@ -1987,24 +1964,15 @@ export function qtlsGWASCalculation(params) {
                 gwasFile: qtlsGWAS.inputs.gwas_file[0],
                 request: qtlsGWAS.request,
                 select_dist: qtlsGWAS.inputs.select_dist[0] * 1000,
-                select_gwas_sample: qtlsGWAS.select_gwas_sample,
-                select_qtls_samples: qtlsGWAS.select_qtls_samples,
                 select_ref: qtlsGWAS.locus_alignment.top.rsnum,
               })
             );
           }
 
-          if (
-            (qtlsGWAS.LDFile ||
-              qtlsGWAS.ldKey ||
-              qtlsGWAS.select_qtls_samples) &&
-            !qtlsGWAS.recalculate
-          ) {
+          if ((qtlsGWAS.LDFile || qtlsGWAS.ldKey) && !qtlsGWAS.recalculate) {
             dispatch(
               qtlsGWASLocusLDCalculation({
                 request: qtlsGWAS.request,
-                select_gwas_sample: qtlsGWAS.select_gwas_sample,
-                select_qtls_samples: qtlsGWAS.select_qtls_samples,
                 gwasFile: qtlsGWAS.inputs.gwas_file[0],
                 associationFile: qtlsGWAS.inputs.association_file[0],
                 LDFile: qtlsGWAS.inputs.ld_file[0],
@@ -2149,10 +2117,8 @@ export function qtlsGWASBoxplotsCalculation(params) {
         //   response.data
         // );
 
-        const {
-          pdata,
-          locus_alignment_boxplots_plot_layout,
-        } = drawLocusAlignmentBoxplots(params, response);
+        const { pdata, locus_alignment_boxplots_plot_layout } =
+          drawLocusAlignmentBoxplots(params, response);
 
         dispatch(
           updateQTLsGWAS({
