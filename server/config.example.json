@@ -35,8 +35,8 @@
     }
   },
   "email": {
-    "support": "",
-    "admin": "",
+    "techSupport": "",
+    "adminSupport": "",
     "baseUrl": "http://localhost:3001",
     "smtp": {
       "host": "host",

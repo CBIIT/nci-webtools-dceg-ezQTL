@@ -361,14 +361,14 @@ async function processSingleLocus(requestData) {
       originalTimestamp: timestamp,
       runTime: runtime,
       resultsUrl: `${config.email.baseUrl}/#/qtls/${request}`,
-      supportEmail: config.email.admin,
+      supportEmail: config.email.adminSupport,
       jobName: params.jobName,
     };
 
     // send user success email
     logger.info(`Sending user success email`);
     const userEmailResults = await mailer.sendMail({
-      from: config.email.admin,
+      from: config.email.adminSupport,
       to: params.email,
       subject: `ezQTL Results - ${timestamp} EST`,
       html: await readTemplate(
@@ -391,14 +391,14 @@ async function processSingleLocus(requestData) {
       originalTimestamp: timestamp,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
-      supportEmail: config.email.admin,
+      supportEmail: config.email.adminSupport,
     };
 
     // send admin error email
     logger.info(`Sending admin error email`);
     const adminEmailResults = await mailer.sendMail({
-      from: config.email.admin,
-      to: config.email.support,
+      from: config.email.adminSupport,
+      to: config.email.techSupport,
       subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
@@ -410,7 +410,7 @@ async function processSingleLocus(requestData) {
     if (params.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
-        from: config.email.admin,
+        from: config.email.adminSupport,
         to: params.email,
         subject: 'ezQTL Error',
         html: await readTemplate(
@@ -521,13 +521,13 @@ async function processMultiLoci(data) {
     // specify email template variables
     const templateData = {
       results: template.join(''),
-      supportEmail: config.email.admin,
+      supportEmail: config.email.adminSupport,
     };
 
     // send user success email
     logger.info(`Sending user multi results email`);
     const userEmailResults = await mailer.sendMail({
-      from: config.email.admin,
+      from: config.email.adminSupport,
       to: email,
       subject: `ezQTL Results - ${timestamp} EST`,
       html: await readTemplate(
@@ -555,8 +555,8 @@ async function processMultiLoci(data) {
       logger.info(`Sending admin multi results email`);
 
       const adminEmailResults = await mailer.sendMail({
-        from: config.email.admin,
-        to: config.email.support,
+        from: config.email.adminSupport,
+        to: config.email.techSupport,
         subject: `ezQTL Results - ${timestamp} EST`,
         html: await readTemplate(
           __dirname + '/templates/admin-multi-failure.html',
@@ -582,14 +582,14 @@ async function processMultiLoci(data) {
       originalTimestamp: timestamp,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
-      supportEmail: config.email.admin,
+      supportEmail: config.email.adminSupport,
     };
 
     // send admin error email
     logger.info(`Sending admin error email`);
     const adminEmailResults = await mailer.sendMail({
-      from: config.email.admin,
-      to: config.email.support,
+      from: config.email.adminSupport,
+      to: config.email.techSupport,
       subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
       html: await readTemplate(
         __dirname + '/templates/admin-failure-email.html',
@@ -601,7 +601,7 @@ async function processMultiLoci(data) {
     if (params.email) {
       logger.info(`Sending user error email`);
       const userEmailResults = await mailer.sendMail({
-        from: config.email.admin,
+        from: config.email.adminSupport,
         to: params.email,
         subject: 'ezQTL Error',
         html: await readTemplate(
