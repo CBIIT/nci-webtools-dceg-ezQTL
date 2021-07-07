@@ -407,21 +407,18 @@ async function qtlsCalculateQC(params, res, next) {
 
   try {
     const wrapper = await calculateQC(params);
-    const data = JSON.parse(wrapper);
-    if (data.error) {
-      res.json(data);
-    } else {
-      let summary = '';
-      if (fs.existsSync(logPath)) {
-        summary = String(await fs.promises.readFile(logPath));
-      }
+    const { error } = JSON.parse(wrapper);
 
-      summary = summary.replace(/#/g, '\u2022');
-      summary = summary.split('\n\n');
-
-      logger.info(`[${request}] Finished /qtlsCalculateQC`);
-      res.json(summary);
+    let summary = '';
+    if (fs.existsSync(logPath)) {
+      summary = String(await fs.promises.readFile(logPath));
     }
+
+    summary = summary.replace(/#/g, '\u2022');
+    summary = summary.split('\n\n');
+
+    logger.info(`[${request}] Finished /qtlsCalculateQC`);
+    res.json({ summary: summary, error: error || false });
   } catch (err) {
     logger.error(`[${request}] Error /qtlsCalculateQC ${err}`);
     res.status(500).json(err);

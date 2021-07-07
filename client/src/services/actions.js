@@ -1616,12 +1616,16 @@ export function qtlsGWASLocusQCCalculation(params) {
               isLoading: false,
               isLoadingQC: false,
               isError: true,
+              locus_qc: response.data.summary,
               // activeResultsTab: 'locus-qc',
             })
           );
         } else {
           await dispatch(
-            updateQTLsGWAS({ locus_qc: response.data, isLoadingQC: false })
+            updateQTLsGWAS({
+              locus_qc: response.data.summary,
+              isLoadingQC: false,
+            })
           );
 
           const qtlsGWAS = getState().qtlsGWAS;

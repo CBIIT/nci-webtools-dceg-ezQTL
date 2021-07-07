@@ -30,23 +30,17 @@ export function LocusQC() {
         />
       )}
       {submitted && qcError && (
+        <p>
+          <b className="text-danger">{qcError}</b>
+        </p>
+      )}
+      {submitted && isQueue && !locus_qc && !isLoading && !isLoadingQC && (
         <LoadingOverlay
           active={true}
-          content={<b className="text-danger">{qcError}</b>}
+          content={<>Reset the left panel to continue.</>}
         />
       )}
-      {submitted &&
-        isQueue &&
-        !locus_qc &&
-        !qcError &&
-        !isLoading &&
-        !isLoadingQC && (
-          <LoadingOverlay
-            active={true}
-            content={<>Reset the left panel to continue.</>}
-          />
-        )}
-      {submitted && locus_qc && !qcError && !isLoading && !isLoadingQC && (
+      {submitted && locus_qc && !isLoading && !isLoadingQC && (
         <>
           {locus_qc.length > 0 && (
             <div>
