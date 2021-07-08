@@ -1611,8 +1611,9 @@ export function qtlsGWASLocusQCCalculation(params) {
         if (response.data.error) {
           dispatch(
             updateQTLsGWAS({
-              qcError:
-                response.data.error || 'Error occurred in QC calculation',
+              qcError: response.data.error.includes('ezQTL QC failed')
+                ? response.data.error
+                : 'An error occurred in QC calculation. Please review your inputs.',
               isLoading: false,
               isLoadingQC: false,
               isError: true,
