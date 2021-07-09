@@ -1631,17 +1631,40 @@ export function qtlsGWASLocusQCCalculation(params) {
 
           const qtlsGWAS = getState().qtlsGWAS;
 
-          if (qtlsGWAS.associationFile || qtlsGWAS.qtlKey) {
+          if (
+            (qtlsGWAS.associationFile || qtlsGWAS.qtlKey) &&
+            !qtlsGWAS.locus_qc.find((log) =>
+              log.includes('QTL file detected as empty file')
+            )
+          ) {
             params.associationFile = 'ezQTL_input_qtl.txt';
           }
 
-          if (qtlsGWAS.LDFile || qtlsGWAS.ldPublic) {
+          if (
+            (qtlsGWAS.LDFile || qtlsGWAS.ldPublic) &&
+            !qtlsGWAS.locus_qc.find((log) =>
+              log.includes('LD file detected as empty file')
+            )
+          ) {
             params.LDFile = 'ezQTL_input_ld.gz';
           }
 
-          if (qtlsGWAS.gwasFile || qtlsGWAS.gwasKey) {
+          if (
+            (qtlsGWAS.gwasFile || qtlsGWAS.gwasKey) &&
+            !qtlsGWAS.locus_qc.find((log) =>
+              log.includes('GWAS file detected as empty file')
+            )
+          ) {
             params.gwasFile = 'ezQTL_input_gwas.txt';
           }
+
+          await dispatch(
+            updateQTLsGWAS({
+              gwasFile: params.gwasFile,
+              associationFile: params.associationFile,
+              LDFile: params.LDFile,
+            })
+          );
 
           params.recalculate = false;
 
@@ -1663,6 +1686,16 @@ export function qtlsGWASLocusQCCalculation(params) {
                 select_gene: qtlsGWAS.select_gene,
                 ldThreshold: qtlsGWAS.ldThreshold,
                 ldAssocData: qtlsGWAS.ldAssocData,
+              })
+            );
+          } else {
+            // if all data files are empty
+            dispatch(
+              updateQTLsGWAS({
+                qcError:
+                  'An error occurred in QC calculation. Please review your inputs.',
+                isLoading: false,
+                isError: true,
               })
             );
           }
@@ -1947,9 +1980,9 @@ export function qtlsGWASCalculation(params) {
             qtlsGWAS.gwas &&
             qtlsGWAS.gwas.data &&
             Object.keys(qtlsGWAS.gwas.data).length > 0 &&
-            (qtlsGWAS.associationFile || qtlsGWAS.qtlKey) &&
-            (qtlsGWAS.gwasFile || qtlsGWAS.gwasKey) &&
-            (qtlsGWAS.LDFile || qtlsGWAS.ldKey)
+            qtlsGWAS.associationFile &&
+            qtlsGWAS.gwasFile &&
+            qtlsGWAS.LDFile
           ) {
             dispatch(
               qtlsGWASHyprcolocCalculation({
@@ -1974,7 +2007,7 @@ export function qtlsGWASCalculation(params) {
             );
           }
 
-          if ((qtlsGWAS.LDFile || qtlsGWAS.ldKey) && !qtlsGWAS.recalculate) {
+          if (qtlsGWAS.LDFile && !qtlsGWAS.recalculate) {
             dispatch(
               qtlsGWASLocusLDCalculation({
                 request: qtlsGWAS.request,

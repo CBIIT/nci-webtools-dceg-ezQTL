@@ -130,16 +130,33 @@ async function calculate(params) {
   summary = summary.split('\n\n');
 
   let newParams = { ...params };
-  if (params.associationFile || params.qtlKey)
+
+  if (
+    (params.associationFile || params.qtlKey) &&
+    !summary.find((log) => log.includes('QTL file detected as empty file'))
+  ) {
     params.associationFile = 'ezQTL_input_qtl.txt';
-  if (params.LDFile || params.ldPublic) params.LDFile = 'ezQTL_input_ld.gz';
-  if (params.gwasFile || params.gwasKey)
+  }
+  if (
+    (params.LDFile || params.ldPublic) &&
+    !summary.find((log) => log.includes('LD file detected as empty file'))
+  ) {
+    params.LDFile = 'ezQTL_input_ld.gz';
+  }
+  if (
+    (params.gwasFile || params.gwasKey) &&
+    !summary.find((log) => log.includes('GWAS file detected as empty file'))
+  ) {
     params.gwasFile = 'ezQTL_input_gwas.txt';
+  }
 
   let state = {
     ...newParams,
     ldProject: { value: params.ldProject, label: params.ldProject },
     locus_qc: summary,
+    gwasFile: params.gwasFile,
+    associationFile: params.associationFile,
+    LDFile: params.LDFile,
     locusInformation: [
       {
         select_dist: params.select_dist,
@@ -279,7 +296,7 @@ async function calculate(params) {
 
   // qtlsGWASLocusLDCalculation
   try {
-    if (params.LDFile || params.ldKey) {
+    if (params.LDFile) {
       const locusLD = await calculateLocusLD({
         workingDirectory: workingDirectory,
         bucket: config.aws.s3.data,

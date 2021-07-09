@@ -25,15 +25,11 @@ export function QTLsGWASResults({ queueRequest }) {
     associationFile,
     gwasFile,
     LDFile,
-    qtlPublic,
-    gwasPublic,
-    ldPublic,
     quantificationFile,
     genotypeFile,
     locus_alignment,
     locus_table,
     locus_qc,
-    inputs,
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -41,13 +37,13 @@ export function QTLsGWASResults({ queueRequest }) {
       component: <LocusQC />,
       key: 'locus-qc',
       title: 'Locus QC',
-      disabled: !submitted || isError || !locus_qc || !inputs,
+      disabled: !submitted || isError || !locus_qc,
     },
     {
       component: <LocusLD />,
       key: 'locus-ld',
       title: 'Locus LD',
-      disabled: !submitted || isError || !inputs || !(LDFile || ldPublic),
+      disabled: !submitted || isError || !LDFile,
     },
     {
       component: <LocusAlignment />,
@@ -56,7 +52,6 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        !inputs ||
         !(locus_alignment.data && locus_alignment.data.length),
     },
     {
@@ -66,40 +61,27 @@ export function QTLsGWASResults({ queueRequest }) {
       disabled:
         !submitted ||
         isError ||
-        !inputs ||
         !(gwas && gwas.data && Object.keys(gwas.data).length > 0) ||
-        !(
-          (associationFile || qtlPublic) &&
-          (gwasFile || gwasPublic) &&
-          (LDFile || ldPublic)
-        ),
+        !(associationFile && gwasFile && LDFile),
     },
     {
       component: <LocusTable />,
       key: 'locus-table',
       title: 'Locus Table',
-      disabled:
-        !submitted ||
-        isError ||
-        !inputs ||
-        !(associationFile || qtlPublic) ||
-        !(LDFile || ldPublic),
+      disabled: !submitted || isError || !associationFile || !LDFile,
     },
     {
       component: <LocusQuantifiation />,
       key: 'locus-quantification',
       title: 'Locus Quantification',
-      disabled:
-        !submitted ||
-        isError ||
-        !inputs ||
-        !(quantificationFile && genotypeFile),
+      disabled: !submitted || isError || !(quantificationFile && genotypeFile),
     },
     {
       component: <LocusDownload />,
       key: 'locus-download',
       title: 'Locus Download',
-      disabled: !submitted || isError || !inputs,
+      disabled:
+        !submitted || isError || (!associationFile && !LDFile && !gwasFile),
     },
   ];
 
