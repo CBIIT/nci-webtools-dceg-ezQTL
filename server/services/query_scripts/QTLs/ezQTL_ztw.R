@@ -38,114 +38,132 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   
   # check gwas file
   if(!is.null(gwasfile)){
-    # format file, remove the CR/^M characters from windows 
-    if(!gwasfile_pub){ formatM_input(gwasfile) }
-    # read orignal file 
-    gwas <- read_delim(gwasfile,delim = '\t',col_names = T,col_types = c('chr'='c','pos'='n','ref'='c','alt'='c','rsnum'='c','pvalue'='d','zscore'='d','effect'='d','se'='d'))
-    # check file format, and select only requeired columns
-    gwas_colnames <- c('chr','pos','ref','alt','rsnum','pvalue','zscore','effect','se')
-    gwas_colname_diff <- gwas_colnames[!gwas_colnames %in% colnames(gwas)]
-    if(length(gwas_colname_diff)!=0){
-      errinfo <- paste0("ERROR: The following GWAS column names for ezQTL are not existed: ",paste0(gwas_colname_diff,collapse = ', '))
-      cat(errinfo,file=logfile,sep="\n",append = T)
-      stop("ezQTL QC failed: GWAS data format")
+    if(file.info(gwasfile)$size<50){
+      gwasfile <- NULL
+      cat("\nGWAS summary",file=logfile,sep="\n",append = T)
+      cat("Warnning: GWAS file detected as empty file",file=logfile,sep="\n",append = T)
     }else{
-      gwas <-gwas %>% select(one_of(gwas_colnames)) %>% unique() 
-      gwas_nchr <- gwas %>% count(chr) %>% dim() %>% .[[1]]
-      if(gwas_nchr!=1){
-        errinfo <- "ERROR: Number of chromosome in GWAS file not equal to 1"
+      # format file, remove the CR/^M characters from windows 
+      if(!gwasfile_pub){ formatM_input(gwasfile) }
+      # read orignal file 
+      gwas <- read_delim(gwasfile,delim = '\t',col_names = T,col_types = c('chr'='c','pos'='n','ref'='c','alt'='c','rsnum'='c','pvalue'='d','zscore'='d','effect'='d','se'='d'))
+      # check file format, and select only requeired columns
+      gwas_colnames <- c('chr','pos','ref','alt','rsnum','pvalue','zscore','effect','se')
+      gwas_colname_diff <- gwas_colnames[!gwas_colnames %in% colnames(gwas)]
+      if(length(gwas_colname_diff)!=0){
+        errinfo <- paste0("ERROR: The following GWAS column names for ezQTL are not existed: ",paste0(gwas_colname_diff,collapse = ', '))
         cat(errinfo,file=logfile,sep="\n",append = T)
         stop("ezQTL QC failed: GWAS data format")
+      }else{
+        gwas <-gwas %>% select(one_of(gwas_colnames)) %>% unique() 
+        gwas_nchr <- gwas %>% count(chr) %>% dim() %>% .[[1]]
+        if(gwas_nchr!=1){
+          errinfo <- "ERROR: Number of chromosome in GWAS file not equal to 1"
+          cat(errinfo,file=logfile,sep="\n",append = T)
+          stop("ezQTL QC failed: GWAS data format")
+        }
+        
+        cat("\nGWAS summary",file=logfile,sep="\n",append = T)
+        gwastmp <- gwas %>% select(rsnum,chr,pos,ref,alt) 
+        cat(paste0('# number of variants included: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
+        gwastmp <- gwastmp %>% filter(str_detect(rsnum,'^rs'))
+        cat(paste0('# number of variants with rsnum: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
+        gwastmp <- gwastmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
+        cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
       }
       
-      cat("\nGWAS summary",file=logfile,sep="\n",append = T)
-      gwastmp <- gwas %>% select(rsnum,chr,pos,ref,alt) 
-      cat(paste0('# number of variants included: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
-      gwastmp <- gwastmp %>% filter(str_detect(rsnum,'^rs'))
-      cat(paste0('# number of variants with rsnum: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
-      gwastmp <- gwastmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
-      cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(gwastmp)[1]),file=logfile,sep="\n",append = T)
     }
-    
   }
   
   # check qtl file
   if(!is.null(qtlfile)){
-    # format file, remove the CR/^M characters from windows 
-    if(!qtlfile_pub){ formatM_input(qtlfile) }
-    # read orignal file 
-    qtl <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = c('gene_id'='c','gene_symbol'='c','variant_id'='c','rsnum'='c','chr'='c','pos'='n','ref'='c','alt'='c','pval_nominal'='d','slope'='d','slope_se'='d'))
-    # check file format, and select only requeired columns
-    qtl_colnames <- c('gene_id','gene_symbol','variant_id','rsnum','chr','pos','ref','alt','tss_distance','pval_nominal','slope','slope_se')
-    qtl_colname_diff <- qtl_colnames[!qtl_colnames %in% colnames(qtl)]
-    if(length(qtl_colname_diff)!=0){
-      errinfo <- paste0("ERROR: The following QTL column names for ezQTL are not existed: ",paste0(qtl_colname_diff,collapse = ', '))
-      cat(errinfo,file=logfile,sep="\n",append = T)
-      stop("ezQTL QC failed: QTL data format")
+    if(file.info(qtlfile)$size<50){
+      qtlfile <- NULL
+      cat("\nQTL summary",file=logfile,sep="\n",append = T)
+      cat("Warnning: QTL file detected as empty file",file=logfile,sep="\n",append = T)
     }else{
-      qtl <-qtl %>% select(one_of(qtl_colnames)) %>% unique()
-      
-      qtl_nchr <- qtl %>% count(chr) %>% dim() %>% .[[1]]
-      if(qtl_nchr!=1){
-        errinfo <- "ERROR: Number of chromosome in QTL file not equal to 1"
+      # format file, remove the CR/^M characters from windows 
+      if(!qtlfile_pub){ formatM_input(qtlfile) }
+      # read orignal file 
+      qtl <- read_delim(qtlfile,delim = '\t',col_names = T,col_types = c('gene_id'='c','gene_symbol'='c','variant_id'='c','rsnum'='c','chr'='c','pos'='n','ref'='c','alt'='c','pval_nominal'='d','slope'='d','slope_se'='d'))
+      # check file format, and select only requeired columns
+      qtl_colnames <- c('gene_id','gene_symbol','variant_id','rsnum','chr','pos','ref','alt','tss_distance','pval_nominal','slope','slope_se')
+      qtl_colname_diff <- qtl_colnames[!qtl_colnames %in% colnames(qtl)]
+      if(length(qtl_colname_diff)!=0){
+        errinfo <- paste0("ERROR: The following QTL column names for ezQTL are not existed: ",paste0(qtl_colname_diff,collapse = ', '))
         cat(errinfo,file=logfile,sep="\n",append = T)
         stop("ezQTL QC failed: QTL data format")
-      }
-      
-      cat("\nQTL summary",file=logfile,sep="\n",append = T)
-      ntraits <- qtl %>% count(gene_id) %>% dim() %>% .[[1]]
-      cat(paste0('# number of QTL traits: ',ntraits),file=logfile,sep="\n",append = T)
-      qtltmp <- qtl %>% select(variant_id,rsnum,chr,pos,ref,alt) %>% unique() 
-      cat(paste0('# number of variants included: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
-      qtltmp <- qtltmp %>% filter(str_detect(rsnum,'^rs'))
-      cat(paste0('# number of variants with rsnum: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
-      qtltmp <- qtltmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
-      cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
-      
-      
-      
-      if(all(is.na(qtl$gene_symbol)) | all(qtl$gene_symbol=="NA")){
-        qtl <- qtl %>% mutate(gene_symbol=gene_id)
       }else{
-        if(any(is.na(qtl$gene_symbol))){
-          qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+        qtl <-qtl %>% select(one_of(qtl_colnames)) %>% unique()
+        
+        qtl_nchr <- qtl %>% count(chr) %>% dim() %>% .[[1]]
+        if(qtl_nchr!=1){
+          errinfo <- "ERROR: Number of chromosome in QTL file not equal to 1"
+          cat(errinfo,file=logfile,sep="\n",append = T)
+          stop("ezQTL QC failed: QTL data format")
         }
-      }
-      
-      dup_qtl_id <- qtl %>% count(gene_id,gene_symbol) %>% count(gene_symbol) %>% filter(n>1)
-      if(dim(dup_qtl_id)[1]>1){
-        cat(paste0('Duplicated gene symbol in the qtl files. Use the gene id and gene symbol together as the new id'),file=logfile,sep="\n",append = T)
-        qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,"|",gene_symbol))
+        
+        cat("\nQTL summary",file=logfile,sep="\n",append = T)
+        ntraits <- qtl %>% count(gene_id) %>% dim() %>% .[[1]]
+        cat(paste0('# number of QTL traits: ',ntraits),file=logfile,sep="\n",append = T)
+        qtltmp <- qtl %>% select(variant_id,rsnum,chr,pos,ref,alt) %>% unique() 
+        cat(paste0('# number of variants included: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
+        qtltmp <- qtltmp %>% filter(str_detect(rsnum,'^rs'))
+        cat(paste0('# number of variants with rsnum: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
+        qtltmp <- qtltmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
+        cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(qtltmp)[1]),file=logfile,sep="\n",append = T)
+        
+        
+        
+        if(all(is.na(qtl$gene_symbol)) | all(qtl$gene_symbol=="NA")){
+          qtl <- qtl %>% mutate(gene_symbol=gene_id)
+        }else{
+          if(any(is.na(qtl$gene_symbol))){
+            qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,'|',gene_symbol))
+          }
+        }
+        
+        dup_qtl_id <- qtl %>% count(gene_id,gene_symbol) %>% count(gene_symbol) %>% filter(n>1)
+        if(dim(dup_qtl_id)[1]>1){
+          cat(paste0('Duplicated gene symbol in the qtl files. Use the gene id and gene symbol together as the new id'),file=logfile,sep="\n",append = T)
+          qtl <- qtl %>% mutate(gene_symbol=paste0(gene_id,"|",gene_symbol))
+        }
+        
       }
       
     }
-    
   }
   
   # check ld file
   if(!is.null(ldfile)){
-    # format file, remove the CR/^M characters from windows 
-    if(!ldfile_pub){ formatM_input(ldfile) }
-    # read orignal file 
-    ld.matrix <- read_delim(ldfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
-    # check file format, and select only requeired columns
-    ld.matrix.size=dim(ld.matrix)
-    if(ld.matrix.size[1]<7 | ld.matrix.size[2]<7 | (ld.matrix.size[2]-ld.matrix.size[1])!=5){
-      errinfo <- paste0("ERROR: The dimensions of the LD matrix file are not correct. Please check the help page for the detail.")
-      cat(errinfo,file=logfile,sep="\n",append = T)
-      stop("ezQTL QC failed: LD data format")
-    }else{
-      # pre-porcessing data
-      ld.info <- ld.matrix %>% select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
-      ld.matrix <- ld.matrix %>% select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
-      
+    if(file.info(ldfile)$size<50){
+      ldfile <- NULL
       cat("\nLD summary",file=logfile,sep="\n",append = T)
-      ldinfotmp <- ld.info %>% select(rsnum,chr,pos,ref,alt) %>% unique() 
-      cat(paste0('# number of variants included: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
-      ldinfotmp <- ldinfotmp %>% filter(str_detect(rsnum,'^rs'))
-      cat(paste0('# number of variants with rsnum: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
-      ldinfotmp <- ldinfotmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
-      cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+      cat("Warnning: LD file detected as empty file",file=logfile,sep="\n",append = T)
+    }else{
+      # format file, remove the CR/^M characters from windows 
+      if(!ldfile_pub){ formatM_input(ldfile) }
+      # read orignal file 
+      ld.matrix <- read_delim(ldfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
+      # check file format, and select only requeired columns
+      ld.matrix.size=dim(ld.matrix)
+      if(ld.matrix.size[1]<7 | ld.matrix.size[2]<7 | (ld.matrix.size[2]-ld.matrix.size[1])!=5){
+        errinfo <- paste0("ERROR: The dimensions of the LD matrix file are not correct. Please check the help page for the detail.")
+        cat(errinfo,file=logfile,sep="\n",append = T)
+        stop("ezQTL QC failed: LD data format")
+      }else{
+        # pre-porcessing data
+        ld.info <- ld.matrix %>% select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
+        ld.matrix <- ld.matrix %>% select(-c(chr,pos,rsnum,ref,alt)) %>% as.matrix
+        
+        cat("\nLD summary",file=logfile,sep="\n",append = T)
+        ldinfotmp <- ld.info %>% select(rsnum,chr,pos,ref,alt) %>% unique() 
+        cat(paste0('# number of variants included: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+        ldinfotmp <- ldinfotmp %>% filter(str_detect(rsnum,'^rs'))
+        cat(paste0('# number of variants with rsnum: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+        ldinfotmp <- ldinfotmp  %>% filter((ref %in% c('A','T') & alt %in% c('A','T'))|(ref %in% c('C','G') & alt %in% c('C','G')))
+        cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(ldinfotmp)[1]),file=logfile,sep="\n",append = T)
+      }
     }
   }
   
@@ -293,12 +311,12 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   if(
     (!is.null(chr_gwas) & !is.null(chr_qtl) & isTRUE(chr_gwas != chr_qtl)) | (!is.null(chr_gwas) & !is.null(chr_ld) & isTRUE(chr_gwas != chr_ld)) | (!is.null(chr_ld) & !is.null(chr_qtl) & isTRUE(chr_ld != chr_qtl))
   ){
-    errinfo <- "ERROR: found different chromosomes among GWAS/QTL/LD datasets, please check the inputs"
-    # return(errinfo)
+    errinfo <- "ezQTL QC failed: found different chromosomes among GWAS/QTL/LD datasets, please check the inputs"
+    #return(errinfo)
     stop(errinfo)
   }
   
-
+  
   
   # Summary of the dataset --------------------------------------------------
   
@@ -350,6 +368,11 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     cat(paste0('# number of variants with rsnum: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     snpalltmp <- snpalltmp  %>% filter((ref_qtl %in% c('A','T') & alt_qtl %in% c('A','T'))|(ref_qtl %in% c('C','G') & alt_qtl %in% c('C','G')))
     cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    
+    if(dim(snpall)[1]==0){
+      errinfo <- "ezQTL QC failed: No overlap SNP detected"
+      stop(errinfo)
+    }
     
     # output the final dataset ------------------------------------------------
     #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
@@ -504,7 +527,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
       if( dim(qtl)[1] == 0){
         cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
-        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
+        stop(paste0('ezQTL QC failed: No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
       }
     }
     
@@ -558,6 +581,11 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     cat(paste0('# number of variants with rsnum: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     snpalltmp <- snpalltmp  %>% filter((ref_gwas %in% c('A','T') & alt_gwas %in% c('A','T'))|(ref_gwas %in% c('C','G') & alt_gwas %in% c('C','G')))
     cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    
+    if(dim(snpall)[1]==0){
+      errinfo <- "ezQTL QC failed: No overlap SNP detected"
+      stop(errinfo)
+    }
     
     # output the final dataset ------------------------------------------------
     #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
@@ -674,7 +702,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       cat(paste0('# number of QTL traits are removed due to low number of SNPs (less than 50 on either side of reference SNP): ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
       if(dim(qtl)[1]==0){
         cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
-        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
+        stop(paste0('ezQTL QC failed: No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
       }
     }
     
@@ -726,6 +754,11 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     snpalltmp <- snpalltmp  %>% filter((ref_qtl %in% c('A','T') & alt_qtl %in% c('A','T'))|(ref_qtl %in% c('C','G') & alt_qtl %in% c('C','G')))
     cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     
+    if(dim(snpall)[1]==0){
+      errinfo <- "ezQTL QC failed: No overlap SNP detected"
+      stop(errinfo)
+    }
+
     # output the final dataset ------------------------------------------------
     #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
     orsnum <- snpall %>% pull(rsnum)
@@ -819,7 +852,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       cat(paste0('# number of QTL traits are removed due to low number of SNPs: ',dim(qtl_rm)[1]),file=logfile,sep="\n",append = T)
       if(dim(qtl)[1] == 0){
         cat(paste0('\nWarning: no QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'),file=logfile,sep="\n",append = T)
-        stop(paste0('No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
+        stop(paste0('ezQTL QC failed: No QTL trait left after QC, suggest to use another reference SNP or increase distance for this locus.'))
       }
     }
     
@@ -870,6 +903,11 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
     cat(paste0('# number of variants with rsnum: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
     snpalltmp <- snpalltmp  %>% filter((ref_gwas %in% c('A','T') & alt_gwas %in% c('A','T'))|(ref_gwas %in% c('C','G') & alt_gwas %in% c('C','G')))
     cat(paste0('# number of variants with rsnum and A/T, C/G alleles: ',dim(snpalltmp)[1]),file=logfile,sep="\n",append = T)
+    
+    if(dim(snpall)[1]==0){
+      errinfo <- "ezQTL QC failed: No overlap SNP detected"
+      stop(errinfo)
+    }
     
     # output the final dataset ------------------------------------------------
     #orsnum <- gwas %>% filter(rsnum %in% qtl$rsnum,rsnum %in% ld.data$rsnum) %>% pull(rsnum)
@@ -1405,7 +1443,7 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   
   
   if(is.null(association_file) & is.null(leadsnp) & is.null(leadsnp_pos)){
-    stop("You have to input the SNP in the locus informaiton for the LD visualization.")
+    stop("ezQTL QC failed: You have to input the SNP in the locus informaiton for the LD visualization.")
   }
   
   ld.matrix <- read_delim(LDfile,delim = '\t',col_names = F,col_types = cols('X1'='c')) %>% rename(chr=X1,pos=X2,rsnum=X3,ref=X4,alt=X5)
@@ -1475,14 +1513,13 @@ IntRegionalPlot <- function(chr=NULL, left=NULL, right=NULL, association_file=NU
   transcript_association <- transcript_association[order(transcript_association$Site),]
   
   if (dim(transcript_association)[1] < 2) {
-    stop("Less than 2 markers, can not compute LD")
+    stop("ezQTL QC failed: Less than 2 markers, can not compute LD")
   } else {
     
     ## tabix gtf file
-    #if(genome_build == "GRCh37") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v19.annotation.gtf.gz')}
-    #if(genome_build == "GRCh38") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v37.annotation.gtf.gz')}
+    # if(genome_build == "GRCh37") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v19.annotation.gtf.gz')}
+    # if(genome_build == "GRCh38") { gtf_tabix_file <- paste0(gtf_tabix_folder,'/gencode.v37.annotation.gtf.gz')}
     regionfile=paste0(chr,":",left,"-",right,'.gtf_tmp')
-    #cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' > ',regionfile)
     cmd_ztw=paste0('tabix ',gtf_tabix_file,' ',chr,":",left,"-",right,' -D > ',regionfile)
     system(cmd_ztw)
     gtf <- read_delim(regionfile,delim = '\t',col_names = FALSE)
