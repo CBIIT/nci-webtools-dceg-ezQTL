@@ -91,7 +91,11 @@ export function LocusAlignment() {
             <p>
               <small>
                 <i>
-                  Click on the SNP to show additional information and actions
+                  Click on the SNP to show additional information and actions.
+                  please note, this figure will not be included in the download
+                  folder. you can click "Download plot" button on the top-right
+                  corner of this plot and then change the downloaded file type
+                  from ".txt" to ".svg".
                 </i>
               </small>
             </p>
