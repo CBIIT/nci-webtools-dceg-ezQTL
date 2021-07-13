@@ -93,7 +93,8 @@ locus_colocalization_hyprcoloc <- function(workDir, select_dist, select_ref, gwa
 
     result_hyprcoloc <- bind_rows(result_hyprcoloc, res[[1]] %>% mutate(gene_id = geneid))
     if (length(res) > 1) {
-      tmpres <- res[[2]][[1]] %>% as.data.frame() %>% rownames_to_column() %>% mutate(gene_id = geneid)
+      # tmpres <- res[[2]][[1]] %>% as.data.frame() %>% rownames_to_column() %>% mutate(gene_id = geneid)
+      tmpres <- tibble(rsnum = names(res[[2]][[1]]), snpscore = res[[2]][[1]]) %>% mutate(gene_id = geneid)
       colnames(tmpres) <- c("rsnum", "snpscore", "gene_id")
       result_snpscore <- bind_rows(result_snpscore, tmpres)
     }
