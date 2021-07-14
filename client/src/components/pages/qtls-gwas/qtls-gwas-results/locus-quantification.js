@@ -163,7 +163,7 @@ export function LocusQuantifiation() {
               </div>
               <div className="col-md-auto mt-4">
                 <Button
-                  disabled={!submitted}
+                  disabled={!submitted || isLoadingQuantification}
                   className="d-block"
                   variant="primary"
                   type="button"
