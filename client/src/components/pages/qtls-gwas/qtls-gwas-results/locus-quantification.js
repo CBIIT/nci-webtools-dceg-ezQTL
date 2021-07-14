@@ -49,7 +49,6 @@ export function LocusQuantifiation() {
     <div className="px-3 py-2" style={{ minHeight: '500px' }}>
       {request && genotypeFile && quantificationFile && (
         <div>
-          <LoadingOverlay active={isLoadingQuantification} />
           <Zoom
             plotURL={`api/results/${request}/quantification_cor.svg`}
             plotId="1"
@@ -175,12 +174,17 @@ export function LocusQuantifiation() {
               </div>
             </>
           </Form>
-          <Zoom
-            plotURL={`api/results/${request}/quantification_qtl.svg`}
-            plotId="3"
-            className="border rounded p-3 mb-2"
-            maxHeight="800px"
-          />
+          <div style={{ minHeight: '800px' }} className="border rounded">
+            <LoadingOverlay active={isLoadingQuantification} />
+            {!isLoadingQuantification && (
+              <Zoom
+                plotURL={`api/results/${request}/quantification_qtl.svg`}
+                plotId="3"
+                className="p-3 mb-2"
+                maxHeight="800px"
+              />
+            )}
+          </div>
         </div>
       )}
     </div>
