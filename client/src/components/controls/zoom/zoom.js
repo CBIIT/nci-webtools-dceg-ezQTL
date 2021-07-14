@@ -145,7 +145,7 @@ export default function Zoom({
                   <TransformComponent>
                     <img
                       className="w-100"
-                      src={plotURL}
+                      src={`${plotURL}#${Date.now()}`}
                       style={{ maxHeight: maxHeight || '500px' }}
                       alt={alt || 'Plot is unavailable.'}
                     />
