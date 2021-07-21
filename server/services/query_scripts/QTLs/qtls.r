@@ -17,13 +17,15 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
   wd = getwd()
   if (ldProject == '1000genomes') {
     ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
+    ldLog = paste0('tmp/', request, '/publicLD.log')
+    cat(paste0('Getting ', ldPathS3, '\n'), file = ldLog, sep = "\n", append = T)
 
     cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
-    system(cmd, intern = TRUE)
+    cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
     cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
-    system(cmd, intern = TRUE)
+    cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
     cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > tmp/', request, '/', request, '.LD.gz')
-    system(cmd, intern = TRUE)
+    cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
 
     out <- read_delim(LDFile, delim = '\t', col_names = F)
     if (dim(out)[1] > 0) {
@@ -44,7 +46,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     }
   }
   if (length(unique(info$chr)) > 1) {
-    errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
+    stop("Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
   } else {
     if (dim(out)[2] > 5) {
       out <- as.matrix(out[, - (1:5)]);
