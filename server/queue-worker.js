@@ -268,7 +268,9 @@ async function calculate(params) {
     // qtlsColocVisualization - summary
     try {
       if (
+        state.hyprcoloc_table.data &&
         state.hyprcoloc_table.data.length > 0 &&
+        state.ecaviar_table.data &&
         state.ecaviar_table.data.length > 0
       ) {
         const colocSummary = await calculateColocVisualize({
