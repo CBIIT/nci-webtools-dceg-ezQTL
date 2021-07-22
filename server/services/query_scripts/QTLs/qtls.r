@@ -24,7 +24,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
     cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
-    cmd = paste0('emeraLD --matrix -i', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > tmp/', request, '/', request, '.LD.gz')
+    cmd = paste0('emeraLD --matrix -i ', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > tmp/', request, '/', request, '.LD.gz')
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
 
     out <- read_delim(LDFile, delim = '\t', col_names = F)
