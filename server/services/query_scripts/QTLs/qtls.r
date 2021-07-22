@@ -13,19 +13,20 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
 }
 
 getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject) {
-  LDFile = paste0('tmp/', request, '/', request, '.LD.gz')
-  wd = getwd()
+  wd = getwd() # project root
+  LDFile = paste0(wd, '/tmp/', request, '/', request, '.LD.gz')
   if (ldProject == '1000genomes') {
     ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
-    ldLog = paste0('tmp/', request, '/publicLD.log')
+    ldLog = paste0(wd, '/tmp/', request, '/publicLD.log')
     cat(paste0('Getting ', ldPathS3, '\n'), file = ldLog, sep = "\n", append = T)
 
-    cmd = paste0('cd data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
+    cmd = paste0('cd ', wd, '/data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
     cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
-    cmd = paste0('emeraLD --matrix -i ', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > tmp/', request, '/', request, '.LD.gz')
+    cmd = paste0('emeraLD --matrix -i ', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > ', wd, '/tmp/', request, '/', request, '.LD.gz')
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
+
 
     out <- read_delim(LDFile, delim = '\t', col_names = F)
     if (dim(out)[1] > 0) {
@@ -69,12 +70,12 @@ createExtractedPanel <- function(select_pop, kgpanel, request) {
       kgpanel %>%
         filter(super_pop == pop_i) %>%
         select(sample) %>%
-        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE)
+        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE, quote = "none")
     } else if (pop_i %in% kgpanel$pop) {
       kgpanel %>%
         filter(pop == pop_i) %>%
         select(sample) %>%
-        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE)
+        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE, quote = "none")
     }
   }
 
