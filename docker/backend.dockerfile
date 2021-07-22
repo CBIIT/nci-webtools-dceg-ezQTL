@@ -40,10 +40,9 @@ RUN dnf -y install \
 # install emerald
 RUN cd /tmp \
     && git clone https://github.com/statgen/emeraLD.git \
-    && cd emeraLD \
-    && git checkout fix/macos-compile \
-    && make \
-    && cd ./bin && mv ./emeraLD /usr/local/bin
+    && cd emeraLD/bin \
+    && chmod 755 emeraLD \
+    && mv emeraLD /usr/local/bin
 
 # install htslib
 RUN cd /tmp \
