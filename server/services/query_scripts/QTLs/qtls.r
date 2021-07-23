@@ -14,17 +14,18 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
 
 getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject) {
   wd = getwd() # project root
+  ldTemp = paste0(wd, '/tmp/', request, '/', request, '.input.vcf.gz')
   LDFile = paste0(wd, '/tmp/', request, '/', request, '.LD.gz')
   if (ldProject == '1000genomes') {
     ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
     ldLog = paste0(wd, '/tmp/', request, '/publicLD.log')
     cat(paste0('Getting ', ldPathS3, '\n'), file = ldLog, sep = "\n", append = T)
 
-    cmd = paste0('cd ', wd, '/data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', wd, '/tmp/', request, '/', request, '.input.vcf.gz ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
+    cmd = paste0('cd ', wd, '/data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', ldTemp, ' ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
-    cmd = paste0('bcftools index -t ', wd, '/tmp/', request, '/', request, '.input.vcf.gz')
+    cmd = paste0('bcftools index -t ', ldTemp)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
-    cmd = paste0('emeraLD --matrix -i ', wd, '/tmp/', request, '/', request, '.input.vcf.gz --stdout --extra --phased |sed "s/:/\t/" |bgzip > ', wd, '/tmp/', request, '/', request, '.LD.gz')
+    cmd = paste0('emeraLD --matrix -i ', ldTemp, ' --stdout --extra --phased |sed "s/:/\t/" |bgzip > ', LDFile)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
 
 
@@ -32,6 +33,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     if (dim(out)[1] > 0) {
       info <- out[, 1:5]
     } else {
+      # No LD data available
       info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
     }
   } else if (ldProject == 'UKBB') {
