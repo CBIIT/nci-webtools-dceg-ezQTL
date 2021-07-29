@@ -37,7 +37,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
       info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
     }
   } else if (ldProject == 'UKBB') {
-    cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -b ', bucket, ' -o ', wd, '/', LDFile)
+    cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -b ', bucket, ' -o ', LDFile)
     system(cmd)
 
     out <- read_delim(LDFile, delim = '\t', col_names = F, col_types = cols('X2' = 'c'))
