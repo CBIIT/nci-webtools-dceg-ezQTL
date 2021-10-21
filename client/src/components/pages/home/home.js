@@ -279,7 +279,7 @@ export function Home() {
           </a>{' '}
           is available under the{' '}
           <a
-            href="https://ldlink.nci.nih.gov/license.txt"
+            href="https://raw.githubusercontent.com/CBIIT/nci-webtools-dceg-ezQTL/master/LICENSE"
             target="_blank"
             rel="noreferrer"
           >
