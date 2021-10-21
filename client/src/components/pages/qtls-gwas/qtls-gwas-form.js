@@ -104,7 +104,7 @@ function LocusInfo({
             <Form.Label className="mb-0">
               cis-QTL Distance <span style={{ color: 'red' }}>*</span>
               <small>
-                <i>(+/- Kb up to 5Mb)</i>
+                <i>(+/- Kb up to 1Mb)</i>
               </small>
             </Form.Label>
             <Form.Control
@@ -112,15 +112,15 @@ function LocusInfo({
               aria-label="cis-QTL Distance Input"
               type="number"
               min="1"
-              max="2000"
+              max="1000"
               id="qtls-distance-input"
               disabled={submitted}
               onChange={(e) => mergeLocusInfo({ select_dist: e.target.value })}
               value={select_dist}
-              isInvalid={(attempt && select_dist < 1) || select_dist > 200}
+              isInvalid={(attempt && select_dist < 1) || select_dist > 1000}
             />
             <Form.Control.Feedback type="invalid">
-              Enter distance between 1 and 200Kb.
+              Enter distance between 1 and 1000Kb.
             </Form.Control.Feedback>
           </Col>
         </Form.Row>
