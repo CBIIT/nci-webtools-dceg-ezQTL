@@ -85,7 +85,21 @@ async function qtlsCalculateMain(params, req, res, next) {
   try {
     const wrapper = await calculateMain(params);
     logger.info(`[${request}] Finished /qtls-calculate-main`);
-    res.json(JSON.parse(wrapper));
+
+    const logPath = path.resolve(
+      params.workingDirectory,
+      'tmp',
+      request,
+      'ezQTL.log'
+    );
+    logger.debug(logPath);
+    const summary = fs.existsSync(logPath)
+      ? String(await fs.promises.readFile(logPath))
+          .replace(/#/g, '\u2022')
+          .split('\n\n')
+      : null;
+
+    res.json({ ...JSON.parse(wrapper), summary });
   } catch (err) {
     logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
     res.status(500).json(err);

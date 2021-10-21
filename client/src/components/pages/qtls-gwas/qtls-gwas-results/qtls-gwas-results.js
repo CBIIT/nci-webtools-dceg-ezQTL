@@ -30,6 +30,8 @@ export function QTLsGWASResults({ queueRequest }) {
     locus_alignment,
     locus_table,
     locus_qc,
+    hyprcoloc_table,
+    ecaviar_table,
   } = useSelector((state) => state.qtlsGWAS);
 
   const tabs = [
@@ -62,7 +64,8 @@ export function QTLsGWASResults({ queueRequest }) {
         !submitted ||
         isError ||
         !(gwas && gwas.data && Object.keys(gwas.data).length > 0) ||
-        !(associationFile && gwasFile && LDFile),
+        !(associationFile && gwasFile && LDFile) ||
+        (!hyprcoloc_table.data.length && !ecaviar_table.data.length),
     },
     {
       component: <LocusTable />,

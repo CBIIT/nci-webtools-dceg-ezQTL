@@ -1899,6 +1899,7 @@ export function qtlsGWASCalculation(params) {
 
         dispatch(
           updateQTLsGWAS({
+            locus_qc: response.data.summary,
             request: response.data['info']['inputs']['request'][0],
             select_ref: response.data['locus_alignment']['top'][0][0]['rsnum'],
             recalculateAttempt:
@@ -1982,7 +1983,8 @@ export function qtlsGWASCalculation(params) {
             Object.keys(qtlsGWAS.gwas.data).length > 0 &&
             qtlsGWAS.associationFile &&
             qtlsGWAS.gwasFile &&
-            qtlsGWAS.LDFile
+            qtlsGWAS.LDFile &&
+            typeof qtlsGWAS.locus_colocalization_correlation.data != 'string'
           ) {
             dispatch(
               qtlsGWASHyprcolocCalculation({

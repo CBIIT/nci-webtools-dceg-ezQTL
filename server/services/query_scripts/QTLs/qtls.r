@@ -119,9 +119,17 @@ locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
   # tmptest <- cor.test(-log10(tmpdata$pvalue),-log10(tmpdata$pval_nominal),method = 'spearman')
   # tmptitle <- paste0('rho=',round(tmptest$estimate,3),', p=',round(tmptest$p.value,3))
 
-  tmptest_spearman <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'spearman')
-  tmptest_pearson <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'pearson')
-  tmptitle <- paste0('rho=', round(tmptest_spearman$estimate, 3), ', r=', round(tmptest_pearson$estimate, 3))
+  # tmptest_spearman <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'spearman')
+  # tmptest_pearson <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'pearson')
+  # tmptitle <- paste0('rho=', round(tmptest_spearman$estimate, 3), ', r=', round(tmptest_pearson$estimate, 3))
+
+  if (length(tmpdata$pvalue) > 5 & length(tmpdata$pvalue) == length(tmpdata$pval_nominal)) {
+    tmptest_spearman <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'spearman')
+    tmptest_pearson <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'pearson')
+    tmptitle <- paste0('rho=', round(tmptest_spearman$estimate, 3), ', r=', round(tmptest_pearson$estimate, 3))
+  } else {
+    tmptitle <- 'rho=NA, r=NA'
+  }
 
   tmpdata_colnames <- colnames(tmpdata)
   locus_alignment_gwas_scatter_data <- list(setNames(as.data.frame(tmpdata), tmpdata_colnames))
@@ -130,20 +138,25 @@ locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
 }
 
 locus_colocalization_correlation <- function(gwasdata, qdata) {
-  #p_cutoff <- 0.01 ### kevin, a parameter for user to choose max pvalue cut-off for both eQTL and GWAS ##
-  tmpdata <- qdata %>%
+  tryCatch({
+    #p_cutoff <- 0.01 ### kevin, a parameter for user to choose max pvalue cut-off for both eQTL and GWAS ##
+    tmpdata <- qdata %>%
     select(gene_symbol, gene_id, chr, pos, ref, alt, pval_nominal) %>%
     left_join(gwasdata) %>%
     filter(!is.na(pvalue), !is.na(pval_nominal))
-  # filter(!is.na(pvalue),!is.na(pval_nominal),pvalue<p_cutoff,pval_nominal<p_cutoff) 
-  #if (p_cutoff < 1) {
-  tmpgeneid <- tmpdata %>%
-    count(gene_id, sort = T) %>%
-    filter(n > 10) %>% pull(gene_id)
-  tmpdata <- tmpdata %>%
-    filter(gene_id %in% tmpgeneid)
-  #}
-  tmpdata <- left_join(
+    # filter(!is.na(pvalue),!is.na(pval_nominal),pvalue<p_cutoff,pval_nominal<p_cutoff)
+    tmpgeneid <- tmpdata %>%
+      count(gene_id, sort = T) %>%
+      filter(n > 10) %>% pull(gene_id)
+    tmpdata <- tmpdata %>%
+      filter(gene_id %in% tmpgeneid)
+
+    if (length(tmpgeneid) < 1) {
+      errinfo <- paste0("\nERROR: the number of overlapped variants with both eQTL and GWAS data is less than 10 for all traits. P-value correlation will not be calculated")
+      cat(errinfo, file = logfile, sep = "\n", append = T)
+      stop("ezQTL QC failed for p-value correlation analysis")
+    }
+    tmpdata <- left_join(
     tmpdata %>%
       group_by(gene_id, gene_symbol) %>%
       do(tidy(cor.test(.$pvalue, .$pval_nominal, method = 'spearman'))) %>%
@@ -154,12 +167,16 @@ locus_colocalization_correlation <- function(gwasdata, qdata) {
       do(tidy(cor.test(.$pvalue, .$pval_nominal, method = 'pearson'))) %>%
       ungroup() %>% select(gene_id, gene_symbol, pearson_r = estimate, pearson_p = p.value)
   )
-  ## cast column types to string to prevent rounding of decimals
-  tmpdata_string <- tmpdata
-  tmpdata_string[3:6] <- lapply(tmpdata_string[3:6], as.character)
-  locus_colocalization_correlation_colnames <- colnames(tmpdata_string)
-  locus_colocalization_correlation_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_correlation_colnames))
-  return(locus_colocalization_correlation_data);
+    ## cast column types to string to prevent rounding of decimals
+    tmpdata_string <- tmpdata
+    tmpdata_string[3:6] <- lapply(tmpdata_string[3:6], as.character)
+    locus_colocalization_correlation_colnames <- colnames(tmpdata_string)
+    locus_colocalization_correlation_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_correlation_colnames))
+    return(locus_colocalization_correlation_data);
+  },
+  error = function(e) {
+    return(e$message)
+  })
 }
 
 locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) {
@@ -464,6 +481,9 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   warningMessages <- list()
   errorMessages <- list()
 
+  # log file path
+  logfile <<- paste0(workDir, '/tmp/', request, '/ezQTL.log')
+
   ## parameters define ##
   if (identical(select_pop, 'false')) {
     ## set default population to EUR if none chosen
@@ -506,7 +526,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   # load association data from user upload
   if (!identical(assocFile, 'false') || !identical(qtlKey, 'false')) {
     qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
-    qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c'))
+    qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c', ref = 'c', alt = 'c'))
   }
   if (!identical(LDFile, 'false')) {
     LDFile <- paste0('tmp/', request, '/', LDFile)
