@@ -74,7 +74,7 @@ RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/Si
 RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'devtools', 'R.utils', 'aws.ec2metadata', 'aws.s3', 'aws.signature', 'gdtools', 'cowplot', 'hrbrthemes','svglite', 'ggsci', 'ggrepel', 'ggplot2', 'ggstatsplot', 'scales', 'ggasym', 'corrr', 'ggridges', 'plyr', 'reshape2'), repos='https://cloud.r-project.org/')"
 
 # install Hyprcoloc R package
-RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = FALSE);"
+RUN Rscript -e "require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--resave-data', '--no-manual'), build_vignettes = TRUE);"
 
 # install python packages
 RUN pip3 install scipy pandas numpy tensorflow boto3
