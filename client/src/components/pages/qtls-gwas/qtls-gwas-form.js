@@ -36,7 +36,7 @@ function LocusInfo({
     if (
       !select_dist ||
       select_dist < 1 ||
-      select_dist > 200 ||
+      select_dist > 1000 ||
       (select_ref && !/^rs\d+$/.test(select_ref)) ||
       (ldPublic && !select_position) ||
       (_LDFile && !_gwasFile && !_associationFile && !select_ref) ||
@@ -117,7 +117,7 @@ function LocusInfo({
               disabled={submitted}
               onChange={(e) => mergeLocusInfo({ select_dist: e.target.value })}
               value={select_dist}
-              isInvalid={(attempt && select_dist < 1) || select_dist > 1000}
+              isInvalid={attempt && (select_dist < 1 || select_dist > 1000)}
             />
             <Form.Control.Feedback type="invalid">
               Enter distance between 1 and 1000Kb.
