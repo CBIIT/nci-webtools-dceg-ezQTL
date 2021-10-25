@@ -92,12 +92,8 @@ async function qtlsCalculateMain(params, req, res, next) {
       request,
       'ezQTL.log'
     );
-    logger.debug(logPath);
-    const summary = fs.existsSync(logPath)
-      ? String(await fs.promises.readFile(logPath))
-          .replace(/#/g, '\u2022')
-          .split('\n\n')
-      : null;
+
+    const summary = getSummary(logPath);
 
     res.json({ ...JSON.parse(wrapper), summary });
   } catch (err) {
@@ -245,11 +241,20 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(
     const wrapper = await calculateHyprcoloc(params);
     logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);
     res.json(JSON.parse(wrapper));
-  } catch (err) {
+  } catch (error) {
     logger.error(
-      `[${request}] Error /qtls-locus-colocalization-hyprcoloc ${err}`
+      `[${request}] Error /qtls-locus-colocalization-hyprcoloc ${error}`
     );
-    res.status(500).json(err);
+
+    const logPath = path.resolve(
+      params.workingDirectory,
+      'tmp',
+      request,
+      'ezQTL.log'
+    );
+    const summary = getSummary(logPath);
+
+    res.status(500).json({ error, summary });
   }
 }
 
@@ -409,6 +414,13 @@ async function calculateQC(params) {
   );
 }
 
+// read log file
+function getSummary(path) {
+  return fs.existsSync(path)
+    ? String(fs.readFileSync(path)).replace(/#/g, '\u2022').split('\n\n')
+    : null;
+}
+
 async function qtlsCalculateQC(params, res, next) {
   const { request, workingDirectory } = params;
 
@@ -417,19 +429,12 @@ async function qtlsCalculateQC(params, res, next) {
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
-
   try {
     const wrapper = await calculateQC(params);
     const { error } = JSON.parse(wrapper);
 
-    let summary = '';
-    if (fs.existsSync(logPath)) {
-      summary = String(await fs.promises.readFile(logPath));
-    }
-
-    summary = summary.replace(/#/g, '\u2022');
-    summary = summary.split('\n\n');
+    const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
+    const summary = getSummary(logPath);
 
     logger.info(`[${request}] Finished /qtlsCalculateQC`);
     res.json({ summary: summary, error: error || false });

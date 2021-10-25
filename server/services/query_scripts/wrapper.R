@@ -65,6 +65,8 @@ qtlsCalculateLocusColocalizationECAVIAR <- function(rfile, workingDirectory, gwa
 }
 
 qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket) {
+  # log file path
+  logfile <<- paste0(workingDirectory, '/tmp/', request, '/ezQTL.log')
   source(rfile)
   locus_colocalization_hyprcoloc(workingDirectory, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket)
 }

@@ -1498,17 +1498,18 @@ function qtlsGWASHyprcolocCalculation(params) {
         }
       })
       .catch(function (error) {
-        console.log(error);
-        if (error) {
-          dispatch(updateError({ visible: true }));
-          dispatch(
-            updateQTLsGWAS({
-              // isError: true,
-              // activeResultsTab: 'locus-qc',
-              isLoadingHyprcoloc: false,
-            })
-          );
-        }
+        const msg =
+          'ezQTL QC failed for HyPrColoc analysis. Review Locus QC Summary for more info.';
+
+        dispatch(updateError({ visible: true, message: msg }));
+        dispatch(
+          updateQTLsGWAS({
+            // isError: true,
+            // activeResultsTab: 'locus-qc',
+            isLoadingHyprcoloc: false,
+            locus_qc: error.response.data.summary,
+          })
+        );
       })
       .then(function () {
         dispatch(updateQTLsGWAS({ isLoadingHyprcoloc: false }));

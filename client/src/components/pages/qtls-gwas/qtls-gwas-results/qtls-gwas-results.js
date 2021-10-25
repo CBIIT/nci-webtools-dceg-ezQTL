@@ -64,8 +64,8 @@ export function QTLsGWASResults({ queueRequest }) {
         !submitted ||
         isError ||
         !(gwas && gwas.data && Object.keys(gwas.data).length > 0) ||
-        !(associationFile && gwasFile && LDFile) ||
-        (!hyprcoloc_table.data.length && !ecaviar_table.data.length),
+        !(associationFile && gwasFile && LDFile),
+      // || (!hyprcoloc_table.data.length && !ecaviar_table.data.length),
     },
     {
       component: <LocusTable />,

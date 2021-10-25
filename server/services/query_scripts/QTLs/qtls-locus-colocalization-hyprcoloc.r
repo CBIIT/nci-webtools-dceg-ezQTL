@@ -55,9 +55,14 @@ locus_colocalization_hyprcoloc <- function(workDir, select_dist, select_ref, gwa
   result_snpscore <- tibble(rsnum = character(), snpscore = double())
 
 
-  ### keep the gene id with at least 20 snps ###
-  nminal <- 20
+  ### keep the gene id with at least 5 snps ###
+  nminal <- 5
   gene_id_filtered <- trait2 %>% count(gene_id, sort = T) %>% arrange(desc(n)) %>% filter(n > nminal) %>% pull(gene_id)
+  if (length(gene_id_filtered) < 1) {
+    errinfo <- paste0("\nERROR: the number of SNPs is less than 5 for all traits. ezQTL will not perform colocalizaiton analysis using HyPrColoc.")
+    cat(errinfo, file = logfile, sep = "\n", append = T)
+    stop("ezQTL QC failed for HyPrColoc analysis")
+  }
   trait2 <- trait2 %>% filter(gene_id %in% gene_id_filtered)
   ###
 
