@@ -683,8 +683,6 @@ export function QTLsGWASForm() {
         recalculateGene,
         recalculateDist,
         recalculateRef,
-        ldProject: ldProject.value,
-        gwasPhenotype: phenotype.value,
         qtlPublic,
         gwasPublic,
         ldPublic,
@@ -696,6 +694,13 @@ export function QTLsGWASForm() {
         select_position:
           qtlPublic || ldPublic || gwasPublic ? select_position : false,
         genome_build: genome.value,
+        genome,
+        qtlProject,
+        ldProject,
+        xQtl,
+        tissue,
+        gwasProject,
+        phenotype,
       };
     });
 

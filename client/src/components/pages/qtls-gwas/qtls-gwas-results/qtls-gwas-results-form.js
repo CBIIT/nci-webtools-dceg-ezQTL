@@ -90,11 +90,6 @@ export function QTLsGWASResultsForm(props) {
   };
 
   async function handleSubmit() {
-    let chromosome;
-
-    if (!select_chromosome) chromosome = false;
-    else chromosome = select_chromosome;
-
     const params = {
       request,
       associationFile:
@@ -122,8 +117,8 @@ export function QTLsGWASResultsForm(props) {
       recalculateGene: false,
       recalculateDist: false,
       recalculateRef: false,
-      ldProject: ldProject.value,
-      gwasPhenotype: phenotype.value,
+      ldProject,
+      phenotype,
       qtlPublic,
       gwasPublic,
       ldPublic,

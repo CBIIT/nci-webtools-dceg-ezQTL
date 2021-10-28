@@ -152,7 +152,6 @@ async function calculate(params) {
 
   let state = {
     ...newParams,
-    ldProject: { value: params.ldProject, label: params.ldProject },
     locus_qc: summary,
     gwasFile: params.gwasFile,
     associationFile: params.associationFile,
