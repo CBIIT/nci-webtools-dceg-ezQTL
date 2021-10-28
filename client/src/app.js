@@ -9,7 +9,7 @@ import {
 import { NCIFooter } from '@cbiitss/react-components';
 import { Home } from './components/pages/home/home';
 import { QTLsGWAS } from './components/pages/qtls-gwas/qtls-gwas';
-import { Help } from './components/pages/help/help';
+import { Documentation } from './components/pages/documentation/documentation';
 import { PublicDataSource } from './components/pages/public-data-source/public-data-source';
 import { Navbar, Nav } from 'react-bootstrap';
 import './styles/main.scss';
@@ -40,7 +40,7 @@ export function App() {
       title: 'Public Data Source',
     },
     {
-      route: '/help',
+      route: '/documentation',
       title: 'Documentation',
     },
   ];
@@ -190,7 +190,7 @@ export function App() {
           <Route exact path={`/`} render={() => <Redirect to="/home" />} />
           <Route path="/home" exact={true} component={Home} />
           <Route path="/qtls/:request?" component={QTLsGWAS} />
-          <Route path="/help" component={Help} />
+          <Route path="/documentation" component={Documentation} />
           <Route path="/source" component={PublicDataSource} />
         </div>
       </main>

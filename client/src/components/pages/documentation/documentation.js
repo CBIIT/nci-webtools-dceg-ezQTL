@@ -2,7 +2,7 @@ import React from 'react';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import { HashLink } from 'react-router-hash-link';
 
-export function Help() {
+export function Documentation() {
   return (
     <div className="px-2">
       <div id="help-logo" className="text-center">
@@ -18,6 +18,7 @@ export function Help() {
         </p>
         <ListGroup>
           {[
+            { title: 'Release History', hash: '#release-history' },
             { title: 'Input File Format of ezQTL', hash: '#input-file-format' },
             { title: 'QTL Association Data', hash: '#qtl-association-data' },
             { title: 'Quantification Data', hash: '#quantification-data' },
@@ -43,7 +44,7 @@ export function Help() {
               <HashLink
                 smooth
                 to={{
-                  pathname: '/help',
+                  pathname: '/documentation',
                   hash: hash,
                   state: { fromDashboard: true },
                 }}
@@ -54,6 +55,32 @@ export function Help() {
           ))}
         </ListGroup>
       </div>
+      <div className="mt-5" id="release-history">
+        <p>
+          <b>Release History</b>
+        </p>
+        <i>ezQTL 2.0.2</i>
+        <ul>
+          <li>Fixed Locus Colocalization issues with limited SNPs</li>
+          <li>Corrected names for public data options</li>
+        </ul>
+        <i>ezQTL 2.0.1</i>
+        <ul>
+          <li>Fixed issue when using Public LD - UKBB Data</li>
+        </ul>
+        <i>ezQTL 2.0.0</i>
+        <ul>
+          <li>Renamed from vQTL to ezQTL</li>
+          <li>Added Locus QC</li>
+          <li>Added public data options for calculation input</li>
+          <li>Added ability to queue calculations</li>
+        </ul>
+        <i>vQTL 1.0.0</i>
+        <ul>
+          <li>Initial Release</li>
+        </ul>
+      </div>
+      <br />
       <div className="mt-5" id="input-file-format">
         <p>
           <b>Input File Format of ezQTL</b>
