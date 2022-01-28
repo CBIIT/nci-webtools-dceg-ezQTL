@@ -18,9 +18,9 @@ export function PublicDataSource() {
     <div className="mx-2 bg-white">
       <div className="mb-4">
         <p>
-          The following table shows the public data sources (LD matrix, QTL
-          associations, and GWAS summary statistics ) contributed to our ezQTL
-          website:
+        The following table shows the public data sources (LD matrix, QTL associations, 
+        and GWAS summary statistics) currently available through ezQTL website. We will 
+        regularly update these public data sources.
         </p>
       </div>
 

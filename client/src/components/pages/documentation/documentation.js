@@ -59,23 +59,28 @@ export function Documentation() {
         <p>
           <b>Release History</b>
         </p>
-        <i>ezQTL 2.0.2</i>
+        <i>ezQTL 2.0.3 (02/04/2022)</i>
+        <ul>
+          <li>Added additional Colocalization Analysis documentation text</li>
+          <li>Added downloadable ReadMe file to Locus Download</li>
+        </ul>
+        <i>ezQTL 2.0.2 (10/28/2021)</i>
         <ul>
           <li>Fixed Locus Colocalization issues with limited SNPs</li>
           <li>Corrected names for public data options</li>
         </ul>
-        <i>ezQTL 2.0.1</i>
+        <i>ezQTL 2.0.1 (07/29/2021</i>
         <ul>
           <li>Fixed issue when using Public LD - UKBB Data</li>
         </ul>
-        <i>ezQTL 2.0.0</i>
+        <i>ezQTL 2.0.0 (07/23/2021)</i>
         <ul>
           <li>Renamed from vQTL to ezQTL</li>
           <li>Added Locus QC</li>
           <li>Added public data options for calculation input</li>
           <li>Added ability to queue calculations</li>
         </ul>
-        <i>vQTL 1.0.0</i>
+        <i>vQTL 1.0.0 (06/11/2020</i>
         <ul>
           <li>Initial Release</li>
         </ul>
@@ -721,6 +726,32 @@ export function Documentation() {
           , a statistical framework that quantifies the probability of the
           variant to be causal both in GWAS and eQTL studies, while allowing the
           arbitrary number of causal variants.
+        </p>
+        <p>
+          We recognize that the colocalization results for two traits in the same 
+          locus might be different between eCAVIAR and HyPrColoc. This could be due 
+          to differences in assumptions of causal variants, utility of LD information, 
+          and number of variants selected for colocalization analysis between two 
+          algorithms. Thus, we recommend users to consider these differences in the 
+          statistical models and assumptions as described in the original publications 
+          of{' '}
+          <a
+            href="http://genetics.cs.ucla.edu/caviar/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            eCAVIAR
+          </a>{' '}
+          and{' '}
+          <a
+            href="https://github.com/jrs95/hyprcoloc"
+            target="_blank"
+            rel="noreferrer"
+          >
+            HyPrColoc
+          </a>{' '}
+          when reporting and interpreting 
+          the results
         </p>
       </div>
       <br />
