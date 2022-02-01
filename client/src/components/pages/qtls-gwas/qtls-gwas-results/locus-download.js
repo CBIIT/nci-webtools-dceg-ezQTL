@@ -4,7 +4,7 @@ import { LoadingOverlay } from '../../../controls/loading-overlay/loading-overla
 import { updateAlert } from '../../../../services/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFileArchive } from '@fortawesome/free-regular-svg-icons';
+import { faFileArchive, faFile } from '@fortawesome/free-regular-svg-icons';
 
 export function LocusDownload() {
   const [loading, setLoading] = useState(false);
@@ -88,7 +88,7 @@ export function LocusDownload() {
       </Button>
       <br />
       <a href="assets/files/ezQTL_Results_ReadMe_JC.txt" download>
-        Download Example ReadMe Information
+        <FontAwesomeIcon icon={faFile} /> Download Example ReadMe Information
       </a>
     </div>
   );
