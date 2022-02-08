@@ -506,7 +506,7 @@ export function Documentation() {
           : <br />
           <code>
             emeraLD --matrix -i input.vcf.gz --stdout --extra --phased |sed
-            's/:/\t/' |bgzip > output.LD.gz
+            's/:/\t/' | bgzip {'>'} output.LD.gz
           </code>
         </p>
       </div>
@@ -815,7 +815,7 @@ export function Documentation() {
           study (typically GWAS data). If the samples used in QTL and GWAS
           studies are from the same ancestry but of different ancestry from the
           provided public LD datasets, we recommend to calculate the LD Mattix
-          from the user study (individual-level genotype data from > 500
+          from the user study (individual-level genotype data from {'>'} 500
           individuals are recommended to be used). Users can visualize the
           difference of LD Matrices between user’s study and public study by
           using the Locus LD module.
@@ -833,6 +833,14 @@ export function Documentation() {
           LD Matrix datasets. A liftover module will be developed in the future
           to support conversion of genome build versions between GRCh37 and
           GRCh38 for all datasets.
+        </p>
+        <p className="ml-3">
+          <i>For researchers who upload their own data, how will the data be stored and protected?</i>
+        </p>
+        <p className="ml-5">
+          For the genomic data privacy, the input data in ezQTL is encrypted and secured during the 
+          data transition, calculation and temporary storing. All the input data and results per query 
+          or submission will be deleted automatically from ezQTL servers after 7 days.
         </p>
       </div>
     </div>
