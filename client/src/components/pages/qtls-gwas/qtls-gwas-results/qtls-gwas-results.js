@@ -104,6 +104,7 @@ export function QTLsGWASResults({ queueRequest }) {
         onSelect={(k) => {
           dispatch(updateQTLsGWAS({ activeResultsTab: k }));
         }}
+        transition={false}
       >
         {tabs.map((item, idx) => (
           <Tab
