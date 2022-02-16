@@ -59,7 +59,7 @@ export function Documentation() {
         <p>
           <b>Release History</b>
         </p>
-        <i>ezQTL 2.0.3 (02/04/2022)</i>
+        <i>ezQTL 2.0.3 (02/16/2022)</i>
         <ul>
           <li>Added additional Colocalization Analysis documentation text</li>
           <li>Added downloadable ReadMe file to Locus Download</li>

@@ -52,15 +52,6 @@ COPY server/renv.lock /deploy/server/
 
 RUN Rscript -e "renv::restore()"
 
-# # install R packages
-# RUN Rscript -e "Sys.setenv(MAKEFLAGS = '-j2'); install.packages(c('jsonlite', 'tidyverse', 'data.table', 'R.utils', 'aws.ec2metadata', 'aws.s3', 'aws.signature', 'gdtools', 'cowplot', 'hrbrthemes','svglite', 'ggsci', 'ggrepel', 'ggplot2', 'ggstatsplot', 'scales', 'ggasym', 'corrr', 'ggridges', 'plyr', 'reshape2', 'PMCMRplus'), repos='https://cloud.r-project.org/')"
-
-# # check if R packages have been installed
-# RUN Rscript -e "lapply(c('jsonlite', 'tidyverse', 'data.table', 'R.utils', 'aws.ec2metadata', 'aws.s3', 'aws.signature', 'gdtools', 'cowplot', 'hrbrthemes','svglite', 'ggsci', 'ggrepel', 'ggplot2', 'ggstatsplot', 'scales', 'ggasym', 'corrr', 'ggridges', 'plyr', 'reshape2', 'PMCMRplus'), require, character.only = T)"
-
-# # install Hyprcoloc R package
-# RUN Rscript -e "install.packages('devtools', repos='https://cloud.r-project.org/'); require(devtools); install_github('jrs95/hyprcoloc', build_opts = c('--no-resave-data', '--no-manual'), build_vignettes = FALSE);"
-
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
 
