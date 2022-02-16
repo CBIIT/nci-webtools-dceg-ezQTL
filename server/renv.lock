@@ -9,6 +9,17 @@
     ]
   },
   "Packages": {
+    "BWStest": {
+      "Package": "BWStest",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c8727f10292b1913b40c05dd659c5f08",
+      "Requirements": [
+        "Rcpp",
+        "memoise"
+      ]
+    },
     "BayesFactor": {
       "Package": "BayesFactor",
       "Version": "0.9.12-4.3",
@@ -64,6 +75,52 @@
         "Matrix"
       ]
     },
+    "PMCMRplus": {
+      "Package": "PMCMRplus",
+      "Version": "1.9.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "803adbaa383090a62dd6ce6edbaabe79",
+      "Requirements": [
+        "BWStest",
+        "MASS",
+        "Rmpfr",
+        "SuppDists",
+        "gmp",
+        "kSamples",
+        "multcompView",
+        "mvtnorm"
+      ]
+    },
+    "R.methodsS3": {
+      "Package": "R.methodsS3",
+      "Version": "1.8.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4bf6453323755202d5909697b6f7c109",
+      "Requirements": []
+    },
+    "R.oo": {
+      "Package": "R.oo",
+      "Version": "1.24.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5709328352717e2f0a9c012be8a97554",
+      "Requirements": [
+        "R.methodsS3"
+      ]
+    },
+    "R.utils": {
+      "Package": "R.utils",
+      "Version": "2.11.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a7ecb8e60815c7a18648e84cd121b23a",
+      "Requirements": [
+        "R.methodsS3",
+        "R.oo"
+      ]
+    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",
@@ -115,6 +172,14 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "da6ab407fa2e5e498ac980f92798cfed",
+      "Requirements": []
+    },
+    "SuppDists": {
+      "Package": "SuppDists",
+      "Version": "1.1-9.7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "82fc819203a2818bd5c10f758991b492",
       "Requirements": []
     },
     "TSP": {
@@ -280,6 +345,17 @@
         "stringr",
         "tibble",
         "tidyr"
+      ]
+    },
+    "cachem": {
+      "Package": "cachem",
+      "Version": "1.0.6",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "648c5b3d71e6a37e3043617489a0a0e9",
+      "Requirements": [
+        "fastmap",
+        "rlang"
       ]
     },
     "callr": {
@@ -1063,6 +1139,16 @@
       "Hash": "68c37fd8f863c6273dcd24928c17d6e1",
       "Requirements": []
     },
+    "kSamples": {
+      "Package": "kSamples",
+      "Version": "1.2-9",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "6a1206db0c58154101383c389adb5ad1",
+      "Requirements": [
+        "SuppDists"
+      ]
+    },
     "knitr": {
       "Package": "knitr",
       "Version": "1.37",
@@ -1133,6 +1219,17 @@
         "mvtnorm"
       ]
     },
+    "memoise": {
+      "Package": "memoise",
+      "Version": "2.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e2817ccf4a065c5d9d7f2cfbe7c1d78c",
+      "Requirements": [
+        "cachem",
+        "rlang"
+      ]
+    },
     "mgcv": {
       "Package": "mgcv",
       "Version": "1.8-38",
@@ -1168,6 +1265,14 @@
         "tidyselect",
         "vctrs"
       ]
+    },
+    "multcompView": {
+      "Package": "multcompView",
+      "Version": "0.1-8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "3c594aae8118cfda8a1b889c664e7295",
+      "Requirements": []
     },
     "munsell": {
       "Package": "munsell",
@@ -1631,6 +1736,17 @@
         "glue",
         "magrittr",
         "stringi"
+      ]
+    },
+    "svglite": {
+      "Package": "svglite",
+      "Version": "2.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "68dfdf211af6aa4e5f050f064f64d401",
+      "Requirements": [
+        "cpp11",
+        "systemfonts"
       ]
     },
     "sys": {
