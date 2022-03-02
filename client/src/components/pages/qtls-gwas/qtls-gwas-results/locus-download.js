@@ -84,7 +84,7 @@ export function LocusDownload() {
           setLoading(false);
         }}
       >
-        <FontAwesomeIcon icon={faFileArchive} /> Save Current Session
+        <FontAwesomeIcon icon={faFileArchive} /> Download Results
       </Button>
       <br />
       <a href="assets/files/ezQTL_Results_ReadMe_JC.txt" download>
