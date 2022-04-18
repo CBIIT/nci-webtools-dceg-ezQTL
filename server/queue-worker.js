@@ -375,7 +375,6 @@ async function processSingleLocus(requestData) {
 
     // specify email template variables
     const templateData = {
-      jobName: 'ezQTL',
       originalTimestamp: timestamp,
       runTime: runtime,
       resultsUrl: `${config.email.baseUrl}/#/qtls/${request}`,
