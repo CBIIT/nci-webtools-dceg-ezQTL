@@ -331,6 +331,7 @@ async function processSingleLocus(requestData) {
   const mailer = nodemailer.createTransport(config.email.smtp);
 
   // logger.debug(params);
+  const start = new Date().getTime();
   try {
     // Setup folders
     const directory = path.resolve(config.tmp.folder, request);
@@ -338,7 +339,6 @@ async function processSingleLocus(requestData) {
 
     logger.info('Start Calculation');
 
-    const start = new Date().getTime();
     await downloadS3(request, directory);
 
     const { state, main } = await calculate(params);
@@ -346,12 +346,6 @@ async function processSingleLocus(requestData) {
     const end = new Date().getTime();
 
     logger.info('Calculation Done');
-
-    const time = end - start;
-    const minutes = Math.floor(time / 60000);
-    var seconds = ((time % 60000) / 1000).toFixed(0);
-
-    const runtime = (minutes > 0 ? minutes + ' min ' : '') + seconds + ' secs';
 
     // upload parameters
     await s3
@@ -376,7 +370,7 @@ async function processSingleLocus(requestData) {
     // specify email template variables
     const templateData = {
       originalTimestamp: timestamp,
-      runTime: runtime,
+      execTime: getExecutionTime(start, end),
       resultsUrl: `${config.email.baseUrl}/#/qtls/${request}`,
       supportEmail: config.email.adminSupport,
       jobName: params.jobName,
@@ -396,6 +390,7 @@ async function processSingleLocus(requestData) {
 
     return true;
   } catch (err) {
+    const end = new Date().getTime();
     logger.error(err);
 
     const stdout = err.stdout ? err.stdout.toString() : '';
@@ -407,6 +402,7 @@ async function processSingleLocus(requestData) {
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: timestamp,
+      execTime: getExecutionTime(start, end),
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
@@ -454,6 +450,7 @@ async function processMultiLoci(data) {
     // Setup folders
     const calculations = await Promise.all(
       paramsArr.map(async (params, i) => {
+        const start = new Date().getTime();
         try {
           const { request, jobName } = params;
 
@@ -462,8 +459,6 @@ async function processMultiLoci(data) {
 
           logger.info(`Calculating: ${request}`);
 
-          const start = new Date().getTime();
-
           // download user uploaded files into unique
           await downloadS3(mainRequest, directory);
           const { state, main } = await calculate(params);
@@ -471,13 +466,6 @@ async function processMultiLoci(data) {
           const end = new Date().getTime();
 
           logger.info(`${request} Done`);
-
-          const time = end - start;
-          const minutes = Math.floor(time / 60000);
-          var seconds = ((time % 60000) / 1000).toFixed(0);
-
-          const runtime =
-            (minutes > 0 ? minutes + ' min ' : '') + seconds + ' secs';
 
           // upload parameters
           await s3
@@ -501,10 +489,12 @@ async function processMultiLoci(data) {
 
           return Promise.resolve({
             jobName: jobName,
-            runtime: runtime,
+            execTime: getExecutionTime(start, end),
             request: request,
           });
         } catch (error) {
+          const end = new Date().getTime();
+
           logger.error(error);
           const stdout = error.stdout ? error.stdout.toString() : '';
           const stderr = error.stderr ? error.stderr.toString() : '';
@@ -515,6 +505,7 @@ async function processMultiLoci(data) {
             parameters: JSON.stringify(params, null, 4),
             exception: error.toString(),
             processOutput: !stdout && !stderr ? null : stdout + stderr,
+            execTime: getExecutionTime(start, end),
           });
         }
       })
@@ -525,12 +516,13 @@ async function processMultiLoci(data) {
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
                   <li>Error - Failed to Process Job</li>
+                  <li>Execution Time: ${data.execTime}</li>
                 </ul>`;
       } else {
         const resultsUrl = `${config.email.baseUrl}/#/qtls/${data.request}`;
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
-                  <li>Execution Time: ${data.runtime}</li>
+                  <li>Execution Time: ${data.execTime}</li>
                   <li>Results: <a href="${resultsUrl}">${resultsUrl}</a></li><br />
                 </ul>`;
       }
@@ -599,6 +591,7 @@ async function processMultiLoci(data) {
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: timestamp,
+      execTime: getExecutionTime(start, end),
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
@@ -714,4 +707,12 @@ async function receiveMessage() {
     // schedule receiving next message
     setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
   }
+}
+
+function getExecutionTime(start, end) {
+  const time = end - start;
+  const minutes = Math.floor(time / 60000);
+  const seconds = ((time % 60000) / 1000).toFixed(0);
+
+  return (minutes > 0 ? minutes + ' min ' : '') + seconds + ' secs';
 }
