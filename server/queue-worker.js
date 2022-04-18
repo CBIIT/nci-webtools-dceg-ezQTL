@@ -405,6 +405,7 @@ async function processSingleLocus(requestData) {
     const templateData = {
       request: request,
       parameters: JSON.stringify(params, null, 4),
+      jobName: params.jobName,
       originalTimestamp: timestamp,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
@@ -429,7 +430,7 @@ async function processSingleLocus(requestData) {
       const userEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
         to: params.email,
-        subject: 'ezQTL Error',
+        subject: `ezQTL Error: ${params.jobName} - ${timestamp} EST`,
         html: await readTemplate(
           __dirname + '/templates/user-failure-email.html',
           templateData
@@ -596,6 +597,7 @@ async function processMultiLoci(data) {
     const templateData = {
       request: request,
       parameters: JSON.stringify(params, null, 4),
+      jobName: params.jobName,
       originalTimestamp: timestamp,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
@@ -620,7 +622,7 @@ async function processMultiLoci(data) {
       const userEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
         to: params.email,
-        subject: 'ezQTL Error',
+        subject: `ezQTL Error: ${params.jobName} - ${timestamp} EST`,
         html: await readTemplate(
           __dirname + '/templates/user-failure-email.html',
           templateData
