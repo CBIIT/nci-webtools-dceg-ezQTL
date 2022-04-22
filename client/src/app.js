@@ -278,6 +278,10 @@ export function App() {
                 title: 'Website Linking',
                 href: 'https://www.cancer.gov/policies/linking',
               },
+              {
+                title: 'HHS Vulnerability Disclosure',
+                href: 'https://www.hhs.gov/vulnerability-disclosure-policy/index.html',
+              },
             ],
           },
         ]}
