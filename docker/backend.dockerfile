@@ -118,7 +118,7 @@ RUN cd /tmp \
 RUN cd /tmp \
     && git clone https://github.com/fhormoz/caviar.git \
     && cd caviar/CAVIAR-C++ \
-    && g++ -std=c++98 ecaviar.cpp PostCal.cpp Util.cpp -I ./armadillo/include/ -DARMA_DONT_USE_WRAPPER -llapack -lblas -lgslcblas -lgsl -o ./eCAVIAR \
+    && g++ ecaviar.cpp PostCal.cpp Util.cpp -std=c++98 -I ./armadillo/include/ -DARMA_DONT_USE_WRAPPER -llapack -lblas -lgslcblas -lgsl -o ./eCAVIAR \
     && mv ./eCAVIAR /usr/local/bin
 
 # install system fonts
