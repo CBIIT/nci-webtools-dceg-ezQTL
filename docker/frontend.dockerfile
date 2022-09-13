@@ -18,7 +18,7 @@ WORKDIR /client
 
 COPY client/package*.json /client/
 
-RUN npm install
+RUN npm install --legacy-peer-deps 
 
 COPY client /client/
 
