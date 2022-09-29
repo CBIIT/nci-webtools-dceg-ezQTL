@@ -9,14 +9,11 @@
     "@fortawesome/free-regular-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@testing-library/jest-dom": "^5.11.9",
-    "@testing-library/react": "^11.2.5",
-    "@testing-library/user-event": "^12.8.3",
+
     "axios": "^0.21.1",
     "bootstrap": "^4.6.0",
     "font-awesome": "^4.7.0",
     "lodash.clonedeep": "^4.5.0",
-    "node-sass": "^4.14.1",
     "plotly.js": "^2.2.0",
     "react": "^17.0.1",
     "react-bootstrap": "^1.5.2",
@@ -26,7 +23,6 @@
     "react-redux": "^7.1.0",
     "react-router-dom": "^5.2.0",
     "react-router-hash-link": "^2.4.3",
-    "react-scripts": "4.0.3",
     "react-select": "^4.2.1",
     "react-table": "^7.7.0",
     "react-zoom-pan-pinch": "^1.6.1",
@@ -40,7 +36,7 @@
     "build": "react-scripts --max_old_space_size=4096 build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --single-quote --write \"src/**/*.{js,json,css,scss}\""
+    "format": "prettier --write \"src/**/*.{js,json,css,scss}\""
   },
   "eslintConfig": {
     "extends": [
@@ -61,7 +57,11 @@
     ]
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.5",
+    "@testing-library/user-event": "^12.8.3",
     "prettier": "^2.3.2",
+    "react-scripts": "5.0.1",
     "sass": "^1.43.2"
   }
 }
