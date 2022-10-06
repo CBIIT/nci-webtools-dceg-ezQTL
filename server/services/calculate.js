@@ -383,35 +383,40 @@ async function calculateQC(params) {
   );
   const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
 
-  return r(
-    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-    'qtlsCalculateQC',
-    [
-      rfile,
-      gwasFile.toString(),
-      associationFile.toString(),
-      LDFile.toString(),
-      qtlKey.toString(),
-      gwasKey.toString(),
-      ldKey.toString(),
-      select_ref.toString(),
-      select_dist.toString(),
-      select_chromosome,
-      select_position,
-      select_pop,
-      ldProject,
-      phenotype,
-      request,
-      plotPath,
-      inputPath,
-      logPath,
-      qtlPublic.toString(),
-      gwasPublic.toString(),
-      ldPublic.toString(),
-      workingDirectory,
-      bucket,
-    ]
+  const calculate = JSON.parse(
+    await r(
+      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+      'qtlsCalculateQC',
+      [
+        rfile,
+        gwasFile.toString(),
+        associationFile.toString(),
+        LDFile.toString(),
+        qtlKey.toString(),
+        gwasKey.toString(),
+        ldKey.toString(),
+        select_ref.toString(),
+        select_dist.toString(),
+        select_chromosome,
+        select_position,
+        select_pop,
+        ldProject,
+        phenotype,
+        request,
+        plotPath,
+        inputPath,
+        logPath,
+        qtlPublic.toString(),
+        gwasPublic.toString(),
+        ldPublic.toString(),
+        workingDirectory,
+        bucket,
+      ]
+    )
   );
+
+  if (calculate?.error) logger.error(calculate.error);
+  return calculate;
 }
 
 // read log file
@@ -430,8 +435,7 @@ async function qtlsCalculateQC(params, res, next) {
   );
 
   try {
-    const wrapper = await calculateQC(params);
-    const { error } = JSON.parse(wrapper);
+    const { error } = await calculateQC(params);
 
     const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
     const summary = getSummary(logPath);

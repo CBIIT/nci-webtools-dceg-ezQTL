@@ -116,11 +116,13 @@ async function calculate(params) {
   const { request } = params;
 
   // qtlsCalculateQC
-  await calculateQC({
+  const { error } = await calculateQC({
     workingDirectory: workingDirectory,
     bucket: config.aws.s3.data,
     ...params,
   });
+  if (error) throw error;
+  
   const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
   let summary = '';
   if (fs.existsSync(logPath)) {
