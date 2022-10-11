@@ -28,7 +28,6 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     cmd = paste0('emeraLD --matrix -i ', ldTemp, ' --stdout --extra --phased |sed "s/:/\t/" |bgzip > ', LDFile)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
 
-
     out <- read_delim(LDFile, delim = '\t', col_names = F)
     if (dim(out)[1] > 0) {
       info <- out[, 1:5]
