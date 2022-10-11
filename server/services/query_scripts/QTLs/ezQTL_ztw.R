@@ -33,7 +33,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
   if(is.null(gwasfile) & is.null(qtlfile) & is.null(ldfile)){
     errinfo <- "ezQTL need at least one of the following files: QTL association file, GWAS association file, and LD matrix file;"
     cat(errinfo,file=logfile,sep="\n",append = T)
-    stop("ezQTL QC failed: no file input")
+    stop(errinfo)
   }
   
   # check gwas file
@@ -53,14 +53,14 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       if(length(gwas_colname_diff)!=0){
         errinfo <- paste0("ERROR: The following GWAS column names for ezQTL are not existed: ",paste0(gwas_colname_diff,collapse = ', '))
         cat(errinfo,file=logfile,sep="\n",append = T)
-        stop("ezQTL QC failed: GWAS data format")
+        stop(errinfo)
       }else{
         gwas <-gwas %>% select(one_of(gwas_colnames)) %>% unique() 
         gwas_nchr <- gwas %>% count(chr) %>% dim() %>% .[[1]]
         if(gwas_nchr!=1){
           errinfo <- "ERROR: Number of chromosome in GWAS file not equal to 1"
           cat(errinfo,file=logfile,sep="\n",append = T)
-          stop("ezQTL QC failed: GWAS data format")
+          stop(errinfo)
         }
         
         cat("\nGWAS summary",file=logfile,sep="\n",append = T)
@@ -92,7 +92,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       if(length(qtl_colname_diff)!=0){
         errinfo <- paste0("ERROR: The following QTL column names for ezQTL are not existed: ",paste0(qtl_colname_diff,collapse = ', '))
         cat(errinfo,file=logfile,sep="\n",append = T)
-        stop("ezQTL QC failed: QTL data format")
+        stop(errinfo)
       }else{
         qtl <-qtl %>% select(one_of(qtl_colnames)) %>% unique()
         
@@ -100,7 +100,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
         if(qtl_nchr!=1){
           errinfo <- "ERROR: Number of chromosome in QTL file not equal to 1"
           cat(errinfo,file=logfile,sep="\n",append = T)
-          stop("ezQTL QC failed: QTL data format")
+          stop(errinfo)
         }
         
         cat("\nQTL summary",file=logfile,sep="\n",append = T)
@@ -150,7 +150,7 @@ coloc_QC <- function(gwasfile=NULL,gwasfile_pub=FALSE, qtlfile=NULL, qtlfile_pub
       if(ld.matrix.size[1]<7 | ld.matrix.size[2]<7 | (ld.matrix.size[2]-ld.matrix.size[1])!=5){
         errinfo <- paste0("ERROR: The dimensions of the LD matrix file are not correct. Please check the help page for the detail.")
         cat(errinfo,file=logfile,sep="\n",append = T)
-        stop("ezQTL QC failed: LD data format")
+        stop(errinfo)
       }else{
         # pre-porcessing data
         ld.info <- ld.matrix %>% select(chr,pos,rsnum,ref,alt) %>% mutate(Seq=seq_along(chr))
