@@ -396,6 +396,8 @@ async function processSingleLocus(requestData) {
     return true;
   } catch (err) {
     const end = new Date().getTime();
+    logger.debug('an error has occured');
+    logger.debug(err);
     logger.error(err);
 
     const stdout = err.stdout ? err.stdout.toString() : '';
