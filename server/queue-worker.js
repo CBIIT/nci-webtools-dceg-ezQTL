@@ -122,7 +122,7 @@ async function calculate(params) {
     ...params,
   });
   if (error) throw error;
-  
+
   const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
   let summary = '';
   if (fs.existsSync(logPath)) {
@@ -339,9 +339,8 @@ async function processSingleLocus(requestData) {
     const directory = path.resolve(config.tmp.folder, request);
     await fs.promises.mkdir(directory, { recursive: true });
 
-    logger.info('Start Calculation');
-
     await downloadS3(request, directory);
+    logger.info('Start Calculation');
 
     const { state, main } = await calculate(params);
 
@@ -408,6 +407,7 @@ async function processSingleLocus(requestData) {
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
+      error: err,
     };
 
     // send admin error email
