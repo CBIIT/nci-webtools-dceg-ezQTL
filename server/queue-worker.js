@@ -675,7 +675,7 @@ async function receiveMessage() {
               VisibilityTimeout: config.aws.sqs.visibilityTimeout,
             })
             .send(),
-        1000 * (config.aws.sqs.visibilityTimeout - 1)
+        1000 * (config.aws.sqs.visibilityTimeout - 5)
       );
 
       // processSingleLocus should return a boolean status indicating success or failure
