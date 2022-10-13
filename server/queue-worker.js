@@ -273,10 +273,10 @@ async function calculate(params) {
     // qtlsColocVisualization - summary
     try {
       if (
-        state.hyprcoloc_table.data &&
-        state.hyprcoloc_table.data.length > 0 &&
-        state.ecaviar_table.data &&
-        state.ecaviar_table.data.length > 0
+        state?.hyprcoloc_table.data &&
+        state?.hyprcoloc_table.data.length > 0 &&
+        state?.ecaviar_table.data &&
+        state?.ecaviar_table.data.length > 0
       ) {
         const colocSummary = await calculateColocVisualize({
           workingDirectory: workingDirectory,
@@ -666,17 +666,16 @@ async function receiveMessage() {
       // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout
-      const intervalId = setInterval(
-        (_) =>
-          sqs
-            .changeMessageVisibility({
-              QueueUrl: QueueUrl,
-              ReceiptHandle: message.ReceiptHandle,
-              VisibilityTimeout: config.aws.sqs.visibilityTimeout,
-            })
-            .send(),
-        1000 * (config.aws.sqs.visibilityTimeout - 5)
-      );
+      const intervalId = setInterval((_) => {
+        logger.debug(`${requestData.request}: refreshing visibility timeout`);
+        sqs
+          .changeMessageVisibility({
+            QueueUrl: QueueUrl,
+            ReceiptHandle: message.ReceiptHandle,
+            VisibilityTimeout: config.aws.sqs.visibilityTimeout,
+          })
+          .send();
+      }, 1000 * (config.aws.sqs.visibilityTimeout - 5));
 
       // processSingleLocus should return a boolean status indicating success or failure
 
@@ -700,6 +699,8 @@ async function receiveMessage() {
       //       .promise();
       //   }
 
+      logger.debug(`${requestData.request}: status\n${status}`);
+      logger.debug(`${requestData.request}: Deleting message`);
       // remove original message from queue once processed
       await sqs
         .deleteMessage({
@@ -710,6 +711,7 @@ async function receiveMessage() {
     }
   } catch (e) {
     // catch exceptions related to sqs
+    logger.error('An error occured while receiving messages.');
     logger.error(e);
   } finally {
     // schedule receiving next message
