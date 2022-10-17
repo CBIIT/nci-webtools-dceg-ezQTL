@@ -1,7 +1,7 @@
 FROM public.ecr.aws/amazonlinux/amazonlinux:2022
 
 RUN dnf -y update \
- && dnf -y install \
+    && dnf -y install \
     gcc-c++ \
     make \
     nodejs \
@@ -30,7 +30,7 @@ RUN dnf -y update \
     python3-setuptools \
     python3-wheel \
     tar \
- && dnf clean all
+    && dnf clean all
 
 # FROM quay.io/centos/centos:stream8
 
@@ -100,17 +100,17 @@ RUN cd /tmp \
 
 # install htslib
 RUN cd /tmp \
-    && curl -L https://github.com/samtools/htslib/releases/download/1.12/htslib-1.12.tar.bz2 | tar xj \
-    && cd htslib-1.12 \
-    && ./configure --enable-libcurl --prefix=/tmp/htslib-1.12 \
+    && curl -L https://github.com/samtools/htslib/releases/download/1.16/htslib-1.16.tar.bz2 | tar xj \
+    && cd htslib-1.16 \
+    && ./configure --enable-libcurl --prefix=/tmp/htslib-1.16 \
     && make && make install \
     && cd ./bin && mv * /usr/local/bin
 
 # install bcftools
 RUN cd /tmp \
-    && curl -L https://github.com/samtools/bcftools/releases/download/1.12/bcftools-1.12.tar.bz2 | tar xj \
-    && cd bcftools-1.12 \
-    && ./configure --enable-libcurl --prefix=/tmp/bcftools-1.12  \
+    && curl -L https://github.com/samtools/bcftools/releases/download/1.16/bcftools-1.16.tar.bz2 | tar xj \
+    && cd bcftools-1.16 \
+    && ./configure --enable-libcurl --prefix=/tmp/bcftools-1.16  \
     && make && make install \
     && mv ./bcftools /usr/local/bin
 
