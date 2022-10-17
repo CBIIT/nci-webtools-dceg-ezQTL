@@ -2254,14 +2254,14 @@ export function submitQueue(params) {
 
 export function fetchResults(request) {
   return async function (dispatch, getState) {
-    dispatch(
-      updateQTLsGWAS({
-        isLoading: true,
-        submitted: true,
-      })
-    );
-
     try {
+      dispatch(
+        updateQTLsGWAS({
+          isLoading: true,
+          submitted: true,
+        })
+      );
+
       const { data } =
         request.request == 'sample'
           ? await axios.get('api/fetch-sample')
