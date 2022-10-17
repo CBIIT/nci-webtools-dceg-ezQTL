@@ -2200,17 +2200,15 @@ export function qtlsGWASBoxplotsCalculation(params) {
 export function getPublicGTEx() {
   return async function (dispatch, getState) {
     try {
-      dispatch(updateQTLsGWAS({ isLoading: true }));
+      dispatch(updateQTLsGWAS({ fetchingOptions: true }));
 
       const { data } = await axios.post('api/getPublicGTEx');
-
-      dispatch(updateQTLsGWAS({ publicGTEx: data, isLoading: false }));
+      dispatch(updateQTLsGWAS({ publicGTEx: data }));
     } catch (error) {
       console.log(error);
-      if (error) {
-        dispatch(updateQTLsGWAS({ isLoading: false }));
-        dispatch(updateError({ visible: true }));
-      }
+      dispatch(updateError({ visible: true }));
+    } finally {
+      dispatch(updateQTLsGWAS({ fetchingOptions: false }));
     }
   };
 }
@@ -2255,12 +2253,7 @@ export function submitQueue(params) {
 export function fetchResults(request) {
   return async function (dispatch, getState) {
     try {
-      dispatch(
-        updateQTLsGWAS({
-          isLoading: true,
-          submitted: true,
-        })
-      );
+      dispatch(updateQTLsGWAS({ isLoading: true, submitted: true }));
 
       const { data } =
         request.request == 'sample'
@@ -2268,7 +2261,6 @@ export function fetchResults(request) {
           : await axios.post('api/fetch-results', request);
 
       const { state, main } = data;
-      // console.log('api/fetch-results', state);
 
       if (main.locus_alignment && Object.keys(main.locus_alignment).length) {
         const { pdata, locus_alignment_plot_layout } =
@@ -2294,7 +2286,6 @@ export function fetchResults(request) {
           updateQTLsGWAS({
             ...state,
             submitted: true,
-            isLoading: false,
             locus_alignment: {
               ...state.locus_alignment,
               data: pdata,
@@ -2303,13 +2294,7 @@ export function fetchResults(request) {
           })
         );
       } else {
-        await dispatch(
-          updateQTLsGWAS({
-            ...state,
-            submitted: true,
-            isLoading: false,
-          })
-        );
+        await dispatch(updateQTLsGWAS({ ...state, submitted: true }));
       }
     } catch (error) {
       console.log(error);
@@ -2322,13 +2307,11 @@ export function fetchResults(request) {
           })
         );
         dispatch(
-          updateQTLsGWAS({
-            isError: true,
-            isLoading: false,
-            activeResultsTab: 'locus-qc',
-          })
+          updateQTLsGWAS({ isError: true, activeResultsTab: 'locus-qc' })
         );
       }
+    } finally {
+      dispatch(updateQTLsGWAS({ isLoading: false }));
     }
   };
 }
