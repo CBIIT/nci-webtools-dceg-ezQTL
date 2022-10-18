@@ -226,10 +226,11 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
     }
   }
 
-  if (is.null(leadsnp)) {
+  if (is.null(leadsnp) || is.na(leadsnp)) {
     # default, using the most significant GWAS variant as the leadsnp
     if (!is.null(gwasfile)) {
       leadsnp <- gwas %>%
+        drop_na(rsnum) %>%
         arrange(pvalue) %>%
         slice(1) %>%
         pull(rsnum)
@@ -243,10 +244,11 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
     }
   }
 
-  if (!is.null(leadsnp)) {
+  if (!is.null(leadsnp) || is.na(leadsnp)) {
     if (!is.null(gwasfile)) {
       if (!leadsnp %in% gwas$rsnum) {
         leadsnp0 <- gwas %>%
+          drop_na(rsnum) %>%
           arrange(pvalue) %>%
           slice(1) %>%
           pull(rsnum)
@@ -266,6 +268,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       if (!is.null(qtlfile)) {
         if (!leadsnp %in% qtl$rsnum) {
           leadsnp0 <- qtl %>%
+            drop_na(rsnum) %>%
             arrange(pval_nominal) %>%
             slice(1) %>%
             pull(rsnum)
@@ -287,6 +290,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
         if (!is.null(ldfile)) {
           if (!leadsnp %in% ld.info$rsnum) {
             leadsnp0 <- ld.info %>%
+              drop_na(rsnum) %>%
               arrange(pos) %>%
               slice(ceiling(n() / 2)) %>%
               pull(rsnum)
