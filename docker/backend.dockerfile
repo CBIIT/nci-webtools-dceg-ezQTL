@@ -32,45 +32,6 @@ RUN dnf -y update \
     tar \
     && dnf clean all
 
-# FROM quay.io/centos/centos:stream8
-
-# RUN dnf -y update \
-#     && dnf -y install \
-#     dnf-plugins-core \
-#     epel-release \
-#     glibc-langpack-en \
-#     && dnf config-manager --set-enabled powertools \
-#     && dnf -y module enable nodejs:14 \
-#     && dnf -y install \
-#     gcc-c++ \
-#     make \
-#     nodejs \
-#     R \
-#     bzip2 \
-#     bzip2-devel \
-#     libcurl-devel \
-#     cairo \
-#     cairo-devel \
-#     openssl-devel \
-#     pkg-config \
-#     zlib-devel \
-#     xz-devel \
-#     git \
-#     libxml2-devel \
-#     readline-devel \
-#     lapack-devel \
-#     blas-devel \
-#     gsl-devel \
-#     gmp-devel \
-#     mpfr-devel \
-#     # v8-devel \
-#     && dnf clean all
-
-# # install python3
-# RUN dnf -y install \
-#     python3 \
-#     python3-devel
-
 # install python packages
 RUN pip3 install scipy pandas numpy tensorflow boto3
 
@@ -78,13 +39,9 @@ RUN mkdir -p /deploy/server /deploy/logs
 
 WORKDIR /deploy/server
 
-# install renv
-RUN Rscript -e "install.packages('renv', repos = 'https://cloud.r-project.org/')"
-
-# install R packages
+# install R packages with renv
 COPY server/renv.lock /deploy/server/
-
-RUN Rscript -e "renv::restore()"
+RUN Rscript -e "install.packages('renv', repos = 'https://cloud.r-project.org/'); renv::restore()"
 
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
