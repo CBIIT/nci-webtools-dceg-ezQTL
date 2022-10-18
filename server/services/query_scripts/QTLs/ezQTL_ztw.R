@@ -244,7 +244,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
     }
   }
 
-  if (!is.null(leadsnp) || is.na(leadsnp)) {
+  if (!is.null(leadsnp) && !is.na(leadsnp)) {
     if (!is.null(gwasfile)) {
       if (!leadsnp %in% gwas$rsnum) {
         leadsnp0 <- gwas %>%
