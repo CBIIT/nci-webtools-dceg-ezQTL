@@ -419,6 +419,9 @@ async function processSingleLocus(requestData) {
       exception: error.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
+      userError: error.includes('ezQTL QC failed')
+        ? error
+        : 'An error occurred in QC calculation. Please review your inputs.',
       error,
       summaryLog,
     };
