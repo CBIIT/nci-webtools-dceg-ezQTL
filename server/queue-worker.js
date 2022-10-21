@@ -116,6 +116,16 @@ async function downloadS3(request, savePath) {
   }
 }
 
+// get summary file
+async function getSummary(requestId) {
+  const logPath = path.resolve(workingDirectory, 'tmp', requestId, 'ezQTL.log');
+  if (fs.existsSync(path)) {
+    return String(await fs.promises.readFile(logPath));
+  } else {
+    return '';
+  }
+}
+
 async function calculate(params) {
   const { request } = params;
 
@@ -127,11 +137,7 @@ async function calculate(params) {
   });
   if (error) throw error;
 
-  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
-  let summary = '';
-  if (fs.existsSync(logPath)) {
-    summary = String(await fs.promises.readFile(logPath));
-  }
+  let summary = await getSummary(request);
   summary = summary.replace(/#/g, '\u2022');
   summary = summary.split('\n\n');
 
@@ -394,14 +400,14 @@ async function processSingleLocus(requestData) {
     });
 
     return true;
-  } catch (err) {
+  } catch (error) {
     const end = new Date().getTime();
-    logger.debug('an error has occured');
-    logger.debug(err);
-    logger.error(err);
 
-    const stdout = err.stdout ? err.stdout.toString() : '';
-    const stderr = err.stderr ? err.stderr.toString() : '';
+    logger.error(error);
+
+    const stdout = error.stdout ? error.stdout.toString() : '';
+    const stderr = error.stderr ? error.stderr.toString() : '';
+    const summaryLog = await getSummary(request);
 
     // template variables
     const templateData = {
@@ -410,10 +416,11 @@ async function processSingleLocus(requestData) {
       jobName: params.jobName,
       originalTimestamp: timestamp,
       execTime: getExecutionTime(start, end),
-      exception: err.toString(),
+      exception: error.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
-      error: err,
+      error,
+      summaryLog,
     };
 
     // send admin error email
