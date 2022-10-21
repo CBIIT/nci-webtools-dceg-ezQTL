@@ -117,10 +117,10 @@ async function downloadS3(request, savePath) {
 }
 
 // get summary file
-async function getSummary(requestId) {
+function getSummary(requestId) {
   const logPath = path.resolve(workingDirectory, 'tmp', requestId, 'ezQTL.log');
-  if (fs.existsSync(path)) {
-    return String(await fs.promises.readFile(logPath));
+  if (fs.existsSync(logPath)) {
+    return String(fs.readFileSync(logPath));
   } else {
     return '';
   }
@@ -137,7 +137,7 @@ async function calculate(params) {
   });
   if (error) throw error;
 
-  let summary = await getSummary(request);
+  let summary = getSummary(request);
   summary = summary.replace(/#/g, '\u2022');
   summary = summary.split('\n\n');
 
@@ -407,7 +407,7 @@ async function processSingleLocus(requestData) {
 
     const stdout = error.stdout ? error.stdout.toString() : '';
     const stderr = error.stderr ? error.stderr.toString() : '';
-    const summaryLog = await getSummary(request);
+    const summaryLog = getSummary(request).replaceAll('\n', '<br>');
 
     // template variables
     const templateData = {
@@ -421,7 +421,7 @@ async function processSingleLocus(requestData) {
       supportEmail: config.email.adminSupport,
       userError: error.includes('ezQTL QC failed')
         ? error
-        : 'An error occurred in QC calculation. Please review your inputs.',
+        : 'An error occurred in QC calculation. Please review your input parameters and calculation logs.',
       error,
       summaryLog,
     };
@@ -709,7 +709,6 @@ async function receiveMessage() {
       //       .promise();
       //   }
 
-      logger.debug(`${requestData.request}: status\n${status}`);
       logger.debug(`${requestData.request}: Deleting message`);
       // remove original message from queue once processed
       await sqs
