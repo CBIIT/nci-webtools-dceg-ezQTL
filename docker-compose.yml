@@ -1,0 +1,30 @@
+version: '3'
+services:
+    backend:
+        build:
+            context: '.'
+            dockerfile: './docker/backend.dockerfile'
+        volumes:
+            - './server/config.json:/deploy/server/config.json:ro'
+            - './logs:/deploy/server/logs'
+            - './tmp:/deploy/tmp'
+            - './data:/deploy/data'
+            - '~/.aws/dceg:/root/.aws/credentials:ro'
+        environment:
+            AWS_PROFILE: dceg
+        ports: 
+            - '3000:3000'
+
+    frontend:
+        build: 
+            context: '.'
+            dockerfile: './docker/frontend.dockerfile'
+            args:
+                APP_PATH: /ezqtl
+        environment:
+            API_BASE_URL: http://backend:3000
+            APP_PATH: /ezqtl
+        ports: 
+            - '3001:80'
+
+
