@@ -361,7 +361,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
 
     pall0 <- qtl %>%
       filter(gene_symbol %in% qtl_min$gene_symbol) %>%
-      mutate(gene_symbol = factor(gene_symbol, levels = qtl_min$gene_symbol)) %>%
+      mutate(gene_symbol = factor(gene_symbol, levels = unique(qtl_min$gene_symbol))) %>%
       ggplot(aes(-log10(pval_nominal), gene_symbol, fill = -log10(pval_nominal))) +
       geom_point(pch = 21, stroke = 0.2, col = "black", size = 3) +
       geom_point(data = qtl_min, pch = 21, stroke = 0.5, col = "red", size = 3) +
