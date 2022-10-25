@@ -1,47 +1,50 @@
 locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build) {
-  if (identical(recalculateAttempt, 'false') || identical(recalculateGene, 'true') || identical(recalculateDist, 'true') || identical(recalculateRef, 'true') || identical(recalculatePop, 'true')) {
-    idx_path_grch37 <- 'data/1kginfo'
-    idx_path_grch38 <- 'data/1kginfo_GRCh38'
+  if (identical(recalculateAttempt, "false") || identical(recalculateGene, "true") || identical(recalculateDist, "true") || identical(recalculateRef, "true") || identical(recalculatePop, "true")) {
+    idx_path_grch37 <- "data/1kginfo"
+    idx_path_grch38 <- "data/1kginfo_GRCh38"
 
-    idx_path <- ifelse(genome_build == 'GRCh37', idx_path_grch37, idx_path_grch38)
+    idx_path <- ifelse(genome_build == "GRCh37", idx_path_grch37, idx_path_grch38)
 
-    cmd <- paste0('cd ', idx_path, '; bcftools view -O z -o ', in_path, ' ', kgvcfpath, ' ', chromosome, ":", minpos, '-', maxpos)
+    cmd <- paste0("cd ", idx_path, "; bcftools view -O z -o ", in_path, " ", kgvcfpath, " ", chromosome, ":", minpos, "-", maxpos)
     system(cmd)
-    cmd <- paste0('bcftools index ', in_path)
+    cmd <- paste0("bcftools index ", in_path)
     system(cmd)
   }
 }
 
 getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject) {
-  wd = getwd() # project root
-  ldTemp = paste0(wd, '/tmp/', request, '/', request, '.input.vcf.gz')
-  LDFile = paste0(wd, '/tmp/', request, '/', request, '.LD.gz')
-  if (ldProject == '1000genomes') {
-    ldPathS3 = paste0('s3://', bucket, '/ezQTL/', ldKey)
-    ldLog = paste0(wd, '/tmp/', request, '/publicLD.log')
-    cat(paste0('Getting ', ldPathS3, '\n'), file = ldLog, sep = "\n", append = T)
+  wd <- getwd() # project root
+  ldTemp <- paste0(wd, "/tmp/", request, "/", request, ".input.vcf.gz")
+  LDFile <- paste0(wd, "/tmp/", request, "/", request, ".LD.gz")
+  if (ldProject == "1000genomes") {
+    ldPathS3 <- paste0("s3://", bucket, "/ezQTL/", ldKey)
+    ldLog <- paste0(wd, "/tmp/", request, "/publicLD.log")
+    cat(paste0("Getting ", ldPathS3, "\n"), file = ldLog, sep = "\n", append = T)
 
-    cmd = paste0('cd ', wd, '/data/', dirname(ldKey), '; bcftools view -S ', wd, '/tmp/', request, '/', request, '.extracted.panel -m2 -M2 -O z -o ', ldTemp, ' ', ldPathS3, ' ', chromosome, ':', minpos, '-', maxpos)
-    cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
-    cmd = paste0('bcftools index -t ', ldTemp)
-    cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
-    cmd = paste0('emeraLD --matrix -i ', ldTemp, ' --stdout --extra --phased |sed "s/:/\t/" |bgzip > ', LDFile)
-    cat(paste(cmd, system(cmd, intern = TRUE), sep = '\n'), file = ldLog, sep = "\n", append = T)
+    cmd <- paste0("cd ", wd, "/data/", dirname(ldKey), "; bcftools view -S ", wd, "/tmp/", request, "/", request, ".extracted.panel -m2 -M2 -O z -o ", ldTemp, " ", ldPathS3, " ", chromosome, ":", minpos, "-", maxpos)
+    cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
+    cmd <- paste0("bcftools index -t ", ldTemp)
+    cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
+    cmd <- paste0("emeraLD --matrix -i ", ldTemp, ' --stdout --extra --phased |sed "s/:/\t/" |bgzip > ', LDFile)
+    cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
 
-    out <- read_delim(LDFile, delim = '\t', col_names = F)
+    out <- read_delim(LDFile, delim = "\t", col_names = F)
     if (dim(out)[1] > 0) {
       info <- out[, 1:5]
     } else {
       # No LD data available
       info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
     }
-  } else if (ldProject == 'UKBB') {
-    cmd = paste0('python3 ', wd, '/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr', chromosome, ':', minpos, '-', maxpos, ' -b ', bucket, ' -o ', LDFile)
+  } else if (ldProject == "UKBB") {
+    cmd <- paste0("python3 ", wd, "/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr", chromosome, ":", minpos, "-", maxpos, " -b ", bucket, " -o ", LDFile)
     system(cmd)
 
-    out <- read_delim(LDFile, delim = '\t', col_names = F, col_types = cols('X2' = 'c'))
+    out <- read_delim(LDFile, delim = "\t", col_names = F, col_types = cols("X2" = "c"))
     if (dim(out)[1] > 0) {
-      out %>% rename(id = X1, chr = X2, pos = X3, ref = X4, alt = X5) %>% relocate(chr, pos, id) %>% write_delim(LDFile, delim = '\t', col_names = F)
+      out %>%
+        rename(id = X1, chr = X2, pos = X3, ref = X4, alt = X5) %>%
+        relocate(chr, pos, id) %>%
+        write_delim(LDFile, delim = "\t", col_names = F)
       info <- out[, 1:5]
     } else {
       info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
@@ -51,18 +54,18 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     stop("Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
   } else {
     if (dim(out)[2] > 5) {
-      out <- as.matrix(out[, - (1:5)]);
+      out <- as.matrix(out[, -(1:5)])
       colnames(out) <- NULL
     } else {
       out <- as.double(1)
     }
     ld_data <- list("Sigma" = out, "info" = info)
   }
-  saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
+  saveRDS(ld_data, file = paste0("tmp/", request, "/", request, ".ld_data.rds"))
 }
 
 createExtractedPanel <- function(select_pop, kgpanel, request) {
-  panelPath = paste0('tmp/', request, '/', request, '.', 'extracted', '.panel')
+  panelPath <- paste0("tmp/", request, "/", request, ".", "extracted", ".panel")
   # Remove pre-existing panel
   unlink(panelPath)
   select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
@@ -71,15 +74,14 @@ createExtractedPanel <- function(select_pop, kgpanel, request) {
       kgpanel %>%
         filter(super_pop == pop_i) %>%
         select(sample) %>%
-        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE, quote = "none")
+        write_delim(panelPath, delim = "\t", col_names = F, append = TRUE, quote = "none")
     } else if (pop_i %in% kgpanel$pop) {
       kgpanel %>%
         filter(pop == pop_i) %>%
         select(sample) %>%
-        write_delim(panelPath, delim = '\t', col_names = F, append = TRUE, quote = "none")
+        write_delim(panelPath, delim = "\t", col_names = F, append = TRUE, quote = "none")
     }
   }
-
 }
 
 # locus_alignment_get_ld <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region_pos) {
@@ -123,11 +125,11 @@ locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
   # tmptitle <- paste0('rho=', round(tmptest_spearman$estimate, 3), ', r=', round(tmptest_pearson$estimate, 3))
 
   if (length(tmpdata$pvalue) > 5 & length(tmpdata$pvalue) == length(tmpdata$pval_nominal)) {
-    tmptest_spearman <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'spearman')
-    tmptest_pearson <- cor.test(-log10(tmpdata$pvalue), - log10(tmpdata$pval_nominal), method = 'pearson')
-    tmptitle <- paste0('rho=', round(tmptest_spearman$estimate, 3), ', r=', round(tmptest_pearson$estimate, 3))
+    tmptest_spearman <- cor.test(-log10(tmpdata$pvalue), -log10(tmpdata$pval_nominal), method = "spearman")
+    tmptest_pearson <- cor.test(-log10(tmpdata$pvalue), -log10(tmpdata$pval_nominal), method = "pearson")
+    tmptitle <- paste0("rho=", round(tmptest_spearman$estimate, 3), ", r=", round(tmptest_pearson$estimate, 3))
   } else {
-    tmptitle <- 'rho=NA, r=NA'
+    tmptitle <- "rho=NA, r=NA"
   }
 
   tmpdata_colnames <- colnames(tmpdata)
@@ -137,60 +139,63 @@ locus_alignment_gwas_scatter <- function(gwasdata, qdata_region) {
 }
 
 locus_colocalization_correlation <- function(gwasdata, qdata) {
-  tryCatch({
-    #p_cutoff <- 0.01 ### kevin, a parameter for user to choose max pvalue cut-off for both eQTL and GWAS ##
-    tmpdata <- qdata %>%
-    select(gene_symbol, gene_id, chr, pos, ref, alt, pval_nominal) %>%
-    left_join(gwasdata) %>%
-    filter(!is.na(pvalue), !is.na(pval_nominal))
-    # filter(!is.na(pvalue),!is.na(pval_nominal),pvalue<p_cutoff,pval_nominal<p_cutoff)
-    tmpgeneid <- tmpdata %>%
-      count(gene_id, sort = T) %>%
-      filter(n > 10) %>% pull(gene_id)
-    tmpdata <- tmpdata %>%
-      filter(gene_id %in% tmpgeneid)
+  tryCatch(
+    {
+      # p_cutoff <- 0.01 ### kevin, a parameter for user to choose max pvalue cut-off for both eQTL and GWAS ##
+      tmpdata <- qdata %>%
+        select(gene_symbol, gene_id, chr, pos, ref, alt, pval_nominal) %>%
+        left_join(gwasdata) %>%
+        filter(!is.na(pvalue), !is.na(pval_nominal))
+      # filter(!is.na(pvalue),!is.na(pval_nominal),pvalue<p_cutoff,pval_nominal<p_cutoff)
+      tmpgeneid <- tmpdata %>%
+        count(gene_id, sort = T) %>%
+        filter(n > 10) %>%
+        pull(gene_id)
+      tmpdata <- tmpdata %>%
+        filter(gene_id %in% tmpgeneid)
 
-    if (length(tmpgeneid) < 1) {
-      errinfo <- paste0("\nERROR: the number of overlapped variants with both eQTL and GWAS data is less than 10 for all traits. P-value correlation will not be calculated")
-      cat(errinfo, file = logfile, sep = "\n", append = T)
-      stop("ezQTL QC failed for p-value correlation analysis")
+      if (length(tmpgeneid) < 1) {
+        errinfo <- paste0("\nERROR: the number of overlapped variants with both eQTL and GWAS data is less than 10 for all traits. P-value correlation will not be calculated")
+        cat(errinfo, file = logfile, sep = "\n", append = T)
+        stop("ezQTL QC failed for p-value correlation analysis")
+      }
+      tmpdata <- left_join(
+        tmpdata %>%
+          group_by(gene_id, gene_symbol) %>%
+          do(tidy(cor.test(.$pvalue, .$pval_nominal, method = "spearman"))) %>%
+          ungroup() %>%
+          select(gene_id, gene_symbol, spearman_r = estimate, spearman_p = p.value),
+        tmpdata %>%
+          group_by(gene_id, gene_symbol) %>%
+          do(tidy(cor.test(.$pvalue, .$pval_nominal, method = "pearson"))) %>%
+          ungroup() %>% select(gene_id, gene_symbol, pearson_r = estimate, pearson_p = p.value)
+      )
+      ## cast column types to string to prevent rounding of decimals
+      tmpdata_string <- tmpdata
+      tmpdata_string[3:6] <- lapply(tmpdata_string[3:6], as.character)
+      locus_colocalization_correlation_colnames <- colnames(tmpdata_string)
+      locus_colocalization_correlation_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_correlation_colnames))
+      return(locus_colocalization_correlation_data)
+    },
+    error = function(e) {
+      return(e$message)
     }
-    tmpdata <- left_join(
-    tmpdata %>%
-      group_by(gene_id, gene_symbol) %>%
-      do(tidy(cor.test(.$pvalue, .$pval_nominal, method = 'spearman'))) %>%
-      ungroup() %>%
-      select(gene_id, gene_symbol, spearman_r = estimate, spearman_p = p.value),
-    tmpdata %>%
-      group_by(gene_id, gene_symbol) %>%
-      do(tidy(cor.test(.$pvalue, .$pval_nominal, method = 'pearson'))) %>%
-      ungroup() %>% select(gene_id, gene_symbol, pearson_r = estimate, pearson_p = p.value)
   )
-    ## cast column types to string to prevent rounding of decimals
-    tmpdata_string <- tmpdata
-    tmpdata_string[3:6] <- lapply(tmpdata_string[3:6], as.character)
-    locus_colocalization_correlation_colnames <- colnames(tmpdata_string)
-    locus_colocalization_correlation_data <- list(setNames(as.data.frame(tmpdata_string), locus_colocalization_correlation_colnames))
-    return(locus_colocalization_correlation_data);
-  },
-  error = function(e) {
-    return(e$message)
-  })
 }
 
 locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) {
   locus_colocalization_correlation_data <- locus_colocalization_correlation(gwasdata, qdata)
-  return(list(locus_colocalization_correlation_data));
+  return(list(locus_colocalization_correlation_data))
 }
 
 locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build) {
-  if (identical(select_ref, 'false')) {
+  if (identical(select_ref, "false")) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
       rsnum <- top_gene_variants$rsnum[[1]]
     } else {
-      ## set default rsnum to ref gene's top rsnum if ref gene is chosen 
-      rsnum <- top_gene_variants[top_gene_variants$gene_id == gene,]$rsnum[[1]]
+      ## set default rsnum to ref gene's top rsnum if ref gene is chosen
+      rsnum <- top_gene_variants[top_gene_variants$gene_id == gene, ]$rsnum[[1]]
     }
   } else {
     rsnum <- rsnum
@@ -198,19 +203,19 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
   index <- which(qdata$rsnum == rsnum)[1]
   rsnum <- qdata$rsnum[index]
   # determine position automaticaly if using user uploaded data
-  if (identical(qtlKey, 'false')) {
+  if (identical(qtlKey, "false")) {
     chromosome <- qdata$chr[index]
     minpos <- qdata$pos[index] - cedistance
     if (minpos < 0) {
-      minpos = 0
+      minpos <- 0
     }
     maxpos <- qdata$pos[index] + cedistance
   } else {
     # public data/user-specified position
-    chromosome = select_chromosome
-    select_position = strtoi(select_position, base = 0L)
-    minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
-    maxpos = select_position + cedistance
+    chromosome <- select_chromosome
+    select_position <- strtoi(select_position, base = 0L)
+    minpos <- ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
+    maxpos <- select_position + cedistance
   }
   # chromosome <- unique(qdata$chr)
   # minpos <- min(qdata$pos)
@@ -219,18 +224,18 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
   ## subset gene variant with cis-QTL Distance window
   qdata <- subset(qdata, pos > minpos & pos < maxpos)
 
-  kgvcfpath_grch37 <- paste0('s3://', bucket, '/ezQTL/1kginfo/ALL.chr', chromosome, '.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz')
-  kgvcfpath_grch38 <- paste0('s3://', bucket, '/ezQTL/1kginfo_GRCh38/ALL.chr', chromosome, '.shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz')
+  kgvcfpath_grch37 <- paste0("s3://", bucket, "/ezQTL/1kginfo/ALL.chr", chromosome, ".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz")
+  kgvcfpath_grch38 <- paste0("s3://", bucket, "/ezQTL/1kginfo_GRCh38/ALL.chr", chromosome, ".shapeit2_integrated_snvindels_v2a_27022019.GRCh38.phased.vcf.gz")
 
-  kgvcfpath <- ifelse(genome_build == 'GRCh37', kgvcfpath_grch37, kgvcfpath_grch38)
+  kgvcfpath <- ifelse(genome_build == "GRCh37", kgvcfpath_grch37, kgvcfpath_grch38)
 
-  in_path <- paste0(workDir, '/tmp/', request, '/', request, '.', 'chr', chromosome, '_', minpos, '_', maxpos, '.vcf.gz')
+  in_path <- paste0(workDir, "/tmp/", request, "/", request, ".", "chr", chromosome, "_", minpos, "_", maxpos, ".vcf.gz")
 
-  if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
+  if (identical(LDFile, "false") || identical(recalculateAttempt, "true")) {
     locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build)
   }
 
-  # popshort <- "CEU"  ### need to find the superpop recomendation data 
+  # popshort <- "CEU"  ### need to find the superpop recomendation data
   select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
 
   if (length(select_pop_list) == 1) {
@@ -255,15 +260,15 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
     }
   }
 
-  cmd = paste0("cd data/Recombination_Rate; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ", workDir, "/tmp/", request, '/', request, ".rc_temp.txt")
+  cmd <- paste0("cd data/Recombination_Rate; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ", workDir, "/tmp/", request, "/", request, ".rc_temp.txt")
   system(cmd)
-  rcdata <- read_delim(paste0('tmp/', request, '/', request, '.', 'rc_temp', '.txt'), delim = "\t", col_names = F)
+  rcdata <- read_delim(paste0("tmp/", request, "/", request, ".", "rc_temp", ".txt"), delim = "\t", col_names = F)
   if (ncol(rcdata)) {
-    colnames(rcdata) <- c('chr', 'pos', 'rate', 'map', 'filtered')
+    colnames(rcdata) <- c("chr", "pos", "rate", "map", "filtered")
   }
   rcdata$pos <- as.integer(rcdata$pos)
 
-  ### main funciton for the LD calculation 
+  ### main funciton for the LD calculation
 
   if (is.null(gene)) {
     gene <- qdata %>%
@@ -289,7 +294,7 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
       filter(gene_id == gene, rsnum == rsnum0)
     variant <- tmp %>%
       pull(variant_id)
-    #rsnum <- tmp %>% pull(rsnum)
+    # rsnum <- tmp %>% pull(rsnum)
     info <- tmp %>%
       select(gene_id:alt)
   }
@@ -306,7 +311,7 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
   qdata_top_annotation_colnames <- colnames(qdata_top_annotation)
   qdata_top_annotation_data <- list(setNames(as.data.frame(qdata_top_annotation), qdata_top_annotation_colnames))
 
-  source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'emeraLD2R.r'))
+  source(paste0(workDir, "/", "server/", "services/", "query_scripts/", "QTLs/", "emeraLD2R.r"))
 
   ### output region as bed file
   qdata_region %>%
@@ -314,10 +319,10 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
     select(chr, start, pos) %>%
     arrange(chr, start, pos) %>%
     unique() %>%
-    write_delim(paste0('tmp/', request, '/', request, '.', 'locus.bed'), delim = '\t', col_names = F)
+    write_delim(paste0("tmp/", request, "/", request, ".", "locus.bed"), delim = "\t", col_names = F)
 
   ## remove any previous extracted panel if exists
-  unlink(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'))
+  unlink(paste0("tmp/", request, "/", request, ".", "extracted", ".panel"))
   ## read multiple population selections
   # select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
   for (pop_i in select_pop_list) {
@@ -325,26 +330,26 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
       kgpanel %>%
         filter(super_pop == pop_i) %>%
         select(sample) %>%
-        write_delim(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'), delim = '\t', col_names = F, append = TRUE)
+        write_delim(paste0("tmp/", request, "/", request, ".", "extracted", ".panel"), delim = "\t", col_names = F, append = TRUE)
     } else if (pop_i %in% kgpanel$pop) {
       kgpanel %>%
         filter(pop == pop_i) %>%
         select(sample) %>%
-        write_delim(paste0('tmp/', request, '/', request, '.', 'extracted', '.panel'), delim = '\t', col_names = F, append = TRUE)
+        write_delim(paste0("tmp/", request, "/", request, ".", "extracted", ".panel"), delim = "\t", col_names = F, append = TRUE)
     }
   }
 
-  if (identical(LDFile, 'false') || identical(recalculateAttempt, 'true')) {
-    if (identical(ldKey, 'false')) {
+  if (identical(LDFile, "false") || identical(recalculateAttempt, "true")) {
+    if (identical(ldKey, "false")) {
       # locus_alignment_get_ld(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, request, chromosome, qdata_region$pos)
       # do not auto generate LD if no LD data input provided
       # empty ld_data
       # ld_data <-
       ld_data <- list("Sigma" = as.double(1), "info" = data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character()))
     } else {
-      #getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
+      # getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
       # LDFile = paste0(request, '.input.vcf.gz')
-      ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
+      ld_data <- readRDS(paste0("tmp/", request, "/", request, ".ld_data.rds"))
     }
     # ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
   }
@@ -354,13 +359,13 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
   ### snp may not found in the LD matrix file, means this snp missing from 1kg ### then use the next one
 
   if (length(index) != 0) {
-    ld_info <- as.data.frame(ld_data$Sigma[index,])
+    ld_info <- as.data.frame(ld_data$Sigma[index, ])
     colnames(ld_info) <- "R2"
     # rownames(ld_info) <- ld_data$info$id
     # qdata_region$R2 <- (ld_info[qdata_region$rsnum,"R2"])^2
-    #use the chr:pos as index instead of rsnum
+    # use the chr:pos as index instead of rsnum
     rownames(ld_info) <- make.unique(paste0(ld_data$info$chr, ":", ld_data$info$pos))
-    qdata_region$R2 <- (ld_info[paste0(qdata_region$chr, ":", qdata_region$pos), "R2"]) ^ 2
+    qdata_region$R2 <- (ld_info[paste0(qdata_region$chr, ":", qdata_region$pos), "R2"])^2
     # write.table(qdata_region, file = paste0("../static/output/",request,".variant_details.txt"), sep = "\t", dec = ".",row.names = FALSE, col.names = TRUE)
     ## cast column types to string to prevent rounding of decimals
     qdata_region_string <- qdata_region
@@ -384,7 +389,7 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
   # initialize colocalization data as empty until data file detected
   locus_colocalization_data <- list(c())
   # if GWAS data file is loaded
-  if (!identical(gwasFile, 'false') || !identical(gwasKey, 'false')) {
+  if (!identical(gwasFile, "false") || !identical(gwasKey, "false")) {
     ## return relevent gwas data ##
     gwas_example_data <- gwas_example(gwasdata, qdata_region)
     ## return locus alignment gwas scatter data
@@ -409,28 +414,29 @@ locus_quantification <- function(workDir, tmp, exprFile, genoFile, edata, gdata,
   library(ggasym)
   library(ggridges)
   library(ggstatsplot)
-  source(paste0(workDir, '/', 'server/', 'services/', 'query_scripts/', 'QTLs/', 'ezQTL_ztw.R'))
+  source(paste0(workDir, "/", "server/", "services/", "query_scripts/", "QTLs/", "ezQTL_ztw.R"))
   # initialize boxplot data as empty until data file detected
   locus_quantification_data <- list(c())
   # initialize heatmap data as empty until data file detected
   locus_quantification_heatmap_data <- list(c())
   # check to see if boxplot data files are present
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false'))) {
+  if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
+    if (identical(genotypeID, "")) {
+      genotypeID <- NULL
+    }
 
-    if (identical(genotypeID, ''))
-      genotypeID = NULL
+    if (identical(traitID, "")) {
+      traitID <- NULL
+    }
 
-    if (identical(traitID, ''))
-      traitID = NULL
-
-    corPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_cor.svg')
+    corPath <- paste0(workDir, "/", "tmp/", request, "/quantification_cor.svg")
     locus_quantification_cor(edata, tmp, corPath)
-    disPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_dis.svg')
+    disPath <- paste0(workDir, "/", "tmp/", request, "/quantification_dis.svg")
     locus_quantification_dis(edata, tmp, output_plot = disPath)
-    qtlPath <- paste0(workDir, '/', 'tmp/', request, '/quantification_qtl.svg')
+    qtlPath <- paste0(workDir, "/", "tmp/", request, "/quantification_qtl.svg")
     locus_quantification_qtl(gdata, edata, output_plot = qtlPath, log2 = FALSE)
   }
-  #return(list(locus_quantification_data, locus_quantification_heatmap_data))
+  # return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
 locus_alignment_boxplots <- function(workDir, exprFile, genoFile, info, request, bucket) {
@@ -440,24 +446,24 @@ locus_alignment_boxplots <- function(workDir, exprFile, genoFile, info, request,
   library(jsonlite)
   # initialize locus alignment boxplots data as empty until data file detected
   locus_alignment_boxplots_data <- list(c())
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false'))) {
-    gdatafile <- paste0('tmp/', request, '/', genoFile)
-    edatafile <- paste0('tmp/', request, '/', exprFile)
+  if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
+    gdatafile <- paste0("tmp/", request, "/", genoFile)
+    edatafile <- paste0("tmp/", request, "/", exprFile)
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
     edata <- read_delim(edatafile, delim = "\t", col_names = T)
 
     # parse info json to data frame
-    info <- paste0('[', info, ']') %>%
+    info <- paste0("[", info, "]") %>%
       fromJSON(info, simplifyDataFrame = TRUE)
     info <- select(info, gene_id, gene_symbol, variant_id, rsnum, chr, pos, ref, alt)
 
     cexpdata <- edata %>%
       filter(gene_id == info$gene_id) %>%
-      gather(Sample, exp, - (chr:gene_id))
+      gather(Sample, exp, -(chr:gene_id))
 
     cexpdata <- gdata %>%
-      gather(Sample, Genotype, - (chr:alt)) %>%
+      gather(Sample, Genotype, -(chr:alt)) %>%
       right_join(info) %>%
       left_join(cexpdata)
 
@@ -481,54 +487,54 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   errorMessages <- list()
 
   # log file path
-  logfile <<- paste0(workDir, '/tmp/', request, '/ezQTL.log')
+  logfile <<- paste0(workDir, "/tmp/", request, "/ezQTL.log")
 
   ## parameters define ##
-  if (identical(select_pop, 'false')) {
+  if (identical(select_pop, "false")) {
     ## set default population to EUR if none chosen
     select_pop <- "CEU+TSI+FIN+GBR+IBS"
   }
-  if (identical(select_gene, 'false')) {
+  if (identical(select_gene, "false")) {
     ## set default gene to top gene if none chosen
     gene <- NULL
   } else {
     gene <- select_gene
   }
-  if (identical(select_ref, 'false')) {
+  if (identical(select_ref, "false")) {
     ## set default rsnum to top gene's rsnum if none chosen
     rsnum <- NULL
   } else {
     rsnum <- select_ref
   }
-  if (identical(select_dist, 'false')) {
+  if (identical(select_dist, "false")) {
     ## set default cisDistance to 100 Kb (100,000 bp) if none supplied
     cedistance <- 100 * 1000
   } else {
     cedistance <- strtoi(select_dist, base = 0L) * 1000
   }
 
-  select_position = strtoi(select_position, base = 0L)
-  minpos = ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
-  maxpos = select_position + cedistance
+  select_position <- strtoi(select_position, base = 0L)
+  minpos <- ifelse(select_position - cedistance < 0, 0, select_position - cedistance)
+  maxpos <- select_position + cedistance
 
   ## load 1kg pop panel file ##
-  kgpanelFile = getS3File('ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel', bucket)
-  kgpanel <- read_delim(kgpanelFile, delim = '\t', col_names = T) %>%
+  kgpanelFile <- getS3File("ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel", bucket)
+  kgpanel <- read_delim(kgpanelFile, delim = "\t", col_names = T) %>%
     select(sample:gender)
   popinfo <- kgpanel %>%
     select(pop, super_pop) %>%
     unique()
 
   ## read and parse association data file ###
-  qdata = NULL
+  qdata <- NULL
 
   # load association data from user upload
-  if (!identical(assocFile, 'false') || !identical(qtlKey, 'false')) {
-    qdatafile <- paste0('tmp/', request, '/ezQTL_input_qtl.txt')
-    qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = 'c', ref = 'c', alt = 'c'))
+  if (!identical(assocFile, "false") || !identical(qtlKey, "false")) {
+    qdatafile <- paste0("tmp/", request, "/ezQTL_input_qtl.txt")
+    qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = "c", ref = "c", alt = "c"))
   }
-  if (!identical(LDFile, 'false')) {
-    LDFile <- paste0('tmp/', request, '/', LDFile)
+  if (!identical(LDFile, "false")) {
+    LDFile <- paste0("tmp/", request, "/", LDFile)
   }
 
 
@@ -540,11 +546,11 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   }
 
   # if boxplot data files are loaded
-  edata <- 'false'
-  gdata <- 'false'
-  if ((!identical(genoFile, 'false') & !identical(exprFile, 'false'))) {
-    gdatafile <- paste0('tmp/', request, '/', genoFile)
-    edatafile <- paste0('tmp/', request, '/', exprFile)
+  edata <- "false"
+  gdata <- "false"
+  if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
+    gdatafile <- paste0("tmp/", request, "/", genoFile)
+    edatafile <- paste0("tmp/", request, "/", exprFile)
 
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
@@ -564,25 +570,25 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   }
 
   ## if LD File is loaded
-  ld_data <- 'false'
-  if (!identical(LDFile, 'false')) {
-    out <- fread(input = paste0(workDir, '/tmp/', request, '/ezQTL_input_ld.gz'), header = FALSE, showProgress = FALSE)
+  ld_data <- "false"
+  if (!identical(LDFile, "false")) {
+    out <- fread(input = paste0(workDir, "/tmp/", request, "/ezQTL_input_ld.gz"), header = FALSE, showProgress = FALSE)
 
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
     if (length(unique(info$chr)) > 1) {
       errorMessages <- c(errorMessages, "Multiple chromosomes detected in GWAS Data File, make sure data is on one chromosome only.")
     } else {
-      out <- as.matrix(out[, - (1:5)]);
+      out <- as.matrix(out[, -(1:5)])
       colnames(out) <- NULL
       ld_data <- list("Sigma" = out, "info" = info)
     }
   }
 
   ## if GWAS File is loaded
-  gwasdata <- 'false'
-  if (!identical(gwasFile, 'false') || !identical(gwasKey, 'false')) {
-    gwasdatafile <- paste0('tmp/', request, '/ezQTL_input_gwas.txt')
+  gwasdata <- "false"
+  if (!identical(gwasFile, "false") || !identical(gwasKey, "false")) {
+    gwasdatafile <- paste0("tmp/", request, "/ezQTL_input_gwas.txt")
 
     gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
     # check if there are multiple chromosomes in the input GWAS file
@@ -593,8 +599,8 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
     }
     # when only gwas data is inputted
     if (is.null(qdata)) {
-      source('server/services/query_scripts/QTLs/ezQTL_ztw.R')
-      qdata = gwas2qtl(gwasdata)
+      source("server/services/query_scripts/QTLs/ezQTL_ztw.R")
+      qdata <- gwas2qtl(gwasdata)
     }
   }
 
@@ -658,13 +664,13 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, qdata, exprFile, genoFile, edata, gdata, '', '', request)
-  #locus_quantification_data <- locus_quantification[[1]]
-  #locus_quantification_heatmap_data <- locus_quantification[[2]]
+  locus_quantification <- locus_quantification(workDir, qdata, exprFile, genoFile, edata, gdata, "", "", request)
+  # locus_quantification_data <- locus_quantification[[1]]
+  # locus_quantification_heatmap_data <- locus_quantification[[2]]
 
   ## Reassign LD file if public LD data is used
-  if (identical(LDFile, 'false') && !identical(ldKey, 'false')) {
-    LDFile = paste0(request, '.LD.gz')
+  if (identical(LDFile, "false") && !identical(ldKey, "false")) {
+    LDFile <- paste0(request, ".LD.gz")
   }
 
   ## combine results from QTLs modules calculations and return ##
