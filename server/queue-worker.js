@@ -250,7 +250,7 @@ async function calculate(params) {
         });
       }
     } catch (err) {
-      logger.error(err);
+      logger.info(err);
     }
 
     // qtlsGWASECaviarCalculation
@@ -274,7 +274,7 @@ async function calculate(params) {
         },
       });
     } catch (err) {
-      logger.error(err);
+      logger.info(err);
     }
     // qtlsColocVisualization - summary
     try {
@@ -303,7 +303,7 @@ async function calculate(params) {
         });
       }
     } catch (err) {
-      logger.error(err);
+      logger.info(err);
     }
   }
 
@@ -327,7 +327,7 @@ async function calculate(params) {
       });
     }
   } catch (err) {
-    logger.error(err);
+    logger.info(err);
   }
 
   return { state: state, main: main };
