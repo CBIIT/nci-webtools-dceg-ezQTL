@@ -393,10 +393,14 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       slice(1) %>%
       pull(chr)
   }
-  # if(!is.null(qtlfile)){ chr_qtl=qtl %>% slice(1) %>% pull(chr)}
   if (!is.null(qtlfile)) {
-    chr_qtl <- ifelse(dim(qtl)[1] > 0, qtl %>% slice(1) %>% pull(chr), FALSE)
+    chr_qtl <- qtl %>%
+      slice(1) %>%
+      pull(chr)
   }
+  # if (!is.null(qtlfile)) {
+  #   chr_qtl <- ifelse(dim(qtl)[1] > 0, qtl %>% slice(1) %>% pull(chr), FALSE)
+  # }
   if (!is.null(ldfile)) {
     chr_ld <- ld.info %>%
       slice(1) %>%
