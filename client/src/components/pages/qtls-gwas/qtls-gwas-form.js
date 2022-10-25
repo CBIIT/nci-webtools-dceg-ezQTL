@@ -1,6 +1,15 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { RootContext } from '../../../index';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import {
+  Form,
+  Button,
+  Row,
+  Col,
+  Popover,
+  OverlayTrigger,
+} from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import {
@@ -105,7 +114,35 @@ function LocusInfo({
               cis-QTL Distance <span style={{ color: 'red' }}>*</span>
               <small>
                 <i>(+/- Kb up to 1Mb)</i>
-              </small>
+              </small>{' '}
+              <OverlayTrigger
+                trigger="click"
+                placement="top"
+                overlay={
+                  <Popover id="popover-basic">
+                    <Popover.Title as="h3">cis-QTL Distance</Popover.Title>
+                    <Popover.Content>
+                      <p>
+                        Please be aware that a large cis-QTL distance will
+                        significantly increase the running time of the job, and
+                        the job may fail due to the large extracted data size.
+                      </p>
+                    </Popover.Content>
+                  </Popover>
+                }
+                rootClose
+              >
+                <Button
+                  variant="link"
+                  className="p-0 font-weight-bold"
+                  aria-label="collapse data info"
+                >
+                  <FontAwesomeIcon
+                    icon={faInfoCircle}
+                    style={{ verticalAlign: 'baseline' }}
+                  />
+                </Button>
+              </OverlayTrigger>
             </Form.Label>
             <Form.Control
               title="cis-QTL Distance Input"
