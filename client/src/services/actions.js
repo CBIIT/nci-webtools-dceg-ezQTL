@@ -1704,11 +1704,16 @@ export function qtlsGWASLocusQCCalculation(params) {
       })
       .catch(function ({ response }) {
         console.error(response);
+        // check if stderr contains the VROOM keyword
+        // this indicates a problem with a file line being too long for the buffer size of the file reader
+        const msg = response.data.stderr.includes('VROOM')
+          ? 'An error occured while trying to read a large data file. Please try again with a smaller cis-QTL Distance value.'
+          : 'Error occurred in QC calculation';
 
         dispatch(updateError({ visible: true }));
         dispatch(
           updateQTLsGWAS({
-            qcError: 'Error occurred in QC calculation',
+            qcError: msg,
             isLoading: false,
             isLoadingQC: false,
             isError: true,
