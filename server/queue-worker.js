@@ -421,6 +421,8 @@ async function processSingleLocus(requestData) {
       supportEmail: config.email.adminSupport,
       userError: error.includes('ezQTL QC failed')
         ? error
+        : error.includes('VROOM')
+        ? 'An error occurred while trying to read a large data file. Please try again with a smaller cis-QTL Distance value.'
         : 'An error occurred in QC calculation. Please review your input parameters and calculation logs.',
       error,
       summaryLog,
