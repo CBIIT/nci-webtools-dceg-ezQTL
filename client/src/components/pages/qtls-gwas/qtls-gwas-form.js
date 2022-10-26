@@ -117,9 +117,9 @@ function LocusInfo({
               </small>{' '}
               <OverlayTrigger
                 trigger="click"
-                placement="top"
+                placement="right"
                 overlay={
-                  <Popover id="popover-basic">
+                  <Popover id="popover-basic" style={{ zIndex: 9999 }}>
                     <Popover.Title as="h3">cis-QTL Distance</Popover.Title>
                     <Popover.Content>
                       <p>
