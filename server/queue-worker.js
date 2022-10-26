@@ -720,7 +720,7 @@ async function receiveMessage() {
     }
   } catch (e) {
     // catch exceptions related to sqs
-    logger.error('An error occured while receiving messages.');
+    logger.error('An error occurred while receiving messages.');
     logger.error(e);
   } finally {
     // schedule receiving next message
