@@ -55,14 +55,8 @@ export function LocusLD() {
           }
         />
       )}
-      {submitted && ldError && (
-        <LoadingOverlay
-          active={true}
-          content={<b className="text-danger">{ldError}</b>}
-        />
-      )}
       <LoadingOverlay active={isLoadingLD} />
-      {submitted && request && !ldError && !isLoading && !isLoadingLD && (
+      {submitted && request && !isLoading && !isLoadingLD && (
         <>
           <div className="px-3 py-2">
             <Form className="row justify-content-between">
@@ -182,6 +176,7 @@ export function LocusLD() {
           </div>
           <hr />
           <div className="px-3 py-2">
+            {ldError && <b className="text-center text-danger">{ldError}</b>}
             <p>
               Locus LD will integratively visualize association data with gene
               structures and linkage disequilibrium matrices from the user-input

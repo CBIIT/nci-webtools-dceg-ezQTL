@@ -1735,6 +1735,10 @@ export function qtlsGWASLocusLDCalculation(params) {
     axios
       .post('api/qtls-locus-ld', params)
       .then(function (response) {
+        const { error } = response.data;
+        if (error) {
+          dispatch(updateQTLsGWAS({ ldError: error }));
+        }
         // console.log('api/qtls-locus-ld response.data', response);
       })
       .catch(function (error) {
@@ -1742,10 +1746,7 @@ export function qtlsGWASLocusLDCalculation(params) {
         if (error) {
           dispatch(updateError({ visible: true }));
           dispatch(
-            updateQTLsGWAS({
-              ldError: 'Error occurred in LD calculation',
-              activeResultsTab: 'locus-qc',
-            })
+            updateQTLsGWAS({ ldError: 'Error occurred in LD calculation' })
           );
         }
       })

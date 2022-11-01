@@ -268,15 +268,23 @@ qtlsCalculateLD <- function(rfile, gwasFile, associationFile, ldFile, genome_bui
   # change work directory to tabix index directory
   setwd(paste0(workDir, "/data/tabix"))
 
-  if (identical(ldAssocData, "GWAS") & !is.null(gwasFile)) {
-    IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
-  } else if (identical(ldAssocData, "QTL") & !is.null(associationFile)) {
-    IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = select_gene, genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
-  } else {
-    if (identical(leadsnp, "false")) {
-      IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp_pos = position, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
-    } else {
-      IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp = leadsnp, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
+  tryCatch(
+    {
+      if (identical(ldAssocData, "GWAS") & !is.null(gwasFile)) {
+        IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+      } else if (identical(ldAssocData, "QTL") & !is.null(associationFile)) {
+        IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = select_gene, genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+      } else {
+        if (identical(leadsnp, "false")) {
+          IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp_pos = position, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
+        } else {
+          IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp = leadsnp, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
+        }
+      }
+    },
+    error = function(e) {
+      print(e)
+      return(list(error = e$message))
     }
-  }
+  )
 }
