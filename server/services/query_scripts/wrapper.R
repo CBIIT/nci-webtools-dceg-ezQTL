@@ -105,9 +105,15 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     } else {
       gwasFile <- paste0(workDir, "/tmp/", request, "/", gwasFile)
       # filter gwas for selected chromosome
-      filterGwas <- read_delim(gwasFile, col_names = T) %>%
-        filter(chr == select_chromosome) %>%
-        write_delim(gwasFile, delim = "\t", col_names = T)
+      if (select_chromosome) {
+        filterGwas <- read_delim(gwasFile,
+          delim = "\t",
+          col_names = T,
+          col_types = c("chr" = "c", "pos" = "n", "ref" = "c", "alt" = "c", "rsnum" = "c", "pvalue" = "d", "zscore" = "d", "effect" = "d", "se" = "d")
+        ) %>%
+          filter(chr == select_chromosome) %>%
+          write_delim(gwasFile, delim = "\t", col_names = T)
+      }
     }
   } else {
     gwasFile <- paste0(workDir, "/tmp/", request, "/", request, ".gwas_temp.txt")
@@ -133,12 +139,15 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     } else {
       associationFile <- paste0(workDir, "/tmp/", request, "/", associationFile)
       # filter association data for selected chromosome
-      filterAssociation <- read_delim(associationFile,
-        col_names = T,
-        col_types = c("gene_id" = "c", "gene_symbol" = "c", "variant_id" = "c", "rsnum" = "c", "chr" = "c", "pos" = "n", "ref" = "c", "alt" = "c", "pval_nominal" = "d", "slope" = "d", "slope_se" = "d")
-      ) %>%
-        filter(chr == select_chromosome) %>%
-        write_delim(associationFile, delim = "\t", col_names = T)
+      if (select_chromosome) {
+        filterAssociation <- read_delim(associationFile,
+          delim = "\t",
+          col_names = T,
+          col_types = c("gene_id" = "c", "gene_symbol" = "c", "variant_id" = "c", "rsnum" = "c", "chr" = "c", "pos" = "n", "ref" = "c", "alt" = "c", "pval_nominal" = "d", "slope" = "d", "slope_se" = "d")
+        ) %>%
+          filter(chr == select_chromosome) %>%
+          write_delim(associationFile, delim = "\t", col_names = T)
+      }
     }
   } else {
     associationFile <- paste0(workDir, "/tmp/", request, "/", request, ".qtl_temp.txt")
@@ -163,9 +172,16 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     } else {
       ldFile <- paste0(workDir, "/tmp/", request, "/", ldFile)
       # filter ld data for selected chromosome
-      filterLd <- read_delim(ldFile, col_names = T) %>%
-        filter(chr == select_chromosome) %>%
-        write_delim(ldFile, delim = "\t", col_names = T)
+      if (select_chromosome) {
+        filterLd <- read_delim(ldFile,
+          delim = "\t",
+          col_names = F,
+          col_types = cols("X1" = "c")
+        ) %>%
+          rename(chr = X1, pos = X2, rsnum = X3, ref = X4, alt = X5) %>%
+          filter(chr == select_chromosome) %>%
+          write_delim(ldFile, delim = "\t", col_names = F)
+      }
     }
   } else {
     ldFile <- paste0(workDir, "/tmp/", request, "/", request, ".LD.gz")
