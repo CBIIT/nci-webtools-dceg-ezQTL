@@ -2,17 +2,24 @@ import React, { useState, useEffect } from 'react';
 import ReactSelect, { components } from 'react-select';
 import { useSelector } from 'react-redux';
 
-export const PopulationSelect = ({ id, disabled, ariaLabel, mergeState }) => {
+export const PopulationSelect = ({
+  id,
+  disabled,
+  ariaLabel,
+  Controller,
+  setValue,
+  control,
+}) => {
   const { inputs } = useSelector((state) => state.qtlsGWAS);
   const [_selectPop, _setSelectPop] = useState([]);
 
   useEffect(() => {
-    mergeState({
-      select_pop:
-        _selectPop && _selectPop.length > 0
-          ? _selectPop.map((item) => item.value).join('+')
-          : false,
-    });
+    setValue(
+      'select_pop',
+      _selectPop && _selectPop.length > 0
+        ? _selectPop.map((item) => item.value).join('+')
+        : false
+    );
   }, [_selectPop]);
 
   // const allPopulationValues = ["ACB", "ASW", "BEB", "CDX", "CEU", "CHB", "CHS", "CLM", "ESN", "FIN", "GBR", "GIH", "GWD", "IBS", "ITU", "JPT", "KHV", "LWK", "MSL", "MXL", "PEL", "PJL", "PUR", "STU", "TSI", "YRI"];
@@ -237,30 +244,37 @@ export const PopulationSelect = ({ id, disabled, ariaLabel, mergeState }) => {
   };
 
   return (
-    <ReactSelect
-      value={_selectPop}
-      onChange={(item) => {
-        // console.log("onChange", item);
-        _setSelectPop(item);
-      }}
-      aria-labelledby={ariaLabel}
-      inputId={id}
-      isMulti={true}
-      options={allPopulationsGrouped}
-      components={{
-        Option,
-        GroupHeading,
-        MultiValueLabel,
-        MultiValueRemove,
-      }}
-      styles={customStyles}
-      closeMenuOnSelect={false}
-      hideSelectedOptions={false}
-      isSearchable={false}
-      isClearable={false}
-      backspaceRemovesValue={false}
-      isDisabled={disabled}
-      menuPortalTarget={document.body}
+    <Controller
+      name="select_pop"
+      control={control}
+      render={({ field }) => (
+        <ReactSelect
+          {...field}
+          value={_selectPop}
+          onChange={(item) => {
+            // console.log("onChange", item);
+            _setSelectPop(item);
+          }}
+          aria-labelledby={ariaLabel}
+          inputId={id}
+          isMulti={true}
+          options={allPopulationsGrouped}
+          components={{
+            Option,
+            GroupHeading,
+            MultiValueLabel,
+            MultiValueRemove,
+          }}
+          styles={customStyles}
+          closeMenuOnSelect={false}
+          hideSelectedOptions={false}
+          isSearchable={false}
+          isClearable={false}
+          backspaceRemovesValue={false}
+          isDisabled={disabled}
+          menuPortalTarget={document.body}
+        />
+      )}
     />
   );
 };

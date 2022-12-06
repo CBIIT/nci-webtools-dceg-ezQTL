@@ -1,4 +1,5 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { RootContext } from '../../../index';
 import {
   Form,
@@ -23,259 +24,6 @@ import {
 import Select from '../../controls/select/select';
 import Accordions from '../../controls/accordions/accordions';
 import { PopulationSelect } from '../../controls/population-select/population-select';
-const { v1: uuidv1 } = require('uuid');
-
-function LocusInfo({
-  locusIndex,
-  attempt,
-  setLocusValid,
-  _LDFile,
-  _associationFile,
-  _gwasFile,
-}) {
-  const dispatch = useDispatch();
-  const { getInitialState } = useContext(RootContext);
-  const { locusInformation, submitted, qtlPublic, ldPublic, gwasPublic } =
-    useSelector((state) => state.qtlsGWAS);
-  const { select_dist, select_position, select_ref, select_chromosome } =
-    locusInformation[locusIndex];
-
-  // check form validity for locus info params
-  useEffect(() => {
-    if (
-      !select_dist ||
-      select_dist < 1 ||
-      select_dist > 1000 ||
-      (select_ref && !/^rs\d+$/.test(select_ref)) ||
-      (ldPublic && !select_position) ||
-      (_LDFile && !_gwasFile && !_associationFile && !select_ref) ||
-      ((ldPublic || qtlPublic || gwasPublic) &&
-        Object.entries(select_chromosome).length < 2)
-    ) {
-      setLocusValid(false);
-    } else {
-      setLocusValid(true);
-    }
-  }, [
-    ldPublic,
-    qtlPublic,
-    gwasPublic,
-    select_dist,
-    select_ref,
-    select_position,
-    select_chromosome,
-    _LDFile,
-    _associationFile,
-    _gwasFile,
-  ]);
-
-  function mergeLocusInfo(data) {
-    let newLocusInfo = locusInformation.slice();
-    newLocusInfo[locusIndex] = { ...newLocusInfo[locusIndex], ...data };
-    dispatch(updateQTLsGWAS({ locusInformation: newLocusInfo }));
-  }
-
-  function addLocusInfo() {
-    let newLocusInfo = locusInformation.slice();
-    newLocusInfo = [
-      ...newLocusInfo,
-      ...getInitialState().qtlsGWAS.locusInformation,
-    ];
-    dispatch(updateQTLsGWAS({ locusInformation: newLocusInfo }));
-  }
-
-  function removeLocusInfo() {
-    let newLocusInfo = locusInformation.slice();
-    newLocusInfo.splice(locusIndex, 1);
-    dispatch(updateQTLsGWAS({ locusInformation: newLocusInfo }));
-  }
-
-  return (
-    <>
-      <div className="border rounded p-2 mb-1">
-        <Form.Row>
-          {locusIndex != 0 && (
-            <Col className="d-flex justify-content-end">
-              <Button
-                className="text-danger p-0"
-                style={{ 'text-decoration': 'underline', fontSize: '.8rem' }}
-                variant="link"
-                size="sm"
-                onClick={() => removeLocusInfo()}
-              >
-                Remove
-              </Button>
-            </Col>
-          )}
-        </Form.Row>
-        <Form.Row>
-          <Col>
-            <Form.Label className="mb-0">
-              cis-QTL Distance <span style={{ color: 'red' }}>*</span>
-              <small>
-                <i>(+/- Kb up to 1Mb)</i>
-              </small>{' '}
-              <OverlayTrigger
-                trigger="click"
-                placement="right"
-                overlay={
-                  <Popover id="popover-basic" style={{ zIndex: 9999 }}>
-                    <Popover.Title as="h3">cis-QTL Distance</Popover.Title>
-                    <Popover.Content>
-                      <p>
-                        Please be aware that a large cis-QTL distance will
-                        significantly increase the running time of the job, and
-                        the job may fail due to the large extracted data size.
-                      </p>
-                    </Popover.Content>
-                  </Popover>
-                }
-                rootClose
-              >
-                <Button
-                  variant="link"
-                  className="p-0 font-weight-bold"
-                  aria-label="collapse data info"
-                >
-                  <FontAwesomeIcon
-                    icon={faInfoCircle}
-                    style={{ verticalAlign: 'baseline' }}
-                  />
-                </Button>
-              </OverlayTrigger>
-            </Form.Label>
-            <Form.Control
-              title="cis-QTL Distance Input"
-              aria-label="cis-QTL Distance Input"
-              type="number"
-              min="1"
-              max="1000"
-              id="qtls-distance-input"
-              disabled={submitted}
-              onChange={(e) => mergeLocusInfo({ select_dist: e.target.value })}
-              value={select_dist}
-              isInvalid={attempt && (select_dist < 1 || select_dist > 1000)}
-            />
-            <Form.Control.Feedback type="invalid">
-              Enter distance between 1 and 1000Kb.
-            </Form.Control.Feedback>
-          </Col>
-        </Form.Row>
-        {qtlPublic || gwasPublic || ldPublic ? (
-          <>
-            <Form.Row>
-              <Col>
-                <Select
-                  className="mb-0"
-                  disabled={submitted}
-                  id="chromosome"
-                  label={
-                    <>
-                      Chromosome <span style={{ color: 'red' }}>*</span>
-                    </>
-                  }
-                  placeholder={'Select Chromosome'}
-                  value={select_chromosome}
-                  options={[
-                    ...Array.from({ length: 22 }, (_, i) => ({
-                      value: i + 1,
-                      label: i + 1,
-                    })),
-                    {
-                      value: 'X',
-                      label: 'X',
-                    },
-                    {
-                      value: 'Y',
-                      label: 'Y',
-                    },
-                  ]}
-                  onChange={(chromosome) => {
-                    mergeLocusInfo({ select_chromosome: chromosome });
-                  }}
-                />
-                {attempt && Object.entries(select_chromosome).length == 0 && (
-                  <div className="text-danger" style={{ fontSize: '80%' }}>
-                    Please select a chromosome
-                  </div>
-                )}
-              </Col>
-            </Form.Row>
-            <Form.Row>
-              <Col>
-                <Form.Label className="mb-0">
-                  Position <span style={{ color: 'red' }}>*</span>
-                </Form.Label>
-                <Form.Control
-                  title="LD Reference Position Input"
-                  aria-label="LD Refereence Position Input"
-                  id="select_position"
-                  disabled={submitted}
-                  onChange={(e) =>
-                    mergeLocusInfo({ select_position: e.target.value })
-                  }
-                  placeholder="e.g. 42743496"
-                  value={select_position}
-                  isInvalid={attempt ? !select_position : false}
-                />
-                <Form.Control.Feedback type="invalid">
-                  Enter a valid position
-                </Form.Control.Feedback>
-              </Col>
-            </Form.Row>
-          </>
-        ) : (
-          <Form.Row>
-            <Col>
-              <Form.Label className="mb-0">
-                SNP{' '}
-                {_LDFile && !_gwasFile && !_associationFile && (
-                  <span style={{ color: 'red' }}>* </span>
-                )}
-                <small>
-                  <i>(Default: lowest GWAS P-value SNP)</i>
-                </small>
-              </Form.Label>
-              <Form.Control
-                title="LD Reference SNP Input"
-                aria-label="LD Refereence SNP Input"
-                id="qtls-snp-input"
-                disabled={submitted}
-                onChange={(e) => mergeLocusInfo({ select_ref: e.target.value })}
-                value={select_ref ? select_ref : ''}
-                isInvalid={
-                  attempt &&
-                  ((select_ref && !/^rs\d+$/.test(select_ref)) ||
-                    (_LDFile && !_gwasFile && !_associationFile && !select_ref))
-                }
-              />
-              <Form.Control.Feedback type="invalid">
-                Enter a valid RS number
-              </Form.Control.Feedback>
-            </Col>
-          </Form.Row>
-        )}
-      </div>
-
-      <Row>
-        {locusIndex == locusInformation.length - 1 && (
-          <Col className="d-flex justify-content-end">
-            <Button
-              className="p-0"
-              variant="link"
-              title="Add Locus Information"
-              aria-label="Add Locus Information"
-              onClick={() => addLocusInfo()}
-              disabled={submitted}
-            >
-              + Add Locus
-            </Button>
-          </Col>
-        )}
-      </Row>
-    </>
-  );
-}
 
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
@@ -284,20 +32,8 @@ export function QTLsGWASForm() {
   const quantificationFileControl = useRef(null);
   const genotypeFileControl = useRef(null);
 
-  const [_associationFile, _setAssociationFile] = useState('');
-  const [_quantificationFile, _setQuantificationFile] = useState('');
-  const [_genotypeFile, _setGenotypeFile] = useState('');
-  const [_LDFile, _setLDFile] = useState('');
-  const [_gwasFile, _setGwasFile] = useState('');
-
-  const [tissueOnly, viewTissueOnly] = useState(false);
-  const [phenotypeOnly, viewPhenotypeOnly] = useState(false);
   const [useQuantification, toggleQuantification] = useState(false);
-
-  const [validEmail, setValidEmail] = useState(false);
-  const [attempt, setAttempt] = useState(false);
-  const [valid, setValid] = useState(false);
-  const [locusValid, setLocusValid] = useState(false);
+  const [valid, setValid] = useState(null);
 
   const {
     associationFile,
@@ -305,10 +41,8 @@ export function QTLsGWASForm() {
     genotypeFile,
     gwasFile,
     LDFile,
-    request,
-    select_pop,
+    select_pop: storePop,
     select_gene,
-    locusInformation,
     recalculateAttempt,
     recalculatePop,
     recalculateGene,
@@ -318,110 +52,143 @@ export function QTLsGWASForm() {
     isLoading,
     fetchingOptions,
     isError,
+
     publicGTEx,
-    genome,
-    genomeOptions,
-    qtlProject,
-    qtlProjectOptions,
-    gwasProject,
-    gwasProjectOptions,
-    ldProject,
-    ldProjectOptions,
-    xQtl,
-    xQtlOptions,
-    tissue,
-    tissueOptions,
-    phenotype,
-    phenotypeOptions,
-    isQueue,
-    jobName,
-    email,
+
+    genome: storeGenome,
+    qtlProject: storeQtlProject,
+    xQtl: storeXQtl,
+    tissue: storeTissue,
+    gwasProject: storeGwasProject,
+    phenotype: storePhenotype,
+    ldProject: storeLdProject,
+    locusInformation: storeLocusInfo,
+
+    useQueue: storeQueue,
+    jobName: storeJobName,
+    email: storeEmail,
+  } = useSelector((state) => state.qtlsGWAS);
+
+  const defaultValues = {
+    qtlPublic: false,
+    gwasPublic: false,
+    ldPublic: false,
+
+    _associationFile: false,
+    _quantificationFile: false,
+    _genotypeFile: false,
+    _gwasFile: false,
+    _LDFile: false,
+
+    genome: storeGenome,
+    qtlProject: storeQtlProject,
+    xQtl: storeXQtl,
+    tissue: storeTissue,
+    gwasProject: storeGwasProject,
+    phenotype: storePhenotype,
+    ldProject: storeLdProject,
+    select_pop: storePop,
+
+    locusInformation: storeLocusInfo,
+
+    useQueue: storeQueue,
+    jobName: storeJobName,
+    email: storeEmail,
+  };
+
+  const {
+    control,
+    reset: resetForm,
+    resetField,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm({ defaultValues });
+
+  const {
+    fields: locusFields,
+    append: appendLocus,
+    remove: removeLocus,
+  } = useFieldArray({
+    control,
+    name: 'locusInformation',
+  });
+
+  const {
     qtlPublic,
     gwasPublic,
     ldPublic,
-    qtlKey,
-    ldKey,
-    gwasKey,
-  } = useSelector((state) => state.qtlsGWAS);
+    _associationFile,
+    _quantificationFile,
+    _genotypeFile,
+    _gwasFile,
+    _LDFile,
+    genome,
+    tissueOnly,
+    phenotypeOnly,
+    qtlProject,
+    xQtl,
+    tissue,
+    gwasProject,
+    phenotype,
+    ldProject,
+    useQueue,
+    locusInformation,
+  } = watch();
 
-  useEffect(() => _setAssociationFile(associationFile), [associationFile]);
-  useEffect(
-    () => _setQuantificationFile(quantificationFile),
-    [quantificationFile]
-  );
-  useEffect(() => _setGenotypeFile(genotypeFile), [genotypeFile]);
-  useEffect(() => _setLDFile(LDFile), [LDFile]);
-  useEffect(() => _setGwasFile(gwasFile), [gwasFile]);
+  const genomeOptions =
+    publicGTEx && publicGTEx['cis-QTL dataset']
+      ? [
+          ...new Set(
+            publicGTEx['cis-QTL dataset'].map((row) => row.Genome_build)
+          ),
+        ].map((genome) => ({
+          value: genome,
+          label: genome,
+        }))
+      : [];
+
   useEffect(() => {
     if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx());
   }, [publicGTEx]);
-  // inital population of public params
+  // populate inital params
   useEffect(() => {
-    if (Object.keys(publicGTEx).length && !genomeOptions.length)
-      getGenomeOptions();
-  }, [publicGTEx, genomeOptions]);
-  useEffect(() => {
-    if (Object.keys(publicGTEx).length && genome.value)
-      populatePublicParameters();
-  }, [genome.value]);
-  useEffect(() => {
-    if (Object.keys(publicGTEx).length && qtlProject && qtlPublic)
-      handleQtlProject(qtlProject);
-  }, [qtlPublic, tissueOnly]);
-  useEffect(() => {
-    if (Object.keys(publicGTEx).length && gwasProject && gwasPublic)
-      handleGwasProject(gwasProject);
-  }, [gwasPublic, phenotypeOnly]);
-
-  // check form validity for file uploads
-  useEffect(() => {
-    if (
-      (!_associationFile &&
-        !_gwasFile &&
-        !_LDFile &&
-        !qtlPublic &&
-        !gwasPublic &&
-        !ldPublic) ||
-      (_quantificationFile && !_genotypeFile) ||
-      (!_quantificationFile && _genotypeFile)
-    ) {
-      setValid(false);
-    } else {
-      setValid(true);
-    }
-  }, [
-    _associationFile,
-    _gwasFile,
-    _LDFile,
-    _quantificationFile,
-    _genotypeFile,
-    qtlPublic,
-    gwasPublic,
-    ldPublic,
-    select_pop,
-  ]);
+    if (Object.keys(publicGTEx).length && genomeOptions.length && !genome)
+      populatePublicParameters(genomeOptions[0]);
+  }, [publicGTEx, genomeOptions, genome]);
 
   // automatically enable/disable queue if more locus info panels are added
   useEffect(() => {
-    if (locusInformation.length > 1)
-      dispatch(updateQTLsGWAS({ isQueue: true }));
+    if (locusInformation.length > 1) setValue('useQueue', true);
   }, [locusInformation]);
 
-  function getGenomeOptions() {
-    const data = publicGTEx['cis-QTL dataset'];
-    const genomeOptions = [...new Set(data.map((row) => row.Genome_build))].map(
-      (genome) => ({ value: genome, label: genome })
-    );
-
-    dispatch(
-      updateQTLsGWAS({
-        genome: genomeOptions[0],
-        genomeOptions: genomeOptions,
-      })
-    );
+  // check form to make sure at least one of the three input types are provided (Association, GWAS, or LD)
+  function checkValidity() {
+    let count = 0;
+    // association
+    if (qtlPublic) {
+      if (tissue.value) count++;
+    } else {
+      if (_associationFile) count++;
+    }
+    // gwas
+    if (gwasPublic) {
+      if (phenotype.value) count++;
+    } else {
+      if (_gwasFile) count++;
+    }
+    // ld
+    if (ldPublic) {
+      if (ldProject.value) count++;
+    } else {
+      if (_LDFile) count++;
+    }
+    setValid(count);
+    return count > 0 ? true : false;
   }
 
-  function getProjectOptions(data) {
+  function getProjectOptions(data, genome) {
     return [
       ...new Set(
         data
@@ -431,26 +198,27 @@ export function QTLsGWASForm() {
     ].map((project) => ({ value: project, label: project }));
   }
 
-  function getXqtlOptions(data, project) {
+  function getXqtlOptions(data, genome, project) {
     return [
       ...new Set(
         data
           .filter(
-            (row) => row.Genome_build == genome.value && row.Project == project
+            (row) =>
+              row.Genome_build == genome.value && row.Project == project.value
           )
           .map((row) => row.xQTL)
       ),
     ].map((xQtl) => ({ value: xQtl, label: xQtl }));
   }
 
-  function getTissueOptions(data, project, xQtl) {
+  function getTissueOptions(data, genome, project, xQtl) {
     return !tissueOnly
       ? data
           .filter(
             (row) =>
               row['Genome_build'] == genome.value &&
-              row['Project'] == project &&
-              row['xQTL'] == xQtl
+              row['Project'] == project.value &&
+              row['xQTL'] == xQtl.value
           )
           .map((row) => ({ value: row.Tissue, label: row.Tissue }))
       : data
@@ -458,12 +226,13 @@ export function QTLsGWASForm() {
           .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
   }
 
-  function getPhenotypeOptions(data, project) {
+  function getPhenotypeOptions(data, genome, project) {
     return !phenotypeOnly
       ? data
           .filter(
             (row) =>
-              row['Genome_build'] == genome.value && row['Project'] == project
+              row['Genome_build'] == genome.value &&
+              row['Project'] == project.value
           )
           .map((row) => ({ value: row.Phenotype, label: row.Phenotype }))
       : data
@@ -471,158 +240,106 @@ export function QTLsGWASForm() {
           .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
   }
 
-  function populatePublicParameters() {
+  function populatePublicParameters(genome) {
     const qtlData = publicGTEx['cis-QTL dataset'];
     const ldData = publicGTEx['LD dataset'];
     const gwasData = publicGTEx['GWAS dataset'];
 
-    const qtlProjectOptions = getProjectOptions(qtlData);
-    const xQtlOptions = getXqtlOptions(qtlData, qtlProjectOptions[0].value);
+    const qtlProjectOptions = getProjectOptions(qtlData, genome);
+    const xQtlOptions = getXqtlOptions(qtlData, genome, qtlProjectOptions[0]);
     const tissueOptions = getTissueOptions(
       qtlData,
-      qtlProjectOptions[0].value,
-      xQtlOptions[0].value
+      genome,
+      qtlProjectOptions[0],
+      xQtlOptions[0]
     );
 
-    const ldProjectOptions = getProjectOptions(ldData);
+    const ldProjectOptions = getProjectOptions(ldData, genome);
 
-    const gwasProjectOptions = getProjectOptions(gwasData);
+    const gwasProjectOptions = getProjectOptions(gwasData, genome);
     const phenotypeOptions = gwasProjectOptions.length
-      ? getPhenotypeOptions(gwasData, gwasProjectOptions[0].value)
+      ? getPhenotypeOptions(gwasData, genome, gwasProjectOptions[0])
       : [];
 
-    dispatch(
-      updateQTLsGWAS({
-        qtlProject: qtlProjectOptions[0],
-        ldProject: ldProjectOptions[0],
-        xQtl: xQtlOptions[0],
-        tissue: tissueOptions[0],
-        gwasProject: gwasProjectOptions[0],
-        phenotype: phenotypeOptions[0] || '',
-
-        qtlProjectOptions: qtlProjectOptions,
-        ldProjectOptions: ldProjectOptions,
-        xQtlOptions: xQtlOptions,
-        tissueOptions: tissueOptions,
-        gwasProjectOptions: gwasProjectOptions,
-        phenotypeOptions: phenotypeOptions || [],
-      })
-    );
+    setValue('genome', genome);
+    setValue('qtlProject', qtlProjectOptions[0]);
+    setValue('xQtl', xQtlOptions[0]);
+    setValue('tissue', tissueOptions[0]);
+    setValue('gwasProject', gwasProjectOptions[0]);
+    setValue('phenotype', phenotypeOptions[0]);
+    setValue('ldProject', ldProjectOptions[0]);
   }
 
   function handleQtlProject(project) {
     const data = publicGTEx['cis-QTL dataset'];
-    const xQtlOptions = getXqtlOptions(data, project.value);
+    const xQtlOptions = getXqtlOptions(data, genome, project);
     const tissueOptions = getTissueOptions(
       data,
-      project.value,
-      xQtlOptions[0].value
+      genome,
+      project,
+      xQtlOptions[0]
     );
 
-    dispatch(
-      updateQTLsGWAS({
-        qtlProject: project,
-        xQtl: xQtlOptions[0],
-        xQtlOptions: xQtlOptions,
-        tissue: tissueOptions[0],
-        tissueOptions: tissueOptions,
-      })
-    );
+    setValue('qtlProject', project);
+    setValue('xQtl', xQtlOptions[0]);
+    setValue('tissue', tissueOptions[0]);
   }
 
   function handleGwasProject(project) {
     const data = publicGTEx['GWAS dataset'];
-    const phenotypeOptions = getPhenotypeOptions(data, project.value);
+    const phenotypeOptions = getPhenotypeOptions(data, genome, project);
 
-    dispatch(
-      updateQTLsGWAS({
-        gwasProject: project,
-        phenotype: phenotypeOptions[0],
-        phenotypeOptions: phenotypeOptions,
-      })
-    );
-  }
-
-  function handleLdProject(project) {
-    dispatch(updateQTLsGWAS({ ldProject: project }));
+    setValue('gwasProject', project);
+    setValue('phenotype', phenotypeOptions[0]);
   }
 
   // qtl type
   function handleXqtl(xQtl) {
     const data = publicGTEx['cis-QTL dataset'];
-    const tissueOptions = getTissueOptions(data, qtlProject.value, xQtl.value);
+    const tissueOptions = getTissueOptions(data, genome, qtlProject, xQtl);
 
-    dispatch(
-      updateQTLsGWAS({
-        xQtl: xQtl,
-        tissue: tissueOptions[0],
-        tissueOptions: tissueOptions,
-      })
-    );
-  }
-
-  function handleTissue(tissue) {
-    dispatch(updateQTLsGWAS({ tissue: tissue }));
-  }
-
-  function handlePhenotype(phenotype) {
-    dispatch(updateQTLsGWAS({ phenotype: phenotype }));
+    setValue('xQtl', xQtl);
+    setValue('tissue', tissueOptions[0]);
   }
 
   const handleReset = () => {
     window.location.hash = '#/qtls';
-
+    resetForm();
+    setValid(null);
     dispatch(
       updateQTLsGWAS({ ...getInitialState().qtlsGWAS, publicGTEx: publicGTEx })
     );
     dispatch(updateAlert(getInitialState().alert));
-    _setAssociationFile('');
-    _setQuantificationFile('');
-    _setGenotypeFile('');
-    _setLDFile('');
-    _setGwasFile('');
-    viewTissueOnly(false);
-    viewPhenotypeOnly(false);
-    setAttempt(false);
   };
 
-  function validateEmail() {
-    const re = new RegExp(
-      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-    );
-    const check = re.test(email);
-    setValidEmail(check);
-    setAttempt(true);
-
-    return isQueue ? check : true;
-  }
-
-  async function handleSubmit() {
-    if (!valid || !locusValid) {
+  async function onSubmit(data) {
+    if (!checkValidity()) {
       return;
     }
-    setAttempt(false);
-    const request = uuidv1();
+    dispatch(updateQTLsGWAS(data));
+    const request = crypto.randomUUID();
 
     await dispatch(
       uploadFile({
-        associationFile: _associationFile,
-        quantificationFile: _quantificationFile,
-        genotypeFile: _genotypeFile,
-        LDFile: _LDFile,
-        gwasFile: _gwasFile,
-        associationFileName: _associationFile ? _associationFile.name : false,
-        quantificationFileName: _quantificationFile
+        associationFile: data._associationFile,
+        quantificationFile: data._quantificationFile,
+        genotypeFile: data._genotypeFile,
+        LDFile: data._LDFile,
+        gwasFile: data._gwasFile,
+        associationFileName: data._associationFile
+          ? _associationFile.name
+          : false,
+        quantificationFileName: data._quantificationFile
           ? _quantificationFile.name
           : false,
-        genotypeFileName: _genotypeFile ? _genotypeFile.name : false,
-        LDFileName: _LDFile ? _LDFile.name : false,
-        gwasFileName: _gwasFile ? _gwasFile.name : false,
+        genotypeFileName: data._genotypeFile ? _genotypeFile.name : false,
+        LDFileName: data._LDFile ? _LDFile.name : false,
+        gwasFileName: data._gwasFile ? _gwasFile.name : false,
         request,
       })
     );
 
-    const params = locusInformation.map((locusInfo, locusIndex) => {
+    const params = data.locusInformation.map((locusInfo, locusIndex) => {
       const { select_dist, select_ref, select_position, select_chromosome } =
         locusInfo;
 
@@ -699,20 +416,19 @@ export function QTLsGWASForm() {
       );
 
       return {
-        jobName: jobName
-          ? `${jobName} - ${locusIndex}`
+        jobName: data.jobName
+          ? `${data.jobName} - ${locusIndex}`
           : `ezQTL - ${locusIndex}`,
         request: `${request}-${locusIndex}`,
-        email: email,
-        isQueue: true,
+        email: data.email,
+        useQueue: data.true,
         submitted: true,
-        associationFile: (_associationFile && _associationFile.name) || false,
-        quantificationFile:
-          (_quantificationFile && _quantificationFile.name) || false,
-        genotypeFile: (_genotypeFile && _genotypeFile.name) || false,
-        gwasFile: (_gwasFile && _gwasFile.name) || false,
-        LDFile: (_LDFile && _LDFile.name) || false,
-        select_pop,
+        associationFile: data._associationFile.name || false,
+        quantificationFile: data._quantificationFile.name || false,
+        genotypeFile: data._genotypeFile.name || false,
+        gwasFile: data._gwasFile.name || false,
+        LDFile: data._LDFile.name || false,
+        select_pop: data.select_pop,
         select_gene,
         select_dist,
         select_ref,
@@ -721,28 +437,26 @@ export function QTLsGWASForm() {
         recalculateGene,
         recalculateDist,
         recalculateRef,
-        qtlPublic,
-        gwasPublic,
-        ldPublic,
-        qtlKey: qtlKey,
-        ldKey: ldKey,
-        gwasKey: gwasKey,
-        select_chromosome:
-          qtlPublic || ldPublic || gwasPublic ? select_chromosome.value : false,
-        select_position:
-          qtlPublic || ldPublic || gwasPublic ? select_position : false,
-        genome_build: genome.value,
-        genome,
-        qtlProject,
-        ldProject,
-        xQtl,
-        tissue,
-        gwasProject,
-        phenotype,
+        qtlPublic: data.qtlPublic,
+        gwasPublic: data.gwasProject,
+        ldPublic: data.ldPublic,
+        qtlKey,
+        ldKey,
+        gwasKey,
+        select_chromosome: select_chromosome.value || false,
+        select_position: select_position,
+        genome_build: data.genome.value,
+        genome: data.genome,
+        qtlProject: data.qtlProject,
+        ldProject: data.ldProject,
+        xQtl: data.xQTL,
+        tissue: data.tissue,
+        gwasProject: data.gwasProject,
+        phenotype: data.phenotype,
       };
     });
 
-    if (isQueue) {
+    if (data.useQueue) {
       dispatch(
         submitQueue({
           params:
@@ -767,44 +481,49 @@ export function QTLsGWASForm() {
                 <Form.Label className="mb-0 mr-auto">
                   Association (QTL) Data
                 </Form.Label>
-                <Form.Check
-                  title="Association (QTL) Public Data Checkbox"
-                  disabled={submitted}
-                  inline
-                  id="qtlSource"
-                  label="Public"
-                  type="checkbox"
-                  checked={qtlPublic}
-                  onChange={(_) => {
-                    dispatch(
-                      updateQTLsGWAS({
-                        qtlPublic: !qtlPublic,
-                        ...(!qtlPublic && { select_ref: false }),
-                      })
-                    );
-                    _setAssociationFile('');
-                  }}
+                <Controller
+                  name="qtlPublic"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Check
+                      {...field}
+                      type="checkbox"
+                      inline
+                      id="qtlPublic"
+                      title="Association Public Data Checkbox"
+                      disabled={submitted}
+                      label="Public"
+                      checked={qtlPublic}
+                      onChange={(_) => {
+                        setValue('qtlPublic', !qtlPublic);
+                        resetField('_qtlFile');
+                      }}
+                    />
+                  )}
                 />
               </div>
               {qtlPublic ? (
                 <div className="mt-2">
                   <Row>
                     <Col>
-                      <Form.Check
-                        title="Association (QTL) Public Data Tissue Only Checkbox"
-                        id="tissueOnly"
-                        label="Tissue Only"
-                        type="checkbox"
-                        disabled={
-                          submitted ||
-                          isLoading ||
-                          fetchingOptions ||
-                          !Object.keys(publicGTEx).length
-                        }
-                        checked={tissueOnly}
-                        onChange={(_) => {
-                          viewTissueOnly(!tissueOnly);
-                        }}
+                      <Controller
+                        name="tissueOnly"
+                        control={control}
+                        render={({ field }) => (
+                          <Form.Check
+                            {...field}
+                            title="Association (QTL) Public Data Tissue Only Checkbox"
+                            id="tissueOnly"
+                            label="Tissue Only"
+                            type="checkbox"
+                            disabled={
+                              submitted ||
+                              isLoading ||
+                              fetchingOptions ||
+                              !Object.keys(publicGTEx).length
+                            }
+                          />
+                        )}
                       />
                     </Col>
                   </Row>
@@ -812,35 +531,51 @@ export function QTLsGWASForm() {
                     <>
                       <Row>
                         <Col>
-                          <Select
-                            disabled={
-                              isLoading ||
-                              fetchingOptions ||
-                              tissueOnly ||
-                              submitted
-                            }
-                            id="project"
-                            label="Project"
-                            value={qtlProject}
-                            options={qtlProjectOptions}
-                            onChange={handleQtlProject}
+                          <Controller
+                            name="qtlProject"
+                            control={control}
+                            rules={{ required: qtlPublic && !tissueOnly }}
+                            render={({ field }) => (
+                              <Select
+                                {...field}
+                                disabled={
+                                  isLoading || fetchingOptions || submitted
+                                }
+                                id="qtlProject"
+                                label="Project"
+                                options={getProjectOptions(
+                                  publicGTEx['cis-QTL dataset'],
+                                  genome
+                                )}
+                                onChange={handleQtlProject}
+                              />
+                            )}
                           />
                         </Col>
                       </Row>
                       <Row>
                         <Col>
-                          <Select
-                            disabled={
-                              isLoading ||
-                              fetchingOptions ||
-                              tissueOnly ||
-                              submitted
-                            }
-                            id="qtlType"
-                            label="QTL Type"
-                            value={xQtl}
-                            options={xQtlOptions}
-                            onChange={handleXqtl}
+                          <Controller
+                            name="xQtl"
+                            control={control}
+                            rules={{ required: qtlPublic && !tissueOnly }}
+                            render={({ field }) => (
+                              <Select
+                                {...field}
+                                disabled={
+                                  isLoading || fetchingOptions || submitted
+                                }
+                                id="qtlType"
+                                label="QTL Type"
+                                value={xQtl}
+                                options={getXqtlOptions(
+                                  publicGTEx['cis-QTL dataset'],
+                                  genome,
+                                  qtlProject
+                                )}
+                                onChange={handleXqtl}
+                              />
+                            )}
                           />
                         </Col>
                       </Row>
@@ -848,83 +583,103 @@ export function QTLsGWASForm() {
                   )}
                   <Row>
                     <Col>
-                      <Select
-                        disabled={isLoading || fetchingOptions || submitted}
-                        id="tissue"
-                        label="Tissue"
-                        value={tissue}
-                        options={tissueOptions}
-                        onChange={handleTissue}
+                      <Controller
+                        name="tissue"
+                        control={control}
+                        rules={{ required: qtlPublic }}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            disabled={isLoading || fetchingOptions || submitted}
+                            id="tissue"
+                            label="Tissue"
+                            options={getTissueOptions(
+                              publicGTEx['cis-QTL dataset'],
+                              genome,
+                              qtlProject,
+                              xQtl
+                            )}
+                          />
+                        )}
                       />
                     </Col>
                   </Row>
                 </div>
               ) : (
-                <Form.File
-                  title="Association (QTL) Data User File Upload Input"
-                  id="qtls-association-file"
-                  disabled={submitted}
-                  key={_associationFile}
-                  label={
-                    _associationFile
-                      ? _associationFile.name ||
-                        _associationFile.filename ||
-                        _associationFile
-                      : 'Choose File'
-                  }
-                  onChange={(e) => {
-                    _setAssociationFile(e.target.files[0]);
-                  }}
-                  // accept=".tsv, .txt"
-                  // isInvalid={
-                  //   attempt ? !_associationFile  : false
-                  // }
-                  // feedback="Please upload a data file"
-                  custom
+                <Controller
+                  name="_associationFile"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.File
+                      {...field}
+                      id="qtls-association-file"
+                      value=""
+                      title="Association (QTL) Data User File Upload Input"
+                      disabled={submitted}
+                      label={
+                        associationFile ||
+                        _associationFile.name ||
+                        'Choose File'
+                      }
+                      onChange={(e) => {
+                        if (e.target.files.length) {
+                          setValue('_associationFile', e.target.files[0]);
+                        }
+                      }}
+                      isInvalid={errors._associationFile}
+                      feedback="Please upload a data file"
+                      custom
+                    />
+                  )}
                 />
               )}
             </Form.Group>
             <Form.Group className="col-sm-12">
               <div className="d-flex">
                 <Form.Label className="mb-0 mr-auto">GWAS Data</Form.Label>
-                <Form.Check
-                  title="GWAS Public Data Checkbox"
-                  disabled={submitted}
-                  inline
-                  id="gwasSource"
-                  label="Public"
-                  type="checkbox"
-                  checked={gwasPublic}
-                  onChange={(_) => {
-                    dispatch(
-                      updateQTLsGWAS({
-                        gwasPublic: !gwasPublic,
-                        ...(!ldPublic && { select_ref: false }),
-                      })
-                    );
-                    _setGwasFile('');
-                  }}
+                <Controller
+                  name="gwasPublic"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Check
+                      {...field}
+                      type="checkbox"
+                      inline
+                      id="gwasSource"
+                      title="GWAS Public Data Checkbox"
+                      disabled={submitted}
+                      label="Public"
+                      checked={gwasPublic}
+                      onChange={(_) => {
+                        setValue('gwasPublic', !gwasPublic);
+                        resetField('_gwasFile');
+                      }}
+                    />
+                  )}
                 />
               </div>
               {gwasPublic ? (
                 <div className="mt-2">
                   <Row>
                     <Col>
-                      <Form.Check
-                        title="GWAS Public Data Phenotype Only Checkbox"
-                        id="phenotypeOnly"
-                        label="Phenotype Only"
-                        type="checkbox"
-                        disabled={
-                          submitted ||
-                          isLoading ||
-                          fetchingOptions ||
-                          !Object.keys(publicGTEx).length
-                        }
-                        checked={phenotypeOnly}
-                        onChange={(_) => {
-                          viewPhenotypeOnly(!phenotypeOnly);
-                        }}
+                      <Controller
+                        name="phenotypeOnly"
+                        control={control}
+                        render={({ field }) => (
+                          <Form.Check
+                            {...field}
+                            title="GWAS Public Data Phenotype Only Checkbox"
+                            id="phenotypeOnly"
+                            label="Phenotype Only"
+                            type="checkbox"
+                            disabled={
+                              submitted ||
+                              isLoading ||
+                              fetchingOptions ||
+                              !Object.keys(publicGTEx).length
+                            }
+                          />
+                        )}
                       />
                     </Col>
                   </Row>
@@ -932,17 +687,14 @@ export function QTLsGWASForm() {
                     <Row>
                       <Col>
                         <Select
-                          disabled={
-                            submitted ||
-                            isLoading ||
-                            fetchingOptions ||
-                            phenotypeOnly ||
-                            !gwasProjectOptions.length
-                          }
+                          disabled={submitted || isLoading || fetchingOptions}
                           id="gwasProject"
                           label="Project"
                           value={gwasProject}
-                          options={gwasProjectOptions}
+                          options={getProjectOptions(
+                            publicGTEx['GWAS dataset'],
+                            genome
+                          )}
                           onChange={handleGwasProject}
                         />
                       </Col>
@@ -951,42 +703,48 @@ export function QTLsGWASForm() {
 
                   <Row>
                     <Col>
-                      <Select
-                        disabled={
-                          submitted ||
-                          isLoading ||
-                          fetchingOptions ||
-                          !phenotypeOptions.length
-                        }
-                        id="gwasPhenotype"
-                        label="Phenotype"
-                        value={phenotype}
-                        options={phenotypeOptions}
-                        onChange={handlePhenotype}
+                      <Controller
+                        name="phenotype"
+                        control={control}
+                        render={({ field }) => (
+                          <Select
+                            {...field}
+                            disabled={submitted || isLoading || fetchingOptions}
+                            id="gwasPhenotype"
+                            label="Phenotype"
+                            options={getPhenotypeOptions(
+                              publicGTEx['GWAS dataset'],
+                              genome,
+                              gwasProject
+                            )}
+                          />
+                        )}
                       />
                     </Col>
                   </Row>
                 </div>
               ) : (
-                <Form.File
-                  title="GWAS Data User File Upload Input"
-                  id="qtls-gwas-file"
-                  disabled={submitted}
-                  key={_gwasFile}
-                  label={
-                    _gwasFile
-                      ? _gwasFile.name || _gwasFile.filename || _gwasFile
-                      : 'Choose File'
-                  }
-                  onChange={(e) => {
-                    _setGwasFile(e.target.files[0]);
-                  }}
-                  // accept=".tsv, .txt"
-                  // isInvalid={
-                  //   attempt ? !_gwasFile : false
-                  // }
-                  // feedback="Please upload a data file"
-                  custom
+                <Controller
+                  name="_gwasFile"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.File
+                      {...field}
+                      id="qtls-gwas-file"
+                      value=""
+                      title="GWAS Data User File Upload Input"
+                      disabled={submitted}
+                      label={gwasFile || _gwasFile.name || 'Choose File'}
+                      onChange={(e) => {
+                        if (e.target.files.length) {
+                          setValue('_gwasFile', e.target.files[0]);
+                        }
+                      }}
+                      isInvalid={errors._gwasFile}
+                      feedback="Please upload a data file"
+                      custom
+                    />
+                  )}
                 />
               )}
               <Form.Text className="text-muted">
@@ -1000,8 +758,8 @@ export function QTLsGWASForm() {
                 variant="link"
                 onClick={() => {
                   toggleQuantification(!useQuantification);
-                  _setQuantificationFile('');
-                  _setGenotypeFile('');
+                  resetField('_quantificationFile');
+                  resetField('_genotypeFile');
                 }}
                 disabled={submitted}
               >
@@ -1015,62 +773,71 @@ export function QTLsGWASForm() {
               <Row>
                 <Form.Group className="col-sm-12">
                   <Form.Label className="mb-0">Quantification Data</Form.Label>
-                  <Form.File
-                    title="Quantification Data User File Upload Input"
-                    ref={quantificationFileControl}
-                    id="qtls-quantification-file"
-                    disabled={submitted}
-                    key={_quantificationFile}
-                    label={
-                      _quantificationFile
-                        ? _quantificationFile.name ||
-                          _quantificationFile.filename ||
-                          _quantificationFile
-                        : 'Choose File'
-                    }
-                    custom
-                    onChange={(e) => {
-                      _setQuantificationFile(e.target.files[0]);
-                    }}
-                    // accept=".tsv, .txt"
-                    isInvalid={
-                      attempt &&
-                      useQuantification &&
-                      !_quantificationFile &&
-                      _genotypeFile
-                    }
-                    feedback="Please input accompanying Quantification Data File with
-          Genotype Data File."
+                  <Controller
+                    name="_quantificationFile"
+                    control={control}
+                    rules={{ required: useQuantification }}
+                    render={({ field }) => (
+                      <Form.File
+                        {...field}
+                        id="qtls-quantification-file"
+                        value=""
+                        title="Quantification Data User File Upload Input"
+                        disabled={submitted}
+                        ref={quantificationFileControl}
+                        label={
+                          quantificationFile ||
+                          _quantificationFile.name ||
+                          'Choose File'
+                        }
+                        onChange={(e) => {
+                          if (e.target.files.length) {
+                            setValue('_quantificationFile', e.target.files[0]);
+                          }
+                        }}
+                        isInvalid={
+                          useQuantification &&
+                          !_quantificationFile &&
+                          _genotypeFile
+                        }
+                        feedback="Please input accompanying Quantification Data File with
+                        Genotype Data File."
+                        custom
+                      />
+                    )}
                   />
                 </Form.Group>
                 <Form.Group className="col-sm-12">
                   <Form.Label className="mb-0">Genotype Data</Form.Label>
-                  <Form.File
-                    title="Genotype Data User File Upload Input"
-                    ref={genotypeFileControl}
-                    id="qtls-genotype-file"
-                    disabled={submitted}
-                    key={_genotypeFile}
-                    label={
-                      _genotypeFile
-                        ? _genotypeFile.name ||
-                          _genotypeFile.filename ||
-                          _genotypeFile
-                        : 'Choose File'
-                    }
-                    onChange={(e) => {
-                      _setGenotypeFile(e.target.files[0]);
-                    }}
-                    // accept=".tsv, .txt"
-                    custom
-                    isInvalid={
-                      attempt &&
-                      useQuantification &&
-                      _quantificationFile &&
-                      !_genotypeFile
-                    }
-                    feedback="Please input accompanying Genotype Data File with
-          Quantification Data File."
+                  <Controller
+                    name="_quantificationFile"
+                    control={control}
+                    rules={{ required: useQuantification }}
+                    render={({ field }) => (
+                      <Form.File
+                        {...field}
+                        id="qtls-genotype-file"
+                        title="Genotype Data User File Upload Input"
+                        disabled={submitted}
+                        ref={genotypeFileControl}
+                        label={
+                          genotypeFile || _genotypeFile.name || 'Choose File'
+                        }
+                        onChange={(e) => {
+                          if (e.target.files.length) {
+                            setValue('_genotypeFile', e.target.files[0]);
+                          }
+                        }}
+                        isInvalid={
+                          useQuantification &&
+                          _quantificationFile &&
+                          !_genotypeFile
+                        }
+                        feedback="Please input accompanying Genotype Data File with
+                        Quantification Data File."
+                        custom
+                      />
+                    )}
                   />
                 </Form.Group>
               </Row>
@@ -1085,41 +852,49 @@ export function QTLsGWASForm() {
         <Row>
           <Form.Group className="col-sm-12 mb-0">
             <div className="d-flex">
-              <Form.Label className="mb-0 mr-auto">
-                LD Data
-                {/* <span style={{ color: 'red' }}>*</span> */}
-              </Form.Label>
-              <Form.Check
-                disabled={submitted}
-                inline
-                id="ldSource"
-                label="Public"
-                type="checkbox"
-                checked={ldPublic}
-                onChange={(_) => {
-                  dispatch(
-                    updateQTLsGWAS({
-                      ldPublic: !ldPublic,
-                      select_pop: false,
-                      ...(!ldPublic && { select_ref: false }),
-                      ...(ldPublic && { ldKey: '' }),
-                    })
-                  );
-                  _setLDFile('');
-                }}
+              <Form.Label className="mb-0 mr-auto">LD Data</Form.Label>
+              <Controller
+                name="ldPublic"
+                control={control}
+                render={({ field }) => (
+                  <Form.Check
+                    {...field}
+                    type="checkbox"
+                    inline
+                    id="ldPublic"
+                    title="LD Public Data Checkbox"
+                    disabled={submitted}
+                    label="Public"
+                    checked={ldPublic}
+                    onChange={(_) => {
+                      setValue('select_pop', false);
+                      setValue('ldPublic', !ldPublic);
+                      resetField('_LDFile');
+                    }}
+                  />
+                )}
               />
             </div>
             {ldPublic ? (
               <div>
                 <Form.Row>
                   <Col>
-                    <Select
-                      disabled={isLoading || fetchingOptions || submitted}
-                      id="ldProject"
-                      label="Project"
-                      value={ldProject}
-                      options={ldProjectOptions}
-                      onChange={handleLdProject}
+                    <Controller
+                      name="ldProject"
+                      control={control}
+                      rules={{ required: ldPublic }}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          disabled={isLoading || fetchingOptions || submitted}
+                          id="ldProject"
+                          label="Project"
+                          options={getProjectOptions(
+                            publicGTEx['LD dataset'],
+                            genome
+                          )}
+                        />
+                      )}
                     />
                   </Col>
                 </Form.Row>
@@ -1133,10 +908,12 @@ export function QTLsGWASForm() {
                         <PopulationSelect
                           id="qtls-results-population-input-asdf"
                           ariaLabel="population-select"
-                          mergeState={(data) => dispatch(updateQTLsGWAS(data))}
                           disabled={
                             submitted || !ldPublic || ldProject.value == 'UKBB'
                           }
+                          Controller={Controller}
+                          setValue={setValue}
+                          control={control}
                         />
                       </>
                     ) : (
@@ -1152,25 +929,27 @@ export function QTLsGWASForm() {
                 </Form.Row>
               </div>
             ) : (
-              <>
-                <Form.File
-                  id="qtls-ld-file"
-                  disabled={submitted}
-                  key={_LDFile}
-                  label={
-                    _LDFile
-                      ? _LDFile.name || _LDFile.filename || _LDFile
-                      : 'Choose File'
-                  }
-                  onChange={(e) => {
-                    _setLDFile(e.target.files[0]);
-                  }}
-                  // accept=".tsv, .txt"
-                  // isInvalid={attempt ? !_LDFile : false}
-                  // feedback="Please upload a data file"
-                  custom
-                />
-              </>
+              <Controller
+                name="_LDFile"
+                control={control}
+                render={({ field }) => (
+                  <Form.File
+                    {...field}
+                    id="qtls-ld-file"
+                    value=""
+                    disabled={submitted}
+                    label={LDFile || _LDFile.name || 'Choose File'}
+                    onChange={(e) => {
+                      if (e.target.files.length) {
+                        setValue('_LDFile', e.target.files[0]);
+                      }
+                    }}
+                    isInvalid={errors._LDFile}
+                    feedback="Please upload a data file"
+                    custom
+                  />
+                )}
+              />
             )}
           </Form.Group>
         </Row>
@@ -1178,32 +957,258 @@ export function QTLsGWASForm() {
     },
     {
       title: 'Locus Information',
-      component: locusInformation.map((_, i) => (
-        <LocusInfo
-          key={`locusInfo-${i}`}
-          locusIndex={i}
-          attempt={attempt}
-          setLocusValid={setLocusValid}
-          _LDFile={_LDFile}
-          _associationFile={_associationFile}
-          _gwasFile={_gwasFile}
-        />
+      component: locusFields.map((item, index) => (
+        <div key={item.id}>
+          <div className="border rounded p-2 mb-1">
+            <Form.Row>
+              {index > 0 && (
+                <Col className="d-flex justify-content-end">
+                  <Button
+                    className="text-danger p-0"
+                    style={{
+                      textDecoration: 'underline',
+                      fontSize: '.8rem',
+                    }}
+                    variant="link"
+                    size="sm"
+                    onClick={() => removeLocus(index)}
+                  >
+                    Remove
+                  </Button>
+                </Col>
+              )}
+            </Form.Row>
+            <Form.Row>
+              <Col>
+                <Form.Label className="mb-0">
+                  cis-QTL Distance <span style={{ color: 'red' }}>*</span>
+                  <small>
+                    <i>(+/- Kb up to 1Mb)</i>
+                  </small>{' '}
+                  <OverlayTrigger
+                    trigger="click"
+                    placement="right"
+                    overlay={
+                      <Popover id="popover-basic" style={{ zIndex: 9999 }}>
+                        <Popover.Title as="h3">cis-QTL Distance</Popover.Title>
+                        <Popover.Content>
+                          <p>
+                            Please be aware that a large cis-QTL distance will
+                            significantly increase the running time of the job,
+                            and the job may fail due to the large extracted data
+                            size.
+                          </p>
+                        </Popover.Content>
+                      </Popover>
+                    }
+                    rootClose
+                  >
+                    <Button
+                      variant="link"
+                      className="p-0 font-weight-bold"
+                      aria-label="collapse data info"
+                    >
+                      <FontAwesomeIcon
+                        icon={faInfoCircle}
+                        style={{ verticalAlign: 'baseline' }}
+                      />
+                    </Button>
+                  </OverlayTrigger>
+                </Form.Label>
+                <Controller
+                  name={`locusInformation.${index}.select_dist`}
+                  control={control}
+                  rules={{ required: true, min: 1, max: 1000 }}
+                  render={({ field }) => (
+                    <Form.Control
+                      {...field}
+                      title="cis-QTL Distance Input"
+                      aria-label="cis-QTL Distance Input"
+                      type="number"
+                      min="1"
+                      max="1000"
+                      id="qtls-distance-input"
+                      disabled={submitted}
+                      isInvalid={
+                        errors.locusInformation &&
+                        errors.locusInformation[index].select_dist
+                      }
+                    />
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">
+                  Enter distance between 1 and 1000Kb.
+                </Form.Control.Feedback>
+              </Col>
+            </Form.Row>
+            {qtlPublic || gwasPublic || ldPublic ? (
+              <>
+                <Form.Row>
+                  <Col>
+                    <Controller
+                      name={`locusInformation.${index}.select_chromosome`}
+                      control={control}
+                      rules={{ required: qtlPublic || gwasPublic || ldPublic }}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          className="mb-0"
+                          disabled={submitted}
+                          id="chromosome"
+                          label={
+                            <>
+                              Chromosome <span style={{ color: 'red' }}>*</span>
+                            </>
+                          }
+                          placeholder={'Select Chromosome'}
+                          // value={select_chromosome}
+                          options={[
+                            ...Array.from({ length: 22 }, (_, i) => ({
+                              value: i + 1,
+                              label: i + 1,
+                            })),
+                            {
+                              value: 'X',
+                              label: 'X',
+                            },
+                            {
+                              value: 'Y',
+                              label: 'Y',
+                            },
+                          ]}
+                          // onChange={(chromosome) => {
+                          //   mergeLocusInfo({ select_chromosome: chromosome });
+                          // }}
+                        />
+                      )}
+                    />
+                    {errors.locusInformation &&
+                      errors.locusInformation[index].select_chromosome && (
+                        <div
+                          className="text-danger"
+                          style={{ fontSize: '80%' }}
+                        >
+                          Please select a chromosome
+                        </div>
+                      )}
+                  </Col>
+                </Form.Row>
+                <Form.Row>
+                  <Col>
+                    <Form.Label className="mb-0">
+                      Position <span style={{ color: 'red' }}>*</span>
+                    </Form.Label>
+                    <Controller
+                      name={`locusInformation.${index}.select_position`}
+                      control={control}
+                      rules={{ required: qtlPublic || gwasPublic || ldPublic }}
+                      render={({ field }) => (
+                        <Form.Control
+                          {...field}
+                          title="LD Reference Position Input"
+                          aria-label="LD Refereence Position Input"
+                          id="select_position"
+                          disabled={submitted}
+                          placeholder="e.g. 42743496"
+                          isInvalid={
+                            errors.locusInformation &&
+                            errors.locusInformation[index].select_position
+                          }
+                        />
+                      )}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      Enter a valid position
+                    </Form.Control.Feedback>
+                  </Col>
+                </Form.Row>
+              </>
+            ) : (
+              <Form.Row>
+                <Col>
+                  <Form.Label className="mb-0">
+                    SNP{' '}
+                    {_LDFile && !_gwasFile && !_associationFile && (
+                      <span style={{ color: 'red' }}>* </span>
+                    )}
+                    <small>
+                      <i>(Default: lowest GWAS P-value SNP)</i>
+                    </small>
+                  </Form.Label>
+                  <Controller
+                    name={`locusInformation.${index}.select_ref`}
+                    control={control}
+                    rules={{
+                      required: _LDFile && !_gwasFile && !_associationFile,
+                      pattern: /^rs\d+$/,
+                    }}
+                    render={({ field }) => (
+                      <Form.Control
+                        {...field}
+                        title="LD Reference SNP Input"
+                        aria-label="LD Refereence SNP Input"
+                        id="qtls-snp-input"
+                        disabled={submitted}
+                        isInvalid={
+                          errors.locusInformation &&
+                          errors.locusInformation[index].select_ref
+                        }
+                      />
+                    )}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Enter a valid RS number
+                  </Form.Control.Feedback>
+                </Col>
+              </Form.Row>
+            )}
+          </div>
+
+          <Row>
+            {index == locusFields.length - 1 && (
+              <Col className="d-flex justify-content-end">
+                <Button
+                  className="p-0"
+                  variant="link"
+                  title="Add Locus Information"
+                  aria-label="Add Locus Information"
+                  onClick={() =>
+                    appendLocus(getInitialState().qtlsGWAS.locusInformation[0])
+                  }
+                  disabled={submitted}
+                >
+                  + Add Locus
+                </Button>
+              </Col>
+            )}
+          </Row>
+        </div>
       )),
     },
   ];
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       <Row>
         <Col>
-          <Select
-            className="border rounded p-2"
-            disabled={!genomeOptions.length || submitted}
-            id="genomeBuild"
-            label="Genome Build"
-            value={genome}
-            options={genomeOptions}
-            onChange={(genome) => dispatch(updateQTLsGWAS({ genome: genome }))}
+          <Controller
+            name="genome"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                className="border rounded p-2"
+                disabled={!genomeOptions.length || submitted}
+                id="genome"
+                label="Genome Build"
+                options={genomeOptions}
+                onChange={(e) => {
+                  setValue('genome', e);
+                  populatePublicParameters(e);
+                }}
+              />
+            )}
           />
         </Col>
       </Row>
@@ -1242,15 +1247,18 @@ export function QTLsGWASForm() {
           <Col>
             <Form.Group controlId="toggleQueue" className="mb-0">
               <Form.Check inline>
-                <Form.Check.Input
-                  className="mr-0"
-                  title="Choose Queued Submission Checkbox"
-                  type="checkbox"
-                  disabled={submitted || locusInformation.length > 1}
-                  checked={isQueue}
-                  onChange={(_) => {
-                    dispatch(updateQTLsGWAS({ isQueue: !isQueue }));
-                  }}
+                <Controller
+                  name="useQueue"
+                  control={control}
+                  render={({ field }) => (
+                    <Form.Check.Input
+                      {...field}
+                      className="mr-0"
+                      title="Choose Queued Submission Checkbox"
+                      type="checkbox"
+                      disabled={submitted || locusInformation.length > 1}
+                    />
+                  )}
                 />
               </Form.Check>
               <Form.Label className="mr-auto">
@@ -1263,17 +1271,20 @@ export function QTLsGWASForm() {
         <Row>
           <Col>
             <Form.Group controlId="jobName" className="mb-2">
-              <Form.Control
-                title="Job Name Input"
-                aria-label="Job Name Input"
-                placeholder="Job Name"
-                size="sm"
-                value={jobName}
-                type="text"
-                onChange={(e) =>
-                  dispatch(updateQTLsGWAS({ jobName: e.target.value }))
-                }
-                disabled={!isQueue || submitted}
+              <Controller
+                name="jobName"
+                control={control}
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    title="Job Name Input"
+                    aria-label="Job Name Input"
+                    placeholder="Job Name"
+                    size="sm"
+                    type="text"
+                    disabled={!useQueue || submitted}
+                  />
+                )}
               />
             </Form.Group>
           </Col>
@@ -1281,18 +1292,26 @@ export function QTLsGWASForm() {
         <Row>
           <Col>
             <Form.Group controlId="email">
-              <Form.Control
-                title="Queued Submission Email Input"
-                aria-label="Queued Submission Email Input"
-                placeholder="Enter Email"
-                size="sm"
-                value={email}
-                type="email"
-                onChange={(e) =>
-                  dispatch(updateQTLsGWAS({ email: e.target.value }))
-                }
-                disabled={!isQueue || submitted}
-                isInvalid={isQueue && attempt ? !validEmail : false}
+              <Controller
+                name="email"
+                control={control}
+                rules={{
+                  required: useQueue,
+                  pattern:
+                    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                }}
+                render={({ field }) => (
+                  <Form.Control
+                    {...field}
+                    title="Queued Submission Email Input"
+                    aria-label="Queued Submission Email Input"
+                    placeholder="Enter Email"
+                    size="sm"
+                    type="email"
+                    disabled={!useQueue || submitted}
+                    isInvalid={errors.email}
+                  />
+                )}
               />
               <Form.Control.Feedback type="invalid">
                 Please provide a valid email
@@ -1308,16 +1327,15 @@ export function QTLsGWASForm() {
         </Row>
       </div>
       <Row className="mt-2">
-        {attempt && !valid && (
+        {valid == 0 && (
           <Col sm="12">
-            <div className="text-danger" style={{ fontSize: '80%' }}>
+            <div className="text-danger">
               Please enter Association, GWAS, or LD data
             </div>
           </Col>
         )}
         <Col sm="6">
           <Button
-            // disabled={loading.active}
             className="w-100"
             variant={isError ? 'danger' : 'secondary'}
             onClick={() => handleReset()}
@@ -1328,16 +1346,12 @@ export function QTLsGWASForm() {
         </Col>
         <Col sm="6">
           <Button
-            // disabled={submitted || loading.active}
             className="w-100"
             variant="primary"
-            type="button"
-            onClick={() => {
-              if (validateEmail()) handleSubmit();
-            }}
+            type="submit"
             disabled={submitted || isLoading || fetchingOptions}
           >
-            {isQueue ? 'Submit' : 'Calculate'}
+            {useQueue ? 'Submit' : 'Calculate'}
           </Button>
         </Col>
       </Row>
