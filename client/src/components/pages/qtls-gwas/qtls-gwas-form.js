@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { RootContext } from '../../../index';
 import {
@@ -28,9 +28,6 @@ import { PopulationSelect } from '../../controls/population-select/population-se
 export function QTLsGWASForm() {
   const dispatch = useDispatch();
   const { getInitialState } = useContext(RootContext);
-
-  const quantificationFileControl = useRef(null);
-  const genotypeFileControl = useRef(null);
 
   const [useQuantification, toggleQuantification] = useState(false);
   const [valid, setValid] = useState(null);
@@ -786,7 +783,6 @@ export function QTLsGWASForm() {
                         value=""
                         title="Quantification Data User File Upload Input"
                         disabled={submitted}
-                        ref={quantificationFileControl}
                         label={
                           quantificationFile ||
                           _quantificationFile.name ||
@@ -797,11 +793,7 @@ export function QTLsGWASForm() {
                             setValue('_quantificationFile', e.target.files[0]);
                           }
                         }}
-                        isInvalid={
-                          useQuantification &&
-                          !_quantificationFile &&
-                          _genotypeFile
-                        }
+                        isInvalid={errors._quantificationFile}
                         feedback="Please input accompanying Quantification Data File with
                         Genotype Data File."
                         custom
@@ -819,9 +811,9 @@ export function QTLsGWASForm() {
                       <Form.File
                         {...field}
                         id="qtls-genotype-file"
+                        value=""
                         title="Genotype Data User File Upload Input"
                         disabled={submitted}
-                        ref={genotypeFileControl}
                         label={
                           genotypeFile || _genotypeFile.name || 'Choose File'
                         }
@@ -830,11 +822,7 @@ export function QTLsGWASForm() {
                             setValue('_genotypeFile', e.target.files[0]);
                           }
                         }}
-                        isInvalid={
-                          useQuantification &&
-                          _quantificationFile &&
-                          !_genotypeFile
-                        }
+                        isInvalid={errors._quantificationFile}
                         feedback="Please input accompanying Genotype Data File with
                         Quantification Data File."
                         custom
