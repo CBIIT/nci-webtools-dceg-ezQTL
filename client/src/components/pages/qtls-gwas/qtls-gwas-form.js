@@ -421,7 +421,7 @@ export function QTLsGWASForm() {
           : `ezQTL - ${locusIndex}`,
         request: `${request}-${locusIndex}`,
         email: data.email,
-        useQueue: data.true,
+        useQueue: data.useQueue,
         submitted: true,
         associationFile: data._associationFile.name || false,
         quantificationFile: data._quantificationFile.name || false,
@@ -461,8 +461,8 @@ export function QTLsGWASForm() {
         submitQueue({
           params:
             params.length > 1 ? params : { ...params[0], request: request },
-          request: request,
-          multi: params.length > 1 ? true : false,
+          multi: params.length > 1,
+          request,
         })
       );
     } else {
@@ -516,6 +516,7 @@ export function QTLsGWASForm() {
                             id="tissueOnly"
                             label="Tissue Only"
                             type="checkbox"
+                            checked={tissueOnly}
                             disabled={
                               submitted ||
                               isLoading ||
@@ -672,6 +673,7 @@ export function QTLsGWASForm() {
                             id="phenotypeOnly"
                             label="Phenotype Only"
                             type="checkbox"
+                            checked={phenotypeOnly}
                             disabled={
                               submitted ||
                               isLoading ||
@@ -1256,6 +1258,7 @@ export function QTLsGWASForm() {
                       className="mr-0"
                       title="Choose Queued Submission Checkbox"
                       type="checkbox"
+                      checked={useQueue}
                       disabled={submitted || locusInformation.length > 1}
                     />
                   )}
