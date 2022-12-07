@@ -59,6 +59,35 @@ export function Documentation() {
         <p>
           <b>Release History</b>
         </p>
+        <i>ezQTL 2.0.8 (12/07/2022)</i>
+        <ul>
+          <li>Fix issue parsing user input data</li>
+          <li>Fix Form Validation</li>
+        </ul>
+        <i>ezQTL 2.0.7 (11/03/2022)</i>
+        <ul>
+          <li>Queue updated to handle multiple jobs simultaneously</li>
+          <li>Error emails now include more detailed information</li>
+          <li>
+            User uploaded input data is now filtered according to the selected
+            chromosome
+          </li>
+          <li>Various bug fixes</li>
+        </ul>
+        <i>ezQTL 2.0.6 (09/29/2022)</i>
+        <ul>
+          <li>Update app dependencies</li>
+        </ul>
+        <i>ezQTL 2.0.5 (04/25/2022)</i>
+        <ul>
+          <li>Include job name in error email</li>
+          <li>Include job executiont time in emails</li>
+        </ul>
+        <i>ezQTL 2.0.4 (03/01/2022)</i>
+        <ul>
+          <li>Include job name in error email</li>
+          <li>Include job executiont time in emails</li>
+        </ul>
         <i>ezQTL 2.0.3 (02/16/2022)</i>
         <ul>
           <li>Added additional Colocalization Analysis documentation text</li>
@@ -728,13 +757,13 @@ export function Documentation() {
           arbitrary number of causal variants.
         </p>
         <p>
-          We recognize that the colocalization results for two traits in the same 
-          locus might be different between eCAVIAR and HyPrColoc. This could be due 
-          to differences in assumptions of causal variants, utility of LD information, 
-          and number of variants selected for colocalization analysis between two 
-          algorithms. Thus, we recommend users to consider these differences in the 
-          statistical models and assumptions as described in the original publications 
-          of{' '}
+          We recognize that the colocalization results for two traits in the
+          same locus might be different between eCAVIAR and HyPrColoc. This
+          could be due to differences in assumptions of causal variants, utility
+          of LD information, and number of variants selected for colocalization
+          analysis between two algorithms. Thus, we recommend users to consider
+          these differences in the statistical models and assumptions as
+          described in the original publications of{' '}
           <a
             href="http://genetics.cs.ucla.edu/caviar/"
             target="_blank"
@@ -750,8 +779,7 @@ export function Documentation() {
           >
             HyPrColoc
           </a>{' '}
-          when reporting and interpreting 
-          the results
+          when reporting and interpreting the results
         </p>
       </div>
       <br />
@@ -835,12 +863,16 @@ export function Documentation() {
           GRCh38 for all datasets.
         </p>
         <p className="ml-3">
-          <i>For researchers who upload their own data, how will the data be stored and protected?</i>
+          <i>
+            For researchers who upload their own data, how will the data be
+            stored and protected?
+          </i>
         </p>
         <p className="ml-5">
-          For the genomic data privacy, the input data in ezQTL is encrypted and secured during the 
-          data transition, calculation and temporary storing. All the input data and results per query 
-          or submission will be deleted automatically from ezQTL servers after 7 days.
+          For the genomic data privacy, the input data in ezQTL is encrypted and
+          secured during the data transition, calculation and temporary storing.
+          All the input data and results per query or submission will be deleted
+          automatically from ezQTL servers after 7 days.
         </p>
       </div>
     </div>
