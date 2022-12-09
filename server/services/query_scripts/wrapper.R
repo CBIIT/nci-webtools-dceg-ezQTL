@@ -240,11 +240,12 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
 }
 
 qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
-  library(plyr)
+  # library(plyr)
   source(rfile)
 
-  hydata <- ldply(hydata, data.frame)
-  ecdata <- ldply(ecdata, data.frame)
+  # hydata <- ldply(hydata, data.frame)
+  # ecdata <- ldply(ecdata, data.frame)
+
 
   coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
 }
