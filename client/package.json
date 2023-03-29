@@ -63,5 +63,8 @@
     "prettier": "^2.3.2",
     "react-scripts": "5.0.1",
     "sass": "^1.43.2"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
