@@ -402,8 +402,12 @@ async function processSingleLocus(requestData) {
     return true;
   } catch (error) {
     const end = new Date().getTime();
-
+    logger.error(
+      `An error occurred while processing single locus job: ${request}`
+    );
     logger.error(error);
+    const execTime = getExecutionTime(start, end);
+    logger.info(`Execution time: ${execTime}`);
 
     const stdout = error.stdout ? error.stdout.toString() : '';
     const stderr = error.stderr ? error.stderr.toString() : '';
@@ -415,7 +419,7 @@ async function processSingleLocus(requestData) {
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: timestamp,
-      execTime: getExecutionTime(start, end),
+      execTime: execTime,
       exception: error.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
@@ -597,10 +601,13 @@ async function processMultiLoci(data) {
 
     return true;
   } catch (err) {
+    logger.error(
+      `An error occurred while processing multi-loci job: ${mainRequest}`
+    );
     logger.error(err);
+    const execTime = getExecutionTime(start, end);
+    logger.info(`Execution time: ${execTime}`);
     const { params, request } = data;
-
-    // logger.error(err);
 
     const stdout = err.stdout ? err.stdout.toString() : '';
     const stderr = err.stderr ? err.stderr.toString() : '';
@@ -611,7 +618,7 @@ async function processMultiLoci(data) {
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: timestamp,
-      execTime: getExecutionTime(start, end),
+      execTime: execTime,
       exception: err.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
