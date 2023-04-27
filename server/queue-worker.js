@@ -20,7 +20,6 @@ const {
 
 const workingDirectory = path.resolve(config.R.workDir);
 
-
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise
   // fall back to default credentials/IAM role
@@ -659,15 +658,15 @@ async function processMultiLoci(data) {
  * specified by config.pollInterval
  */
 async function receiveMessage() {
-  const sqs = new AWS.SQS();
-
   try {
     // to simplify running multiple workers in parallel,
     // fetch one message at a time
+    const sqs = new AWS.SQS();
     const { QueueUrl } = await sqs
       .getQueueUrl({ QueueName: config.aws.sqs.url })
       .promise();
 
+    logger.debug('Polling for messages');
     const data = await sqs
       .receiveMessage({
         QueueUrl: QueueUrl,
@@ -684,17 +683,17 @@ async function receiveMessage() {
       logger.info(`[${requestData.request}] Received message`);
       // logger.debug(message.Body);
 
-      // while processing is not complete, update the message's visibilityTimeout
+      // while processing is not complete, update the message's visibilityTimeout every 20 seconds
       const refreshVisibilityTimeout = setInterval((_) => {
         logger.debug(`[${requestData.request}] Refreshing visibility timeout`);
         sqs
           .changeMessageVisibility({
             QueueUrl: QueueUrl,
             ReceiptHandle: message.ReceiptHandle,
-            VisibilityTimeout: config.aws.sqs.visibilityTimeout,
+            VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 60,
           })
           .send();
-      }, 1000 * (config.aws.sqs.visibilityTimeout * 0.5));
+      }, 1000 * 20);
       // log every 10 minutes to indicate job progress
       const heartbeat = setInterval((_) => {
         logger.info(`[${requestData.request}] In Progress`);
