@@ -106,7 +106,10 @@ async function downloadS3(request, savePath) {
         .pipe(tar.x({ strip: 1, C: savePath }))
         .once('finish', () =>
           fs.unlink(filepath, (error) => {
-            logger.error(error);
+            if (error) {
+              logger.error('An error occurred while removing the archive');
+              logger.error(error);
+            }
           })
         );
     }
