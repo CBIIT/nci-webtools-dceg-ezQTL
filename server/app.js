@@ -3,10 +3,6 @@ const express = require('express');
 const config = require('./config.json');
 const logger = require('./services/logger');
 const { apiRouter } = require('./services/api');
-const { forkCluster } = require('./services/cluster');
-
-// returns true if in master process
-if (forkCluster()) return;
 
 logger.info(`[${process.pid}] Started worker process`);
 

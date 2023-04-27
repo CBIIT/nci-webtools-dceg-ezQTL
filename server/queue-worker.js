@@ -7,7 +7,7 @@ const tar = require('tar');
 var _ = require('lodash');
 const config = require('./config.json');
 const logger = require('./services/logger');
-const { forkCluster } = require('./services/cluster');
+
 const {
   calculateQC,
   calculateMain,
@@ -20,8 +20,6 @@ const {
 
 const workingDirectory = path.resolve(config.R.workDir);
 
-// returns true if in master process
-if (forkCluster()) return;
 
 (async function main() {
   // update aws configuration if all keys are supplied, otherwise

@@ -1,0 +1,16 @@
+{
+  "apps": [
+    {
+      "name": "prod",
+      "script": "app.js",
+      "exec_mode": "cluster",
+      "instances": "max"
+    },
+    {
+      "name": "dev",
+      "script": "app.js",
+      "watch": ["."],
+      "ignore_watch": ["node_modules", "data", "input", "output", "logs"]
+    }
+  ]
+}
