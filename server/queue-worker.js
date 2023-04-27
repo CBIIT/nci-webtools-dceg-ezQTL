@@ -688,14 +688,23 @@ async function receiveMessage() {
 
       // while processing is not complete, update the message's visibilityTimeout every 20 seconds
       const refreshVisibilityTimeout = setInterval((_) => {
-        logger.debug(`[${requestData.request}] Refreshing visibility timeout`);
-        sqs
-          .changeMessageVisibility({
-            QueueUrl: QueueUrl,
-            ReceiptHandle: message.ReceiptHandle,
-            VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 60,
-          })
-          .send();
+        try {
+          logger.debug(
+            `[${requestData.request}] Refreshing visibility timeout`
+          );
+          sqs
+            .changeMessageVisibility({
+              QueueUrl: QueueUrl,
+              ReceiptHandle: message.ReceiptHandle,
+              VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 60,
+            })
+            .send();
+        } catch (error) {
+          logger.error(
+            `[${requestData.request}] Unable to refresh visibility timeout`
+          );
+          logger.error(error);
+        }
       }, 1000 * 20);
       // log every 10 minutes to indicate job progress
       const heartbeat = setInterval((_) => {
