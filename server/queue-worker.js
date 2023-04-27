@@ -94,7 +94,7 @@ async function downloadS3(request, savePath) {
     const filename = path.basename(Key);
     const filepath = path.resolve(savePath, filename);
 
-    logger.debug(`Downloading: ${Key} to ${savePath}`);
+    logger.debug(`[${request}] Downloading: ${Key} to ${savePath}`);
     const object = await s3
       .getObject({
         Bucket: config.aws.s3.queue,
@@ -108,8 +108,8 @@ async function downloadS3(request, savePath) {
       fs.createReadStream(filepath)
         .pipe(tar.x({ strip: 1, C: savePath }))
         .once('finish', () =>
-          fs.unlink(filepath, (e) => {
-            if (e) logger.error(e);
+          fs.unlink(filepath, (error) => {
+            logger.error(error);
           })
         );
     }
@@ -250,7 +250,8 @@ async function calculate(params) {
         });
       }
     } catch (err) {
-      logger.info(err);
+      logger.error(`[${request}] ${err.message}`);
+      logger.error(err);
     }
 
     // qtlsGWASECaviarCalculation
@@ -274,7 +275,8 @@ async function calculate(params) {
         },
       });
     } catch (err) {
-      logger.info(err);
+      logger.error(`[${request}] ${err.message}`);
+      logger.error(err);
     }
     // qtlsColocVisualization - summary
     try {
@@ -303,7 +305,8 @@ async function calculate(params) {
         });
       }
     } catch (err) {
-      logger.info(err);
+      logger.error(`[${request}] ${err.message}`);
+      logger.error(err);
     }
   }
 
@@ -327,7 +330,8 @@ async function calculate(params) {
       });
     }
   } catch (err) {
-    logger.info(err);
+    logger.error(`[${request}] ${err.message}`);
+    logger.error(err);
   }
 
   return { state: state, main: main };
@@ -350,13 +354,10 @@ async function processSingleLocus(requestData) {
     await fs.promises.mkdir(directory, { recursive: true });
 
     await downloadS3(request, directory);
-    logger.info('Start Calculation');
-
+    logger.info(`[${request}] Start calculation`);
     const { state, main } = await calculate(params);
-
     const end = new Date().getTime();
-
-    logger.info('Calculation Done');
+    logger.info(`[${request}] Calculation done`);
 
     // upload parameters
     await s3
@@ -388,7 +389,7 @@ async function processSingleLocus(requestData) {
     };
 
     // send user success email
-    logger.info(`Sending user success email`);
+    logger.info(`[${request}] Sending user success email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
       to: params.email,
@@ -403,11 +404,11 @@ async function processSingleLocus(requestData) {
   } catch (error) {
     const end = new Date().getTime();
     logger.error(
-      `An error occurred while processing single locus job: ${request}`
+      `[${request}] An error occurred while processing single locus job`
     );
     logger.error(error);
     const execTime = getExecutionTime(start, end);
-    logger.info(`Execution time: ${execTime}`);
+    logger.info(`[${request}] Execution time: ${execTime}`);
 
     const stdout = error.stdout ? error.stdout.toString() : '';
     const stderr = error.stderr ? error.stderr.toString() : '';
@@ -433,7 +434,7 @@ async function processSingleLocus(requestData) {
     };
 
     // send admin error email
-    logger.info(`Sending admin error email`);
+    logger.info(`[${request}] Sending admin error email`);
     const adminEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
       to: config.email.techSupport,
@@ -446,7 +447,7 @@ async function processSingleLocus(requestData) {
 
     // send user error email
     if (params.email) {
-      logger.info(`Sending user error email`);
+      logger.info(`[${request}] Sending user error email`);
       const userEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
         to: params.email,
@@ -471,7 +472,6 @@ async function processMultiLoci(data) {
 
   // logger.debug(params);
   try {
-    // Setup folders
     const calculations = await Promise.all(
       paramsArr.map(async (params, i) => {
         const start = new Date().getTime();
@@ -481,15 +481,16 @@ async function processMultiLoci(data) {
           const directory = path.resolve(config.tmp.folder, request);
           await fs.promises.mkdir(directory, { recursive: true });
 
-          logger.info(`Calculating: ${request}`);
-
           // download user uploaded files into unique
           await downloadS3(mainRequest, directory);
+          logger.info(
+            `[${mainRequest}] Start Calculation of multi locus job (${request})`
+          );
           const { state, main } = await calculate(params);
-
           const end = new Date().getTime();
-
-          logger.info(`${request} Done`);
+          logger.info(
+            `[${mainRequest}] Calculation of multi locus job done (${request})`
+          );
 
           // upload parameters
           await s3
@@ -518,7 +519,9 @@ async function processMultiLoci(data) {
           });
         } catch (error) {
           const end = new Date().getTime();
-
+          logger.error(
+            `[${mainRequest}] An error occurred while processing multi locus job (${params.request})`
+          );
           logger.error(error);
           const stdout = error.stdout ? error.stdout.toString() : '';
           const stderr = error.stderr ? error.stderr.toString() : '';
@@ -559,7 +562,7 @@ async function processMultiLoci(data) {
     };
 
     // send user success email
-    logger.info(`Sending user multi results email`);
+    logger.info(`[${mainRequest}] Sending user multi locus results email`);
     const userEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
       to: email,
@@ -586,8 +589,7 @@ async function processMultiLoci(data) {
                     </ul><hr />`
       );
 
-      logger.info(`Sending admin multi results email`);
-
+      logger.info(`[${mainRequest}] Sending admin multi locus error email`);
       const adminEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
         to: config.email.techSupport,
@@ -602,11 +604,11 @@ async function processMultiLoci(data) {
     return true;
   } catch (err) {
     logger.error(
-      `An error occurred while processing multi-loci job: ${mainRequest}`
+      `[${mainRequest}] An error occurred while processing multi-loci job`
     );
     logger.error(err);
     const execTime = getExecutionTime(start, end);
-    logger.info(`Execution time: ${execTime}`);
+    logger.info(`[${mainRequest}] Execution time: ${execTime}`);
     const { params, request } = data;
 
     const stdout = err.stdout ? err.stdout.toString() : '';
@@ -625,7 +627,7 @@ async function processMultiLoci(data) {
     };
 
     // send admin error email
-    logger.info(`Sending admin error email`);
+    logger.info(`[${mainRequest}] Sending admin error email`);
     const adminEmailResults = await mailer.sendMail({
       from: config.email.adminSupport,
       to: config.email.techSupport,
@@ -638,7 +640,7 @@ async function processMultiLoci(data) {
 
     // send user error email
     if (params.email) {
-      logger.info(`Sending user error email`);
+      logger.info(`[${mainRequest}] Sending user error email`);
       const userEmailResults = await mailer.sendMail({
         from: config.email.adminSupport,
         to: params.email,
@@ -681,12 +683,12 @@ async function receiveMessage() {
       const message = data.Messages[0];
       const requestData = JSON.parse(message.Body);
 
-      logger.info(`Received Message ${requestData.request}`);
+      logger.info(`[${requestData.request}] Received message`);
       // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout
-      const intervalId = setInterval((_) => {
-        logger.debug(`${requestData.request}: refreshing visibility timeout`);
+      const refreshVisibilityTimeout = setInterval((_) => {
+        logger.debug(`[${requestData.request}] Refreshing visibility timeout`);
         sqs
           .changeMessageVisibility({
             QueueUrl: QueueUrl,
@@ -695,13 +697,15 @@ async function receiveMessage() {
           })
           .send();
       }, 1000 * (config.aws.sqs.visibilityTimeout * 0.5));
+      // log every 10 minutes to indicate job progress
+      const heartbeat = setInterval((_) => {
+        logger.info(`[${requestData.request}] In Progress`);
+      }, 1000 * 60 * 10);
 
       // processSingleLocus should return a boolean status indicating success or failure
-
       const status = requestData.multi
         ? await processMultiLoci(requestData)
         : await processSingleLocus(requestData);
-      clearInterval(intervalId);
 
       // if message was not processed successfully, send it to the
       // error queue (add metadata in future if needed)
@@ -718,18 +722,21 @@ async function receiveMessage() {
       //       .promise();
       //   }
 
-      logger.debug(`${requestData.request}: Deleting message`);
       // remove original message from queue once processed
+      logger.info(`[${requestData.request}] Deleting message`);
       await sqs
         .deleteMessage({
           QueueUrl: QueueUrl,
           ReceiptHandle: message.ReceiptHandle,
         })
         .promise();
+
+      clearInterval(refreshVisibilityTimeout);
+      clearInterval(heartbeat);
     }
   } catch (e) {
     // catch exceptions related to sqs
-    logger.error('An error occurred while receiving messages.');
+    logger.error('An error occurred while receiving or processing messages.');
     logger.error(e);
   } finally {
     // schedule receiving next message
