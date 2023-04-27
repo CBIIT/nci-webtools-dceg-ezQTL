@@ -719,6 +719,9 @@ async function receiveMessage() {
       //       .promise();
       //   }
 
+      clearInterval(refreshVisibilityTimeout);
+      clearInterval(heartbeat);
+
       // remove original message from queue once processed
       logger.info(`[${requestData.request}] Deleting message`);
       await sqs
@@ -727,9 +730,6 @@ async function receiveMessage() {
           ReceiptHandle: message.ReceiptHandle,
         })
         .promise();
-
-      clearInterval(refreshVisibilityTimeout);
-      clearInterval(heartbeat);
     }
   } catch (e) {
     // catch exceptions related to sqs
