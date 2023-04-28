@@ -84,7 +84,8 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
   library(data.table)
   setwd(workDir)
 
-  dir.create(file.path(workDir, paste0("tmp/", request)))
+  outputDir <- file.path(workDir, paste0("tmp/", request))
+  if (!dir.exists(outputDir)) dir.create(outputDir)
 
   source(paste0(workDir, "/", "server/", "services/", "query_scripts/", "QTLs/", "qtls.r"))
 
