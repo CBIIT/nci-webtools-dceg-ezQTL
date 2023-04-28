@@ -250,11 +250,11 @@ async function calculate(params) {
         });
       }
     } catch (err) {
-      logger.error(`[${request}] ${err.message}`);
+      logger.error(`[${request}] calculateHyprcoloc`);
       logger.error(err);
     }
 
-    // qtlsGWASECaviarCalculation
+    // qtlsGWAS ECaviarCalculation
     try {
       const { ecaviar } = JSON.parse(
         await calculateECAVIAR({
@@ -275,7 +275,7 @@ async function calculate(params) {
         },
       });
     } catch (err) {
-      logger.error(`[${request}] ${err.message}`);
+      logger.error(`[${request}] calculateECAVIAR`);
       logger.error(err);
     }
     // qtlsColocVisualization - summary
@@ -305,7 +305,7 @@ async function calculate(params) {
         });
       }
     } catch (err) {
-      logger.error(`[${request}] ${err.message}`);
+      logger.error(`[${request}] calculateColocVisualize`);
       logger.error(err);
     }
   }
@@ -330,7 +330,7 @@ async function calculate(params) {
       });
     }
   } catch (err) {
-    logger.error(`[${request}] ${err.message}`);
+    logger.error(`[${request}] calculateLocusLD`);
     logger.error(err);
   }
 
