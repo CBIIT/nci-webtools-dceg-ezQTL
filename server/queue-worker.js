@@ -343,12 +343,12 @@ async function calculate(params) {
  */
 async function processSingleLocus(requestData) {
   const { params, request, timestamp } = requestData;
-  const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
-
   // logger.debug(params);
   const start = new Date().getTime();
+
   try {
+    const s3 = new AWS.S3();
     // Setup folders
     const directory = path.resolve(config.tmp.folder, request);
     await fs.promises.mkdir(directory, { recursive: true });
@@ -466,11 +466,10 @@ async function processSingleLocus(requestData) {
 async function processMultiLoci(data) {
   const { params: paramsArr, request: mainRequest, timestamp } = data;
   const email = paramsArr[0].email;
-
-  const s3 = new AWS.S3();
   const mailer = nodemailer.createTransport(config.email.smtp);
-
   // logger.debug(params);
+  const s3 = new AWS.S3();
+
   try {
     const calculations = await Promise.all(
       paramsArr.map(async (params, i) => {
@@ -662,9 +661,9 @@ async function processMultiLoci(data) {
  */
 async function receiveMessage() {
   try {
+    const sqs = new AWS.SQS();
     // to simplify running multiple workers in parallel,
     // fetch one message at a time
-    const sqs = new AWS.SQS();
     const { QueueUrl } = await sqs
       .getQueueUrl({ QueueName: config.aws.sqs.url })
       .promise();
@@ -716,37 +715,42 @@ async function receiveMessage() {
         ? await processMultiLoci(requestData)
         : await processSingleLocus(requestData);
 
-      // if message was not processed successfully, send it to the
-      // error queue (add metadata in future if needed)
-      //   if (!status && config.queue.errorUrl) {
-      //     // generate new unique request for error message
-      //     const request = crypto.randomBytes(16).toString('hex');
-      //     await sqs
-      //       .sendMessage({
-      //         QueueUrl: config.queue.errorUrl,
-      //         MessageDeduplicationId: request,
-      //         MessageGroupId: request,
-      //         MessageBody: JSON.stringify(params),
-      //       })
-      //       .promise();
-      //   }
-
       clearInterval(refreshVisibilityTimeout);
       clearInterval(heartbeat);
 
       // remove original message from queue once processed
-      logger.info(`[${requestData.request}] Deleting message`);
-      await sqs
-        .deleteMessage({
-          QueueUrl: QueueUrl,
-          ReceiptHandle: message.ReceiptHandle,
-        })
-        .promise();
+      try {
+        logger.info(`[${requestData.request}] Deleting message`);
+        await sqs
+          .deleteMessage({
+            QueueUrl: QueueUrl,
+            ReceiptHandle: message.ReceiptHandle,
+          })
+          .promise();
+      } catch (error) {
+        logger.error(`[${requestData.request}] Unable to delete message`);
+        logger.error(error);
+      }
     }
   } catch (e) {
     // catch exceptions related to sqs
     logger.error('An error occurred while receiving or processing messages.');
     logger.error(e);
+    // if message was not processed successfully, send it to the
+    // error queue (add metadata in future if needed)
+    // if (config.aws.sqs.errorUrl) {
+    //   const { QueueUrl } = await sqs
+    //     .getQueueUrl({ QueueName: config.aws.sqs.errorUrl })
+    //     .promise();
+    //   await sqs
+    //     .sendMessage({
+    //       QueueUrl,
+    //       MessageDeduplicationId: request,
+    //       MessageGroupId: request,
+    //       MessageBody: JSON.stringify(params),
+    //     })
+    //     .promise();
+    // }
   } finally {
     // schedule receiving next message
     setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
