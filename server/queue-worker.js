@@ -702,13 +702,13 @@ async function receiveMessage() {
           logger.error(
             `[${requestData.request}] Unable to refresh visibility timeout`
           );
-          logger.error(error);
+          throw error;
         }
       }, 1000 * 20);
-      // log every 10 minutes to indicate job progress
+      // log every 60 minutes to indicate job progress for long running jobs
       const heartbeat = setInterval((_) => {
         logger.info(`[${requestData.request}] In Progress`);
-      }, 1000 * 60 * 10);
+      }, 1000 * 60 * 60);
 
       // processSingleLocus should return a boolean status indicating success or failure
       const status = requestData.multi
@@ -729,7 +729,7 @@ async function receiveMessage() {
           .promise();
       } catch (error) {
         logger.error(`[${requestData.request}] Unable to delete message`);
-        logger.error(error);
+        throw error;
       }
     }
   } catch (e) {
