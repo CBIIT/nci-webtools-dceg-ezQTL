@@ -686,18 +686,18 @@ async function receiveMessage() {
       // logger.debug(message.Body);
 
       // while processing is not complete, update the message's visibilityTimeout every 20 seconds
-      const refreshVisibilityTimeout = setInterval((_) => {
+      const refreshVisibilityTimeout = setInterval(async (_) => {
         try {
           logger.debug(
             `[${requestData.request}] Refreshing visibility timeout`
           );
-          sqs
+          await sqs
             .changeMessageVisibility({
               QueueUrl: QueueUrl,
               ReceiptHandle: message.ReceiptHandle,
               VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 60,
             })
-            .send();
+            .promise();
         } catch (error) {
           logger.error(
             `[${requestData.request}] Unable to refresh visibility timeout`
