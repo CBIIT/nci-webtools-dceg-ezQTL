@@ -702,6 +702,7 @@ async function receiveMessage() {
           logger.error(
             `[${requestData.request}] Unable to refresh visibility timeout`
           );
+          logger.error(error);
           throw error;
         }
       }, 1000 * 20);
