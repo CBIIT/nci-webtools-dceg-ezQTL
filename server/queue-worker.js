@@ -695,7 +695,7 @@ async function receiveMessage() {
             .changeMessageVisibility({
               QueueUrl: QueueUrl,
               ReceiptHandle: message.ReceiptHandle,
-              VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 60,
+              VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 300,
             })
             .promise();
         } catch (error) {
