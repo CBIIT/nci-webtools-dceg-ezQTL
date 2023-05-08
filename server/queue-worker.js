@@ -360,6 +360,7 @@ async function processSingleLocus(requestData) {
     logger.info(`[${request}] Calculation done`);
 
     // upload parameters
+    logger.debug(`[${request}] Uploading parameters`);
     await s3
       .upload({
         Body: JSON.stringify({ state: state, main: main }),
@@ -369,6 +370,7 @@ async function processSingleLocus(requestData) {
       .promise();
 
     // upload archived project directory
+    logger.debug(`[${request}] Uploading results`);
     await s3
       .upload({
         Body: tar.c({ sync: true, gzip: true, C: config.tmp.folder }, [
