@@ -373,9 +373,9 @@ async function processSingleLocus(requestData) {
     logger.debug(`[${request}] Uploading results`);
     await s3
       .upload({
-        Body: tar.c({ sync: true, gzip: true, C: config.tmp.folder }, [
-          request,
-        ]),
+        Body: tar
+          .c({ sync: true, gzip: true, C: config.tmp.folder }, [request])
+          .read(),
         Bucket: config.aws.s3.queue,
         Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
       })
@@ -505,9 +505,9 @@ async function processMultiLoci(data) {
           // upload archived project directory
           await s3
             .upload({
-              Body: tar.c({ sync: true, gzip: true, C: config.tmp.folder }, [
-                request,
-              ]),
+              Body: tar
+                .c({ sync: true, gzip: true, C: config.tmp.folder }, [request])
+                .read(),
               Bucket: config.aws.s3.queue,
               Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
             })
