@@ -73,6 +73,35 @@ function streamToFile(readStream, filePath) {
 }
 
 /**
+ * Deletes input data from s3
+ * @param {*} dir
+ */
+async function deleteInputData(request) {
+  const s3 = new AWS.S3();
+  const listParams = {
+    Bucket: config.aws.s3.queue,
+    Prefix: `${config.aws.s3.inputPrefix}/${request}/`,
+  };
+
+  const listedObjects = await s3.listObjectsV2(listParams).promise();
+
+  if (listedObjects.Contents.length === 0) return;
+
+  const deleteParams = {
+    Bucket: bucket,
+    Delete: { Objects: [] },
+  };
+
+  listedObjects.Contents.forEach(({ Key }) => {
+    deleteParams.Delete.Objects.push({ Key });
+  });
+
+  await s3.deleteObjects(deleteParams).promise();
+
+  if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+}
+
+/**
  * Downloads work files from s3 for calculation
  * @param {string} request
  * @param {string} savePath
@@ -460,6 +489,15 @@ async function processSingleLocus(requestData) {
     }
 
     return false;
+  } finally {
+    // delete input data from s3
+    try {
+      logger.debug(`[${request}] Deleting input data`);
+      await deleteInputData(request);
+    } catch (error) {
+      logger.error(`[${request}] An error occurred while deleting input data`);
+      logger.error(error);
+    }
   }
 }
 
@@ -652,6 +690,17 @@ async function processMultiLoci(data) {
     }
 
     return false;
+  } finally {
+    // delete input data from s3
+    try {
+      logger.debug(`[${mainRequest}] Deleting input data`);
+      await deleteInputData(mainRequest);
+    } catch (error) {
+      logger.error(
+        `[${mainRequest}] An error occurred while deleting input data`
+      );
+      logger.error(error);
+    }
   }
 }
 
