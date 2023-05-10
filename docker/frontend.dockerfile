@@ -20,6 +20,7 @@ COPY client/package*.json /client/
 
 RUN npm install --legacy-peer-deps 
 
+ARG CACHE_BUST
 COPY client /client/
 
 RUN npm run build \

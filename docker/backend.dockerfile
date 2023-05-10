@@ -82,6 +82,7 @@ RUN cd /tmp \
 RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/SigProfilerPlotting/fonts/* /usr/share/fonts; fc-cache -fv;
 
 # copy the rest of the application
+ARG CACHE_BUST
 COPY . /deploy/
 
 CMD npm start
