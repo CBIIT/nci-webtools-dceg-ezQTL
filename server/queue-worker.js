@@ -529,8 +529,8 @@ async function processMultiLoci(data) {
           logger.info(
             `[${mainRequest}] Calculation of multi locus job done (${request})`
           );
-
           // upload parameters
+          logger.debug(`[${request}] Uploading parameters`);
           await s3
             .upload({
               Body: JSON.stringify({ state: state, main: main }),
@@ -540,6 +540,7 @@ async function processMultiLoci(data) {
             .promise();
 
           // upload archived project directory
+          logger.debug(`[${request}] Uploading results`);
           await s3
             .upload({
               Body: await tar.c({ gzip: true, C: config.tmp.folder }, [
