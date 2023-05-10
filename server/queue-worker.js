@@ -74,12 +74,13 @@ function streamToFile(readStream, filePath) {
 
 /**
  * Deletes input data from s3
- * @param {*} dir
+ * @param {*} request request id that corresponds with input directory path
  */
 async function deleteInputData(request) {
   const s3 = new AWS.S3();
+  const bucket = config.aws.s3.queue;
   const listParams = {
-    Bucket: config.aws.s3.queue,
+    Bucket: bucket,
     Prefix: `${config.aws.s3.inputPrefix}/${request}/`,
   };
 
@@ -98,7 +99,7 @@ async function deleteInputData(request) {
 
   await s3.deleteObjects(deleteParams).promise();
 
-  if (listedObjects.IsTruncated) await emptyS3Directory(bucket, dir);
+  if (listedObjects.IsTruncated) await deleteInputData(request);
 }
 
 /**
