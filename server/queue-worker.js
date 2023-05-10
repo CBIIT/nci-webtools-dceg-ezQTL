@@ -668,7 +668,7 @@ async function receiveMessage() {
       .getQueueUrl({ QueueName: config.aws.sqs.url })
       .promise();
 
-    logger.debug('Polling for messages');
+    // logger.debug('Polling for messages');
     const data = await sqs
       .receiveMessage({
         QueueUrl: QueueUrl,
