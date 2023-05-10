@@ -541,9 +541,9 @@ async function processMultiLoci(data) {
           // upload archived project directory
           await s3
             .upload({
-              Body: tar
-                .c({ sync: true, gzip: true, C: config.tmp.folder }, [request])
-                .read(),
+              Body: await tar.c({ gzip: true, C: config.tmp.folder }, [
+                request,
+              ]),
               Bucket: config.aws.s3.queue,
               Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
             })
