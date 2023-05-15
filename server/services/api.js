@@ -228,19 +228,23 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
         await fs.promises.writeFile(filepath, object.Body);
         // extract and delete archive
         if (path.extname(filename) == '.tgz') {
-          await new Promise((resolve, reject) => {
-            fs.createReadStream(filepath)
-              .on('end', () =>
+          logger.debug(`Extracting ${filename} to ${resultsFolder}`);
+          fs.createReadStream(filepath).pipe(
+            await tar.x({ strip: 1, C: resultsFolder }),
+            (err) => {
+              if (err) logger.error(err);
+              else {
+                logger.debug('Extraction done');
                 fs.unlink(filepath, (err) => {
                   if (err) {
-                    reject(err);
+                    logger.error(`Failed to delete ${filename}`);
                   } else {
-                    resolve();
+                    logger.debug(`Deleted ${filename}`);
                   }
-                })
-              )
-              .pipe(tar.x({ strip: 1, C: resultsFolder }));
-          });
+                });
+              }
+            }
+          );
         }
       }
     }
