@@ -125,6 +125,10 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       system(cmd)
 
       gdata <- read_delim(paste0("tmp/", request, "/", request, ".gwas_temp.txt"), delim = "\t", col_names = T)
+      if (dim(gdata)[1] == 0) {
+        errinfo <- "ezQTL QC failed: No data found in GWAS query. Try a different SNP position"
+        stop(errinfo)
+      }
       names(gdata)[names(gdata) == "#trait"] <- "trait"
       phenotype <- phenotype$value
       gdata %>%
@@ -160,6 +164,10 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
 
       # rename #gene_id to gene_id
       qdata <- read_delim(paste0("tmp/", request, "/", request, ".qtl_temp.txt"), delim = "\t", col_names = T, col_types = cols(variant_id = "c"))
+      if (dim(qdata)[1] == 0) {
+        errinfo <- "ezQTL QC failed: No data found in QTL query. Try a different SNP position"
+        stop(errinfo)
+      }
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
       qdata %>%
         filter(chr == select_chromosome) %>%
