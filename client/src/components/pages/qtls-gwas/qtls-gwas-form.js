@@ -51,7 +51,9 @@ export function QTLsGWASForm() {
     isError,
 
     publicGTEx,
-
+    qtlPublic: storeQtlPublic,
+    gwasPublic: storeGwasPublic,
+    ldPublic: storeLdPublic,
     genome: storeGenome,
     qtlProject: storeQtlProject,
     xQtl: storeXQtl,
@@ -132,7 +134,16 @@ export function QTLsGWASForm() {
     ldProject,
     useQueue,
     locusInformation,
+    email,
   } = watch();
+
+  const usePublic =
+    qtlPublic ||
+    gwasPublic ||
+    ldPublic ||
+    storeQtlPublic ||
+    storeGwasPublic ||
+    storeLdPublic;
 
   const genomeOptions =
     publicGTEx && publicGTEx['cis-QTL dataset']
@@ -159,6 +170,10 @@ export function QTLsGWASForm() {
   useEffect(() => {
     if (locusInformation.length > 1) setValue('useQueue', true);
   }, [locusInformation]);
+  // rehydrate form after loading queue results
+  useEffect(() => {
+    if (storeEmail !== email) resetForm(defaultValues);
+  }, [storeEmail]);
 
   // check form to make sure at least one of the three input types are provided (Association, GWAS, or LD)
   function checkValidity() {
@@ -490,7 +505,7 @@ export function QTLsGWASForm() {
                       title="Association Public Data Checkbox"
                       disabled={submitted}
                       label="Public"
-                      checked={qtlPublic}
+                      checked={qtlPublic || storeQtlPublic}
                       onChange={(_) => {
                         setValue('qtlPublic', !qtlPublic);
                         resetField('_qtlFile');
@@ -647,7 +662,7 @@ export function QTLsGWASForm() {
                       title="GWAS Public Data Checkbox"
                       disabled={submitted}
                       label="Public"
-                      checked={gwasPublic}
+                      checked={gwasPublic || storeGwasPublic}
                       onChange={(_) => {
                         setValue('gwasPublic', !gwasPublic);
                         resetField('_gwasFile');
@@ -855,7 +870,7 @@ export function QTLsGWASForm() {
                     title="LD Public Data Checkbox"
                     disabled={submitted}
                     label="Public"
-                    checked={ldPublic}
+                    checked={ldPublic || storeLdPublic}
                     onChange={(_) => {
                       setValue('select_pop', false);
                       setValue('ldPublic', !ldPublic);
@@ -1031,14 +1046,14 @@ export function QTLsGWASForm() {
                 </Form.Control.Feedback>
               </Col>
             </Form.Row>
-            {qtlPublic || gwasPublic || ldPublic ? (
+            {usePublic ? (
               <>
                 <Form.Row>
                   <Col>
                     <Controller
                       name={`locusInformation.${index}.select_chromosome`}
                       control={control}
-                      rules={{ required: qtlPublic || gwasPublic || ldPublic }}
+                      rules={{ required: usePublic }}
                       render={({ field }) => (
                         <Select
                           {...field}
@@ -1091,7 +1106,7 @@ export function QTLsGWASForm() {
                     <Controller
                       name={`locusInformation.${index}.select_position`}
                       control={control}
-                      rules={{ required: qtlPublic || gwasPublic || ldPublic }}
+                      rules={{ required: usePublic }}
                       render={({ field }) => (
                         <Form.Control
                           {...field}
