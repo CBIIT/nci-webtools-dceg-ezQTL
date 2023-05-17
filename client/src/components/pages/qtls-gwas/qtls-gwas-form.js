@@ -450,7 +450,7 @@ export function QTLsGWASForm() {
         recalculateDist,
         recalculateRef,
         qtlPublic: data.qtlPublic,
-        gwasPublic: data.gwasProject,
+        gwasPublic: data.gwasPublic,
         ldPublic: data.ldPublic,
         qtlKey,
         ldKey,
@@ -782,7 +782,11 @@ export function QTLsGWASForm() {
             </Col>
           </Row>
           {(useQuantification ||
-            (submitted && _quantificationFile && _genotypeFile)) && (
+            (submitted &&
+              (_quantificationFile ||
+                _genotypeFile ||
+                quantificationFile ||
+                genotypeFile))) && (
             <>
               <Row>
                 <Form.Group className="col-sm-12">
