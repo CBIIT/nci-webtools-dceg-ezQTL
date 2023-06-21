@@ -233,13 +233,16 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
         drop_na(rsnum) %>%
         arrange(pvalue) %>%
         slice(1) %>%
-        pull(rsnum)
+        pull(rsnum) 
+      if (length(leadsnp) == 0) leadsnp = NA
     } else {
+      print(321)
       if (!is.null(qtlfile)) {
         leadsnp <- qtl %>%
           arrange(pval_nominal) %>%
           slice(1) %>%
           pull(rsnum)
+        if (length(leadsnp) == 0) leadsnp = NA
       }
     }
   }
