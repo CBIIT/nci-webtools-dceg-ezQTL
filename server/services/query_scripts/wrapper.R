@@ -236,6 +236,10 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     gwasPublic <- TRUE
   }
 
+  stdout <- vector("character")
+  con <- textConnection("stdout", "wr", local = TRUE)
+  sink(con, type = "message")
+  sink(con, type = "output")
 
   tryCatch(
     {
@@ -245,7 +249,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     error = function(e) {
       library(jsonlite)
       print(e)
-      return(toJSON(list(error = e$message), pretty = TRUE, auto_unbox = TRUE))
+      return(toJSON(list(error = e$message, stdout = stdout), pretty = TRUE, auto_unbox = TRUE))
     }
   )
 }

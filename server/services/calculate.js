@@ -435,13 +435,13 @@ async function qtlsCalculateQC(params, res, next) {
   );
 
   try {
-    const { error } = await calculateQC(params);
+    const { error, ...rest } = await calculateQC(params);
 
     const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
     const summary = getSummary(logPath);
 
     logger.info(`[${request}] Finished /qtlsCalculateQC`);
-    res.json({ summary: summary, error: error || false });
+    res.json({ summary: summary, error: error || false, ...rest });
   } catch (err) {
     logger.error(`[${request}] Error /qtlsCalculateQC ${err}`);
     res.status(500).json(err);
