@@ -133,6 +133,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       phenotype <- phenotype$value
       gdata %>%
         filter(trait == phenotype, chr == select_chromosome) %>%
+        rename_with(tolower) %>%
         write_delim(paste0("tmp/", request, "/", request, ".gwas_temp.txt"), delim = "\t", col_names = T)
     }
   }
@@ -171,6 +172,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
       qdata %>%
         filter(chr == select_chromosome) %>%
+        rename_with(tolower) %>%
         write_delim(paste0("tmp/", request, "/", request, ".qtl_temp.txt"), delim = "\t", col_names = T)
     }
   }
