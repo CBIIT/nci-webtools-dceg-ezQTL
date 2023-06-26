@@ -7,6 +7,7 @@ const tar = require('tar');
 var _ = require('lodash');
 const config = require('./config.json');
 const logger = require('./services/logger');
+const { Worker, isMainThread, workerData } = require('worker_threads');
 
 const {
   calculateQC,
@@ -32,7 +33,12 @@ const workingDirectory = path.resolve(config.R.workDir);
     fs.mkdirSync(folder, { recursive: true });
   }
 
-  receiveMessage();
+  if (isMainThread) receiveMessage();
+  else {
+    const { workerType, requestData } = workerData;
+    if (workerType == 'single') processSingleLocus(requestData);
+    else processMultiLoci(requestData);
+  }
 })();
 
 function mergeState(state, data) {
@@ -763,26 +769,29 @@ async function receiveMessage() {
       }, 1000 * 60 * 60);
 
       // processSingleLocus should return a boolean status indicating success or failure
-      const status = requestData.multi
-        ? await processMultiLoci(requestData)
-        : await processSingleLocus(requestData);
+      const workerType = requestData.multi ? 'multi' : 'single';
+      const calculationWorker = new Worker(__filename, {
+        workerData: { workerType, requestData },
+      });
 
-      clearInterval(refreshVisibilityTimeout);
-      clearInterval(heartbeat);
+      calculationWorker.on('exit', async (code) => {
+        clearInterval(refreshVisibilityTimeout);
+        clearInterval(heartbeat);
 
-      // remove original message from queue once processed
-      try {
-        logger.info(`[${requestData.request}] Deleting message`);
-        await sqs
-          .deleteMessage({
-            QueueUrl: QueueUrl,
-            ReceiptHandle: message.ReceiptHandle,
-          })
-          .promise();
-      } catch (error) {
-        logger.error(`[${requestData.request}] Unable to delete message`);
-        throw error;
-      }
+        // remove original message from queue once processed
+        try {
+          logger.info(`[${requestData.request}] Deleting message`);
+          await sqs
+            .deleteMessage({
+              QueueUrl: QueueUrl,
+              ReceiptHandle: message.ReceiptHandle,
+            })
+            .promise();
+        } catch (error) {
+          logger.error(`[${requestData.request}] Unable to delete message`);
+          throw error;
+        }
+      });
     }
   } catch (e) {
     // catch exceptions related to sqs
