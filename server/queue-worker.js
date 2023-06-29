@@ -516,73 +516,77 @@ async function processMultiLoci(data) {
   const s3 = new AWS.S3();
 
   try {
-    const calculations = await Promise.all(
-      paramsArr.map(async (params, i) => {
-        const start = new Date().getTime();
-        try {
-          const { request, jobName } = params;
+    async function processJob(params) {
+      const start = new Date().getTime();
+      try {
+        const { request, jobName } = params;
 
-          const directory = path.resolve(config.tmp.folder, request);
-          await fs.promises.mkdir(directory, { recursive: true });
+        const directory = path.resolve(config.tmp.folder, request);
+        await fs.promises.mkdir(directory, { recursive: true });
 
-          // download user uploaded files into unique
-          await downloadS3(mainRequest, directory);
-          logger.info(
-            `[${mainRequest}] Start Calculation of multi locus job (${request})`
-          );
-          const { state, main } = await calculate(params);
-          const end = new Date().getTime();
-          logger.info(
-            `[${mainRequest}] Calculation of multi locus job done (${request})`
-          );
-          // upload parameters
-          logger.debug(`[${request}] Uploading parameters`);
-          await s3
-            .upload({
-              Body: JSON.stringify({ state: state, main: main }),
-              Bucket: config.aws.s3.queue,
-              Key: `${config.aws.s3.outputPrefix}/${request}/state.json`,
-            })
-            .promise();
+        // download user uploaded files into unique
+        await downloadS3(mainRequest, directory);
+        logger.info(
+          `[${mainRequest}] Start Calculation of multi locus job (${request})`
+        );
+        const { state, main } = await calculate(params);
+        const end = new Date().getTime();
+        logger.info(
+          `[${mainRequest}] Calculation of multi locus job done (${request})`
+        );
+        // upload parameters
+        logger.debug(`[${request}] Uploading parameters`);
+        await s3
+          .upload({
+            Body: JSON.stringify({ state: state, main: main }),
+            Bucket: config.aws.s3.queue,
+            Key: `${config.aws.s3.outputPrefix}/${request}/state.json`,
+          })
+          .promise();
 
-          // upload archived project directory
-          logger.debug(`[${request}] Uploading results`);
-          await s3
-            .upload({
-              Body: await tar.c({ gzip: true, C: config.tmp.folder }, [
-                request,
-              ]),
-              Bucket: config.aws.s3.queue,
-              Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
-            })
-            .promise();
+        // upload archived project directory
+        logger.debug(`[${request}] Uploading results`);
+        await s3
+          .upload({
+            Body: await tar.c({ gzip: true, C: config.tmp.folder }, [request]),
+            Bucket: config.aws.s3.queue,
+            Key: `${config.aws.s3.outputPrefix}/${request}/${request}.tgz`,
+          })
+          .promise();
 
-          return Promise.resolve({
-            jobName: jobName,
-            execTime: getExecutionTime(start, end),
-            request: request,
-          });
-        } catch (error) {
-          const end = new Date().getTime();
-          logger.error(
-            `[${mainRequest}] An error occurred while processing multi locus job (${params.request})`
-          );
-          logger.error(error);
-          const stdout = error.stdout ? error.stdout.toString() : '';
-          const stderr = error.stderr ? error.stderr.toString() : '';
+        return {
+          jobName: jobName,
+          execTime: getExecutionTime(start, end),
+          request: request,
+        };
+      } catch (error) {
+        const end = new Date().getTime();
+        logger.error(
+          `[${mainRequest}] An error occurred while processing multi locus job (${params.request})`
+        );
+        logger.error(error);
+        const stdout = error.stdout ? error.stdout.toString() : '';
+        const stderr = error.stderr ? error.stderr.toString() : '';
 
-          return Promise.resolve({
-            request: params.request,
-            jobName: params.jobName,
-            parameters: JSON.stringify(params, null, 4),
-            exception: error.toString(),
-            processOutput: !stdout && !stderr ? null : stdout + stderr,
-            execTime: getExecutionTime(start, end),
-          });
-        }
-      })
-    );
+        return {
+          request: params.request,
+          jobName: params.jobName,
+          parameters: JSON.stringify(params, null, 4),
+          exception: error.toString(),
+          processOutput: !stdout && !stderr ? null : stdout + stderr,
+          execTime: getExecutionTime(start, end),
+        };
+      }
+    }
 
+    const mapSeries = async (iterable, fn) => {
+      const results = [];
+      for (const x of iterable) {
+        results.push(await fn(x));
+      }
+      return results;
+    };
+    const calculations = await mapSeries(paramsArr, processJob);
     const template = calculations.map((data, i) => {
       if (data.exception) {
         return `<ul style="list-style-type: none">
