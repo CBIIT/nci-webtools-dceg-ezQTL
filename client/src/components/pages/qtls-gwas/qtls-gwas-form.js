@@ -1040,7 +1040,7 @@ export function QTLsGWASForm() {
                       disabled={submitted}
                       isInvalid={
                         errors.locusInformation &&
-                        errors.locusInformation[index].select_dist
+                        errors.locusInformation[index]?.select_dist
                       }
                     />
                   )}
@@ -1092,7 +1092,7 @@ export function QTLsGWASForm() {
                       )}
                     />
                     {errors.locusInformation &&
-                      errors.locusInformation[index].select_chromosome && (
+                      errors.locusInformation[index]?.select_chromosome && (
                         <div
                           className="text-danger"
                           style={{ fontSize: '80%' }}
@@ -1121,7 +1121,7 @@ export function QTLsGWASForm() {
                           placeholder="e.g. 42743496"
                           isInvalid={
                             errors.locusInformation &&
-                            errors.locusInformation[index].select_position
+                            errors.locusInformation[index]?.select_position
                           }
                         />
                       )}
@@ -1160,7 +1160,7 @@ export function QTLsGWASForm() {
                         disabled={submitted}
                         isInvalid={
                           errors.locusInformation &&
-                          errors.locusInformation[index].select_ref
+                          errors.locusInformation[index]?.select_ref
                         }
                       />
                     )}
