@@ -469,17 +469,19 @@ async function processSingleLocus(requestData) {
       summaryLog,
     };
 
-    // send admin error email
-    logger.info(`[${request}] Sending admin error email`);
-    const adminEmailResults = await mailer.sendMail({
-      from: config.email.adminSupport,
-      to: config.email.techSupport,
-      subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
-      html: await readTemplate(
-        __dirname + '/templates/admin-failure-email.html',
-        templateData
-      ),
-    });
+    // send admin error email for unexpected errors not prefixed with "ezQTL QC failed"
+    if (!error.toString().includes('ezQTL QC failed')) {
+      logger.info(`[${request}] Sending admin error email`);
+      const adminEmailResults = await mailer.sendMail({
+        from: config.email.adminSupport,
+        to: config.email.techSupport,
+        subject: `ezQTL Error: ${request} - ${timestamp} EST`, // searchable calculation error subject
+        html: await readTemplate(
+          __dirname + '/templates/admin-failure-email.html',
+          templateData
+        ),
+      });
+    }
 
     // send user error email
     if (params.email) {
@@ -623,7 +625,9 @@ async function processMultiLoci(data) {
     });
 
     // send admin failure email if needed
-    const failed = calculations.filter((data) => data.exception);
+    const failed = calculations.filter(
+      (data) => !data.exception.includes('ezQTL QC failed')
+    );
     if (failed.length) {
       const errorsTemplate = failed.map(
         (data) => `<ul style="list-style-type: none">
