@@ -593,7 +593,8 @@ async function processMultiLoci(data) {
       if (data.exception) {
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
-                  <li>Error - Failed to Process Job</li>
+                  <li>Error:</li>
+                  <li><pre>${data.exception}</pre></li>
                   <li>Execution Time: ${data.execTime}</li>
                 </ul>`;
       } else {
