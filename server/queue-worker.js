@@ -443,6 +443,7 @@ async function processSingleLocus(requestData) {
       `[${request}] An error occurred while processing single locus job`
     );
     logger.error(error);
+    logger.error(JSON.stringify(params));
     const execTime = getExecutionTime(start, end);
     logger.info(`[${request}] Execution time: ${execTime}`);
 
@@ -661,6 +662,7 @@ async function processMultiLoci(data) {
       `[${mainRequest}] An error occurred while processing multi-loci job`
     );
     logger.error(err);
+    logger.error(json.stringify(params));
     const execTime = getExecutionTime(start, end);
     logger.info(`[${mainRequest}] Execution time: ${execTime}`);
     const { params, request } = data;
