@@ -149,7 +149,7 @@ apiRouter.post('/queue', async (req, res, next) => {
   if (!fs.existsSync(wd)) {
     fs.mkdirSync(wd);
   }
-
+  fs.writeFileSync(path.join(wd, 'params.json'), JSON.stringify(req.body));
   try {
     logger.debug(`Uploading: ${fs.readdirSync(wd)}`);
     await new AWS.S3()
@@ -171,7 +171,6 @@ apiRouter.post('/queue', async (req, res, next) => {
         MessageGroupId: request,
         MessageBody: JSON.stringify({
           ...req.body,
-          multi: multi,
           timestamp: new Date().toLocaleString('en-US', {
             timeZone: 'America/New_York',
           }),
