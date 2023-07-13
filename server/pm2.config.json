@@ -14,9 +14,7 @@
     },
     {
       "name": "queue-worker",
-      "script": "queue-worker.js",
-      "exec_mode": "cluster",
-      "instances": "max"
+      "script": "queue-worker.js"
     }
   ]
 }
