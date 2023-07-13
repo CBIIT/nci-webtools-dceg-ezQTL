@@ -33,8 +33,11 @@ const workingDirectory = path.resolve(config.R.workDir);
     fs.mkdirSync(folder, { recursive: true });
   }
 
-  if (isMainThread) receiveMessage();
-  else {
+  if (isMainThread) {
+    logger.debug('Starting main');
+    receiveMessage();
+  } else {
+    logger.debug('Starting worker');
     const { workerType, requestData } = workerData;
     if (workerType == 'single') processSingleLocus(requestData);
     else processMultiLoci(requestData);
