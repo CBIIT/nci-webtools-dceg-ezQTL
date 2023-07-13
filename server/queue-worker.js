@@ -594,17 +594,19 @@ async function processMultiLoci(data) {
       if (data.exception) {
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
-                  <li>Error:</li>
+                  <li>Error: An error occurred while processing this job</li>
                   <li><pre>${data.exception}</pre></li>
                   <li>Execution Time: ${data.execTime}</li>
-                </ul>`;
+                </ul>
+                </br>`;
       } else {
         const resultsUrl = `${config.email.baseUrl}/#/qtls/${data.request}`;
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
                   <li>Execution Time: ${data.execTime}</li>
                   <li>Results: <a href="${resultsUrl}">${resultsUrl}</a></li><br />
-                </ul>`;
+                </ul>
+                </br>`;
       }
     });
 
