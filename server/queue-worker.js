@@ -373,6 +373,14 @@ async function calculate(params) {
   return { state: state, main: main };
 }
 
+function userErrorMessage(msg) {
+  return msg.toString().includes('ezQTL QC failed')
+    ? msg.toString()
+    : msg.toString().includes('VROOM')
+    ? 'An error occurred while trying to read a large data file. Please try again with a smaller cis-QTL Distance value.'
+    : 'An error occurred in QC calculation. Please review your input parameters and calculation logs.';
+}
+
 /**
  * Processes a message and sends emails when finished
  * @param {object} params
@@ -461,11 +469,7 @@ async function processSingleLocus(requestData) {
       exception: error.toString(),
       processOutput: !stdout && !stderr ? null : stdout + stderr,
       supportEmail: config.email.adminSupport,
-      userError: error.toString().includes('ezQTL QC failed')
-        ? error.toString()
-        : error.toString().includes('VROOM')
-        ? 'An error occurred while trying to read a large data file. Please try again with a smaller cis-QTL Distance value.'
-        : 'An error occurred in QC calculation. Please review your input parameters and calculation logs.',
+      userError: userErrorMessage(error),
       error,
       summaryLog,
     };
@@ -576,7 +580,7 @@ async function processMultiLoci(data) {
           request: params.request,
           jobName: params.jobName,
           parameters: JSON.stringify(params, null, 4),
-          exception: error.toString(),
+          exception: userErrorMessage(error),
           processOutput: !stdout && !stderr ? null : stdout + stderr,
           execTime: getExecutionTime(start, end),
         };
