@@ -630,7 +630,7 @@ async function processMultiLoci(data) {
 
     // send admin failure email if needed
     const failed = calculations.filter(
-      (data) => !data.exception.includes('ezQTL QC failed')
+      (data) => data?.exception && !data?.exception.includes('ezQTL QC failed')
     );
     if (failed.length) {
       const errorsTemplate = failed.map(
