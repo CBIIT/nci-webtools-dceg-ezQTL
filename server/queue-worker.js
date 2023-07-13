@@ -792,7 +792,7 @@ async function receiveMessage() {
         workerData: { workerType, requestData },
       });
 
-      calculationWorker.on('exit', async (code) => {
+      await calculationWorker.on('exit', async (code) => {
         clearInterval(refreshVisibilityTimeout);
         clearInterval(heartbeat);
 
@@ -809,6 +809,8 @@ async function receiveMessage() {
           logger.error(`[${requestData.request}] Unable to delete message`);
           throw error;
         }
+        // schedule receiving next message
+        setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
       });
     }
   } catch (e) {
@@ -830,7 +832,6 @@ async function receiveMessage() {
     //     })
     //     .promise();
     // }
-  } finally {
     // schedule receiving next message
     setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
   }
