@@ -568,6 +568,7 @@ async function processMultiLoci(data) {
           `[${mainRequest}] An error occurred while processing multi locus job (${params.request})`
         );
         logger.error(error);
+        logger.error(JSON.stringify(params));
         const stdout = error.stdout ? error.stdout.toString() : '';
         const stderr = error.stderr ? error.stderr.toString() : '';
 
@@ -664,7 +665,7 @@ async function processMultiLoci(data) {
       `[${mainRequest}] An error occurred while processing multi-loci job`
     );
     logger.error(err);
-    logger.error(json.stringify(params));
+    logger.error(json.stringify(data));
     const execTime = getExecutionTime(start, end);
     logger.info(`[${mainRequest}] Execution time: ${execTime}`);
     const { params, request } = data;
