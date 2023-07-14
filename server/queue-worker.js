@@ -578,14 +578,16 @@ async function processMultiLoci(data) {
         logger.error(JSON.stringify(params));
         const stdout = error.stdout ? error.stdout.toString() : '';
         const stderr = error.stderr ? error.stderr.toString() : '';
+        const summaryLog = getSummary(params.request).replaceAll('\n', '<br>');
 
         return {
           request: params.request,
           jobName: params.jobName,
           parameters: JSON.stringify(params, null, 4),
-          exception: userErrorMessage(error),
+          exception: error,
           processOutput: !stdout && !stderr ? null : stdout + stderr,
           execTime: getExecutionTime(start, end),
+          summaryLog,
         };
       }
     }
@@ -603,7 +605,9 @@ async function processMultiLoci(data) {
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
                   <li>Error: An error occurred while processing this job</li>
-                  <li><pre>${data.exception}</pre></li>
+                  <li><pre>${userErrorMessage(data.exception)}</pre></li>
+                  <li><b>Logs: </b></li>
+                  <li><pre>${data.summaryLog}</pre></li>
                   <li>Execution Time: ${data.execTime}</li>
                 </ul>
                 </br>`;
@@ -648,7 +652,7 @@ async function processMultiLoci(data) {
                       <li><b>Parameters: </b></li>
                       <li><pre>${data.parameters}</pre></li>
                       <li><b>Exception: </b></li>
-                      <li><pre>${data.exception}</pre></li>
+                      <li><pre>${data.exception.toString()}</pre></li>
                       <li><b>Process Output: </b></li>
                       <li><pre>${data.processOutput}</pre></li>
                     </ul><hr />`
