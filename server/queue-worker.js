@@ -815,6 +815,8 @@ async function receiveMessage() {
         // schedule receiving next message
         setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
       });
+    } else {
+      setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
     }
   } catch (e) {
     // catch exceptions related to sqs
