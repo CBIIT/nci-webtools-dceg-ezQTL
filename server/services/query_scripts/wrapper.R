@@ -1,3 +1,4 @@
+library(jsonlite)
 # increase buffer size in case of large LD files https://github.com/tidyverse/vroom/issues/364
 Sys.setenv(VROOM_CONNECTION_SIZE = "500000")
 
@@ -127,7 +128,8 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       gdata <- read_delim(paste0("tmp/", request, "/", request, ".gwas_temp.txt"), delim = "\t", col_names = T)
       if (dim(gdata)[1] == 0) {
         errinfo <- "ezQTL QC failed: No data found in GWAS query. Try a different SNP position"
-        stop(errinfo)
+        return(toJSON(list(error = errinfo), auto_unbox = TRUE))
+        # stop(errinfo)
       }
       names(gdata)[names(gdata) == "#trait"] <- "trait"
       phenotype <- phenotype$value
@@ -167,7 +169,8 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       qdata <- read_delim(paste0("tmp/", request, "/", request, ".qtl_temp.txt"), delim = "\t", col_names = T, col_types = cols(variant_id = "c"))
       if (dim(qdata)[1] == 0) {
         errinfo <- "ezQTL QC failed: No data found in QTL query. Try a different SNP position"
-        stop(errinfo)
+        return(toJSON(list(error = errinfo), auto_unbox = TRUE))
+        # stop(errinfo)
       }
       names(qdata)[names(qdata) == "#gene_id"] <- "gene_id"
       qdata %>%
@@ -247,7 +250,6 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       return("{}")
     },
     error = function(e) {
-      library(jsonlite)
       print(e)
       return(toJSON(list(error = e$message, stdout = stdout), pretty = TRUE, auto_unbox = TRUE))
     }
