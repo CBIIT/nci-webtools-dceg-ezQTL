@@ -64,8 +64,9 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
           .[[1]]
         if (gwas_nchr != 1) {
           errinfo <- "ERROR: Number of chromosome in GWAS file not equal to 1"
+          err <- "ezQTL QC failed: Number of chromosome in GWAS file not equal to 1"
           cat(errinfo, file = logfile, sep = "\n", append = T)
-          stop(errinfo)
+          stop(err)
         }
 
         cat("\nGWAS summary", file = logfile, sep = "\n", append = T)
@@ -110,8 +111,9 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
           .[[1]]
         if (qtl_nchr != 1) {
           errinfo <- "ERROR: Number of chromosome in QTL file not equal to 1"
+          err <- "ezQTL QC failed: Number of chromosome in GWAS file not equal to 1"
           cat(errinfo, file = logfile, sep = "\n", append = T)
-          stop(errinfo)
+          stop(err)
         }
 
         cat("\nQTL summary", file = logfile, sep = "\n", append = T)
