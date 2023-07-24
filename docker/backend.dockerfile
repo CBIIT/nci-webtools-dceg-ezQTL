@@ -41,7 +41,10 @@ WORKDIR /deploy/server
 
 # install R packages with renv
 COPY server/renv.lock /deploy/server/
-RUN Rscript -e "install.packages('renv', repos = 'https://cloud.r-project.org/'); renv::restore()"
+COPY server/.Rprofile /deploy/server/
+COPY server/renv/activate.R /deploy/server/renv/
+COPY server/renv/settings.dcf /deploy/server/renv/
+RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
 
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
