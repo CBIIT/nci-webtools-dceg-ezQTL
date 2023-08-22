@@ -154,7 +154,7 @@ apiRouter.post('/queue', async (req, res, next) => {
     logger.debug(`Uploading: ${fs.readdirSync(wd)}`);
     await new AWS.S3()
       .upload({
-        Body: tar.c({ sync: true, gzip: true, C: tmpDir }, [request]).read(),
+        Body: tar.c({ gzip: true, C: tmpDir }, [request]),
         Bucket: awsInfo.s3.queue,
         Key: `${awsInfo.s3.inputPrefix}/${request}/${request}.tgz`,
       })
@@ -229,7 +229,7 @@ apiRouter.post('/fetch-results', async (req, res, next) => {
         if (path.extname(filename) == '.tgz') {
           logger.debug(`Extracting ${filename} to ${resultsFolder}`);
           fs.createReadStream(filepath).pipe(
-            await tar.x({ strip: 1, C: resultsFolder }),
+            tar.x({ strip: 1, C: resultsFolder }),
             (err) => {
               if (err) logger.error(err);
               else {
@@ -325,12 +325,14 @@ apiRouter.get('/getPublications', async (req, res, next) => {
 });
 
 // download work session
-apiRouter.post('/locus-download', (req, res, next) => {
-  const { request } = req.body;
+apiRouter.get('/locus-download/:request', (req, res, next) => {
+  const { request } = req.params;
+  logger.debug(request);
   if (!validate(request)) next(new Error(`Invalid request`));
 
   try {
-    tar.c({ sync: true, gzip: true, cwd: tmpDir }, [request]).pipe(res);
+    res.attachment(`${request}.tar.gz`);
+    tar.c({ gzip: true, cwd: tmpDir }, [request]).pipe(res);
   } catch (err) {
     next(err);
   }

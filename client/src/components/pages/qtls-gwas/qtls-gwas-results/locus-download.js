@@ -51,38 +51,8 @@ export function LocusDownload() {
           isLoadingSummary ||
           isLoadingQC
         }
-        onClick={async () => {
-          setLoading(true);
-          const response = await fetch('api/locus-download', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ request: request }),
-          });
-          if (response.ok) {
-            const objectURL = URL.createObjectURL(await response.blob());
-            const tempLink = document.createElement('a');
-
-            tempLink.href = `${objectURL}`;
-            tempLink.setAttribute(
-              'download',
-              `${new Date().toISOString().split('T')[0]}.ezQTL.tar.gz`
-            );
-            document.body.appendChild(tempLink);
-            tempLink.click();
-            document.body.removeChild(tempLink);
-          } else {
-            dispatch(
-              updateAlert({
-                show: true,
-                message: `Locus Download is not available`,
-                variant: 'danger',
-              })
-            );
-          }
-          setLoading(false);
-        }}
+        href={`api/locus-download/${request}`}
+        target={'_blank'}
       >
         <FontAwesomeIcon icon={faFileArchive} /> Download Results
       </Button>
