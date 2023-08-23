@@ -2,7 +2,6 @@
   "name": "ezqtl-client",
   "version": "2.0.0",
   "homepage": ".",
-  "proxy": "http://localhost:3000",
   "dependencies": {
     "@cbiitss/react-components": "^0.1.4",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
