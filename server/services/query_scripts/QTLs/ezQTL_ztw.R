@@ -29,7 +29,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
   cat(ainfo, file = logfile, sep = "\n", append = FALSE)
 
   if (is.null(gwasfile) & is.null(qtlfile) & is.null(ldfile)) {
-    errinfo <- "ezQTL need at least one of the following files: QTL association file, GWAS association file, and LD matrix file;"
+    errinfo <- "ezQTL QC failed: ezQTL need at least one of the following files: QTL association file, GWAS association file, and LD matrix file;"
     cat(errinfo, file = logfile, sep = "\n", append = T)
     stop(errinfo)
   }
@@ -51,7 +51,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       gwas_colnames <- c("chr", "pos", "ref", "alt", "rsnum", "pvalue", "zscore", "effect", "se")
       gwas_colname_diff <- gwas_colnames[!gwas_colnames %in% colnames(gwas)]
       if (length(gwas_colname_diff) != 0) {
-        errinfo <- paste0("ERROR: The following GWAS column names for ezQTL are not existed: ", paste0(gwas_colname_diff, collapse = ", "))
+        errinfo <- paste0("ezQTL QC failed: The following GWAS column names for ezQTL are not existed: ", paste0(gwas_colname_diff, collapse = ", "))
         cat(errinfo, file = logfile, sep = "\n", append = T)
         stop(errinfo)
       } else {
@@ -63,9 +63,8 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
           dim() %>%
           .[[1]]
         if (gwas_nchr != 1) {
-          errinfo <- "ERROR: Number of chromosome in GWAS file not equal to 1"
           err <- "ezQTL QC failed: Number of chromosome in GWAS file not equal to 1"
-          cat(errinfo, file = logfile, sep = "\n", append = T)
+          cat(err, file = logfile, sep = "\n", append = T)
           stop(err)
         }
 
@@ -97,7 +96,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       qtl_colnames <- c("gene_id", "gene_symbol", "variant_id", "rsnum", "chr", "pos", "ref", "alt", "tss_distance", "pval_nominal", "slope", "slope_se")
       qtl_colname_diff <- qtl_colnames[!qtl_colnames %in% colnames(qtl)]
       if (length(qtl_colname_diff) != 0) {
-        errinfo <- paste0("ERROR: The following QTL column names for ezQTL are not existed: ", paste0(qtl_colname_diff, collapse = ", "))
+        errinfo <- paste0("ezQTL QC failed: The following QTL column names for ezQTL are not existed: ", paste0(qtl_colname_diff, collapse = ", "))
         cat(errinfo, file = logfile, sep = "\n", append = T)
         stop(errinfo)
       } else {
@@ -110,9 +109,8 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
           dim() %>%
           .[[1]]
         if (qtl_nchr != 1) {
-          errinfo <- "ERROR: Number of chromosome in QTL file not equal to 1"
           err <- "ezQTL QC failed: Number of chromosome in GWAS file not equal to 1"
-          cat(errinfo, file = logfile, sep = "\n", append = T)
+          cat(err, file = logfile, sep = "\n", append = T)
           stop(err)
         }
 
@@ -158,7 +156,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
     if (file.info(ldfile)$size < 50) {
       ldfile <- NULL
       cat("\nLD summary", file = logfile, sep = "\n", append = T)
-      cat("Warnning: LD file detected as empty file", file = logfile, sep = "\n", append = T)
+      cat("Warning: LD file detected as empty file", file = logfile, sep = "\n", append = T)
     } else {
       # format file, remove the CR/^M characters from windows
       if (!ldfile_pub) {
@@ -169,7 +167,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       # check file format, and select only requeired columns
       ld.matrix.size <- dim(ld.matrix)
       if (ld.matrix.size[1] < 7 | ld.matrix.size[2] < 7 | (ld.matrix.size[2] - ld.matrix.size[1]) != 5) {
-        errinfo <- paste0("ERROR: The dimensions of the LD matrix file are not correct. Please check the help page for the detail.")
+        errinfo <- paste0("ezQTL QC failed: The dimensions of the LD matrix file are not correct. Please check the help page for the detail.")
         cat(errinfo, file = logfile, sep = "\n", append = T)
         stop(errinfo)
       } else {
@@ -235,8 +233,8 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
         drop_na(rsnum) %>%
         arrange(pvalue) %>%
         slice(1) %>%
-        pull(rsnum) 
-      if (length(leadsnp) == 0) leadsnp = NA
+        pull(rsnum)
+      if (length(leadsnp) == 0) leadsnp <- NA
     } else {
       print(321)
       if (!is.null(qtlfile)) {
@@ -244,7 +242,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
           arrange(pval_nominal) %>%
           slice(1) %>%
           pull(rsnum)
-        if (length(leadsnp) == 0) leadsnp = NA
+        if (length(leadsnp) == 0) leadsnp <- NA
       }
     }
   }

@@ -127,7 +127,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
 
       gdata <- read_delim(paste0("tmp/", request, "/", request, ".gwas_temp.txt"), delim = "\t", col_names = T)
       if (dim(gdata)[1] == 0) {
-        errinfo <- "ezQTL QC failed: No data found in GWAS query. Try a different SNP position"
+        errinfo <- paste0("ezQTL QC failed: No data found in GWAS query. Try a different SNP position.")
         return(toJSON(list(error = errinfo), auto_unbox = TRUE))
         # stop(errinfo)
       }
