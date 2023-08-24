@@ -34,10 +34,13 @@ export function QTLsGWASForm() {
 
   const {
     associationFile,
+    associationFileName,
     quantificationFile,
     genotypeFile,
     gwasFile,
+    gwasFileName,
     LDFile,
+    LDFileName,
     select_pop: storePop,
     select_gene,
     recalculateAttempt,
@@ -160,7 +163,7 @@ export function QTLsGWASForm() {
   useEffect(() => {
     if (!Object.keys(publicGTEx).length) dispatch(getPublicGTEx());
   }, [publicGTEx]);
-  // populate inital params
+  // populate initial params
   useEffect(() => {
     if (Object.keys(publicGTEx).length && genomeOptions.length && !genome)
       populatePublicParameters(genomeOptions[0]);
@@ -436,10 +439,13 @@ export function QTLsGWASForm() {
         useQueue: data.useQueue,
         submitted: true,
         associationFile: data._associationFile.name || false,
+        associationFileName: data._associationFile.name || false,
         quantificationFile: data._quantificationFile.name || false,
         genotypeFile: data._genotypeFile.name || false,
         gwasFile: data._gwasFile.name || false,
+        gwasFileName: data._gwasFile.name || false,
         LDFile: data._LDFile.name || false,
+        LDFileName: data._LDFile.name || false,
         select_pop: data.select_pop,
         select_gene,
         select_dist,
@@ -482,6 +488,8 @@ export function QTLsGWASForm() {
     }
   }
 
+  console.log(ldPublic);
+
   const accordionComponents = [
     {
       title: 'Association Data',
@@ -514,7 +522,7 @@ export function QTLsGWASForm() {
                   )}
                 />
               </div>
-              {qtlPublic ? (
+              {qtlPublic || storeQtlPublic ? (
                 <div className="mt-2">
                   <Row>
                     <Col>
@@ -630,6 +638,7 @@ export function QTLsGWASForm() {
                       title="Association (QTL) Data User File Upload Input"
                       disabled={submitted}
                       label={
+                        associationFileName ||
                         associationFile ||
                         _associationFile.name ||
                         'Choose File'
@@ -671,7 +680,7 @@ export function QTLsGWASForm() {
                   )}
                 />
               </div>
-              {gwasPublic ? (
+              {gwasPublic || storeGwasPublic ? (
                 <div className="mt-2">
                   <Row>
                     <Col>
@@ -748,7 +757,12 @@ export function QTLsGWASForm() {
                       value=""
                       title="GWAS Data User File Upload Input"
                       disabled={submitted}
-                      label={gwasFile || _gwasFile.name || 'Choose File'}
+                      label={
+                        gwasFileName ||
+                        gwasFile ||
+                        _gwasFile.name ||
+                        'Choose File'
+                      }
                       onChange={(e) => {
                         if (e.target.files.length) {
                           setValue('_gwasFile', e.target.files[0]);
@@ -884,7 +898,7 @@ export function QTLsGWASForm() {
                 )}
               />
             </div>
-            {ldPublic ? (
+            {ldPublic || storeLdPublic ? (
               <div>
                 <Form.Row>
                   <Col>
@@ -947,7 +961,9 @@ export function QTLsGWASForm() {
                     id="qtls-ld-file"
                     value=""
                     disabled={submitted}
-                    label={LDFile || _LDFile.name || 'Choose File'}
+                    label={
+                      LDFileName || LDFile || _LDFile.name || 'Choose File'
+                    }
                     onChange={(e) => {
                       if (e.target.files.length) {
                         setValue('_LDFile', e.target.files[0]);

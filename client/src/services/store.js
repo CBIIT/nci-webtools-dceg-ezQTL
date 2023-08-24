@@ -7,10 +7,13 @@ export const getInitialState = async () => {
     qtlsGWAS: {
       openSidebar: true,
       associationFile: null,
+      associationFileName: null,
       quantificationFile: null,
       genotypeFile: null,
       gwasFile: null,
+      gwasFileName: null,
       LDFile: null,
+      LDFileName: null,
       request: '',
       select_pop: false,
       select_gene: false,
