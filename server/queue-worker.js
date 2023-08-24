@@ -769,7 +769,8 @@ async function receiveMessage() {
       logger.info(`[${requestData.request}] Received message`);
       // logger.debug(message.Body);
 
-      // while processing is not complete, update the message's visibilityTimeout every 20 seconds
+      // while processing is not complete, update the message's visibilityTimeout at half the visibility timeout in seconds
+      const visTimeout = config?.aws.sqs.visibilityTimeout || 300;
       const refreshVisibilityTimeout = setInterval(async (_) => {
         try {
           logger.debug(
@@ -779,7 +780,7 @@ async function receiveMessage() {
             .changeMessageVisibility({
               QueueUrl: QueueUrl,
               ReceiptHandle: message.ReceiptHandle,
-              VisibilityTimeout: config?.aws.sqs.visibilityTimeout || 300,
+              VisibilityTimeout: visTimeout,
             })
             .promise();
         } catch (error) {
@@ -789,7 +790,7 @@ async function receiveMessage() {
           logger.error(error);
           throw error;
         }
-      }, 1000 * 20);
+      }, 1000 * (visTimeout / 2));
       // log every 60 minutes to indicate job progress for long running jobs
       const heartbeat = setInterval((_) => {
         logger.info(`[${requestData.request}] In Progress`);
