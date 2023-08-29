@@ -788,10 +788,7 @@ async function receiveMessage() {
             `[${requestData.request}] Unable to refresh visibility timeout`
           );
           logger.error(error);
-          logger.error(
-            'Terminating worker. Return job to queue and process next job.'
-          );
-          await calculationWorker.terminate();
+          throw error;
         }
       }, 1000 * (visTimeout / 2));
       // log every 60 minutes to indicate job progress for long running jobs
@@ -799,30 +796,28 @@ async function receiveMessage() {
         logger.info(`[${requestData.request}] In Progress`);
       }, 1000 * 60 * 60);
 
+      // processSingleLocus should return a boolean status indicating success or failure
       const workerType = requestData.multi ? 'multi' : 'single';
       const calculationWorker = new Worker(__filename, {
         workerData: { workerType, requestData },
       });
 
-      calculationWorker.on('exit', async (code) => {
+      await calculationWorker.on('exit', async (code) => {
         clearInterval(refreshVisibilityTimeout);
         clearInterval(heartbeat);
 
-        // worker exited successfully
-        if (code == 0) {
-          // remove original message from queue once processed
-          try {
-            logger.info(`[${requestData.request}] Deleting message`);
-            await sqs
-              .deleteMessage({
-                QueueUrl: QueueUrl,
-                ReceiptHandle: message.ReceiptHandle,
-              })
-              .promise();
-          } catch (error) {
-            logger.error(`[${requestData.request}] Unable to delete message`);
-            throw error;
-          }
+        // remove original message from queue once processed
+        try {
+          logger.info(`[${requestData.request}] Deleting message`);
+          await sqs
+            .deleteMessage({
+              QueueUrl: QueueUrl,
+              ReceiptHandle: message.ReceiptHandle,
+            })
+            .promise();
+        } catch (error) {
+          logger.error(`[${requestData.request}] Unable to delete message`);
+          throw error;
         }
         // schedule receiving next message
         setTimeout(receiveMessage, 1000 * (config.aws.sqs.pollInterval || 60));
