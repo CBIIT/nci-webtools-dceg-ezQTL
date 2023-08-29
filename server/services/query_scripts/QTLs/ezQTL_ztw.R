@@ -634,7 +634,12 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       return(list(pall1, pall2))
     } else {
       ggsave(filename = paste0(output_plot_prefix, "_QC_overlapping.svg"), plot = pall1, width = 12, height = 12)
-      ggsave(filename = paste0(output_plot_prefix, "_QC_zscore.svg"), plot = pall2, width = 10, height = 8)
+      tryCatch(
+        ggsave(filename = paste0(output_plot_prefix, "_QC_zscore.svg"), plot = pall2, width = 10, height = 8),
+        error = function(e) {
+          print(e)
+        }
+      )
     }
 
 
@@ -835,7 +840,12 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       return(list(pall1, pall2))
     } else {
       ggsave(filename = paste0(output_plot_prefix, "_QC_overlapping.svg"), plot = pall1, width = 12, height = 12)
-      ggsave(filename = paste0(output_plot_prefix, "_QC_zscore.svg"), plot = pall2, width = 10, height = 8)
+      tryCatch(
+        ggsave(filename = paste0(output_plot_prefix, "_QC_zscore.svg"), plot = pall2, width = 10, height = 8),
+        error = function(e) {
+          print(e)
+        }
+      )
     }
 
 
@@ -1403,7 +1413,12 @@ ecaviar_visualize <- function(ecdata, output_plot_prefix = NULL, plot_width = NU
     if (is.null(plot_height)) {
       plot_height <- yleng
     }
-    ggsave(filename = output_plot, plot = p2, width = plot_width, height = plot_height)
+    tryCatch(
+      ggsave(filename = output_plot, plot = p2, width = plot_width, height = plot_height),
+      error = function(e) {
+        print(e)
+      }
+    )
   }
 }
 
