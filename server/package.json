@@ -7,7 +7,6 @@
   "scripts": {
     "start": "pm2-runtime start pm2.config.json --only prod",
     "start:dev": "pm2-runtime start pm2.config.json --only dev",
-    "start-queue-worker": "pm2-runtime start pm2.config.json --only queue-worker",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --single-quote --write \"**/*.{js,json}\""
   },

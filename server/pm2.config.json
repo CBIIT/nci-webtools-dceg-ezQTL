@@ -2,14 +2,14 @@
   "apps": [
     {
       "name": "prod",
-      "script": "app.js",
+      "script": "server.js",
       "node_args": "--require dotenv/config",
       "exec_mode": "cluster",
       "instances": "max"
     },
     {
       "name": "dev",
-      "script": "app.js",
+      "script": "server.js",
       "node_args": "--require dotenv/config",
       "watch": ["."],
       "ignore_watch": ["node_modules", "data", "input", "output", "logs"]
