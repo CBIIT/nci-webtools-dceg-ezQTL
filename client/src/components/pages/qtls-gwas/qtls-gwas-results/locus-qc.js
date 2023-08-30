@@ -94,7 +94,7 @@ export function LocusQC() {
           )}
           {request && (
             <Zoom
-              plotURL={`api/results/${request}/${request}_QC_QTLminP.svg`}
+              plotURL={`api/data/${request}/${request}_QC_QTLminP.svg`}
               plotId="1"
               className="border rounded p-3 mb-2"
               maxHeight="800px"
@@ -114,7 +114,7 @@ export function LocusQC() {
 
           {gwasFile || gwasKey ? (
             <Zoom
-              plotURL={`api/results/${request}/${request}_QC_overlapping.svg`}
+              plotURL={`api/data/${request}/${request}_QC_overlapping.svg`}
               plotId="2"
               className="border rounded p-3 mb-2"
               maxHeight="1000px"
@@ -139,7 +139,7 @@ export function LocusQC() {
 
           {gwasFile || gwasKey ? (
             <Zoom
-              plotURL={`api/results/${request}/${request}_QC_zscore.svg`}
+              plotURL={`api/data/${request}/${request}_QC_zscore.svg`}
               plotId="3"
               className="border rounded p-3"
               maxHeight="800px"

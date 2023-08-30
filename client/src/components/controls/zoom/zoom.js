@@ -41,7 +41,7 @@ export default function Zoom({
   async function downloadData(txtPath) {
     setLoading(true);
     try {
-      const response = await fetch(`api/results/${txtPath}`);
+      const response = await fetch(`api/data/${txtPath}`);
 
       if (!response.ok) {
         const { msg } = await response.json();
