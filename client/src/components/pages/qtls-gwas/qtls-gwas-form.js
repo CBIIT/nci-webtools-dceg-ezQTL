@@ -488,8 +488,6 @@ export function QTLsGWASForm() {
     }
   }
 
-  console.log(ldPublic);
-
   const accordionComponents = [
     {
       title: 'Association Data',
@@ -1365,7 +1363,6 @@ export function QTLsGWASForm() {
             className="w-100"
             variant={isError ? 'danger' : 'secondary'}
             onClick={() => handleReset()}
-            disabled={submitted && isLoading}
           >
             Reset
           </Button>
