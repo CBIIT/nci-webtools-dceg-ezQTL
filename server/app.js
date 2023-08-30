@@ -1,8 +1,8 @@
-const process = require('process');
-const express = require('express');
-const config = require('./config.json');
-const logger = require('./services/logger');
-const { apiRouter } = require('./services/api');
+import process from 'process';
+import express from 'express';
+import config from './config.json' assert { type: 'json' };
+import logger from './services/logger.js';
+import { apiRouter } from './services/api.js';
 
 logger.info(`[${process.pid}] Started worker process`);
 

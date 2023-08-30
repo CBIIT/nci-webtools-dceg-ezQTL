@@ -1,15 +1,15 @@
-const fs = require('fs');
-const path = require('path');
-const AWS = require('aws-sdk');
-const nodemailer = require('nodemailer');
-const r = require('r-wrapper').async;
-const tar = require('tar');
-var _ = require('lodash');
-const config = require('./config.json');
-const logger = require('./services/logger');
-const { Worker, isMainThread, workerData } = require('worker_threads');
+import fs from 'fs';
+import path from 'path';
+import AWS from 'aws-sdk';
+import nodemailer from 'nodemailer';
+import { async as r } from 'r-wrapper';
+import tar from 'tar';
+import _ from 'lodash';
+import config from './config.json';
+import logger from './services/logger';
+import { Worker, isMainThread, workerData } from 'worker_threads';
 
-const {
+import {
   calculateQC,
   calculateMain,
   calculateHyprcolocLD,
@@ -17,7 +17,7 @@ const {
   calculateECAVIAR,
   calculateHyprcoloc,
   calculateColocVisualize,
-} = require('./services/calculate');
+} from './services/calculate';
 
 const workingDirectory = path.resolve(config.R.workDir);
 

@@ -1,9 +1,10 @@
-const r = require('r-wrapper').async;
-const path = require('path');
-const logger = require('../services/logger');
-const config = require('../config');
-const AWS = require('aws-sdk');
-const fs = require('fs');
+import rWrapper from 'r-wrapper';
+import path from 'path';
+import logger from '../services/logger.js';
+import config from '../config.json' assert { type: 'json' };
+import AWS from 'aws-sdk';
+import fs from 'fs';
+const r = rWrapper.async;
 
 const awsInfo = config.aws;
 AWS.config.update(awsInfo);
@@ -516,7 +517,7 @@ async function qtlsCalculateLD(params, res, next) {
   }
 }
 
-module.exports = {
+export {
   calculateMain,
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,

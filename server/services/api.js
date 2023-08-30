@@ -1,9 +1,10 @@
-const express = require('express');
-const compression = require('compression');
-const config = require('../config');
-const logger = require('./logger');
-const path = require('path');
-const {
+import express from 'express';
+import compression from 'compression';
+import config from '../config.json' assert { type: 'json' };
+import logger from './logger.js';
+import path from 'path';
+
+import {
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
   qtlsCalculateLocusColocalizationHyprcoloc,
@@ -12,15 +13,16 @@ const {
   qtlsCalculateLD,
   qtlsColocVisualize,
   qtlsCalculateQuantification,
-} = require('./calculate');
+} from './calculate.js';
+
 const apiRouter = express.Router();
-const multer = require('multer');
-const fs = require('fs-extra');
-const XLSX = require('xlsx');
-const AWS = require('aws-sdk');
-const tar = require('tar');
-const Papa = require('papaparse');
-const { validate, v1: uuidv1 } = require('uuid');
+import multer from 'multer';
+import fs from 'fs-extra';
+import XLSX from 'xlsx';
+import AWS from 'aws-sdk';
+import tar from 'tar';
+import Papa from 'papaparse';
+import { validate, v1 as uuidv1 } from 'uuid';
 
 const dataDir = path.resolve(config.data.folder);
 const tmpDir = path.resolve(config.tmp.folder);
@@ -417,4 +419,4 @@ apiRouter.post('/qtls-recalculate-quantification', (req, res, next) =>
   )
 );
 
-module.exports = { apiRouter };
+export { apiRouter };
