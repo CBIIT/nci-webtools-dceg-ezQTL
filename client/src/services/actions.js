@@ -1402,44 +1402,44 @@ export function uploadFile(params) {
 
     try {
       const res = await axios.post('api/file-upload', form, config);
-      if (res.data.files && res.data.files.length > 0) {
-        dispatch(
-          updateQTLsGWAS({
-            associationFile:
-              res.data.body.associationFileName !== 'false'
-                ? res.data.files.filter(
-                    (item) =>
-                      item.filename === res.data.body.associationFileName
-                  )[0].filename
-                : false,
-            quantificationFile:
-              res.data.body.quantificationFileName !== 'false'
-                ? res.data.files.filter(
-                    (item) =>
-                      item.filename === res.data.body.quantificationFileName
-                  )[0].filename
-                : false,
-            genotypeFile:
-              res.data.body.genotypeFileName !== 'false'
-                ? res.data.files.filter(
-                    (item) => item.filename === res.data.body.genotypeFileName
-                  )[0].filename
-                : false,
-            gwasFile:
-              res.data.body.gwasFileName !== 'false'
-                ? res.data.files.filter(
-                    (item) => item.filename === res.data.body.gwasFileName
-                  )[0].filename
-                : false,
-            LDFile:
-              res.data.body.LDFileName !== 'false'
-                ? res.data.files.filter(
-                    (item) => item.filename === res.data.body.LDFileName
-                  )[0].filename
-                : false,
-          })
-        );
-      }
+      // if (res.data.files && res.data.files.length > 0) {
+      //   dispatch(
+      //     updateQTLsGWAS({
+      //       associationFile:
+      //         res.data.body.associationFileName !== 'false'
+      //           ? res.data.files.filter(
+      //               (item) =>
+      //                 item.filename === res.data.body.associationFileName
+      //             )[0].filename
+      //           : false,
+      //       quantificationFile:
+      //         res.data.body.quantificationFileName !== 'false'
+      //           ? res.data.files.filter(
+      //               (item) =>
+      //                 item.filename === res.data.body.quantificationFileName
+      //             )[0].filename
+      //           : false,
+      //       genotypeFile:
+      //         res.data.body.genotypeFileName !== 'false'
+      //           ? res.data.files.filter(
+      //               (item) => item.filename === res.data.body.genotypeFileName
+      //             )[0].filename
+      //           : false,
+      //       gwasFile:
+      //         res.data.body.gwasFileName !== 'false'
+      //           ? res.data.files.filter(
+      //               (item) => item.filename === res.data.body.gwasFileName
+      //             )[0].filename
+      //           : false,
+      //       LDFile:
+      //         res.data.body.LDFileName !== 'false'
+      //           ? res.data.files.filter(
+      //               (item) => item.filename === res.data.body.LDFileName
+      //             )[0].filename
+      //           : false,
+      //     })
+      //   );
+      // }
       dispatch(updateQTLsGWAS({ isLoading: false }));
     } catch (error) {
       console.log(error);

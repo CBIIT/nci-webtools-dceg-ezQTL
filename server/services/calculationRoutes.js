@@ -1,0 +1,417 @@
+import Router from 'express-promise-router';
+import { check } from 'express-validator';
+import path from 'path';
+import multer from 'multer';
+import fs from 'fs-extra';
+import XLSX from 'xlsx';
+import tar from 'tar';
+import { validate, v1 as uuidv1 } from 'uuid';
+import { parseCSV, mkdirs } from './utils.js';
+import { downloadDirectory } from './s3.js';
+import {
+  qtlsCalculateMain,
+  qtlsCalculateLocusAlignmentBoxplots,
+  qtlsCalculateLocusColocalizationHyprcoloc,
+  qtlsCalculateLocusColocalizationECAVIAR,
+  qtlsCalculateQC,
+  qtlsCalculateLD,
+  qtlsColocVisualize,
+  qtlsCalculateQuantification,
+} from './calculate.js';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default function calculationRoutes(env) {
+  const router = Router();
+  const dataDir = path.resolve(env.DATA_FOLDER);
+  const outputDir = path.resolve(env.OUTPUT_FOLDER);
+  const workingDirectory = path.resolve(__dirname, '../..'); // project root
+
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      const { request_id } = req.body;
+      const uploadDir = path.resolve(outputDir, request_id);
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir);
+      }
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      cb(null, file.originalname);
+    },
+  });
+  const upload = multer({ storage: storage });
+  const validateRequest = check('request').isUUID();
+
+  // add cache-control headers to GET requests
+  // router.use((request, response, next) => {
+  //   if (request.method === 'GET')
+  //     response.set(`Cache-Control', 'public, max-age=${60 * 60}`);
+  //   next();
+  // });
+
+  // file upload route
+  router.post(
+    '/file-upload',
+    check('request_id').isUUID(),
+    upload.any(),
+    async (req, res) => {
+      res.json(true);
+      //   const { logger } = req.app.locals;
+      //   logger.info(`[${req.body.request_id}] Execute /file-upload`);
+      //   logger.debug(
+      //     `[${req.body.request_id}] Parameters ${JSON.stringify(
+      //       req.body,
+      //       undefined,
+      //       4
+      //     )}`
+      //   );
+      //   try {
+      //     logger.info(`[${req.body.request_id}] Finished /file-upload`);
+      //     res.json({
+      //       files: req.files,
+      //       body: req.body,
+      //     });
+      //   } catch (err) {
+      //     logger.error(`[${req.body.request_id}] Error /file-upload ${err}`);
+      //     res.status(500).json(err);
+      //   }
+    }
+  );
+
+  // calculation routes
+  router.post('/qtls-calculate-main', async (req, res) => {
+    req.setTimeout(900000);
+    res.setTimeout(900000, () => {
+      res.status(504).send('Calculation Timed Out');
+    });
+
+    res.json(
+      await qtlsCalculateMain(
+        {
+          ...req.body,
+          workingDirectory,
+          bucket: env.DATA_BUCKET,
+        },
+        req.app.locals.logger,
+        env
+      )
+    );
+  });
+
+  // get list of public data options
+  router.post('/getPublicGTEx', async (req, res) => {
+    const workbook = XLSX.readFile(
+      path.resolve(env.DATA_FOLDER, 'vQTL2_resource.xlsx')
+    );
+    const sheetNames = workbook.SheetNames;
+    const data = sheetNames.reduce(
+      (acc, sheet) => ({
+        ...acc,
+        [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
+      }),
+      {}
+    );
+
+    res.json(data);
+  });
+
+  //   router.post('/queue', async (req, res, next) => {
+  //     const { logger } = req.app.locals;
+  //     const { request, multi } = req.body;
+  //     const sqs = new AWS.SQS();
+  //     const wd = path.join(outputDir, '/', request);
+
+  //     if (!fs.existsSync(wd)) {
+  //       fs.mkdirSync(wd);
+  //     }
+  //     fs.writeFileSync(path.join(wd, 'params.json'), JSON.stringify(req.body));
+  //     try {
+  //       logger.debug(`Uploading: ${fs.readdirSync(wd)}`);
+  //       await new AWS.S3()
+  //         .upload({
+  //           Body: tar.c({ gzip: true, C: outputDir }, [request]),
+  //           Bucket: env.IO_BUCKET,
+  //           Key: `${env.INPUT_KEY_PREFIX}/${request}/${request}.tgz`,
+  //         })
+  //         .promise();
+
+  //       const { QueueUrl } = await sqs
+  //         // .getQueueUrl({ QueueName: awsInfo.sqs.url })
+  //         .promise();
+
+  //       await sqs
+  //         .sendMessage({
+  //           QueueUrl: QueueUrl,
+  //           MessageDeduplicationId: request,
+  //           MessageGroupId: request,
+  //           MessageBody: JSON.stringify({
+  //             ...req.body,
+  //             timestamp: new Date().toLocaleString('en-US', {
+  //               timeZone: 'America/New_York',
+  //             }),
+  //           }),
+  //         })
+  //         .promise();
+
+  //       logger.info('Queue submitted request: ' + request);
+  //       res.json({ request });
+  //     } catch (err) {
+  //       logger.info('Queue failed to submit request: ' + request);
+  //       next(err);
+  //     }
+  //   });
+
+  router.post('/fetch-results', validateRequest, async (req, res) => {
+    const { logger } = req.app.locals;
+
+    try {
+      const { request } = req.body;
+
+      logger.info(`Fetch Queue Result: ${request}`);
+
+      // validate request id
+      //   if (!validate(request.substring(0, 36)))
+      //     next(new Error(`Invalid request`));
+
+      // ensure output directory exists
+      const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request);
+      await mkdirs([resultsFolder]);
+
+      // find objects which use the specified request as the prefix
+      //   const objects = await s3
+      //     .listObjectsV2({
+      //       Bucket: env.IO_BUCKET,
+      //       Prefix: `${env.OUTPUT_KEY_PREFIX}/${request}/`,
+      //     })
+      //     .promise();
+
+      //   // download results
+      //   for (let { Key } of objects.Contents) {
+      //     const filename = path.basename(Key);
+      //     const filepath = path.resolve(resultsFolder, filename);
+
+      //     // download files if they do not exist
+      //     if (!fs.existsSync(filepath)) {
+      //       logger.debug(`Downloading file: ${Key}`);
+
+      //       const object = await s3
+      //         .getObject({
+      //           Bucket: env.IO_BUCKET,
+      //           Key,
+      //         })
+      //         .promise();
+
+      //       await fs.promises.writeFile(filepath, object.Body);
+      //       // extract and delete archive
+      //       if (path.extname(filename) == '.tgz') {
+      //         logger.debug(`Extracting ${filename} to ${resultsFolder}`);
+      //         fs.createReadStream(filepath).pipe(
+      //           tar.x({ strip: 1, C: resultsFolder }),
+      //           (err) => {
+      //             if (err) logger.error(err);
+      //             else {
+      //               logger.debug('Extraction done');
+      //               fs.unlink(filepath, (err) => {
+      //                 if (err) {
+      //                   logger.error(`Failed to delete ${filename}`);
+      //                 } else {
+      //                   logger.debug(`Deleted ${filename}`);
+      //                 }
+      //               });
+      //             }
+      //           }
+      //         );
+      //       }
+      //     }
+      //   }
+      await downloadDirectory(
+        resultsFolder,
+        `${env.OUTPUT_KEY_PREFIX}/${request}/`,
+        env.IO_BUCKET,
+        { region: env.AWS_DEFAULT_REGION }
+      );
+
+      let stateFilePath = path.resolve(resultsFolder, `state.json`);
+
+      if (fs.existsSync(stateFilePath)) {
+        let data = JSON.parse(
+          String(await fs.promises.readFile(stateFilePath))
+        );
+
+        res.json(data);
+      } else {
+        next(new Error(`Params not found`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/fetch-sample', async (req, res, next) => {
+    const { logger } = req.app.locals;
+
+    logger.info(`Fetching Sample`);
+    try {
+      const request_id = uuidv1();
+      const sampleArchive = path.resolve(env.DATA_FOLDER, 'sample/sample.tgz');
+      const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request_id);
+
+      // ensure output directory exists
+      await fs.promises.mkdir(resultsFolder, { recursive: true });
+
+      // copy sample to resultsFolder
+      await fs.copy(path.resolve(env.DATA_FOLDER, 'sample'), resultsFolder);
+
+      // extract files
+      await new Promise((resolve, reject) => {
+        fs.createReadStream(sampleArchive)
+          .on('end', () => resolve())
+          .on('error', (err) => reject(err))
+          .pipe(tar.x({ strip: 1, C: resultsFolder }));
+      });
+
+      let stateFilePath = path.resolve(resultsFolder, `state.json`);
+
+      if (fs.existsSync(stateFilePath)) {
+        let data = JSON.parse(
+          String(await fs.promises.readFile(stateFilePath))
+        );
+
+        // rename files
+        const oldRequest = data.state.request;
+        const files = fs.readdirSync(resultsFolder);
+        files.forEach((file) =>
+          fs.renameSync(
+            path.resolve(resultsFolder, file),
+            path.resolve(resultsFolder, file.replace(oldRequest, request_id))
+          )
+        );
+
+        // replace request id
+        data.state.request = request_id;
+        data.state.inputs.request[0] = request_id;
+
+        res.json(data);
+      } else {
+        next(new Error(`Params not found`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Publications page data
+  router.get('/getPublications', async (req, res, next) => {
+    try {
+      const csv = await parseCSV(
+        path.resolve(dataDir, 'vQTL2_resource_simple.csv')
+      );
+
+      res.json(csv);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // download work session
+  router.get('/locus-download/:request', validateRequest, (req, res, next) => {
+    const { request } = req.params;
+    res.attachment(`${request}.tar.gz`);
+    tar.c({ gzip: true, cwd: outputDir }, [request]).pipe(res);
+  });
+
+  router.post('/qtls-locus-alignment-boxplots', (req, res, next) =>
+    qtlsCalculateLocusAlignmentBoxplots(
+      {
+        ...req.body,
+        workingDirectory,
+        bucket: env.DATA_BUCKET,
+      },
+      req,
+      res,
+      next
+    )
+  );
+
+  router.post('/qtls-locus-colocalization-hyprcoloc', async (req, res) =>
+    res.json(
+      await qtlsCalculateLocusColocalizationHyprcoloc(
+        {
+          ...req.body,
+          workingDirectory,
+          bucket: env.DATA_BUCKET,
+        },
+        req.app.locals.logger,
+        env
+      )
+    )
+  );
+
+  router.post('/qtls-locus-colocalization-ecaviar', async (req, res) => {
+    req.setTimeout(900000);
+    res.setTimeout(900000, () => {
+      res.status(504).send('Calculation Timed Out');
+    });
+    res.json(
+      await qtlsCalculateLocusColocalizationECAVIAR(
+        {
+          ...req.body,
+          workingDirectory,
+          bucket: env.DATA_BUCKET,
+        },
+        req.app.locals.logger,
+        env
+      )
+    );
+  });
+
+  router.post('/qtls-locus-qc', async (req, res) =>
+    res.json(
+      await qtlsCalculateQC(
+        {
+          ...req.body,
+          workingDirectory,
+          bucket: env.DATA_BUCKET,
+        },
+        req.app.locals.logger,
+        env
+      )
+    )
+  );
+
+  router.post('/qtls-coloc-visualize', async (req, res) =>
+    res.json(await qtlsColocVisualize(req.body, req.app.locals.logger, env))
+  );
+
+  router.post('/qtls-locus-ld', async (req, res) =>
+    res.json(
+      await qtlsCalculateLD(
+        {
+          ...req.body,
+          workingDirectory,
+          bucket: env.DATA_BUCKET,
+        },
+        req.app.locals.logger,
+        env
+      )
+    )
+  );
+
+  router.post('/qtls-recalculate-quantification', async (req, res) =>
+    res.json(
+      await qtlsCalculateQuantification(
+        {
+          ...req.body,
+          workingDirectory,
+          bucket: env.DATA_BUCKET,
+        },
+        req.app.locals.logger,
+        env
+      )
+    )
+  );
+  return router;
+}

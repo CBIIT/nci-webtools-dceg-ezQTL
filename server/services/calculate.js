@@ -1,13 +1,10 @@
 import rWrapper from 'r-wrapper';
 import path from 'path';
-import logger from '../services/logger.js';
-import config from '../config.json' assert { type: 'json' };
-import AWS from 'aws-sdk';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const r = rWrapper.async;
-
-const awsInfo = config.aws;
-AWS.config.update(awsInfo);
 
 async function calculateMain(params) {
   const {
@@ -72,35 +69,31 @@ async function calculateMain(params) {
   );
 }
 
-async function qtlsCalculateMain(params, req, res, next) {
-  req.setTimeout(900000);
-  res.setTimeout(900000, () => {
-    res.status(504).send('Calculation Timed Out');
-  });
+async function qtlsCalculateMain(params, logger, env) {
   const { request } = params;
   logger.info(`[${request}] Execute /qtls-calculate-main`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  // logger.debug(
+  //   `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
+  // );
+
+  // try {
+  const wrapper = await calculateMain(params);
+  logger.info(`[${request}] Finished /qtls-calculate-main`);
+
+  const logPath = path.resolve(
+    params.workingDirectory,
+    'tmp',
+    request,
+    'ezQTL.log'
   );
 
-  try {
-    const wrapper = await calculateMain(params);
-    logger.info(`[${request}] Finished /qtls-calculate-main`);
+  const summary = getSummary(logPath);
 
-    const logPath = path.resolve(
-      params.workingDirectory,
-      'tmp',
-      request,
-      'ezQTL.log'
-    );
-
-    const summary = getSummary(logPath);
-
-    res.json({ ...JSON.parse(wrapper), summary });
-  } catch (err) {
-    logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
-    res.status(500).json(err);
-  }
+  return { ...JSON.parse(wrapper), summary };
+  // } catch (err) {
+  //   logger.error(`[${request}] Error /qtls-calculate-main ${err}`);
+  //   res.status(500).json(err);
+  // }
 }
 async function calculateQuantification(params) {
   const {
@@ -133,7 +126,7 @@ async function calculateQuantification(params) {
   );
 }
 
-async function qtlsCalculateQuantification(params, res, next) {
+async function qtlsCalculateQuantification(params, logger, env) {
   const { request } = params;
 
   logger.info(`[${request}] Execute /calculate-quantification`);
@@ -141,17 +134,17 @@ async function qtlsCalculateQuantification(params, res, next) {
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  try {
-    const wrapper = await calculateQuantification(params);
-    logger.info(`[${request}] Finished /calculate-quantification`);
-    res.json(wrapper);
-  } catch (err) {
-    logger.error(`[${request}] Error /calculate-quantification ${err}`);
-    res.status(500).json(err);
-  }
+  // try {
+  const wrapper = await calculateQuantification(params);
+  logger.info(`[${request}] Finished /calculate-quantification`);
+  return JSON.parse(wrapper);
+  // } catch (err) {
+  //   logger.error(`[${request}] Error /calculate-quantification ${err}`);
+  //   res.status(500).json(err);
+  // }
 }
 
-async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
+async function qtlsCalculateLocusAlignmentBoxplots(params, logger, env) {
   const {
     request,
     quantificationFile,
@@ -167,26 +160,26 @@ async function qtlsCalculateLocusAlignmentBoxplots(params, req, res, next) {
   );
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
-  try {
-    const wrapper = await r(
-      path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
-      'qtlsCalculateLocusAlignmentBoxplots',
-      [
-        rfile,
-        workingDirectory.toString(),
-        quantificationFile.toString(),
-        genotypeFile.toString(),
-        JSON.stringify(info),
-        request.toString(),
-        bucket.toString(),
-      ]
-    );
-    logger.info(`[${request}] Finished /qtls-locus-alignment-boxplots`);
-    res.json(JSON.parse(wrapper));
-  } catch (err) {
-    logger.error(`[${request}] Error /qtls-locus-alignment-boxplots ${err}`);
-    res.status(500).json(err);
-  }
+  // try {
+  const wrapper = await r(
+    path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
+    'qtlsCalculateLocusAlignmentBoxplots',
+    [
+      rfile,
+      workingDirectory.toString(),
+      quantificationFile.toString(),
+      genotypeFile.toString(),
+      JSON.stringify(info),
+      request.toString(),
+      bucket.toString(),
+    ]
+  );
+  logger.info(`[${request}] Finished /qtls-locus-alignment-boxplots`);
+  return JSON.parse(wrapper);
+  // } catch (err) {
+  //   logger.error(`[${request}] Error /qtls-locus-alignment-boxplots ${err}`);
+  //   res.status(500).json(err);
+  // }
 }
 
 async function calculateHyprcoloc(params) {
@@ -225,12 +218,7 @@ async function calculateHyprcoloc(params) {
   );
 }
 
-async function qtlsCalculateLocusColocalizationHyprcoloc(
-  params,
-  req,
-  res,
-  next
-) {
+async function qtlsCalculateLocusColocalizationHyprcoloc(params, logger, env) {
   const { request } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-hyprcoloc`);
@@ -238,25 +226,25 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  try {
-    const wrapper = await calculateHyprcoloc(params);
-    logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);
-    res.json(JSON.parse(wrapper));
-  } catch (error) {
-    logger.error(
-      `[${request}] Error /qtls-locus-colocalization-hyprcoloc ${error}`
-    );
+  // try {
+  const wrapper = await calculateHyprcoloc(params);
+  logger.info(`[${request}] Finished /qtls-locus-colocalization-hyprcoloc`);
+  return JSON.parse(wrapper);
+  // } catch (error) {
+  //   logger.error(
+  //     `[${request}] Error /qtls-locus-colocalization-hyprcoloc ${error}`
+  //   );
 
-    const logPath = path.resolve(
-      params.workingDirectory,
-      'tmp',
-      request,
-      'ezQTL.log'
-    );
-    const summary = getSummary(logPath);
+  //   const logPath = path.resolve(
+  //     params.workingDirectory,
+  //     'tmp',
+  //     request,
+  //     'ezQTL.log'
+  //   );
+  //   const summary = getSummary(logPath);
 
-    res.status(500).json({ error, summary });
-  }
+  //   res.status(500).json({ error, summary });
+  // }
 }
 
 function calculateECAVIAR(params) {
@@ -294,11 +282,7 @@ function calculateECAVIAR(params) {
   );
 }
 
-async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
-  req.setTimeout(900000);
-  res.setTimeout(900000, () => {
-    res.status(504).send('Calculation Timed Out');
-  });
+async function qtlsCalculateLocusColocalizationECAVIAR(params, logger, env) {
   const { request } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-ecaviar`);
@@ -306,24 +290,25 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, req, res, next) {
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  try {
-    const wrapper = await calculateECAVIAR(params);
-    logger.info(`[${request}] Finished /qtls-locus-colocalization-ecaviar`);
-    res.json(JSON.parse(wrapper));
-  } catch (err) {
-    logger.error(
-      `[${request}] Error /qtls-locus-colocalization-ecaviar ${err}`
-    );
-    res.status(500).json(err);
-  }
+  // try {
+  const wrapper = await calculateECAVIAR(params);
+  logger.info(`[${request}] Finished /qtls-locus-colocalization-ecaviar`);
+  return JSON.parse(wrapper);
+  // res.json(JSON.parse(wrapper));
+  // } catch (err) {
+  //   logger.error(
+  //     `[${request}] Error /qtls-locus-colocalization-ecaviar ${err}`
+  //   );
+  //   res.status(500).json(err);
+  // }
 }
 
-function calculateColocVisualize(params) {
+function calculateColocVisualize(params, logger, env) {
   const { request, hydata, ecdata } = params;
 
   const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
   const requestPath = path.resolve(
-    config.tmp.folder,
+    env.OUTPUT_FOLDER,
     request,
     request + '_Summary.svg'
   );
@@ -335,22 +320,22 @@ function calculateColocVisualize(params) {
   );
 }
 
-async function qtlsColocVisualize(params, res, next) {
+async function qtlsColocVisualize(params, logger, env) {
   const { request } = params;
 
   logger.info(`[${request}] Execute /coloc-visualize`);
 
-  try {
-    const wrapper = await calculateColocVisualize(params);
-    logger.info(`[${request}] Finished /colc-visualize`);
-    res.json(wrapper);
-  } catch (err) {
-    logger.error(`[${request}] Error /colc-visualize ${err}`);
-    res.status(500).json(err);
-  }
+  // try {
+  const wrapper = await calculateColocVisualize(params);
+  logger.info(`[${request}] Finished /colc-visualize`);
+  return JSON.parse(wrapper);
+  // } catch (err) {
+  //   logger.error(`[${request}] Error /colc-visualize ${err}`);
+  //   res.status(500).json(err);
+  // }
 }
 
-async function calculateQC(params) {
+async function calculateQC(params, logger) {
   const {
     request,
     gwasFile,
@@ -427,26 +412,23 @@ function getSummary(path) {
     : null;
 }
 
-async function qtlsCalculateQC(params, res, next) {
+async function qtlsCalculateQC(params, logger, env) {
   const { request, workingDirectory } = params;
 
   logger.info(`[${request}] Execute /qtlsCalculateQC`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
 
-  try {
-    const { error, ...rest } = await calculateQC(params);
+  // try {
+  const { error, ...rest } = await calculateQC(params, logger);
 
-    const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
-    const summary = getSummary(logPath);
+  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
+  const summary = getSummary(logPath);
 
-    logger.info(`[${request}] Finished /qtlsCalculateQC`);
-    res.json({ summary: summary, error: error || false, ...rest });
-  } catch (err) {
-    logger.error(`[${request}] Error /qtlsCalculateQC ${err}`);
-    res.status(500).json(err);
-  }
+  logger.info(`[${request}] Finished /qtlsCalculateQC`);
+  return { summary: summary, error: error || false, ...rest };
+  // } catch (err) {
+  //   logger.error(`[${request}] Error /qtlsCalculateQC ${err}`);
+  //   res.status(500).json(err);
+  // }
 }
 
 async function calculateLocusLD(params) {
@@ -499,7 +481,7 @@ async function calculateLocusLD(params) {
   );
 }
 
-async function qtlsCalculateLD(params, res, next) {
+async function qtlsCalculateLD(params, logger, env) {
   const { request } = params;
 
   logger.info(`[${request}] Execute /calculateLD`);
@@ -507,14 +489,14 @@ async function qtlsCalculateLD(params, res, next) {
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  try {
-    const wrapper = await calculateLocusLD(params);
-    logger.info(`[${request}] Finished /calculateLD`);
-    res.json(wrapper);
-  } catch (err) {
-    logger.error(`[${request}] Error /calculateLD ${err}`);
-    res.status(500).json(err);
-  }
+  // try {
+  const wrapper = await calculateLocusLD(params);
+  logger.info(`[${request}] Finished /calculateLD`);
+  return wrapper;
+  // } catch (err) {
+  //   logger.error(`[${request}] Error /calculateLD ${err}`);
+  //   res.status(500).json(err);
+  // }
 }
 
 export {
