@@ -1,41 +1,49 @@
-import { info } from 'console';
-import path from 'path';
-import { createLogger, format, transports } from 'winston';
-import config from '../config.json' assert { type: 'json' };
-import 'winston-daily-rotate-file';
-const { Console, DailyRotateFile } = transports;
-const { folder: logFolder, level: logLevel } = config.logs;
+import { inspect } from 'util';
+import {
+  createLogger as createWinstonLogger,
+  format,
+  transports,
+} from 'winston';
+import pick from 'lodash/pick.js';
+import isEmpty from 'lodash/isEmpty.js';
 
-export default new createLogger({
-  level: logLevel || 'info',
-  format: format.combine(
-    format.errors({ stack: true }), // <-- use errors format
-    // format.colorize(),
-    format.timestamp(),
-    format.prettyPrint(),
-    format.label({ label: '[ezQTL]' }),
-    format.timestamp({
-      format: 'YYYY-MM-DD HH:mm:ss',
-    }),
-    format.printf(({ level, message, timestamp, stack }) => {
-      if (stack) {
-        // print log trace
-        return `[${timestamp}] [${level}] ${message} - ${stack}`;
-      }
-      return `[${timestamp}] [${level}] ${message}`;
-    })
-  ),
-  transports: [
-    new Console(),
-    new DailyRotateFile({
-      filename: path.resolve(logFolder, 'application-%DATE%.log'),
-      datePattern: 'YYYY-MM-DD-HH',
-      zippedArchive: false,
-      maxSize: '1024m',
-      timestamp: true,
-      maxFiles: '1d',
-      prepend: true,
-    }),
-  ],
-  exitOnError: false,
-});
+export function formatObject(object) {
+  if (object instanceof Error) {
+    const errorObject = pick(object, [
+      'code',
+      'message',
+      'stack',
+      'stdout',
+      'stderr',
+    ]);
+    return formatObject(errorObject);
+  } else if (typeof object === 'string' || typeof object === 'number') {
+    return String(object);
+  } else if (object === null || object === undefined || isEmpty(object)) {
+    return '';
+  } else {
+    return inspect(object, {
+      depth: null,
+      compact: true,
+      breakLength: Infinity,
+    });
+  }
+}
+
+export function createLogger(name, level = 'info') {
+  return new createWinstonLogger({
+    level: level,
+    format: format.combine(
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      format.label({ label: name }),
+      format.printf(
+        (e) =>
+          `[${e.label}] [${e.timestamp}] [${e.level}] - ${formatObject(
+            e.message
+          )}`
+      )
+    ),
+    transports: [new transports.Console()],
+    exitOnError: false,
+  });
+}
