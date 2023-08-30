@@ -14,7 +14,6 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.400.0",
-    "aws-sdk": "^2.866.0",
     "compression": "^1.7.4",
     "dotenv": "^16.3.1",
     "express": "^4.17.1",
