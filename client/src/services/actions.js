@@ -2219,7 +2219,7 @@ export function getPublicGTEx() {
   };
 }
 
-export function submitQueue(data) {
+export function submitLong(data) {
   return async function (dispatch, getState) {
     dispatch(
       updateQTLsGWAS({
@@ -2229,12 +2229,12 @@ export function submitQueue(data) {
     );
 
     try {
-      const response = await axios.post('api/queue', data);
+      const response = await axios.post('api/submitLong', data);
       // console.log('api/queue', response);
       dispatch(
         updateSuccess({
           visible: true,
-          message: `Your job was successfully submitted to the queue. You will recieve an email at ${
+          message: `Your job was successfully submitted. You will recieve an email at ${
             data.multi ? data.params[0].email : data.params.email
           } with your results.`,
         })
@@ -2244,7 +2244,7 @@ export function submitQueue(data) {
       console.log(error);
       if (error) {
         dispatch(
-          updateError({ visible: true, message: 'Queue submission failed' })
+          updateError({ visible: true, message: 'Job submission failed' })
         );
         dispatch(
           updateQTLsGWAS({

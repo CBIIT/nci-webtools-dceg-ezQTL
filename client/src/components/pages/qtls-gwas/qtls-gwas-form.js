@@ -19,7 +19,7 @@ import {
   updateQTLsGWAS,
   getPublicGTEx,
   updateAlert,
-  submitQueue,
+  submitLong,
 } from '../../../services/actions';
 import Select from '../../controls/select/select';
 import Accordions from '../../controls/accordions/accordions';
@@ -476,9 +476,9 @@ export function QTLsGWASForm() {
 
     if (data.useQueue) {
       dispatch(
-        submitQueue({
+        submitLong({
           params:
-            params.length > 1 ? params : { ...params[0], request: request },
+            params.length > 1 ? params : { ...params[0], request },
           multi: params.length > 1,
           request,
         })
@@ -1277,7 +1277,7 @@ export function QTLsGWASForm() {
                     <Form.Check.Input
                       {...field}
                       className="mr-0"
-                      title="Choose Queued Submission Checkbox"
+                      title="Long Job Submission"
                       type="checkbox"
                       checked={useQueue}
                       disabled={submitted || locusInformation.length > 1}
@@ -1285,9 +1285,7 @@ export function QTLsGWASForm() {
                   )}
                 />
               </Form.Check>
-              <Form.Label className="mr-auto">
-                Submit this job to a Queue
-              </Form.Label>
+              <Form.Label className="mr-auto">Submit Long Job</Form.Label>
             </Form.Group>
           </Col>
         </Row>
@@ -1342,8 +1340,8 @@ export function QTLsGWASForm() {
               </Form.Control.Feedback>
               <Form.Text className="text-muted">
                 <i>
-                  Note: if sending to queue, when computation is completed, a
-                  notification will be sent to the e-mail entered above.
+                  Note: When computation is completed, a notification will be
+                  sent to your e-mail.
                 </i>
               </Form.Text>
             </Form.Group>

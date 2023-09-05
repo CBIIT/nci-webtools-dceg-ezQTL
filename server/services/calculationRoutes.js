@@ -6,8 +6,7 @@ import fs from 'fs-extra';
 import XLSX from 'xlsx';
 import tar from 'tar';
 import { validate, v1 as uuidv1 } from 'uuid';
-import { parseCSV, mkdirs } from './utils.js';
-import { downloadDirectory } from './s3.js';
+import { parseCSV, mkdirs, writeJson } from './utils.js';
 import {
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
@@ -19,12 +18,13 @@ import {
   qtlsCalculateQuantification,
 } from './calculate.js';
 import { fileURLToPath } from 'url';
+import { getWorker } from './workers.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default function calculationRoutes(env) {
   const router = Router();
-  const dataDir = path.resolve(env.DATA_FOLDER);
+  const dataDir = path.resolve(env.APP_DATA_FOLDER);
   const outputDir = path.resolve(env.OUTPUT_FOLDER);
   const workingDirectory = path.resolve(__dirname, '../..'); // project root
 
@@ -104,7 +104,7 @@ export default function calculationRoutes(env) {
   // get list of public data options
   router.post('/getPublicGTEx', async (req, res) => {
     const workbook = XLSX.readFile(
-      path.resolve(env.DATA_FOLDER, 'vQTL2_resource.xlsx')
+      path.resolve(env.APP_DATA_FOLDER, 'vQTL2_resource.xlsx')
     );
     const sheetNames = workbook.SheetNames;
     const data = sheetNames.reduce(
@@ -118,51 +118,28 @@ export default function calculationRoutes(env) {
     res.json(data);
   });
 
-  //   router.post('/queue', async (req, res, next) => {
-  //     const { logger } = req.app.locals;
-  //     const { request, multi } = req.body;
-  //     const sqs = new AWS.SQS();
-  //     const wd = path.join(outputDir, '/', request);
+  router.post('/submitLong', validateRequest, async (req, res) => {
+    const { request } = req.body;
+    const inputFolder = path.resolve(env.INPUT_FOLDER, request);
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
+    const paramsFilePath = path.resolve(inputFolder, 'params.json');
+    const statusFilePath = path.resolve(outputFolder, 'status.json');
+    await mkdirs([inputFolder, outputFolder]);
 
-  //     if (!fs.existsSync(wd)) {
-  //       fs.mkdirSync(wd);
-  //     }
-  //     fs.writeFileSync(path.join(wd, 'params.json'), JSON.stringify(req.body));
-  //     try {
-  //       logger.debug(`Uploading: ${fs.readdirSync(wd)}`);
-  //       await new AWS.S3()
-  //         .upload({
-  //           Body: tar.c({ gzip: true, C: outputDir }, [request]),
-  //           Bucket: env.IO_BUCKET,
-  //           Key: `${env.INPUT_KEY_PREFIX}/${request}/${request}.tgz`,
-  //         })
-  //         .promise();
+    const status = {
+      id: request,
+      status: 'SUBMITTED',
+      submittedAt: new Date(),
+    };
 
-  //       const { QueueUrl } = await sqs
-  //         // .getQueueUrl({ QueueName: awsInfo.sqs.url })
-  //         .promise();
+    await writeJson(paramsFilePath, req.body);
+    await writeJson(statusFilePath, status);
 
-  //       await sqs
-  //         .sendMessage({
-  //           QueueUrl: QueueUrl,
-  //           MessageDeduplicationId: request,
-  //           MessageGroupId: request,
-  //           MessageBody: JSON.stringify({
-  //             ...req.body,
-  //             timestamp: new Date().toLocaleString('en-US', {
-  //               timeZone: 'America/New_York',
-  //             }),
-  //           }),
-  //         })
-  //         .promise();
-
-  //       logger.info('Queue submitted request: ' + request);
-  //       res.json({ request });
-  //     } catch (err) {
-  //       logger.info('Queue failed to submit request: ' + request);
-  //       next(err);
-  //     }
-  //   });
+    const type = env.NODE_ENV === 'dev' ? 'local' : 'fargate';
+    const worker = getWorker(type);
+    worker(request, req.app, env);
+    res.json(request);
+  });
 
   router.post('/fetch-results', validateRequest, async (req, res) => {
     const { logger } = req.app.locals;
@@ -177,8 +154,8 @@ export default function calculationRoutes(env) {
       //     next(new Error(`Invalid request`));
 
       // ensure output directory exists
-      const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request);
-      await mkdirs([resultsFolder]);
+      const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
+      await mkdirs([outputFolder]);
 
       // find objects which use the specified request as the prefix
       //   const objects = await s3
@@ -227,14 +204,8 @@ export default function calculationRoutes(env) {
       //       }
       //     }
       //   }
-      await downloadDirectory(
-        resultsFolder,
-        `${env.OUTPUT_KEY_PREFIX}/${request}/`,
-        env.IO_BUCKET,
-        { region: env.AWS_DEFAULT_REGION }
-      );
 
-      let stateFilePath = path.resolve(resultsFolder, `state.json`);
+      let stateFilePath = path.resolve(outputFolder, `state.json`);
 
       if (fs.existsSync(stateFilePath)) {
         let data = JSON.parse(
@@ -256,14 +227,14 @@ export default function calculationRoutes(env) {
     logger.info(`Fetching Sample`);
     try {
       const request_id = uuidv1();
-      const sampleArchive = path.resolve(env.DATA_FOLDER, 'sample/sample.tgz');
+      const sampleArchive = path.resolve(env.APP_DATA_FOLDER, 'sample/sample.tgz');
       const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request_id);
 
       // ensure output directory exists
       await fs.promises.mkdir(resultsFolder, { recursive: true });
 
       // copy sample to resultsFolder
-      await fs.copy(path.resolve(env.DATA_FOLDER, 'sample'), resultsFolder);
+      await fs.copy(path.resolve(env.APP_DATA_FOLDER, 'sample'), resultsFolder);
 
       // extract files
       await new Promise((resolve, reject) => {
