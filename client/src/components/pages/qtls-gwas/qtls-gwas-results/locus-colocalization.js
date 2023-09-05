@@ -619,7 +619,7 @@ export function LocusColocalization() {
 
             {summaryLoaded && !summaryError && (
               <Zoom
-                plotURL={`api/data/${request}/${request}_Summary.svg`}
+                plotURL={`api/data/${request}/Summary.svg`}
                 className="border rounded p-3 mb-2"
                 maxHeight="1000px"
                 descAbove={
