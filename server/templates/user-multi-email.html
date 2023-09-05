@@ -9,19 +9,17 @@
 
   <body>
     Dear ezQTL User, <br />
-    <p>
-      The jobs you submitted to the ezQTL queue have completed.
-    </p>
+    <p>The jobs you submitted to the ezQTL queue have completed.</p>
     <b>Job Information</b>
-    {results}
+    <%= results %>
 
     <p>The results will be available for the next 7 days.</p>
     <p>For jobs with errors, please correct your settings and resubmit</p>
 
     <p>
       Please contact us at
-      <a href="mailto:{supportEmail}">{supportEmail}</a> for more information or
-      if you have any questions.
+      <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> for more
+      information or if you have any questions.
     </p>
 
     <p>

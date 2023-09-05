@@ -14,17 +14,17 @@
     </p>
     <b>Job Information</b>
     <ul style="list-style-type: none">
-      <li>Job Name: {jobName}</li>
-      <li>Submitted Time: {originalTimestamp} EST</li>
-      <li>Execution Time: {execTime}</li>
+      <li>Job Name: <%= jobName %></li>
+      <li>Submitted Time: <%= originalTimestamp %> EST</li>
+      <li>Execution Time: <%= execTime %></li>
     </ul>
     <b>Results:</b><br />
-    <a href="{resultsUrl}">{resultsUrl}</a>
+    <a href="<%= resultsUrl %>"><%= resultsUrl %></a>
     <p>The results will be available for the next 7 days.</p>
     <p>
       Please contact us at
-      <a href="mailto:{supportEmail}">{supportEmail}</a> for more information or
-      if you have any questions.
+      <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> for more
+      information or if you have any questions.
     </p>
 
     <p>

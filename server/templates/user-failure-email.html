@@ -12,20 +12,20 @@
     <p>
       The job you submitted to the ezQTL queue failed to be processed. Please
       correct your settings and resubmit or contact us at
-      <a href="mailto:{supportEmail}">{supportEmail}</a> for more information or
+      <a href="mailto:<%= supportEmail %>"><%= supportEmail %></a> for more information or
       if you have any questions.
     </p>
 
     <b>Job Information</b>
     <ul style="list-style-type: none">
-      <li>Job Name: {jobName}</li>
-      <li>ID: {request}</li>
-      <li>Submitted Time: {originalTimestamp} EST</li>
-      <li>Execution Time: {execTime}</li>
-      <li>Error Message: {userError}</li>
+      <li>Job Name: <%= jobName %></li>
+      <li>ID: <%= request %></li>
+      <li>Submitted Time: <%= originalTimestamp %> EST</li>
+      <li>Execution Time: <%= execTime %></li>
+      <li>Error Message: <%= userError %></li>
       
       <p><b>Logs:</b></p>
-      <p><pre>{summaryLog}</pre></p>
+      <p><pre><%= summaryLog %></pre></p>
     </ul>
 
     <p>
