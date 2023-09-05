@@ -5,6 +5,8 @@ export const required = [
   'APP_PORT',
   'APP_TIER',
   'LOG_LEVEL',
+  'APP_DATA_FOLDER',
+  'APP_SCRIPTS',
   'DATA_FOLDER',
   'INPUT_FOLDER',
   'OUTPUT_FOLDER',
@@ -21,7 +23,6 @@ export const required = [
   'SECURITY_GROUP_IDS',
   'ECS_CLUSTER',
   'WORKER_TASK_NAME',
-  'WORKER_TYPE',
 ];
 
 export function validateEnvironment(env = process.env, vars = required) {
