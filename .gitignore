@@ -2,6 +2,7 @@
 **/node_modules/
 angular/
 www/
+appData/
 
 # client
 client/build/
