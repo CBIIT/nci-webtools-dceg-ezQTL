@@ -692,7 +692,31 @@ main <- function(assocFile, exprFile, genoFile, gwasFile, LDFile, request, selec
   }
 
   ## combine results from QTLs modules calculations and return ##
-  dataSourceJSON <- c(toJSON(list(info = list(recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene, recalculateDist = recalculateDist, recalculateRef = recalculateRef, top_gene_variants = list(data = top_gene_variants_data), all_gene_variants = list(data = all_gene_variants_data), gene_list = list(data = gene_list_data), inputs = list(association_file = assocFile, quantification_file = exprFile, genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile), select_pop = select_pop, select_gene = select_gene, select_dist = select_dist, select_ref = select_ref, request = request), messages = list(warnings = warningMessages, errors = errorMessages)), locus_alignment = list(data = locus_alignment_data, rc = rcdata_region_data, top = qdata_top_annotation_data), locus_alignment_gwas_scatter = list(data = locus_alignment_gwas_scatter_data, title = locus_alignment_gwas_scatter_title), gwas = list(data = gwas_example_data), locus_colocalization_correlation = list(data = locus_colocalization_correlation_data))))
+  dataSourceJSON <- c(toJSON(list(
+    info = list(
+      recalculateAttempt = recalculateAttempt, recalculatePop = recalculatePop, recalculateGene = recalculateGene,
+      recalculateDist = recalculateDist, recalculateRef = recalculateRef,
+      top_gene_variants = list(data = top_gene_variants_data),
+      all_gene_variants = list(data = all_gene_variants_data),
+      gene_list = list(data = gene_list_data),
+      inputs = list(
+        association_file = assocFile, quantification_file = exprFile,
+        genotype_file = genoFile, gwas_file = gwasFile, ld_file = basename(LDFile),
+        select_pop = select_pop, select_gene = select_gene, select_dist = select_dist,
+        select_ref = select_ref, request = request
+      ),
+      messages = list(warnings = warningMessages, errors = errorMessages)
+    ), locus_alignment = list(
+      data = locus_alignment_data, rc = rcdata_region_data,
+      top = qdata_top_annotation_data
+    ),
+    locus_alignment_gwas_scatter = list(
+      data = locus_alignment_gwas_scatter_data,
+      title = locus_alignment_gwas_scatter_title
+    ),
+    gwas = list(data = gwas_example_data),
+    locus_colocalization_correlation = list(data = locus_colocalization_correlation_data)
+  )))
   ## remove all generated temporary files in the /tmp directory
 
   # unlink(paste0('tmp/*',request,'*'))
