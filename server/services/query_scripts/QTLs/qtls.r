@@ -1,27 +1,35 @@
-locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build) {
-  if (identical(recalculateAttempt, "false") || identical(recalculateGene, "true") || identical(recalculateDist, "true") || identical(recalculateRef, "true") || identical(recalculatePop, "true")) {
-    idx_path_grch37 <- "data/1kginfo"
-    idx_path_grch38 <- "data/1kginfo_GRCh38"
+appScriptsPath <- Sys.getenv("APP_SCRIPTS")
+appDataFolder <- Sys.getenv(("APP_DATA_FOLDER"))
+bucket <- Sys.getenv("DATA_BUCKET")
+
+locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist,
+                                          recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build) {
+  if (identical(recalculateAttempt, "false") || identical(recalculateGene, "true") ||
+    identical(recalculateDist, "true") || identical(recalculateRef, "true") ||
+    identical(recalculatePop, "true")) {
+    idx_path_grch37 <- file.path(appDataFolder, "1kginfo")
+    idx_path_grch38 <- file.path(appDataFolder, "1kginfo_GRCh38")
 
     idx_path <- ifelse(genome_build == "GRCh37", idx_path_grch37, idx_path_grch38)
 
-    cmd <- paste0("cd ", idx_path, "; bcftools view -O z -o ", in_path, " ", kgvcfpath, " ", chromosome, ":", minpos, "-", maxpos)
+    cmd <- paste0("cd ", idx_path, "; bcftools view -O z -o ", "../", in_path, " ", kgvcfpath, " ", chromosome, ":", minpos, "-", maxpos, ";")
     system(cmd)
     cmd <- paste0("bcftools index ", in_path)
     system(cmd)
   }
 }
 
-getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject) {
-  wd <- getwd() # project root
-  ldTemp <- paste0(wd, "/tmp/", request, "/", request, ".input.vcf.gz")
-  LDFile <- paste0(wd, "/tmp/", request, "/", request, ".LD.gz")
+getPublicLD <- function(ldKey, request, chromosome, minpos, maxpos, ldProject) {
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
+
+  ldTemp <- file.path(outputFolder, "input.vcf.gz")
+  LDFile <- file.path(outputFolder, "LD.gz")
   if (ldProject == "1000genomes") {
     ldPathS3 <- paste0("s3://", bucket, "/ezQTL/", ldKey)
-    ldLog <- paste0(wd, "/tmp/", request, "/publicLD.log")
+    ldLog <- file.path(outputFolder, "publicLD.log")
     cat(paste0("Getting ", ldPathS3, "\n"), file = ldLog, sep = "\n", append = T)
 
-    cmd <- paste0("cd ", wd, "/data/", dirname(ldKey), "; bcftools view -S ", wd, "/tmp/", request, "/", request, ".extracted.panel -m2 -M2 -O z -o ", ldTemp, " ", ldPathS3, " ", chromosome, ":", minpos, "-", maxpos)
+    cmd <- paste0("cd ", appDataFolder, "/", dirname(ldKey), "; bcftools view -S ../", outputFolder, "/extracted.panel -m2 -M2 -O z -o ../", ldTemp, " ", ldPathS3, " ", chromosome, ":", minpos, "-", maxpos)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
     cmd <- paste0("bcftools index -t ", ldTemp)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
@@ -36,7 +44,7 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
       info <- data.frame(chr = integer(), pos = integer(), id = character(), ref = character(), alt = character())
     }
   } else if (ldProject == "UKBB") {
-    cmd <- paste0("python3 ", wd, "/server/services/query_scripts/QTLs/LD_extract_UKBB_npz.py -q chr", chromosome, ":", minpos, "-", maxpos, " -b ", bucket, " -o ", LDFile)
+    cmd <- paste0("python3 ", appScriptsPath, "/LD_extract_UKBB_npz.py -q chr", chromosome, ":", minpos, "-", maxpos, " -b ", bucket, " -o ", LDFile)
     system(cmd)
 
     out <- read_delim(LDFile, delim = "\t", col_names = F, col_types = cols("X2" = "c"))
@@ -61,11 +69,12 @@ getPublicLD <- function(bucket, ldKey, request, chromosome, minpos, maxpos, ldPr
     }
     ld_data <- list("Sigma" = out, "info" = info)
   }
-  saveRDS(ld_data, file = paste0("tmp/", request, "/", request, ".ld_data.rds"))
+  saveRDS(ld_data, file = file.path(outputFolder, "ld_data.rds"))
 }
 
 createExtractedPanel <- function(select_pop, kgpanel, request) {
-  panelPath <- paste0("tmp/", request, "/", request, ".", "extracted", ".panel")
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
+  panelPath <- file.path(outputFolder, "extracted.panel")
   # Remove pre-existing panel
   unlink(panelPath)
   select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
@@ -94,7 +103,7 @@ createExtractedPanel <- function(select_pop, kgpanel, request) {
 #     in_bin <- '/usr/local/bin/emeraLD'
 #     getLD <- emeraLD2R(path = paste0('tmp/', request, '/', request, '.', 'input', '.vcf.gz'), bin = in_bin)
 #     ld_data <- getLD(region = regionLD)
-#     saveRDS(ld_data, file = paste0("tmp/", request, '/', request, ".ld_data.rds"))
+#     saveRDS(ld_data, file = file.path("tmp/", request, '/', request, ".ld_data.rds"))
 #   }
 # }
 
@@ -188,7 +197,9 @@ locus_colocalization <- function(gwasdata, qdata, gwasFile, assocFile, request) 
   return(list(locus_colocalization_correlation_data))
 }
 
-locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build) {
+locus_alignment <- function(qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, ldProject, qtlKey, ldKey, gwasKey, genome_build) {
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
+
   if (identical(select_ref, "false")) {
     ## set default rsnum to top gene's top rsnum if no ref gene or ld ref chosen
     if (is.null(gene)) {
@@ -229,7 +240,7 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
 
   kgvcfpath <- ifelse(genome_build == "GRCh37", kgvcfpath_grch37, kgvcfpath_grch38)
 
-  in_path <- paste0(workDir, "/tmp/", request, "/", request, ".", "chr", chromosome, "_", minpos, "_", maxpos, ".vcf.gz")
+  in_path <- file.path(outputFolder, paste0("chr", chromosome, "_", minpos, "_", maxpos, ".vcf.gz"))
 
   if (identical(LDFile, "false") || identical(recalculateAttempt, "true")) {
     locus_alignment_define_window(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, in_path, kgvcfpath, chromosome, minpos, maxpos, genome_build)
@@ -260,9 +271,9 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
     }
   }
 
-  cmd <- paste0("cd data/Recombination_Rate; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ", workDir, "/tmp/", request, "/", request, ".rc_temp.txt")
+  cmd <- paste0("cd ", file.path(appDataFolder, "Recombination_Rate"), "; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ../", outputFolder, "/rc_temp.txt")
   system(cmd)
-  rcdata <- read_delim(paste0("tmp/", request, "/", request, ".", "rc_temp", ".txt"), delim = "\t", col_names = F)
+  rcdata <- read_delim(file.path(outputFolder, "rc_temp.txt"), delim = "\t", col_names = F)
   if (ncol(rcdata)) {
     colnames(rcdata) <- c("chr", "pos", "rate", "map", "filtered")
   }
@@ -311,7 +322,7 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
   qdata_top_annotation_colnames <- colnames(qdata_top_annotation)
   qdata_top_annotation_data <- list(setNames(as.data.frame(qdata_top_annotation), qdata_top_annotation_colnames))
 
-  source(paste0(workDir, "/", "server/", "services/", "query_scripts/", "QTLs/", "emeraLD2R.r"))
+  source(file.path(appScriptsPath, "emeraLD2R.r"))
 
   ### output region as bed file
   qdata_region %>%
@@ -319,10 +330,10 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
     select(chr, start, pos) %>%
     arrange(chr, start, pos) %>%
     unique() %>%
-    write_delim(paste0("tmp/", request, "/", request, ".", "locus.bed"), delim = "\t", col_names = F)
+    write_delim(file.path(outputFolder, "locus.bed"), delim = "\t", col_names = F)
 
   ## remove any previous extracted panel if exists
-  unlink(paste0("tmp/", request, "/", request, ".", "extracted", ".panel"))
+  unlink(file.path(outputFolder, "extracted.panel"))
   ## read multiple population selections
   # select_pop_list <- unlist(strsplit(select_pop, "+", fixed = TRUE))
   for (pop_i in select_pop_list) {
@@ -330,12 +341,12 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
       kgpanel %>%
         filter(super_pop == pop_i) %>%
         select(sample) %>%
-        write_delim(paste0("tmp/", request, "/", request, ".", "extracted", ".panel"), delim = "\t", col_names = F, append = TRUE)
+        write_delim(file.path(outputFolder, "extracted.panel"), delim = "\t", col_names = F, append = TRUE)
     } else if (pop_i %in% kgpanel$pop) {
       kgpanel %>%
         filter(pop == pop_i) %>%
         select(sample) %>%
-        write_delim(paste0("tmp/", request, "/", request, ".", "extracted", ".panel"), delim = "\t", col_names = F, append = TRUE)
+        write_delim(file.path(outputFolder, "extracted.panel"), delim = "\t", col_names = F, append = TRUE)
     }
   }
 
@@ -349,9 +360,8 @@ locus_alignment <- function(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpane
     } else {
       # getPublicLD(bucket, ldKey, request, chromosome, minpos, maxpos, ldProject)
       # LDFile = paste0(request, '.input.vcf.gz')
-      ld_data <- readRDS(paste0("tmp/", request, "/", request, ".ld_data.rds"))
+      ld_data <- readRDS(file.path(outputFolder, "ld_data.rds"))
     }
-    # ld_data <- readRDS(paste0("tmp/", request, '/', request, ".ld_data.rds"))
   }
 
   index <- which(ld_data$info$id == rsnum | str_detect(ld_data$info$id, paste0(";", rsnum)) | str_detect(ld_data$info$id, paste0(rsnum, ";")))
@@ -410,11 +420,12 @@ locus_quantification_heatmap <- function(edata_boxplot) {
   return(list(setNames(as.data.frame(tmpdata), tmpdata_colnames)))
 }
 
-locus_quantification <- function(workDir, tmp, exprFile, genoFile, edata, gdata, traitID, genotypeID, request) {
+locus_quantification <- function(tmp, exprFile, genoFile, edata, gdata, traitID, genotypeID, request) {
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   library(ggasym)
   library(ggridges)
   library(ggstatsplot)
-  source(paste0(workDir, "/", "server/", "services/", "query_scripts/", "QTLs/", "ezQTL_ztw.R"))
+  source(file.path(appScriptsPath, "ezQTL_ztw.R"))
   # initialize boxplot data as empty until data file detected
   locus_quantification_data <- list(c())
   # initialize heatmap data as empty until data file detected
@@ -429,26 +440,26 @@ locus_quantification <- function(workDir, tmp, exprFile, genoFile, edata, gdata,
       traitID <- NULL
     }
 
-    corPath <- paste0(workDir, "/", "tmp/", request, "/quantification_cor.svg")
+    corPath <- file.path(outputFolder, "quantification_cor.svg")
     locus_quantification_cor(edata, tmp, corPath)
-    disPath <- paste0(workDir, "/", "tmp/", request, "/quantification_dis.svg")
+    disPath <- file.path(outputFolder, "quantification_dis.svg")
     locus_quantification_dis(edata, tmp, output_plot = disPath)
-    qtlPath <- paste0(workDir, "/", "tmp/", request, "/quantification_qtl.svg")
+    qtlPath <- file.path(outputFolder, "quantification_qtl.svg")
     locus_quantification_qtl(gdata, edata, output_plot = qtlPath, log2 = FALSE)
   }
   # return(list(locus_quantification_data, locus_quantification_heatmap_data))
 }
 
-locus_alignment_boxplots <- function(workDir, exprFile, genoFile, info, request, bucket) {
-  setwd(workDir)
+locus_alignment_boxplots <- function(exprFile, genoFile, info, request) {
+  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
   # initialize locus alignment boxplots data as empty until data file detected
   locus_alignment_boxplots_data <- list(c())
   if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
-    gdatafile <- paste0("tmp/", request, "/", genoFile)
-    edatafile <- paste0("tmp/", request, "/", exprFile)
+    gdatafile <- file.path(inputFolder, genoFile)
+    edatafile <- file.path(inputFolder, exprFile)
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
     edata <- read_delim(edatafile, delim = "\t", col_names = T)
@@ -474,8 +485,9 @@ locus_alignment_boxplots <- function(workDir, exprFile, genoFile, info, request,
   return(dataSourceJSON)
 }
 
-main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
-  setwd(workDir)
+main <- function(assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, genome_build) {
+  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
@@ -487,7 +499,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   errorMessages <- list()
 
   # log file path
-  logfile <<- paste0(workDir, "/tmp/", request, "/ezQTL.log")
+  logfile <<- file.path(outputFolder, "ezQTL.log")
 
   ## parameters define ##
   if (identical(select_pop, "false")) {
@@ -530,11 +542,11 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
 
   # load association data from user upload
   if (!identical(assocFile, "false") || !identical(qtlKey, "false")) {
-    qdatafile <- paste0("tmp/", request, "/ezQTL_input_qtl.txt")
+    qdatafile <- file.path(outputFolder, "ezQTL_input_qtl.txt")
     qdata <- read_delim(qdatafile, delim = "\t", col_names = T, col_types = cols(variant_id = "c", ref = "c", alt = "c"))
   }
   if (!identical(LDFile, "false")) {
-    LDFile <- paste0("tmp/", request, "/", LDFile)
+    LDFile <- file.path(outputFolder, LDFile)
   }
 
 
@@ -549,8 +561,8 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   edata <- "false"
   gdata <- "false"
   if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
-    gdatafile <- paste0("tmp/", request, "/", genoFile)
-    edatafile <- paste0("tmp/", request, "/", exprFile)
+    gdatafile <- file.path(inputFolder, genoFile)
+    edatafile <- file.path(inputFolder, exprFile)
 
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
@@ -572,7 +584,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   ## if LD File is loaded
   ld_data <- "false"
   if (!identical(LDFile, "false")) {
-    out <- fread(input = paste0(workDir, "/tmp/", request, "/ezQTL_input_ld.gz"), header = FALSE, showProgress = FALSE)
+    out <- fread(input = file.path(outputFolder, "ezQTL_input_ld.gz"), header = FALSE, showProgress = FALSE)
 
     info <- out[, 1:5]
     colnames(info) <- c("chr", "pos", "id", "ref", "alt")
@@ -588,7 +600,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   ## if GWAS File is loaded
   gwasdata <- "false"
   if (!identical(gwasFile, "false") || !identical(gwasKey, "false")) {
-    gwasdatafile <- paste0("tmp/", request, "/ezQTL_input_gwas.txt")
+    gwasdatafile <- file.path(outputFolder, "ezQTL_input_gwas.txt")
 
     gwasdata <- read_delim(gwasdatafile, delim = "\t", col_names = T)
     # check if there are multiple chromosomes in the input GWAS file
@@ -599,7 +611,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
     }
     # when only gwas data is inputted
     if (is.null(qdata)) {
-      source("server/services/query_scripts/QTLs/ezQTL_ztw.R")
+      source(file.path(appScriptsPath, "ezQTL_ztw.R"))
       qdata <- gwas2qtl(gwasdata)
     }
   }
@@ -653,7 +665,13 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
 
   ## call calculations for qtls modules: locus alignment and locus quantification ##
   ## locus alignment calculations ##
-  locus_alignment <- locus_alignment(workDir, qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile, select_ref, cedistance, top_gene_variants, select_chromosome, select_position, bucket, ldProject, qtlKey, ldKey, gwasKey, genome_build)
+  locus_alignment <- locus_alignment(
+    qdata, qdata_tmp, gwasdata, ld_data,
+    kgpanel, select_pop, gene, rsnum, request, recalculateAttempt, recalculatePop,
+    recalculateGene, recalculateDist, recalculateRef, gwasFile, assocFile, LDFile,
+    select_ref, cedistance, top_gene_variants, select_chromosome, select_position,
+    ldProject, qtlKey, ldKey, gwasKey, genome_build
+  )
   locus_alignment_data <- locus_alignment[[1]]
   rcdata_region_data <- locus_alignment[[2]]
   qdata_top_annotation_data <- locus_alignment[[3]]
@@ -664,7 +682,7 @@ main <- function(workDir, assocFile, exprFile, genoFile, gwasFile, LDFile, reque
   locus_colocalization_data <- locus_alignment[[6]]
   locus_colocalization_correlation_data <- locus_colocalization_data[[1]]
   ## locus quantification calculations ##
-  locus_quantification <- locus_quantification(workDir, qdata, exprFile, genoFile, edata, gdata, "", "", request)
+  locus_quantification <- locus_quantification(qdata, exprFile, genoFile, edata, gdata, "", "", request)
   # locus_quantification_data <- locus_quantification[[1]]
   # locus_quantification_heatmap_data <- locus_quantification[[2]]
 

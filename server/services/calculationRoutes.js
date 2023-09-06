@@ -6,7 +6,7 @@ import fs from 'fs-extra';
 import XLSX from 'xlsx';
 import tar from 'tar';
 import { validate, v1 as uuidv1 } from 'uuid';
-import { parseCSV, mkdirs, writeJson } from './utils.js';
+import { parseCSV, mkdirs, writeJson ,getFiles} from './utils.js';
 import {
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
@@ -17,21 +17,17 @@ import {
   qtlsColocVisualize,
   qtlsCalculateQuantification,
 } from './calculate.js';
-import { fileURLToPath } from 'url';
 import { getWorker } from './workers.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export default function calculationRoutes(env) {
   const router = Router();
   const dataDir = path.resolve(env.APP_DATA_FOLDER);
-  const outputDir = path.resolve(env.OUTPUT_FOLDER);
-  const workingDirectory = path.resolve(__dirname, '../..'); // project root
+  const inputFolder = path.resolve(env.INPUT_FOLDER);
 
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
       const { request_id } = req.body;
-      const uploadDir = path.resolve(outputDir, request_id);
+      const uploadDir = path.resolve(inputFolder, request_id);
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir);
       }
@@ -57,28 +53,7 @@ export default function calculationRoutes(env) {
     '/file-upload',
     check('request_id').isUUID(),
     upload.any(),
-    async (req, res) => {
-      res.json(true);
-      //   const { logger } = req.app.locals;
-      //   logger.info(`[${req.body.request_id}] Execute /file-upload`);
-      //   logger.debug(
-      //     `[${req.body.request_id}] Parameters ${JSON.stringify(
-      //       req.body,
-      //       undefined,
-      //       4
-      //     )}`
-      //   );
-      //   try {
-      //     logger.info(`[${req.body.request_id}] Finished /file-upload`);
-      //     res.json({
-      //       files: req.files,
-      //       body: req.body,
-      //     });
-      //   } catch (err) {
-      //     logger.error(`[${req.body.request_id}] Error /file-upload ${err}`);
-      //     res.status(500).json(err);
-      //   }
-    }
+    async (req, res) => res.json(true)
   );
 
   // calculation routes
@@ -88,17 +63,7 @@ export default function calculationRoutes(env) {
       res.status(504).send('Calculation Timed Out');
     });
 
-    res.json(
-      await qtlsCalculateMain(
-        {
-          ...req.body,
-          workingDirectory,
-          bucket: env.DATA_BUCKET,
-        },
-        req.app.locals.logger,
-        env
-      )
-    );
+    res.json(await qtlsCalculateMain(req.body, req.app.locals.logger, env));
   });
 
   // get list of public data options
@@ -227,7 +192,10 @@ export default function calculationRoutes(env) {
     logger.info(`Fetching Sample`);
     try {
       const request_id = uuidv1();
-      const sampleArchive = path.resolve(env.APP_DATA_FOLDER, 'sample/sample.tgz');
+      const sampleArchive = path.resolve(
+        env.APP_DATA_FOLDER,
+        'sample/sample.tgz'
+      );
       const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request_id);
 
       // ensure output directory exists
@@ -295,26 +263,13 @@ export default function calculationRoutes(env) {
   });
 
   router.post('/qtls-locus-alignment-boxplots', (req, res, next) =>
-    qtlsCalculateLocusAlignmentBoxplots(
-      {
-        ...req.body,
-        workingDirectory,
-        bucket: env.DATA_BUCKET,
-      },
-      req,
-      res,
-      next
-    )
+    qtlsCalculateLocusAlignmentBoxplots(req.body, req, res, next)
   );
 
   router.post('/qtls-locus-colocalization-hyprcoloc', async (req, res) =>
     res.json(
       await qtlsCalculateLocusColocalizationHyprcoloc(
-        {
-          ...req.body,
-          workingDirectory,
-          bucket: env.DATA_BUCKET,
-        },
+        req.body,
         req.app.locals.logger,
         env
       )
@@ -328,11 +283,7 @@ export default function calculationRoutes(env) {
     });
     res.json(
       await qtlsCalculateLocusColocalizationECAVIAR(
-        {
-          ...req.body,
-          workingDirectory,
-          bucket: env.DATA_BUCKET,
-        },
+        req.body,
         req.app.locals.logger,
         env
       )
@@ -340,17 +291,7 @@ export default function calculationRoutes(env) {
   });
 
   router.post('/qtls-locus-qc', async (req, res) =>
-    res.json(
-      await qtlsCalculateQC(
-        {
-          ...req.body,
-          workingDirectory,
-          bucket: env.DATA_BUCKET,
-        },
-        req.app.locals.logger,
-        env
-      )
-    )
+    res.json(await qtlsCalculateQC(req.body, req.app.locals.logger, env))
   );
 
   router.post('/qtls-coloc-visualize', async (req, res) =>
@@ -358,30 +299,12 @@ export default function calculationRoutes(env) {
   );
 
   router.post('/qtls-locus-ld', async (req, res) =>
-    res.json(
-      await qtlsCalculateLD(
-        {
-          ...req.body,
-          workingDirectory,
-          bucket: env.DATA_BUCKET,
-        },
-        req.app.locals.logger,
-        env
-      )
-    )
+    res.json(await qtlsCalculateLD(req.body, req.app.locals.logger, env))
   );
 
   router.post('/qtls-recalculate-quantification', async (req, res) =>
     res.json(
-      await qtlsCalculateQuantification(
-        {
-          ...req.body,
-          workingDirectory,
-          bucket: env.DATA_BUCKET,
-        },
-        req.app.locals.logger,
-        env
-      )
+      await qtlsCalculateQuantification(req.body, req.app.locals.logger, env)
     )
   );
   return router;

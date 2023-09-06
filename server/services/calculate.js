@@ -2,6 +2,7 @@ import rWrapper from 'r-wrapper';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
+import { mkdirs, writeJson } from './utils.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const r = rWrapper.async;
@@ -23,25 +24,19 @@ async function calculateMain(params) {
     recalculateGene,
     recalculateDist,
     recalculateRef,
-    workingDirectory,
     ldProject,
     qtlKey,
     ldKey,
     gwasKey,
     select_chromosome,
     select_position,
-    bucket,
     genome_build,
   } = params;
-
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsCalculateMain',
     [
-      rfile,
-      workingDirectory.toString(),
       associationFile.toString(),
       quantificationFile.toString(),
       genotypeFile.toString(),
@@ -63,7 +58,6 @@ async function calculateMain(params) {
       gwasKey.toString(),
       select_chromosome.toString(),
       parseInt(select_position),
-      bucket.toString(),
       genome_build.toString(),
     ]
   );
@@ -80,12 +74,7 @@ async function qtlsCalculateMain(params, logger, env) {
   const wrapper = await calculateMain(params);
   logger.info(`[${request}] Finished /qtls-calculate-main`);
 
-  const logPath = path.resolve(
-    params.workingDirectory,
-    'tmp',
-    request,
-    'ezQTL.log'
-  );
+  const logPath = path.resolve(env.OUTPUT_FOLDER, request, 'ezQTL.log');
 
   const summary = getSummary(logPath);
 
@@ -96,33 +85,12 @@ async function qtlsCalculateMain(params, logger, env) {
   // }
 }
 async function calculateQuantification(params) {
-  const {
-    request,
-    exprFile,
-    genoFile,
-    traitID,
-    genotypeID,
-    log2,
-    bucket,
-    workingDirectory,
-  } = params;
-
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
+  const { request, exprFile, genoFile, traitID, genotypeID, log2 } = params;
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsRecalculateQuantification',
-    [
-      rfile,
-      workingDirectory,
-      exprFile,
-      genoFile,
-      traitID,
-      genotypeID,
-      log2,
-      request,
-      bucket,
-    ]
+    [exprFile, genoFile, traitID, genotypeID, log2, request]
   );
 }
 
@@ -134,86 +102,47 @@ async function qtlsCalculateQuantification(params, logger, env) {
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  // try {
   const wrapper = await calculateQuantification(params);
   logger.info(`[${request}] Finished /calculate-quantification`);
   return JSON.parse(wrapper);
-  // } catch (err) {
-  //   logger.error(`[${request}] Error /calculate-quantification ${err}`);
-  //   res.status(500).json(err);
-  // }
 }
 
 async function qtlsCalculateLocusAlignmentBoxplots(params, logger, env) {
-  const {
-    request,
-    quantificationFile,
-    genotypeFile,
-    info,
-    workingDirectory,
-    bucket,
-  } = params;
+  const { request, quantificationFile, genotypeFile, info } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-alignment-boxplots`);
   logger.debug(
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'qtls.r');
-  // try {
   const wrapper = await r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsCalculateLocusAlignmentBoxplots',
     [
-      rfile,
-      workingDirectory.toString(),
       quantificationFile.toString(),
       genotypeFile.toString(),
       JSON.stringify(info),
       request.toString(),
-      bucket.toString(),
     ]
   );
   logger.info(`[${request}] Finished /qtls-locus-alignment-boxplots`);
   return JSON.parse(wrapper);
-  // } catch (err) {
-  //   logger.error(`[${request}] Error /qtls-locus-alignment-boxplots ${err}`);
-  //   res.status(500).json(err);
-  // }
 }
 
 async function calculateHyprcoloc(params) {
-  const {
-    request,
-    select_dist,
-    select_ref,
-    gwasfile,
-    qtlfile,
-    ldfile,
-    workingDirectory,
-    bucket,
-  } = params;
-
-  const rfile = path.resolve(
-    __dirname,
-    'query_scripts',
-    'QTLs',
-    'qtls-locus-colocalization-hyprcoloc.r'
-  );
+  const { request, select_dist, select_ref, gwasfile, qtlfile, ldfile } =
+    params;
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsCalculateLocusColocalizationHyprcoloc',
     [
-      rfile,
-      workingDirectory.toString(),
       select_dist.toString(),
       select_ref.toString(),
       gwasfile.toString(),
       qtlfile.toString(),
       ldfile.toString(),
       request.toString(),
-      bucket.toString(),
     ]
   );
 }
@@ -236,7 +165,7 @@ async function qtlsCalculateLocusColocalizationHyprcoloc(params, logger, env) {
   //   );
 
   //   const logPath = path.resolve(
-  //     params.workingDirectory,
+  //     params.
   //     'tmp',
   //     request,
   //     'ezQTL.log'
@@ -255,29 +184,18 @@ function calculateECAVIAR(params) {
     LDFile,
     select_ref,
     select_dist,
-    workingDirectory,
-    bucket,
   } = params;
 
-  const rfile = path.resolve(
-    __dirname,
-    'query_scripts',
-    'QTLs',
-    'qtls-locus-colocalization-ecaviar.r'
-  );
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsCalculateLocusColocalizationECAVIAR',
     [
-      rfile,
-      workingDirectory.toString(),
       gwasFile.toString(),
       associationFile.toString(),
       LDFile.toString(),
       select_ref.toString(),
       select_dist.toString(),
       request.toString(),
-      bucket.toString(),
     ]
   );
 }
@@ -286,56 +204,30 @@ async function qtlsCalculateLocusColocalizationECAVIAR(params, logger, env) {
   const { request } = params;
 
   logger.info(`[${request}] Execute /qtls-locus-colocalization-ecaviar`);
-  logger.debug(
-    `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
-  );
 
-  // try {
   const wrapper = await calculateECAVIAR(params);
   logger.info(`[${request}] Finished /qtls-locus-colocalization-ecaviar`);
   return JSON.parse(wrapper);
-  // res.json(JSON.parse(wrapper));
-  // } catch (err) {
-  //   logger.error(
-  //     `[${request}] Error /qtls-locus-colocalization-ecaviar ${err}`
-  //   );
-  //   res.status(500).json(err);
-  // }
 }
 
-function calculateColocVisualize(params, logger, env) {
+function calculateColocVisualize(params) {
   const { request, hydata, ecdata } = params;
-
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  const requestPath = path.resolve(
-    env.OUTPUT_FOLDER,
-    request,
-    request + '_Summary.svg'
-  );
-
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsColocVisualize',
-    [rfile, hydata, ecdata, requestPath]
+    [hydata, ecdata, request]
   );
 }
 
 async function qtlsColocVisualize(params, logger, env) {
   const { request } = params;
-
   logger.info(`[${request}] Execute /coloc-visualize`);
-
-  // try {
   const wrapper = await calculateColocVisualize(params);
   logger.info(`[${request}] Finished /colc-visualize`);
-  return JSON.parse(wrapper);
-  // } catch (err) {
-  //   logger.error(`[${request}] Error /colc-visualize ${err}`);
-  //   res.status(500).json(err);
-  // }
+  return wrapper;
 }
 
-async function calculateQC(params, logger) {
+async function calculateQC(params, logger, env = process.env) {
   const {
     request,
     gwasFile,
@@ -351,30 +243,16 @@ async function calculateQC(params, logger) {
     select_pop,
     ldProject,
     phenotype,
-    workingDirectory,
     qtlPublic,
     gwasPublic,
     ldPublic,
-    bucket,
   } = params;
-
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-
-  const plotPath = path.resolve(workingDirectory, 'tmp', request, request);
-  const inputPath = path.resolve(
-    workingDirectory,
-    'tmp',
-    request,
-    'ezQTL_input'
-  );
-  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
 
   const calculate = JSON.parse(
     await r(
       path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
       'qtlsCalculateQC',
       [
-        rfile,
         gwasFile.toString(),
         associationFile.toString(),
         LDFile.toString(),
@@ -389,14 +267,9 @@ async function calculateQC(params, logger) {
         ldProject,
         phenotype,
         request,
-        plotPath,
-        inputPath,
-        logPath,
         qtlPublic.toString(),
         gwasPublic.toString(),
         ldPublic.toString(),
-        workingDirectory,
-        bucket,
       ]
     )
   );
@@ -413,22 +286,18 @@ function getSummary(path) {
 }
 
 async function qtlsCalculateQC(params, logger, env) {
-  const { request, workingDirectory } = params;
-
+  const { request } = params;
   logger.info(`[${request}] Execute /qtlsCalculateQC`);
-
-  // try {
+  const inputFolder = path.resolve(env.INPUT_FOLDER, request);
+  const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
+  await mkdirs([inputFolder, outputFolder]);
+  await writeJson(path.resolve(outputFolder, 'params.json'), params);
   const { error, ...rest } = await calculateQC(params, logger);
-
-  const logPath = path.resolve(workingDirectory, 'tmp', request, 'ezQTL.log');
+  const logPath = path.resolve(outputFolder, 'ezQTL.log');
   const summary = getSummary(logPath);
 
   logger.info(`[${request}] Finished /qtlsCalculateQC`);
   return { summary: summary, error: error || false, ...rest };
-  // } catch (err) {
-  //   logger.error(`[${request}] Error /qtlsCalculateQC ${err}`);
-  //   res.status(500).json(err);
-  // }
 }
 
 async function calculateLocusLD(params) {
@@ -443,40 +312,25 @@ async function calculateLocusLD(params) {
     ldThreshold,
     ldAssocData,
     select_gene,
-    workingDirectory,
-    bucket,
   } = params;
 
-  const rfile = path.resolve(__dirname, 'query_scripts', 'QTLs', 'ezQTL_ztw.R');
-  const outputPath = path.resolve(
-    workingDirectory,
-    'tmp',
-    request,
-    'LD_Output.png'
-  );
-
   let threshold = ldThreshold;
-
   if (ldThreshold) threshold = parseFloat(ldThreshold);
 
   return r(
     path.resolve(__dirname, 'query_scripts', 'wrapper.R'),
     'qtlsCalculateLD',
     [
-      rfile,
       gwasFile.toString(),
       associationFile.toString(),
       LDFile.toString(),
       genome_build.toString(),
-      outputPath.toString(),
       leadsnp.toString(),
       position,
       threshold,
       ldAssocData,
       select_gene,
       request.toString(),
-      workingDirectory,
-      bucket,
     ]
   );
 }
@@ -489,14 +343,9 @@ async function qtlsCalculateLD(params, logger, env) {
     `[${request}] Parameters ${JSON.stringify(params, undefined, 4)}`
   );
 
-  // try {
-  const wrapper = await calculateLocusLD(params);
+  const wrapper = await calculateLocusLD(params, logger, env);
   logger.info(`[${request}] Finished /calculateLD`);
   return wrapper;
-  // } catch (err) {
-  //   logger.error(`[${request}] Error /calculateLD ${err}`);
-  //   res.status(500).json(err);
-  // }
 }
 
 export {

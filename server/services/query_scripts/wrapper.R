@@ -1,3 +1,6 @@
+appScriptsPath <- Sys.getenv("APP_SCRIPTS")
+appDataFolder <- Sys.getenv(("APP_DATA_FOLDER"))
+bucket <- Sys.getenv("DATA_BUCKET")
 library(jsonlite)
 # increase buffer size in case of large LD files https://github.com/tidyverse/vroom/issues/364
 Sys.setenv(VROOM_CONNECTION_SIZE = "500000")
@@ -25,18 +28,19 @@ getS3File <- function(key, bucket) {
   return(rawToChar(get_object(key, bucket)))
 }
 
-qtlsCalculateMain <- function(rfile, workingDirectory, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build) {
-  source(rfile)
+qtlsCalculateMain <- function(associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, genome_build) {
+  source(file.path(appScriptsPath, "qtls.r"))
   ldProject <- ldProject$value
-  main(workingDirectory, associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, bucket, genome_build)
+  main(associationFile, quantificationFile, genotypeFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, genome_build)
 }
 
-qtlsRecalculateQuantification <- function(rfile, workDir, exprFile, genoFile, traitID, genotypeID, log2, request, bucket) {
-  source(rfile)
-  setwd(workDir)
+qtlsRecalculateQuantification <- function(exprFile, genoFile, traitID, genotypeID, log2, request) {
+  source(file.path(appScriptsPath, "ezQTL_ztw.R"))
+  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
 
-  gdatafile <- paste0("tmp/", request, "/", genoFile)
-  edatafile <- paste0("tmp/", request, "/", exprFile)
+  gdatafile <- file.path(inputFolder, genoFile)
+  edatafile <- file.path(inputFolder, exprFile)
 
   gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
   # check if there are multiple chromosomes in the input genotype file
@@ -49,7 +53,7 @@ qtlsRecalculateQuantification <- function(rfile, workDir, exprFile, genoFile, tr
     errorMessages <- c(errorMessages, "Multiple chromosomes detected in Quantification Data File, make sure data is on one chromosome only.")
   }
 
-  qtlPath <- paste0(workDir, "/", "tmp/", request, "/quantification_qtl.svg")
+  qtlPath <- file.path(outputFolder, "quantification_qtl.svg")
 
   if (identical(traitID, "")) {
     traitID <- NULL
@@ -63,32 +67,34 @@ qtlsRecalculateQuantification <- function(rfile, workDir, exprFile, genoFile, tr
   locus_quantification_qtl(gdata, edata, genotypeID, traitID, qtlPath, log2)
 }
 
-qtlsCalculateLocusAlignmentBoxplots <- function(rfile, workingDirectory, quantificationFile, genotypeFile, info, request, bucket) {
-  source(rfile)
-  locus_alignment_boxplots(workingDirectory, quantificationFile, genotypeFile, info, request, bucket)
+qtlsCalculateLocusAlignmentBoxplots <- function(quantificationFile, genotypeFile, info, request) {
+  source(file.path(appScriptsPath, "qtls.R"))
+  locus_alignment_boxplots(quantificationFile, genotypeFile, info, request)
 }
 
-qtlsCalculateLocusColocalizationECAVIAR <- function(rfile, workingDirectory, gwasFile, associationFile, LDFile, select_ref, select_dist, request, bucket) {
-  source(rfile)
-  locus_colocalization_eCAVIAR(workingDirectory, gwasFile, associationFile, LDFile, select_ref, select_dist, request, bucket)
+qtlsCalculateLocusColocalizationECAVIAR <- function(gwasFile, associationFile, LDFile, select_ref, select_dist, request) {
+  source(file.path(appScriptsPath, "qtls-locus-colocalization-ecaviar.R"))
+  locus_colocalization_eCAVIAR(gwasFile, associationFile, LDFile, select_ref, select_dist, request)
 }
 
-qtlsCalculateLocusColocalizationHyprcoloc <- function(rfile, workingDirectory, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket) {
+qtlsCalculateLocusColocalizationHyprcoloc <- function(select_dist, select_ref, gwasFile, associationFile, ldfile, request) {
+  source(file.path(appScriptsPath, "qtls-locus-colocalization-hyprcoloc.R"))
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   # log file path
-  logfile <<- paste0(workingDirectory, "/tmp/", request, "/ezQTL.log")
-  source(rfile)
-  locus_colocalization_hyprcoloc(workingDirectory, select_dist, select_ref, gwasFile, associationFile, ldfile, request, bucket)
+  logfile <<- file.path(outputFolder, "ezQTL.log")
+
+  locus_colocalization_hyprcoloc(select_dist, select_ref, gwasFile, associationFile, ldfile, request)
 }
 
-qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, phenotype, request, plotPath, inputPath, logPath, qtlPublic, gwasPublic, ldPublic, workDir, bucket) {
-  source(rfile)
+qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, phenotype, request, qtlPublic, gwasPublic, ldPublic) {
+  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
+  outputPrefix <- file.path(outputFolder, "ezQTL_input")
+  outputPlotPrefix <- file.path(outputFolder, "ezQTL")
+  logPath <- file.path(outputFolder, "ezQTL.log")
+  source(file.path(appScriptsPath, "ezQTL_ztw.R"))
+  source(file.path(appScriptsPath, "qtls.r"))
   library(data.table)
-  setwd(workDir)
-
-  outputDir <- file.path(workDir, paste0("tmp/", request))
-  if (!dir.exists(outputDir)) dir.create(outputDir)
-
-  source(paste0(workDir, "/", "server/", "services/", "query_scripts/", "QTLs/", "qtls.r"))
 
   if (identical(distance, "false")) {
     ## set default cisDistance to 100 Kb (100,000 bp) if none supplied
@@ -105,7 +111,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     if (identical(gwasFile, "false")) {
       gwasFile <- NULL
     } else {
-      gwasFile <- paste0(workDir, "/tmp/", request, "/", gwasFile)
+      gwasFile <- file.path(inputFolder, gwasFile)
       # filter gwas for selected chromosome
       if (length(select_chromosome) > 1) {
         filterGwas <- read_delim(gwasFile,
@@ -118,14 +124,14 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       }
     }
   } else {
-    gwasFile <- paste0(workDir, "/tmp/", request, "/", request, ".gwas_temp.txt")
+    gwasFile <- file.path(outputFolder, "gwas_temp.txt")
     if (!file.exists(gwasFile)) {
       loadAWS()
       gwasPathS3 <- paste0("s3://", bucket, "/ezQTL/", gwasKey)
-      cmd <- paste0("cd data/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh >", gwasFile)
+      cmd <- paste0("cd ", appDataFolder, "/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ../../", gwasFile)
       system(cmd)
 
-      gdata <- read_delim(paste0("tmp/", request, "/", request, ".gwas_temp.txt"), delim = "\t", col_names = T)
+      gdata <- read_delim(file.path(outputFolder, "gwas_temp.txt"), delim = "\t", col_names = T)
       if (dim(gdata)[1] == 0) {
         errinfo <- paste0("ezQTL QC failed: No data found in GWAS query. Try a different SNP position.")
         return(toJSON(list(error = errinfo), auto_unbox = TRUE))
@@ -136,7 +142,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       gdata %>%
         filter(trait == phenotype, chr == select_chromosome) %>%
         rename_with(tolower) %>%
-        write_delim(paste0("tmp/", request, "/", request, ".gwas_temp.txt"), delim = "\t", col_names = T)
+        write_delim(file.path(outputFolder, "gwas_temp.txt"), delim = "\t", col_names = T)
     }
   }
 
@@ -145,7 +151,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     if (identical(associationFile, "false")) {
       associationFile <- NULL
     } else {
-      associationFile <- paste0(workDir, "/tmp/", request, "/", associationFile)
+      associationFile <- file.path(inputFolder, associationFile)
       # filter association data for selected chromosome
       if (length(select_chromosome) > 1) {
         filterAssociation <- read_delim(associationFile,
@@ -158,15 +164,15 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       }
     }
   } else {
-    associationFile <- paste0(workDir, "/tmp/", request, "/", request, ".qtl_temp.txt")
+    associationFile <- file.path(outputFolder, "qtl_temp.txt")
     if (!file.exists(associationFile)) {
       loadAWS()
       qtlPathS3 <- paste0("s3://", bucket, "/ezQTL/", qtlKey)
-      cmd <- paste0("cd data/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh >", associationFile)
+      cmd <- paste0("cd ", appDataFolder, "/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ../../", associationFile)
       system(cmd)
 
       # rename #gene_id to gene_id
-      qdata <- read_delim(paste0("tmp/", request, "/", request, ".qtl_temp.txt"), delim = "\t", col_names = T, col_types = cols(variant_id = "c"))
+      qdata <- read_delim(file.path(outputFolder, "qtl_temp.txt"), delim = "\t", col_names = T, col_types = cols(variant_id = "c"))
       if (dim(qdata)[1] == 0) {
         errinfo <- "ezQTL QC failed: No data found in QTL query. Try a different SNP position"
         return(toJSON(list(error = errinfo), auto_unbox = TRUE))
@@ -176,7 +182,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       qdata %>%
         filter(chr == select_chromosome) %>%
         rename_with(tolower) %>%
-        write_delim(paste0("tmp/", request, "/", request, ".qtl_temp.txt"), delim = "\t", col_names = T)
+        write_delim(file.path(outputFolder, "qtl_temp.txt"), delim = "\t", col_names = T)
     }
   }
 
@@ -184,7 +190,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
     if (identical(ldFile, "false")) {
       ldFile <- NULL
     } else {
-      ldFile <- paste0(workDir, "/tmp/", request, "/", ldFile)
+      ldFile <- file.path(inputFolder, ldFile)
       # filter ld data for selected chromosome
       if (length(select_chromosome) > 1) {
         filterLd <- read_delim(ldFile,
@@ -198,7 +204,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
       }
     }
   } else {
-    ldFile <- paste0(workDir, "/tmp/", request, "/", request, ".LD.gz")
+    ldFile <- file.path(outputFolder, "LD.gz")
     if (!file.exists(ldFile)) {
       kgpanelFile <- getS3File("ezQTL/1kginfo/integrated_call_samples_v3.20130502.ALL.panel", bucket)
       kgpanel <- read_delim(kgpanelFile, delim = "\t", col_names = T) %>%
@@ -206,7 +212,7 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
 
       createExtractedPanel(select_pop, kgpanel, request)
       ldProject <- ldProject$value
-      getPublicLD(bucket, ldKey, request, select_chromosome, minpos, maxpos, ldProject)
+      getPublicLD(ldKey, request, select_chromosome, minpos, maxpos, ldProject)
     }
   }
 
@@ -246,7 +252,12 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
 
   tryCatch(
     {
-      coloc_QC(gwasfile = gwasFile, gwasfile_pub = gwasPublic, qtlfile = associationFile, qtlfile_pub = qtlPublic, ldfile = ldFile, ldfile_pub = ldPublic, leadsnp = leadsnp, leadpos = leadpos, distance = cedistance, zscore_gene = NULL, output_plot_prefix = plotPath, output_prefix = inputPath, logfile = logPath)
+      coloc_QC(
+        gwasfile = gwasFile, gwasfile_pub = gwasPublic, qtlfile = associationFile,
+        qtlfile_pub = qtlPublic, ldfile = ldFile, ldfile_pub = ldPublic, leadsnp = leadsnp,
+        leadpos = leadpos, distance = cedistance, zscore_gene = NULL,
+        output_plot_prefix = outputPlotPrefix, output_prefix = outputPrefix, logfile = logPath
+      )
       return("{}")
     },
     error = function(e) {
@@ -256,38 +267,37 @@ qtlsCalculateQC <- function(rfile, gwasFile, associationFile, ldFile, qtlKey, gw
   )
 }
 
-qtlsColocVisualize <- function(rfile, hydata, ecdata, request) {
+qtlsColocVisualize <- function(hydata, ecdata, request) {
+  source(file.path(appScriptsPath, "ezQTL_ztw.R"))
   # library(plyr)
-  source(rfile)
 
   # hydata <- ldply(hydata, data.frame)
   # ecdata <- ldply(ecdata, data.frame)
-
-
-  coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), request)
+  plotPath <- file.path(Sys.getenv("OUTPUT_FOLDER"), request, "Summary.svg")
+  coloc_visualize(as.data.frame(hydata), as.data.frame(ecdata), plotPath)
 }
 
-qtlsCalculateLD <- function(rfile, gwasFile, associationFile, ldFile, genome_build, outputPath, leadsnp, position, ldThreshold, ldAssocData, select_gene, request, workDir, bucket) {
-  source(rfile)
+qtlsCalculateLD <- function(gwasFile, associationFile, ldFile, genome_build, leadsnp, position, ldThreshold, ldAssocData, select_gene, request) {
+  source(file.path(appScriptsPath, "ezQTL_ztw.R"))
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   loadAWS()
-
 
   if (identical(gwasFile, "false")) {
     gwasFile <- NULL
   } else {
-    gwasFile <- paste0(workDir, "/tmp/", request, "/ezQTL_input_gwas.txt")
+    gwasFile <- file.path("..", outputFolder, "ezQTL_input_gwas.txt")
   }
 
   if (identical(associationFile, "false")) {
     associationFile <- NULL
   } else {
-    associationFile <- paste0(workDir, "/tmp/", request, "/ezQTL_input_qtl.txt")
+    associationFile <- file.path("..", outputFolder, "ezQTL_input_qtl.txt")
   }
 
   if (identical(ldFile, "false")) {
     ldFile <- NULL
   } else {
-    ldFile <- paste0(workDir, "/tmp/", request, "/ezQTL_input_ld.gz")
+    ldFile <- file.path("..", outputFolder, "ezQTL_input_ld.gz")
   }
 
 
@@ -303,19 +313,20 @@ qtlsCalculateLD <- function(rfile, gwasFile, associationFile, ldFile, genome_bui
   tabixPath <- paste0("s3://", bucket, "/ezQTL/tabix/", tabixFile)
 
   # change work directory to tabix index directory
-  setwd(paste0(workDir, "/data/tabix"))
+  setwd(file.path(appDataFolder, "tabix"))
+  plotPath <- file.path("..", outputFolder, "LD_Output.png")
 
   tryCatch(
     {
       if (identical(ldAssocData, "GWAS") & !is.null(gwasFile)) {
-        IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+        IntRegionalPlot(genome_build = genome_build, association_file = gwasFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = plotPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
       } else if (identical(ldAssocData, "QTL") & !is.null(associationFile)) {
-        IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = select_gene, genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = outputPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
+        IntRegionalPlot(chr = 21, left = 42759805, right = 42859805, trait = select_gene, genome_build = genome_build, association_file = associationFile, LDfile = ldFile, gtf_tabix_file = tabixPath, output_file = plotPath, leadsnp = leadsnp, threshold = ldThreshold, label_gene_name = TRUE)
       } else {
         if (identical(leadsnp, "false")) {
-          IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp_pos = position, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
+          IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp_pos = position, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = plotPath)
         } else {
-          IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp = leadsnp, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = outputPath)
+          IntRegionalPlot(genome_build = genome_build, gtf_tabix_file = tabixPath, leadsnp = leadsnp, association_file = NULL, LDfile = ldFile, label_gene_name = TRUE, output_file = plotPath)
         }
       }
     },

@@ -11,13 +11,15 @@ dist=$4
 #ldfile=$5
 ldinfo=$5
 request=$6
-workdir=$7
+dataPath=$7
+scriptPath=$8
+outputPath=$9
 
-LD_subset_gene="${workdir}/server/services/query_scripts/QTLs/LD_subset_gene.r"
+LD_subset_gene="${scriptPath}/LD_subset_gene.r"
 
 
 # localpath=$(pwd)
-output=$workdir/tmp/${request}/${request}.eCAVIAR.txt
+output=$outputPath/eCAVIAR.txt
 rm -rf $output 
 touch $output
 
@@ -27,7 +29,7 @@ touch $output
 # echo $tmpfold >run.log
 # cd $tmpfold
 
-tmpfold=$workdir/tmp/${request}/${request}.ECAVIAR_TMP
+tmpfold=$outputPath/ECAVIAR_TMP
 mkdir $tmpfold
 
 tmpinfo=`grep -m 1 $leadsnp $gwasfile` 
@@ -52,7 +54,7 @@ maxpos2=$(( position + dist2 ))
 
 ## define file for LD calculation ##
 # kgpath=${vQTLfolder}"/1kginfo/"
-kgpath="${workdir}/data/1kginfo/"
+kgpath="${dataPath}/1kginfo/"
 kgvcfpath=${kgpath}"ALL.chr"${chr}".phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz"
 # poppanel=${kgpath}"integrated_call_samples_v3.20130502.ALL.panel"
 #emerald="/data/zhangt8/NF_eQTL_ALL/vQTL/tools/emeraLD/bin/emeraLD"
@@ -162,7 +164,7 @@ if [ ! -f "$ldinfo" ]; then
     # cat $poppanel |grep -w $ldinfo |cut -f 1  >${request}.extracted.panel
     # bcftools view -S tmp/${request}.extracted.panel -O v $kgvcfpath ${chr}":"${minpos}"-"${maxpos}|awk -F "\t" -v OFS="\t" 'NR==FNR{a[$4]=1;next;}/^#/ || $3 in a {print $0}' $tmpfold/ecaviar_list.txt -|bcftools sort -O z -o $tmpfold/${request}.input.vcf.gz 
     # bcftools index -t $tmpfold/${request}.input.vcf.gz 
-    emeraLD --matrix -i ${workdir}/tmp/${request}/${request}.input.vcf.gz --stdout --extra |sed 's/:/\t/' |bgzip > $tmpfold/emerald.LD.gz
+    emeraLD --matrix -i ${outputPath}/input.vcf.gz --stdout --extra |sed 's/:/\t/' |bgzip > $tmpfold/emerald.LD.gz
     ldinfo=$tmpfold/emerald.LD.gz
     
 fi
@@ -205,7 +207,7 @@ while read -r gene; do
     
 done <<< "$genelist"
 
-cat */eCAVIAR_out.txt2 |awk -F "\t" -v OFS="\t" '!a[$0]++' >$output 
+cat */eCAVIAR_out.txt2 |awk -F "\t" -v OFS="\t" '!a[$0]++' > ../../../$output 
 cp run.log ../${request}.run.log
 
 # rm -rf  $tmpfold
