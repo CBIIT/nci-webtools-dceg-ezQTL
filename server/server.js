@@ -18,7 +18,7 @@ if (isMainModule(import.meta)) {
  */
 export function main(env) {
   const { APP_PORT, APP_NAME, SERVER_TIMEOUT } = env;
-  const serverTimeout = (+SERVER_TIMEOUT || 900) * 1000;
+  const serverTimeout = (+SERVER_TIMEOUT || 900) * 100;
   const app = createApp(env);
   const server = app.listen(APP_PORT, () => {
     app.locals.logger.info(`${APP_NAME} started on port ${APP_PORT}`);
