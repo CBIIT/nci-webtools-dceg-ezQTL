@@ -259,7 +259,7 @@ export default function calculationRoutes(env) {
   router.get('/locus-download/:request', validateRequest, (req, res, next) => {
     const { request } = req.params;
     res.attachment(`${request}.tar.gz`);
-    tar.c({ gzip: true, cwd: outputDir }, [request]).pipe(res);
+    tar.c({ gzip: true, cwd: env.OUTPUT_FOLDER }, [request]).pipe(res);
   });
 
   router.post('/qtls-locus-alignment-boxplots', (req, res, next) =>
