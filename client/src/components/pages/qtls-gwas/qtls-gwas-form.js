@@ -477,8 +477,7 @@ export function QTLsGWASForm() {
     if (data.useQueue) {
       dispatch(
         submitLong({
-          params:
-            params.length > 1 ? params : { ...params[0], request },
+          params: params.length > 1 ? params : { ...params[0], request },
           multi: params.length > 1,
           request,
         })
@@ -1361,6 +1360,7 @@ export function QTLsGWASForm() {
             className="w-100"
             variant={isError ? 'danger' : 'secondary'}
             onClick={() => handleReset()}
+            disabled={submitted && isLoading}
           >
             Reset
           </Button>
