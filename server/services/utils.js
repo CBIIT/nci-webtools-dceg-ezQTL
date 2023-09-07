@@ -1,6 +1,13 @@
 import { fileURLToPath } from 'url';
 import { existsSync, createReadStream } from 'fs';
-import { mkdir, writeFile, readFile, copyFile, readdir } from 'fs/promises';
+import {
+  mkdir,
+  writeFile,
+  readFile,
+  copyFile,
+  readdir,
+  rm,
+} from 'fs/promises';
 import path from 'path';
 import { promisify } from 'util';
 import { execFile } from 'child_process';
@@ -30,6 +37,15 @@ export function isMainModule(importMeta, env = process.env) {
  */
 export async function mkdirs(dirs) {
   return await Promise.all(dirs.map((dir) => mkdir(dir, { recursive: true })));
+}
+
+/**
+ * Removes directories
+ * @param {string[]} dirs
+ * @returns
+ */
+export async function rmdirs(dirs) {
+  return await Promise.all(dirs.map((dir) => rm(dir, { recursive: true })));
 }
 
 /**
