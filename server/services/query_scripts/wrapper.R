@@ -128,7 +128,7 @@ qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, 
     if (!file.exists(gwasFile)) {
       loadAWS()
       gwasPathS3 <- paste0("s3://", bucket, "/ezQTL/", gwasKey)
-      cmd <- paste0("cd ", appDataFolder, "/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ../../", gwasFile)
+      cmd <- paste0("cd ", appDataFolder, "/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ", gwasFile)
       system(cmd)
 
       gdata <- read_delim(file.path(outputFolder, "gwas_temp.txt"), delim = "\t", col_names = T)
@@ -168,7 +168,7 @@ qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, 
     if (!file.exists(associationFile)) {
       loadAWS()
       qtlPathS3 <- paste0("s3://", bucket, "/ezQTL/", qtlKey)
-      cmd <- paste0("cd ", appDataFolder, "/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ../../", associationFile)
+      cmd <- paste0("cd ", appDataFolder, "/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ", associationFile)
       system(cmd)
 
       # rename #gene_id to gene_id
@@ -285,19 +285,19 @@ qtlsCalculateLD <- function(gwasFile, associationFile, ldFile, genome_build, lea
   if (identical(gwasFile, "false")) {
     gwasFile <- NULL
   } else {
-    gwasFile <- file.path("..", outputFolder, "ezQTL_input_gwas.txt")
+    gwasFile <- file.path(outputFolder, "ezQTL_input_gwas.txt")
   }
 
   if (identical(associationFile, "false")) {
     associationFile <- NULL
   } else {
-    associationFile <- file.path("..", outputFolder, "ezQTL_input_qtl.txt")
+    associationFile <- file.path(outputFolder, "ezQTL_input_qtl.txt")
   }
 
   if (identical(ldFile, "false")) {
     ldFile <- NULL
   } else {
-    ldFile <- file.path("..", outputFolder, "ezQTL_input_ld.gz")
+    ldFile <- file.path(outputFolder, "ezQTL_input_ld.gz")
   }
 
 
@@ -314,7 +314,7 @@ qtlsCalculateLD <- function(gwasFile, associationFile, ldFile, genome_build, lea
 
   # change work directory to tabix index directory
   setwd(file.path(appDataFolder, "tabix"))
-  plotPath <- file.path("..", outputFolder, "LD_Output.png")
+  plotPath <- file.path(outputFolder, "LD_Output.png")
 
   tryCatch(
     {

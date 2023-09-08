@@ -12,7 +12,7 @@ locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, re
 
     idx_path <- ifelse(genome_build == "GRCh37", idx_path_grch37, idx_path_grch38)
 
-    cmd <- paste0("cd ", idx_path, "; bcftools view -O z -o ", "../", in_path, " ", kgvcfpath, " ", chromosome, ":", minpos, "-", maxpos, ";")
+    cmd <- paste0("cd ", idx_path, "; bcftools view -O z -o ", in_path, " ", kgvcfpath, " ", chromosome, ":", minpos, "-", maxpos, ";")
     system(cmd)
     cmd <- paste0("bcftools index ", in_path)
     system(cmd)
@@ -29,7 +29,7 @@ getPublicLD <- function(ldKey, request, chromosome, minpos, maxpos, ldProject) {
     ldLog <- file.path(outputFolder, "publicLD.log")
     cat(paste0("Getting ", ldPathS3, "\n"), file = ldLog, sep = "\n", append = T)
 
-    cmd <- paste0("cd ", appDataFolder, "/", dirname(ldKey), "; bcftools view -S ../", outputFolder, "/extracted.panel -m2 -M2 -O z -o ../", ldTemp, " ", ldPathS3, " ", chromosome, ":", minpos, "-", maxpos)
+    cmd <- paste0("cd ", appDataFolder, "/", dirname(ldKey), "; bcftools view -S ", outputFolder, "/extracted.panel -m2 -M2 -O z -o ", ldTemp, " ", ldPathS3, " ", chromosome, ":", minpos, "-", maxpos)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
     cmd <- paste0("bcftools index -t ", ldTemp)
     cat(paste(cmd, system(cmd, intern = TRUE), sep = "\n"), file = ldLog, sep = "\n", append = T)
@@ -271,7 +271,7 @@ locus_alignment <- function(qdata, qdata_tmp, gwasdata, ld_data, kgpanel, select
     }
   }
 
-  cmd <- paste0("cd ", file.path(appDataFolder, "Recombination_Rate"), "; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ../", outputFolder, "/rc_temp.txt")
+  cmd <- paste0("cd ", file.path(appDataFolder, "Recombination_Rate"), "; tabix s3://", bucket, "/ezQTL/Recombination_Rate/", popshort, ".txt.gz ", chromosome, ":", minpos, "-", maxpos, " -D > ", outputFolder, "/rc_temp.txt")
   system(cmd)
   rcdata <- read_delim(file.path(outputFolder, "rc_temp.txt"), delim = "\t", col_names = F)
   if (ncol(rcdata)) {
