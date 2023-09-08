@@ -77,6 +77,8 @@ async function calculate(params, logger, env) {
     gwasFile: params.gwasFile,
     associationFile: params.associationFile,
     LDFile: params.LDFile,
+    genotypeFile: params.genotypeFile,
+    quantificationFile: params.quantificationFile,
     locusInformation: [
       {
         select_dist: params.select_dist,

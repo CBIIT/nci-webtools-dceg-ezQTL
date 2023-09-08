@@ -1668,6 +1668,8 @@ export function qtlsGWASLocusQCCalculation(params) {
               gwasFile: params.gwasFile,
               associationFile: params.associationFile,
               LDFile: params.LDFile,
+              genotypeFile: params.genotypeFile,
+              quantificationFile: params.quantificationFile,
             })
           );
 
