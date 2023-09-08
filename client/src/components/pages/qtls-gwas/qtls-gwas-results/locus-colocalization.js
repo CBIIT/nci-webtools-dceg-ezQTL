@@ -381,7 +381,7 @@ export function LocusColocalization() {
           {hyprcoloc_table.data.length > 0 && (
             <div className="mb-2">
               <Zoom
-                plotURL={`api/data/${request}/hyprcoloc_table.svg`}
+                plotURL={`api/data/output/${request}/hyprcoloc_table.svg`}
                 className="border rounded p-3"
                 maxHeight="650px"
               />
@@ -454,7 +454,7 @@ export function LocusColocalization() {
             {hyprcolocSNPScore_table && !isLoadingHyprcoloc && !hyprcolocError && (
               <div className="mb-2">
                 <Zoom
-                  plotURL={`api/data/${request}/hyprcoloc_snpscore_table.svg`}
+                  plotURL={`api/data/output/${request}/hyprcoloc_snpscore_table.svg`}
                   className="border rounded p-3"
                 />
               </div>
@@ -539,7 +539,7 @@ export function LocusColocalization() {
             {ecaviar_table.data.length > 0 && (
               <div className="mb-2">
                 <Zoom
-                  plotURL={`api/data/${request}/ecaviar_table_barplot.svg`}
+                  plotURL={`api/data/output/${request}/ecaviar_table_barplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
                   plotId="1"
@@ -556,7 +556,7 @@ export function LocusColocalization() {
                 />
                 <br />
                 <Zoom
-                  plotURL={`api/data/${request}/ecaviar_table_boxplot.svg`}
+                  plotURL={`api/data/output/${request}/ecaviar_table_boxplot.svg`}
                   className="border rounded p-3"
                   maxHeight="1000px"
                   plotId="2"
@@ -619,7 +619,7 @@ export function LocusColocalization() {
 
             {summaryLoaded && !summaryError && (
               <Zoom
-                plotURL={`api/data/${request}/Summary.svg`}
+                plotURL={`api/data/output/${request}/Summary.svg`}
                 className="border rounded p-3 mb-2"
                 maxHeight="1000px"
                 descAbove={

@@ -12,7 +12,7 @@ export function createApi(env) {
   router.use(logRequests());
 
   // serve static files under /data
-  router.use('/data', express.static(env.OUTPUT_FOLDER));
+  router.use('/data', express.static(env.DATA_FOLDER));
 
   // register routes
   router.get('/ping', async (req, res) => res.json(true));

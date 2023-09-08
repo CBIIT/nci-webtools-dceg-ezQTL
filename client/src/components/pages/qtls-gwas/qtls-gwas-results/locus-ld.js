@@ -223,7 +223,7 @@ export function LocusLD() {
           <hr />
           <div className="px-3 py-2">
             <Zoom
-              plotURL={`api/data/${request}/LD_Output.png`}
+              plotURL={`api/data/output/${request}/LD_Output.png`}
               className="border rounded p-3"
               maxHeight="100%"
             />
