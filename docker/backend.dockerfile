@@ -89,3 +89,7 @@ ARG CACHE_BUST
 COPY . /deploy/
 
 CMD npm start
+
+# ensure symlink exists for /data/appData
+RUN mkdir -p /data/appData \
+    && ln -sf /data/appData /appData

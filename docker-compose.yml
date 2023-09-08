@@ -9,7 +9,7 @@ services:
     env_file: "./server/.env"
     environment:
       DATA_FOLDER: /data
-      APP_DATA_FOLDER: /data/appData
+      APP_DATA_FOLDER: /appData
       INPUT_FOLDER: /data/input
       OUTPUT_FOLDER: /data/output
       APP_PORT: 3001
