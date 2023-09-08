@@ -6,7 +6,8 @@ import fs from 'fs-extra';
 import XLSX from 'xlsx';
 import tar from 'tar';
 import { validate, v1 as uuidv1 } from 'uuid';
-import { parseCSV, mkdirs, writeJson ,getFiles} from './utils.js';
+import { handleValidationErrors, logFiles } from './middleware.js';
+import { parseCSV, mkdirs, writeJson, getFiles } from './utils.js';
 import {
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
@@ -41,18 +42,13 @@ export default function calculationRoutes(env) {
   const upload = multer({ storage: storage });
   const validateRequest = check('request').isUUID();
 
-  // add cache-control headers to GET requests
-  // router.use((request, response, next) => {
-  //   if (request.method === 'GET')
-  //     response.set(`Cache-Control', 'public, max-age=${60 * 60}`);
-  //   next();
-  // });
-
   // file upload route
   router.post(
     '/file-upload',
-    check('request_id').isUUID(),
+    check('request').isUUID(),
+    handleValidationErrors,
     upload.any(),
+    logFiles(),
     async (req, res) => res.json(true)
   );
 
@@ -83,108 +79,66 @@ export default function calculationRoutes(env) {
     res.json(data);
   });
 
-  router.post('/submitLong', validateRequest, async (req, res) => {
-    const { request } = req.body;
-    const inputFolder = path.resolve(env.INPUT_FOLDER, request);
-    const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
-    const paramsFilePath = path.resolve(inputFolder, 'params.json');
-    const statusFilePath = path.resolve(outputFolder, 'status.json');
-    await mkdirs([inputFolder, outputFolder]);
-
-    const status = {
-      id: request,
-      status: 'SUBMITTED',
-      submittedAt: new Date(),
-    };
-
-    await writeJson(paramsFilePath, req.body);
-    await writeJson(statusFilePath, status);
-
-    const type = env.NODE_ENV === 'dev' ? 'local' : 'fargate';
-    const worker = getWorker(type);
-    worker(request, req.app, env);
-    res.json(request);
-  });
-
-  router.post('/fetch-results', validateRequest, async (req, res) => {
-    const { logger } = req.app.locals;
-
-    try {
+  router.post(
+    '/submitLong',
+    validateRequest,
+    handleValidationErrors,
+    async (req, res) => {
       const { request } = req.body;
-
-      logger.info(`Fetch Queue Result: ${request}`);
-
-      // validate request id
-      //   if (!validate(request.substring(0, 36)))
-      //     next(new Error(`Invalid request`));
-
-      // ensure output directory exists
+      const inputFolder = path.resolve(env.INPUT_FOLDER, request);
       const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
-      await mkdirs([outputFolder]);
+      const paramsFilePath = path.resolve(inputFolder, 'params.json');
+      const statusFilePath = path.resolve(outputFolder, 'status.json');
+      await mkdirs([inputFolder, outputFolder]);
 
-      // find objects which use the specified request as the prefix
-      //   const objects = await s3
-      //     .listObjectsV2({
-      //       Bucket: env.IO_BUCKET,
-      //       Prefix: `${env.OUTPUT_KEY_PREFIX}/${request}/`,
-      //     })
-      //     .promise();
+      const status = {
+        id: request,
+        status: 'SUBMITTED',
+        submittedAt: new Date(),
+      };
 
-      //   // download results
-      //   for (let { Key } of objects.Contents) {
-      //     const filename = path.basename(Key);
-      //     const filepath = path.resolve(resultsFolder, filename);
+      await writeJson(paramsFilePath, req.body);
+      await writeJson(statusFilePath, status);
 
-      //     // download files if they do not exist
-      //     if (!fs.existsSync(filepath)) {
-      //       logger.debug(`Downloading file: ${Key}`);
-
-      //       const object = await s3
-      //         .getObject({
-      //           Bucket: env.IO_BUCKET,
-      //           Key,
-      //         })
-      //         .promise();
-
-      //       await fs.promises.writeFile(filepath, object.Body);
-      //       // extract and delete archive
-      //       if (path.extname(filename) == '.tgz') {
-      //         logger.debug(`Extracting ${filename} to ${resultsFolder}`);
-      //         fs.createReadStream(filepath).pipe(
-      //           tar.x({ strip: 1, C: resultsFolder }),
-      //           (err) => {
-      //             if (err) logger.error(err);
-      //             else {
-      //               logger.debug('Extraction done');
-      //               fs.unlink(filepath, (err) => {
-      //                 if (err) {
-      //                   logger.error(`Failed to delete ${filename}`);
-      //                 } else {
-      //                   logger.debug(`Deleted ${filename}`);
-      //                 }
-      //               });
-      //             }
-      //           }
-      //         );
-      //       }
-      //     }
-      //   }
-
-      let stateFilePath = path.resolve(outputFolder, `state.json`);
-
-      if (fs.existsSync(stateFilePath)) {
-        let data = JSON.parse(
-          String(await fs.promises.readFile(stateFilePath))
-        );
-
-        res.json(data);
-      } else {
-        next(new Error(`Params not found`));
-      }
-    } catch (error) {
-      next(error);
+      const type = env.NODE_ENV === 'dev' ? 'local' : 'fargate';
+      const worker = getWorker(type);
+      worker(request, req.app, env);
+      res.json(request);
     }
-  });
+  );
+
+  router.post(
+    '/fetch-results',
+    validateRequest,
+    handleValidationErrors,
+    async (req, res) => {
+      const { logger } = req.app.locals;
+
+      try {
+        const { request } = req.body;
+
+        logger.info(`Fetch Queue Result: ${request}`);
+
+        // ensure output directory exists
+        const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
+        await mkdirs([outputFolder]);
+
+        let stateFilePath = path.resolve(outputFolder, `state.json`);
+
+        if (fs.existsSync(stateFilePath)) {
+          let data = JSON.parse(
+            String(await fs.promises.readFile(stateFilePath))
+          );
+
+          res.json(data);
+        } else {
+          next(new Error(`Params not found`));
+        }
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 
   router.get('/fetch-sample', async (req, res, next) => {
     const { logger } = req.app.locals;
@@ -256,11 +210,16 @@ export default function calculationRoutes(env) {
   });
 
   // download work session
-  router.get('/locus-download/:request', validateRequest, (req, res, next) => {
-    const { request } = req.params;
-    res.attachment(`${request}.tar.gz`);
-    tar.c({ gzip: true, cwd: env.OUTPUT_FOLDER }, [request]).pipe(res);
-  });
+  router.get(
+    '/locus-download/:request',
+    validateRequest,
+    handleValidationErrors,
+    (req, res, next) => {
+      const { request } = req.params;
+      res.attachment(`${request}.tar.gz`);
+      tar.c({ gzip: true, cwd: env.OUTPUT_FOLDER }, [request]).pipe(res);
+    }
+  );
 
   router.post('/qtls-locus-alignment-boxplots', (req, res, next) =>
     qtlsCalculateLocusAlignmentBoxplots(req.body, req, res, next)
