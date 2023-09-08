@@ -1382,7 +1382,7 @@ export const drawLocusAlignmentScatter = (
 export function uploadFile(params) {
   return async function (dispatch, getState) {
     const form = new FormData();
-    form.append('request_id', params.request.toString());
+    form.append('request', params.request.toString());
     form.append('associationFile', params.associationFile);
     form.append('quantificationFile', params.quantificationFile);
     form.append('genotypeFile', params.genotypeFile);
@@ -1401,7 +1401,11 @@ export function uploadFile(params) {
     dispatch(updateQTLsGWAS({ isLoading: true }));
 
     try {
-      const res = await axios.post('api/file-upload', form, config);
+      const res = await axios.post(
+        `api/file-upload/${params.request}`,
+        form,
+        config
+      );
       // if (res.data.files && res.data.files.length > 0) {
       //   dispatch(
       //     updateQTLsGWAS({

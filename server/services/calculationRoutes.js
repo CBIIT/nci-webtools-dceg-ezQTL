@@ -27,8 +27,8 @@ export default function calculationRoutes(env) {
 
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      const { request_id } = req.body;
-      const uploadDir = path.resolve(inputFolder, request_id);
+      const { request } = req.body;
+      const uploadDir = path.resolve(inputFolder, request);
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir);
       }
@@ -44,8 +44,8 @@ export default function calculationRoutes(env) {
 
   // file upload route
   router.post(
-    '/file-upload',
-    check('request').isUUID(),
+    '/file-upload/:request',
+    validateRequest,
     handleValidationErrors,
     upload.any(),
     logFiles(),
@@ -145,12 +145,12 @@ export default function calculationRoutes(env) {
 
     logger.info(`Fetching Sample`);
     try {
-      const request_id = uuidv1();
+      const request = uuidv1();
       const sampleArchive = path.resolve(
         env.APP_DATA_FOLDER,
         'sample/sample.tgz'
       );
-      const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request_id);
+      const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request);
 
       // ensure output directory exists
       await fs.promises.mkdir(resultsFolder, { recursive: true });
@@ -179,13 +179,13 @@ export default function calculationRoutes(env) {
         files.forEach((file) =>
           fs.renameSync(
             path.resolve(resultsFolder, file),
-            path.resolve(resultsFolder, file.replace(oldRequest, request_id))
+            path.resolve(resultsFolder, file.replace(oldRequest, request))
           )
         );
 
         // replace request id
-        data.state.request = request_id;
-        data.state.inputs.request[0] = request_id;
+        data.state.request = request;
+        data.state.inputs.request[0] = request;
 
         res.json(data);
       } else {
