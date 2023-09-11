@@ -204,55 +204,63 @@ export function QTLsGWASForm() {
   }
 
   function getProjectOptions(data, genome) {
-    return [
-      ...new Set(
-        data
-          .filter((row) => row['Genome_build'] == genome.value)
-          .map((row) => row['Project'])
-      ),
-    ].map((project) => ({ value: project, label: project }));
+    if (data && genome) {
+      return [
+        ...new Set(
+          data
+            .filter((row) => row['Genome_build'] == genome.value)
+            .map((row) => row['Project'])
+        ),
+      ].map((project) => ({ value: project, label: project }));
+    } else return [];
   }
 
   function getXqtlOptions(data, genome, project) {
-    return [
-      ...new Set(
-        data
-          .filter(
-            (row) =>
-              row.Genome_build == genome.value && row.Project == project.value
-          )
-          .map((row) => row.xQTL)
-      ),
-    ].map((xQtl) => ({ value: xQtl, label: xQtl }));
+    if (data && genome && project) {
+      return [
+        ...new Set(
+          data
+            .filter(
+              (row) =>
+                row.Genome_build == genome.value && row.Project == project.value
+            )
+            .map((row) => row.xQTL)
+        ),
+      ].map((xQtl) => ({ value: xQtl, label: xQtl }));
+    } else return [];
   }
 
   function getTissueOptions(data, genome, project, xQtl) {
-    return !tissueOnly
-      ? data
-          .filter(
-            (row) =>
-              row['Genome_build'] == genome.value &&
-              row['Project'] == project.value &&
-              row['xQTL'] == xQtl.value
-          )
-          .map((row) => ({ value: row.Tissue, label: row.Tissue }))
-      : data
-          .filter((row) => row['Genome_build'] == genome.value)
-          .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
+    if ((data && genome && project, xQtl)) {
+      return !tissueOnly
+        ? data
+            .filter(
+              (row) =>
+                row['Genome_build'] == genome.value &&
+                row['Project'] == project.value &&
+                row['xQTL'] == xQtl.value
+            )
+            .map((row) => ({ value: row.Tissue, label: row.Tissue }))
+        : data
+            .filter((row) => row['Genome_build'] == genome.value)
+            .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
+    } else return [];
   }
 
   function getPhenotypeOptions(data, genome, project) {
-    return !phenotypeOnly
-      ? data
-          .filter(
-            (row) =>
-              row['Genome_build'] == genome.value &&
-              row['Project'] == project.value
-          )
-          .map((row) => ({ value: row.Phenotype, label: row.Phenotype }))
-      : data
-          .filter((row) => row['Genome_build'] == genome.value)
-          .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
+    if (data && genome && project) {
+      return !phenotypeOnly
+        ? data
+            .filter(
+              (row) =>
+                row['Genome_build'] == genome.value &&
+                row['Project'] == project.value
+            )
+            .map((row) => ({ value: row.Phenotype, label: row.Phenotype }))
+        : data
+            .filter((row) => row['Genome_build'] == genome.value)
+            .map((row) => ({ value: row.Full_Name, label: row.Full_Name }));
+    } else return [];
   }
 
   function populatePublicParameters(genome) {
