@@ -1,5 +1,5 @@
 appScriptsPath <- Sys.getenv("APP_SCRIPTS")
-appDataFolder <- Sys.getenv(("APP_DATA_FOLDER"))
+appDataFolder <- Sys.getenv("APP_DATA_FOLDER")
 bucket <- Sys.getenv("DATA_BUCKET")
 library(jsonlite)
 # increase buffer size in case of large LD files https://github.com/tidyverse/vroom/issues/364
@@ -68,17 +68,17 @@ qtlsRecalculateQuantification <- function(exprFile, genoFile, traitID, genotypeI
 }
 
 qtlsCalculateLocusAlignmentBoxplots <- function(quantificationFile, genotypeFile, info, request) {
-  source(file.path(appScriptsPath, "qtls.R"))
+  source(file.path(appScriptsPath, "qtls.r"))
   locus_alignment_boxplots(quantificationFile, genotypeFile, info, request)
 }
 
 qtlsCalculateLocusColocalizationECAVIAR <- function(gwasFile, associationFile, LDFile, select_ref, select_dist, request) {
-  source(file.path(appScriptsPath, "qtls-locus-colocalization-ecaviar.R"))
+  source(file.path(appScriptsPath, "qtls-locus-colocalization-ecaviar.r"))
   locus_colocalization_eCAVIAR(gwasFile, associationFile, LDFile, select_ref, select_dist, request)
 }
 
 qtlsCalculateLocusColocalizationHyprcoloc <- function(select_dist, select_ref, gwasFile, associationFile, ldfile, request) {
-  source(file.path(appScriptsPath, "qtls-locus-colocalization-hyprcoloc.R"))
+  source(file.path(appScriptsPath, "qtls-locus-colocalization-hyprcoloc.r"))
   outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   # log file path
   logfile <<- file.path(outputFolder, "ezQTL.log")

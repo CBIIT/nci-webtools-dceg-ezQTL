@@ -1,5 +1,5 @@
 appScriptsPath <- Sys.getenv("APP_SCRIPTS")
-appDataFolder <- Sys.getenv(("APP_DATA_FOLDER"))
+appDataFolder <- Sys.getenv("APP_DATA_FOLDER")
 
 locus_colocalization_hyprcoloc <- function(select_dist, select_ref, gwasfile, qtlfile, ldfile, request, bucket) {
   source(file.path(appScriptsPath, "ezQTL_ztw.R"))

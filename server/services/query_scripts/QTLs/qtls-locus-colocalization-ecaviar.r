@@ -1,5 +1,5 @@
 appScriptsPath <- Sys.getenv("APP_SCRIPTS")
-appDataFolder <- Sys.getenv(("APP_DATA_FOLDER"))
+appDataFolder <- Sys.getenv("APP_DATA_FOLDER")
 
 locus_colocalization_eCAVIAR <- function(gwasFile, assocFile, LDFile, select_ref, select_dist, request, bucket) {
   source(file.path(appScriptsPath, "ezQTL_ztw.R"))

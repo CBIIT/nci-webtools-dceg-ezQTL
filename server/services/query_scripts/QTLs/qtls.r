@@ -1,5 +1,5 @@
 appScriptsPath <- Sys.getenv("APP_SCRIPTS")
-appDataFolder <- Sys.getenv(("APP_DATA_FOLDER"))
+appDataFolder <- Sys.getenv("APP_DATA_FOLDER")
 bucket <- Sys.getenv("DATA_BUCKET")
 
 locus_alignment_define_window <- function(recalculateAttempt, recalculatePop, recalculateGene, recalculateDist,
