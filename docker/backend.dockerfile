@@ -93,3 +93,5 @@ CMD npm start
 # ensure symlink exists for /data/appData
 RUN mkdir -p /data/appData \
     && ln -sf /data/appData /appData
+RUN mkdir -p /deploy/server/services/query_scripts/QTLs \
+    && ln -sf /deploy/server/services/query_scripts/QTLs /appScripts
