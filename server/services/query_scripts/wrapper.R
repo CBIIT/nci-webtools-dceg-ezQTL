@@ -9,7 +9,7 @@ loadAWS <- function() {
   if (Sys.getenv("AWS_ACCESS_KEY_ID") == "") {
     library(aws.ec2metadata)
 
-    if (is_ec2()) {
+    if (is_ec2() || is_ecs()) {
       awsConfig <- aws.signature::locate_credentials()
       Sys.setenv(
         "AWS_ACCESS_KEY_ID" = awsConfig$key,
