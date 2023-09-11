@@ -23,6 +23,7 @@ export const required = [
   'SECURITY_GROUP_IDS',
   'ECS_CLUSTER',
   'WORKER_TASK_NAME',
+  'WORKER_TYPE',
 ];
 
 export function validateEnvironment(env = process.env, vars = required) {

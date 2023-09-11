@@ -100,8 +100,7 @@ export default function calculationRoutes(env) {
       await writeJson(paramsFilePath, req.body);
       await writeJson(statusFilePath, status);
 
-      const type = env.NODE_ENV === 'dev' ? 'local' : 'fargate';
-      const worker = getWorker(type);
+      const worker = getWorker(env.WORKER_TYPE);
       worker(request, req.app, env);
       res.json(request);
     }
