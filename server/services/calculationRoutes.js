@@ -4,10 +4,10 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs-extra';
 import XLSX from 'xlsx';
-import tar from 'tar';
+import archiver from 'archiver';
 import { validate, v1 as uuidv1 } from 'uuid';
 import { handleValidationErrors, logFiles } from './middleware.js';
-import { parseCSV, mkdirs, writeJson, getFiles } from './utils.js';
+import { parseCSV, mkdirs, writeJson, getFiles, readJson } from './utils.js';
 import {
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
@@ -213,10 +213,15 @@ export default function calculationRoutes(env) {
     '/locus-download/:request',
     validateRequest,
     handleValidationErrors,
-    (req, res, next) => {
+    async (req, res, next) => {
       const { request } = req.params;
-      res.attachment(`${request}.tar.gz`);
-      tar.c({ gzip: true, cwd: env.OUTPUT_FOLDER }, [request]).pipe(res);
+      const output = path.resolve(env.OUTPUT_FOLDER, request);
+      const { state } = await readJson(path.resolve(output, 'state.json'));
+      const archive = archiver('zip', { zlib: { level: 6 } });
+      const filename = state.jobName ? state.jobName.trim() : 'ezQTL_results';
+      res.attachment(`${filename}.zip`);
+      archive.directory(output, false).pipe(res);
+      archive.finalize();
     }
   );
 

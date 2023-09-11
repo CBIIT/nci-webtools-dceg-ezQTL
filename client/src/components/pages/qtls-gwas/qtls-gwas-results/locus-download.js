@@ -52,7 +52,6 @@ export function LocusDownload() {
           isLoadingQC
         }
         href={`api/locus-download/${request}`}
-        target={'_blank'}
       >
         <FontAwesomeIcon icon={faFileArchive} /> Download Results
       </Button>
