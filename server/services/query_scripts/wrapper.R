@@ -129,7 +129,9 @@ qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, 
       loadAWS()
       gwasPathS3 <- paste0("s3://", bucket, "/ezQTL/", gwasKey)
       cmd <- paste0("cd ", appDataFolder, "/", dirname(gwasKey), "; tabix ", gwasPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ", gwasFile)
-      system(cmd)
+      gwasQuery <- system(cmd)
+      cat(cmd, file = file.path(outputFolder, "gwas_s3_log.txt"), sep = "\n", append = FALSE)
+      cat(gwasQuery, file = file.path(outputFolder, "gwas_s3_log.txt"), sep = "\n", append = TRUE)
 
       gdata <- read_delim(file.path(outputFolder, "gwas_temp.txt"), delim = "\t", col_names = T)
       if (dim(gdata)[1] == 0) {
@@ -168,8 +170,10 @@ qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, 
     if (!file.exists(associationFile)) {
       loadAWS()
       qtlPathS3 <- paste0("s3://", bucket, "/ezQTL/", qtlKey)
-      cmd <- paste0("cd ", appDataFolder, "/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh > ", associationFile)
-      system(cmd)
+      cmd <- paste0("cd ", appDataFolder, "/", dirname(qtlKey), "; tabix ", qtlPathS3, " ", select_chromosome, ":", minpos, "-", maxpos, " -Dh --verbosity 4 > ", associationFile)
+      qtlQuery <- system(cmd, intern = TRUE)
+      cat(cmd, file = file.path(outputFolder, "qtl_s3_log.txt"), sep = "\n", append = FALSE)
+      cat(qtlQuery, file = file.path(outputFolder, "qtl_s3_log.txt"), sep = "\n", append = TRUE)
 
       # rename #gene_id to gene_id
       qdata <- read_delim(file.path(outputFolder, "qtl_temp.txt"), delim = "\t", col_names = T, col_types = cols(variant_id = "c"))
