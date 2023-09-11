@@ -437,11 +437,12 @@ export function QTLsGWASForm() {
       dispatch(
         updateQTLsGWAS({ qtlKey: qtlKey, gwasKey: gwasKey, ldKey: ldKey })
       );
+      const jobIndex =
+        data.locusInformation.length > 1 ? ` - ${locusIndex}` : '';
+      const jobName = (data.jobName || 'ezQTL') + jobIndex;
 
       return {
-        jobName: data.jobName
-          ? `${data.jobName} - ${locusIndex}`
-          : `ezQTL - ${locusIndex}`,
+        jobName,
         request: `${request}-${locusIndex}`,
         email: data.email,
         useQueue: data.useQueue,
