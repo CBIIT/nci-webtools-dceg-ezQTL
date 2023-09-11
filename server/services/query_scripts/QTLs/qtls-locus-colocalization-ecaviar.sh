@@ -207,7 +207,7 @@ while read -r gene; do
     
 done <<< "$genelist"
 
-cat */eCAVIAR_out.txt2 |awk -F "\t" -v OFS="\t" '!a[$0]++' > ../../../$output 
+cat */eCAVIAR_out.txt2 |awk -F "\t" -v OFS="\t" '!a[$0]++' > $output 
 cp run.log ../${request}.run.log
 
 # rm -rf  $tmpfold
