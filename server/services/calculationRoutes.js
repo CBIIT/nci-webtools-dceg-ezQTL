@@ -27,7 +27,7 @@ export default function calculationRoutes(env) {
 
   const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      const { request } = req.body;
+      const { request } = req.params;
       const uploadDir = path.resolve(inputFolder, request);
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir);

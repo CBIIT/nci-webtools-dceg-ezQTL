@@ -1380,70 +1380,18 @@ export const drawLocusAlignmentScatter = (
 };
 
 export function uploadFile(params) {
-  return async function (dispatch, getState) {
+  return async function (dispatch) {
+    dispatch(updateQTLsGWAS({ isLoading: true }));
     const form = new FormData();
-    form.append('request', params.request.toString());
     form.append('associationFile', params.associationFile);
     form.append('quantificationFile', params.quantificationFile);
     form.append('genotypeFile', params.genotypeFile);
     form.append('gwasFile', params.gwasFile);
     form.append('LDFile', params.LDFile);
-    form.append('associationFileName', params.associationFileName);
-    form.append('quantificationFileName', params.quantificationFileName);
-    form.append('genotypeFileName', params.genotypeFileName);
-    form.append('gwasFileName', params.gwasFileName);
-    form.append('LDFileName', params.LDFileName);
-    const config = {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    };
-    dispatch(updateQTLsGWAS({ isLoading: true }));
+    const config = { headers: { 'Content-Type': 'multipart/form-data' } };
 
     try {
-      const res = await axios.post(
-        `api/file-upload/${params.request}`,
-        form,
-        config
-      );
-      // if (res.data.files && res.data.files.length > 0) {
-      //   dispatch(
-      //     updateQTLsGWAS({
-      //       associationFile:
-      //         res.data.body.associationFileName !== 'false'
-      //           ? res.data.files.filter(
-      //               (item) =>
-      //                 item.filename === res.data.body.associationFileName
-      //             )[0].filename
-      //           : false,
-      //       quantificationFile:
-      //         res.data.body.quantificationFileName !== 'false'
-      //           ? res.data.files.filter(
-      //               (item) =>
-      //                 item.filename === res.data.body.quantificationFileName
-      //             )[0].filename
-      //           : false,
-      //       genotypeFile:
-      //         res.data.body.genotypeFileName !== 'false'
-      //           ? res.data.files.filter(
-      //               (item) => item.filename === res.data.body.genotypeFileName
-      //             )[0].filename
-      //           : false,
-      //       gwasFile:
-      //         res.data.body.gwasFileName !== 'false'
-      //           ? res.data.files.filter(
-      //               (item) => item.filename === res.data.body.gwasFileName
-      //             )[0].filename
-      //           : false,
-      //       LDFile:
-      //         res.data.body.LDFileName !== 'false'
-      //           ? res.data.files.filter(
-      //               (item) => item.filename === res.data.body.LDFileName
-      //             )[0].filename
-      //           : false,
-      //     })
-      //   );
-      // }
+      await axios.post(`api/file-upload/${params.request}`, form, config);
       dispatch(updateQTLsGWAS({ isLoading: false }));
     } catch (error) {
       console.log(error);

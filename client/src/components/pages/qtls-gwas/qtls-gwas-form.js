@@ -341,26 +341,32 @@ export function QTLsGWASForm() {
     }
     dispatch(updateQTLsGWAS(data));
     const request = crypto.randomUUID();
+    const {
+      _associationFile,
+      _quantificationFile,
+      _genotypeFile,
+      _LDFile,
+      _gwasFile,
+    } = data;
 
-    await dispatch(
-      uploadFile({
-        associationFile: data._associationFile,
-        quantificationFile: data._quantificationFile,
-        genotypeFile: data._genotypeFile,
-        LDFile: data._LDFile,
-        gwasFile: data._gwasFile,
-        associationFileName: data._associationFile
-          ? _associationFile.name
-          : false,
-        quantificationFileName: data._quantificationFile
-          ? _quantificationFile.name
-          : false,
-        genotypeFileName: data._genotypeFile ? _genotypeFile.name : false,
-        LDFileName: data._LDFile ? _LDFile.name : false,
-        gwasFileName: data._gwasFile ? _gwasFile.name : false,
-        request,
-      })
-    );
+    if (
+      _associationFile ||
+      _quantificationFile ||
+      _genotypeFile ||
+      _LDFile ||
+      _gwasFile
+    ) {
+      await dispatch(
+        uploadFile({
+          associationFile: _associationFile,
+          quantificationFile: _quantificationFile,
+          genotypeFile: _genotypeFile,
+          LDFile: _LDFile,
+          gwasFile: _gwasFile,
+          request,
+        })
+      );
+    }
 
     const params = data.locusInformation.map((locusInfo, locusIndex) => {
       const { select_dist, select_ref, select_position, select_chromosome } =
