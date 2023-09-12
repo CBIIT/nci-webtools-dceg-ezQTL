@@ -4,6 +4,7 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs-extra';
 import XLSX from 'xlsx';
+import tar from 'tar';
 import archiver from 'archiver';
 import { validate, v1 as uuidv1 } from 'uuid';
 import { handleValidationErrors, logFiles } from './middleware.js';
