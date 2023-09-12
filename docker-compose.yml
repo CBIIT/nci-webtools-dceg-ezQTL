@@ -9,8 +9,8 @@ services:
     env_file: "./server/.env"
     environment:
       DATA_FOLDER: /data
-      APP_DATA_FOLDER: /appData
-      APP_SCRIPTS: /appScripts
+      APP_DATA_FOLDER: /data/appData
+      APP_SCRIPTS: /deploy/server/services/query_scripts/QTLs
       INPUT_FOLDER: /data/input
       OUTPUT_FOLDER: /data/output
       APP_PORT: 3001
