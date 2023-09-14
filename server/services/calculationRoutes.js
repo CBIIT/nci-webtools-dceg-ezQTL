@@ -85,7 +85,7 @@ export default function calculationRoutes(env) {
     validateRequest,
     handleValidationErrors,
     async (req, res) => {
-      const { request } = req.body;
+      const { request, params, ...rest } = req.body;
       const inputFolder = path.resolve(env.INPUT_FOLDER, request);
       const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
       const paramsFilePath = path.resolve(inputFolder, 'params.json');
@@ -97,8 +97,24 @@ export default function calculationRoutes(env) {
         status: 'SUBMITTED',
         submittedAt: new Date(),
       };
-
-      await writeJson(paramsFilePath, req.body);
+      const sanitized = (params) => {
+        if (Array.isArray(params)) {
+          return params.map((p) => ({
+            ...p,
+            jobName: p.jobName.replace(/[/\\?%*:|"<>]/g, '-'),
+          }));
+        } else {
+          return {
+            ...params,
+            jobName: params.jobName.replace(/[/\\?%*:|"<>]/g, '-'),
+          };
+        }
+      };
+      await writeJson(paramsFilePath, {
+        request,
+        params: sanitized(params),
+        ...rest,
+      });
       await writeJson(statusFilePath, status);
 
       const worker = getWorker(env.WORKER_TYPE);

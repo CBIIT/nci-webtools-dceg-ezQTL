@@ -445,7 +445,8 @@ export function QTLsGWASForm() {
       );
       const jobIndex =
         data.locusInformation.length > 1 ? ` - ${locusIndex}` : '';
-      const jobName = (data.jobName || 'ezQTL') + jobIndex;
+      const jobName =
+        (data.jobName.replace(/[/\\?%*:|"<>]/g, '-') || 'ezQTL') + jobIndex;
 
       return {
         jobName,
