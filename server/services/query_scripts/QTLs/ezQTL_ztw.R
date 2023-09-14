@@ -444,7 +444,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       pertmp <- dim(snpalltmp)[1] / dim(snpall)[1]
       pertmp2 <- percent_format(accuracy = 0.01)(pertmp)
       cat(paste0("\nWarning: found ", pertmp2, " SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and alleles information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID for colocalization analyses."), file = logfile, sep = "\n", append = T)
-      snpalltmp %>% write_delim(paste0(substr(output_plot_prefix, 1, nchar(output_plot_prefix) - 36), "snp_not_match.txt"), delim = "\t", col_names = T)
+      snpalltmp %>% write_delim(paste0(output_plot_prefix, "snp_not_match.txt"), delim = "\t", col_names = T)
       if (pertmp > 0.9) {
         cat(paste0("Warning: align GWAS and QTL dataset based on LD information"), file = logfile, sep = "\n", append = T)
         snpall <- snpall %>% select(rsnum, chr, pos = pos_ld, ref = ref_ld, alt = alt_ld)
@@ -698,7 +698,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       pertmp <- dim(snpalltmp)[1] / dim(snpall)[1]
       pertmp2 <- percent_format(accuracy = 0.01)(pertmp)
       cat(paste0("\nWarning: found ", pertmp2, " SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and allels information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID."), file = logfile, sep = "\n", append = T)
-      snpalltmp %>% write_delim(paste0(substr(output_plot_prefix, 1, nchar(output_plot_prefix) - 36), "snp_not_match.txt"), delim = "\t", col_names = T)
+      snpalltmp %>% write_delim(paste0(output_plot_prefix, "snp_not_match.txt"), delim = "\t", col_names = T)
       if (pertmp > 0.9) {
         cat(paste0("Warning: align QTL based on GWAS information"), file = logfile, sep = "\n", append = T)
         snpall <- snpall %>% select(rsnum, chr, pos = pos_gwas, ref = ref_gwas, alt = alt_gwas)
@@ -901,7 +901,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       pertmp <- dim(snpalltmp)[1] / dim(snpall)[1]
       pertmp2 <- percent_format(accuracy = 0.01)(pertmp)
       cat(paste0("\nWarning: found ", pertmp2, " SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and allels information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID."), file = logfile, sep = "\n", append = T)
-      snpalltmp %>% write_delim(paste0(substr(output_plot_prefix, 1, nchar(output_plot_prefix) - 36), "snp_not_match.txt"), delim = "\t", col_names = T)
+      snpalltmp %>% write_delim(paste0(output_plot_prefix, "snp_not_match.txt"), delim = "\t", col_names = T)
       if (pertmp > 0.9) {
         cat(paste0("Warning: align GWAS and QTL dataset based on LD information"), file = logfile, sep = "\n", append = T)
         snpall <- snpall %>% select(rsnum, chr, pos = pos_ld, ref = ref_ld, alt = alt_ld)
@@ -1072,7 +1072,7 @@ coloc_QC <- function(gwasfile = NULL, gwasfile_pub = FALSE, qtlfile = NULL, qtlf
       pertmp <- dim(snpalltmp)[1] / dim(snpall)[1]
       pertmp2 <- percent_format(accuracy = 0.01)(pertmp)
       cat(paste0("\nWarning: found ", pertmp2, " SNPs with same rsnum, but different information. Please check the input datasets. Make sure input the data have the same genome build and allels information. Check the SNP Matching information for detail (snp_not_match.txt). However, ezQTL still can use the overlapped rsnum as the ID for colocalization analyses."), file = logfile, sep = "\n", append = T)
-      snpalltmp %>% write_delim(paste0(substr(output_plot_prefix, 1, nchar(output_plot_prefix) - 36), "snp_not_match.txt"), delim = "\t", col_names = T)
+      snpalltmp %>% write_delim(paste0(output_plot_prefix, "snp_not_match.txt"), delim = "\t", col_names = T)
       if (pertmp > 0.9) {
         cat(paste0("Warning: align GWAS and QTL dataset based on LD information"), file = logfile, sep = "\n", append = T)
         snpall <- snpall %>% select(rsnum, chr, pos = pos_ld, ref = ref_ld, alt = alt_ld)
