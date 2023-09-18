@@ -233,9 +233,9 @@ export default function calculationRoutes(env) {
     async (req, res, next) => {
       const { request } = req.params;
       const output = path.resolve(env.OUTPUT_FOLDER, request);
-      const { state } = await readJson(path.resolve(output, 'state.json'));
+      const jobState = await readJson(path.resolve(output, 'state.json'));
       const archive = archiver('zip', { zlib: { level: 6 } });
-      const filename = state.jobName ? state.jobName.trim() : 'ezQTL_results';
+      const filename = jobState?.state.jobName ? jobState.state.jobName.trim() : 'ezQTL_results';
       res.attachment(`${filename}.zip`);
       archive.directory(output, false).pipe(res);
       archive.finalize();
