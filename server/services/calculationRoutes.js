@@ -23,7 +23,6 @@ import { getWorker } from './workers.js';
 
 export default function calculationRoutes(env) {
   const router = Router();
-  const dataDir = path.resolve(env.APP_DATA_FOLDER);
   const inputFolder = path.resolve(env.INPUT_FOLDER);
 
   const storage = multer.diskStorage({
@@ -182,7 +181,7 @@ export default function calculationRoutes(env) {
   router.get('/getPublications', async (req, res, next) => {
     try {
       const csv = await parseCSV(
-        path.resolve(dataDir, 'vQTL2_resource_simple.csv')
+        path.resolve(env.APP_DATA_FOLDER, 'vQTL2_resource_simple.csv')
       );
 
       res.json(csv);
