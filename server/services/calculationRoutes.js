@@ -4,9 +4,9 @@ import path from 'path';
 import multer from 'multer';
 import fs from 'fs-extra';
 import XLSX from 'xlsx';
-import tar from 'tar';
 import archiver from 'archiver';
-import { validate, v1 as uuidv1 } from 'uuid';
+import decompress from 'decompress';
+import { v1 as uuidv1 } from 'uuid';
 import { handleValidationErrors, logFiles } from './middleware.js';
 import { parseCSV, mkdirs, writeJson, getFiles, readJson } from './utils.js';
 import {
@@ -157,59 +157,25 @@ export default function calculationRoutes(env) {
   );
 
   router.get('/fetch-sample', async (req, res, next) => {
-    const { logger } = req.app.locals;
+    const request = uuidv1();
+    const sampleArchive = path.resolve(env.APP_DATA_FOLDER, 'sample.zip');
+    const outputFolder = path.resolve(env.OUTPUT_FOLDER, request);
 
-    logger.info(`Fetching Sample`);
-    try {
-      const request = uuidv1();
-      const sampleArchive = path.resolve(
-        env.APP_DATA_FOLDER,
-        'sample/sample.tgz'
-      );
-      const resultsFolder = path.resolve(env.OUTPUT_FOLDER, request);
+    // ensure output directory exists
+    await mkdirs([outputFolder]);
 
-      // ensure output directory exists
-      await fs.promises.mkdir(resultsFolder, { recursive: true });
+    // extract files
+    await decompress(sampleArchive, outputFolder, { strip: 1 });
 
-      // copy sample to resultsFolder
-      await fs.copy(path.resolve(env.APP_DATA_FOLDER, 'sample'), resultsFolder);
-
-      // extract files
-      await new Promise((resolve, reject) => {
-        fs.createReadStream(sampleArchive)
-          .on('end', () => resolve())
-          .on('error', (err) => reject(err))
-          .pipe(tar.x({ strip: 1, C: resultsFolder }));
-      });
-
-      let stateFilePath = path.resolve(resultsFolder, `state.json`);
-
-      if (fs.existsSync(stateFilePath)) {
-        let data = JSON.parse(
-          String(await fs.promises.readFile(stateFilePath))
-        );
-
-        // rename files
-        const oldRequest = data.state.request;
-        const files = fs.readdirSync(resultsFolder);
-        files.forEach((file) =>
-          fs.renameSync(
-            path.resolve(resultsFolder, file),
-            path.resolve(resultsFolder, file.replace(oldRequest, request))
-          )
-        );
-
-        // replace request id
-        data.state.request = request;
-        data.state.inputs.request[0] = request;
-
-        res.json(data);
-      } else {
-        next(new Error(`Params not found`));
-      }
-    } catch (error) {
-      next(error);
-    }
+    // modify state with new request id
+    const stateFile = path.resolve(outputFolder, 'state.json');
+    const prevState = await readJson(stateFile);
+    const newState = {
+      ...prevState,
+      state: { ...prevState.state, request: request },
+    };
+    await writeJson(stateFile, newState);
+    res.json(newState);
   });
 
   // Publications page data
@@ -235,7 +201,9 @@ export default function calculationRoutes(env) {
       const output = path.resolve(env.OUTPUT_FOLDER, request);
       const jobState = await readJson(path.resolve(output, 'state.json'));
       const archive = archiver('zip', { zlib: { level: 6 } });
-      const filename = jobState?.state.jobName ? jobState.state.jobName.trim() : 'ezQTL_results';
+      const filename = jobState?.state.jobName
+        ? jobState.state.jobName.trim()
+        : 'ezQTL_results';
       res.attachment(`${filename}.zip`);
       archive.directory(output, false).pipe(res);
       archive.finalize();
