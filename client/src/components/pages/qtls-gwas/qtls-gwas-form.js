@@ -1184,7 +1184,7 @@ export function QTLsGWASForm() {
                       <Form.Control
                         {...field}
                         title="LD Reference SNP Input"
-                        aria-label="LD Refereence SNP Input"
+                        aria-label="LD Reference SNP Input"
                         id="qtls-snp-input"
                         disabled={submitted}
                         isInvalid={
