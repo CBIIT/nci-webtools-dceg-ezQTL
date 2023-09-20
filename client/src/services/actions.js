@@ -2188,7 +2188,7 @@ export function submitLong(data) {
       dispatch(
         updateSuccess({
           visible: true,
-          message: `Your job was successfully submitted. You will recieve an email at ${
+          message: `Your job was successfully submitted. You will receive an email at ${
             data.multi ? data.params[0].email : data.params.email
           } with your results.`,
         })
