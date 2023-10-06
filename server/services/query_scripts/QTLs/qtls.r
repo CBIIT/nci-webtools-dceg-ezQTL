@@ -451,15 +451,15 @@ locus_quantification <- function(tmp, exprFile, genoFile, edata, gdata, traitID,
 }
 
 locus_alignment_boxplots <- function(exprFile, genoFile, info, request) {
-  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
+  outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   library(tidyverse)
   # library(forcats)
   library(jsonlite)
   # initialize locus alignment boxplots data as empty until data file detected
   locus_alignment_boxplots_data <- list(c())
   if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
-    gdatafile <- file.path(inputFolder, genoFile)
-    edatafile <- file.path(inputFolder, exprFile)
+    gdatafile <- file.path(outputFolder, genoFile)
+    edatafile <- file.path(outputFolder, exprFile)
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
     edata <- read_delim(edatafile, delim = "\t", col_names = T)
@@ -486,7 +486,6 @@ locus_alignment_boxplots <- function(exprFile, genoFile, info, request) {
 }
 
 main <- function(assocFile, exprFile, genoFile, gwasFile, LDFile, request, select_pop, select_gene, select_dist, select_ref, recalculateAttempt, recalculatePop, recalculateGene, recalculateDist, recalculateRef, ldProject, qtlKey, ldKey, gwasKey, select_chromosome, select_position, genome_build) {
-  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
   outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   library(tidyverse)
   # library(forcats)
@@ -561,8 +560,8 @@ main <- function(assocFile, exprFile, genoFile, gwasFile, LDFile, request, selec
   edata <- "false"
   gdata <- "false"
   if ((!identical(genoFile, "false") & !identical(exprFile, "false"))) {
-    gdatafile <- file.path(inputFolder, genoFile)
-    edatafile <- file.path(inputFolder, exprFile)
+    gdatafile <- file.path(outputFolder, genoFile)
+    edatafile <- file.path(outputFolder, exprFile)
 
 
     gdata <- read_delim(gdatafile, delim = "\t", col_names = T)

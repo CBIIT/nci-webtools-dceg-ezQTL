@@ -36,11 +36,10 @@ qtlsCalculateMain <- function(associationFile, quantificationFile, genotypeFile,
 
 qtlsRecalculateQuantification <- function(exprFile, genoFile, traitID, genotypeID, log2, request) {
   source(file.path(appScriptsPath, "ezQTL_ztw.R"))
-  inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
   outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
 
-  gdatafile <- file.path(inputFolder, genoFile)
-  edatafile <- file.path(inputFolder, exprFile)
+  gdatafile <- file.path(outputFolder, genoFile)
+  edatafile <- file.path(outputFolder, exprFile)
 
   gdata <- read_delim(gdatafile, delim = "\t", col_names = T)
   # check if there are multiple chromosomes in the input genotype file
@@ -86,7 +85,7 @@ qtlsCalculateLocusColocalizationHyprcoloc <- function(select_dist, select_ref, g
   locus_colocalization_hyprcoloc(select_dist, select_ref, gwasFile, associationFile, ldfile, request)
 }
 
-qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, phenotype, request, qtlPublic, gwasPublic, ldPublic) {
+qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, quantificationFile, genotypeFile, qtlKey, gwasKey, ldKey, leadsnp, distance, select_chromosome, select_position, select_pop, ldProject, phenotype, request, qtlPublic, gwasPublic, ldPublic) {
   inputFolder <- file.path(Sys.getenv("INPUT_FOLDER"), request)
   outputFolder <- file.path(Sys.getenv("OUTPUT_FOLDER"), request)
   outputPrefix <- file.path(outputFolder, "ezQTL_input")
@@ -220,6 +219,13 @@ qtlsCalculateQC <- function(gwasFile, associationFile, ldFile, qtlKey, gwasKey, 
     }
   }
 
+  # copy quantification and genotype files to output folder if available
+  if (!identical(quantificationFile, "false")) {
+    file.copy(file.path(inputFolder, quantificationFile), file.path(outputFolder, quantificationFile))
+  }
+  if (!identical(genotypeFile, "false")) {
+    file.copy(file.path(inputFolder, genotypeFile), file.path(outputFolder, genotypeFile))
+  }
 
   if (identical(leadsnp, "false")) {
     leadsnp <- NULL
