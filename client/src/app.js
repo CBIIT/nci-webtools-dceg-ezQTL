@@ -114,6 +114,7 @@ export function App() {
   return (
     <Router>
       <header className="bg-white">
+        <include-html src="https://cbiit.github.io/nci-softwaresolutions-elements/banners/government-shutdown.html"></include-html>
         <div>
           <a
             href={window.location.href + '#main'}
