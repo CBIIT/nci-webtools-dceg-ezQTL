@@ -283,7 +283,7 @@ async function processSingleLocus(data, logger, env) {
       {
         originalTimestamp: submittedAt.toISOString(),
         execTime: getExecutionTime(start, end),
-        resultsUrl: path.join(env.APP_BASE_URL, '#/qtls', request),
+        resultsUrl: `${env.APP_BASE_URL}/#/qtls/${request}`,
         supportEmail: env.EMAIL_ADMIN,
         jobName: params.jobName,
       }
@@ -437,7 +437,7 @@ async function processMultiLoci(data, logger, env) {
                 </ul>
                 </br>`;
       } else {
-        const resultsUrl = path.join(env.APP_BASE_URL, '#/qtls', data.request);
+        const resultsUrl = `${env.APP_BASE_URL}/#/qtls/${request}`;
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
                   <li>Execution Time: ${data.execTime}</li>
