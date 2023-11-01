@@ -40,7 +40,14 @@ export default function calculationRoutes(env) {
     },
   });
   const upload = multer({ storage: storage });
-  const validateRequest = check('request').isUUID();
+  const validateRequest = check('request').if((value, { req }) => {
+    const validIndex = new RegExp(/^[0-9]*$/);
+    if (validIndex.test(value.split('-').pop())) {
+      return validate(value.substring(0, 35)).isUUID();
+    } else {
+      return check(value).isUUID();
+    }
+  });
 
   // file upload route
   router.post(
@@ -126,7 +133,7 @@ export default function calculationRoutes(env) {
     '/fetch-results',
     validateRequest,
     handleValidationErrors,
-    async (req, res) => {
+    async (req, res, next) => {
       const { logger } = req.app.locals;
 
       try {
