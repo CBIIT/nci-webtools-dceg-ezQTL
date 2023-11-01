@@ -327,7 +327,9 @@ async function processSingleLocus(data, logger, env) {
       logger.info(`[${request}] Sending admin error email`);
       await sendNotification(
         env.EMAIL_TECH_SUPPORT,
-        `ezQTL Error: ${request} - ${submittedAt.toISOString()} EST`,
+        `ezQTL ${
+          env.APP_TIER
+        } Error: ${request} - ${submittedAt.toISOString()} EST`,
         'templates/admin-failure-email.html',
         templateData
       );
@@ -484,7 +486,9 @@ async function processMultiLoci(data, logger, env) {
       logger.info(`[${mainRequest}] Sending admin multi locus error email`);
       await sendNotification(
         env.EMAIL_TECH_SUPPORT,
-        `ezQTL Error: ${data.request} - ${submittedAt.toISOString()} EST`,
+        `ezQTL ${env.APP_TIER} Error: ${
+          data.request
+        } - ${submittedAt.toISOString()} EST`,
         'templates/admin-multi-failure-email.html',
         { errors: errorsTemplate.join(''), request: data.request }
       );
@@ -523,7 +527,9 @@ async function processMultiLoci(data, logger, env) {
     logger.info(`[${mainRequest}] Sending admin error email`);
     await sendNotification(
       env.EMAIL_TECH_SUPPORT,
-      `ezQTL Error: ${request} - ${submittedAt.toISOString()} EST`,
+      `ezQTL ${
+        env.APP_TIER
+      } Error: ${request} - ${submittedAt.toISOString()} EST`,
       'templates/admin-failure-email.html',
       templateData
     );
