@@ -437,7 +437,7 @@ async function processMultiLoci(data, logger, env) {
                 </ul>
                 </br>`;
       } else {
-        const resultsUrl = `${env.APP_BASE_URL}/#/qtls/${request}`;
+        const resultsUrl = `${env.APP_BASE_URL}/#/qtls/${data.request}`;
         return `<ul style="list-style-type: none">
                   <li>Job Name: ${data.jobName}</li>
                   <li>Execution Time: ${data.execTime}</li>
@@ -484,7 +484,7 @@ async function processMultiLoci(data, logger, env) {
       logger.info(`[${mainRequest}] Sending admin multi locus error email`);
       await sendNotification(
         env.EMAIL_TECH_SUPPORT,
-        `ezQTL Error: ${request} - ${submittedAt.toISOString()} EST`,
+        `ezQTL Error: ${data.request} - ${submittedAt.toISOString()} EST`,
         'templates/admin-multi-failure-email.html',
         { errors: errorsTemplate.join(''), request: data.request }
       );
