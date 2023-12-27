@@ -309,7 +309,7 @@ async function processSingleLocus(data, logger, env) {
 
     // template variables
     const templateData = {
-      request: request,
+      request,
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: submittedAt.toISOString(),
@@ -504,14 +504,14 @@ async function processMultiLoci(data, logger, env) {
     logger.error(JSON.stringify(data));
     const execTime = getExecutionTime(mainStart, end);
     logger.info(`[${mainRequest}] Execution time: ${execTime}`);
-    const { params, request } = data;
+    const { params } = data;
 
     const stdout = err.stdout ? err.stdout.toString() : '';
     const stderr = err.stderr ? err.stderr.toString() : '';
 
     // template variables
     const templateData = {
-      request,
+      request: mainRequest,
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: submittedAt.toISOString(),
@@ -529,7 +529,7 @@ async function processMultiLoci(data, logger, env) {
       env.EMAIL_TECH_SUPPORT,
       `ezQTL ${
         env.APP_TIER
-      } Error: ${request} - ${submittedAt.toISOString()} EST`,
+      } Error: ${mainRequest} - ${submittedAt.toISOString()} EST`,
       'templates/admin-failure-email.html',
       templateData
     );
