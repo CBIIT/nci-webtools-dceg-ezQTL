@@ -309,7 +309,7 @@ async function processSingleLocus(data, logger, env) {
 
     // template variables
     const templateData = {
-      request,
+      request: request,
       parameters: JSON.stringify(params, null, 4),
       jobName: params.jobName,
       originalTimestamp: submittedAt.toISOString(),
