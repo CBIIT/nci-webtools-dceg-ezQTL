@@ -6,7 +6,7 @@ RUN dnf -y update \
     make \
     nodejs \
     npm \
-    R \
+    R-4.1.3 \
     bzip2 \
     bzip2-devel \
     libcurl-devel \
@@ -44,7 +44,13 @@ COPY server/renv.lock /deploy/server/
 COPY server/.Rprofile /deploy/server/
 COPY server/renv/activate.R /deploy/server/renv/
 COPY server/renv/settings.dcf /deploy/server/renv/
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
+
+RUN R -e "\
+    options(\
+    renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
+    Ncpus = parallel::detectCores() \
+    ); \
+    renv::restore();"
 
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
