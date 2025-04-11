@@ -47,7 +47,7 @@ COPY server/renv/settings.dcf /deploy/server/renv/
 
 RUN R -e "\
     options(\
-    renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
+    # renv.config.repos.override = '$R_REPO', \
     Ncpus = parallel::detectCores() \
     ); \
     renv::restore();"

@@ -5,7 +5,12 @@ source("renv/activate.R")
 ## in pre-built binary snapshots, rather than building from source.
 
 ## For Linux and Windows users, we'll use RStudio Package Manager (RSPM).
-if (Sys.info()[["sysname"]] %in% c("Linux", "Windows")) {
+if (Sys.info()[["sysname"]] %in% c("Linux")) {
+    options(repos = c(
+        RSPM = "https://packagemanager.posit.co/cran/__linux__/rhel9/latest",
+        CRAN = "https://cran.rstudio.com/"
+    ))
+} else if (Sys.info()[["sysname"]] %in% c("Windows")) {
     options(repos = c(
         RSPM = "https://packagemanager.rstudio.com/all/latest",
         CRAN = "https://cran.rstudio.com/"
