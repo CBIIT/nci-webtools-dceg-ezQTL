@@ -4,11 +4,17 @@ RUN dnf -y update \
     && dnf -y install \
     gcc-c++ \
     make \
+    cmake \
     nodejs \
     npm \
-    R \
+    R-4.3.2 \
     bzip2 \
     bzip2-devel \
+    fribidi-devel \
+    freetype-devel \
+    libpng-devel \
+    libtiff-devel \
+    libjpeg-devel \
     libcurl-devel \
     cairo \
     cairo-devel \
@@ -40,11 +46,17 @@ RUN mkdir -p /deploy/server /deploy/logs
 WORKDIR /deploy/server
 
 # install R packages with renv
-COPY server/renv.lock /deploy/server/
+COPY server /deploy/server/
 COPY server/.Rprofile /deploy/server/
 COPY server/renv/activate.R /deploy/server/renv/
-COPY server/renv/settings.dcf /deploy/server/renv/
-RUN R -e "options(Ncpus=parallel::detectCores()); renv::restore()"
+COPY server/renv/settings.json /deploy/server/renv/
+
+RUN R -e "\
+    options(\
+    renv.config.repos.override = 'https://packagemanager.posit.co/cran/__linux__/rhel9/latest', \
+    Ncpus = parallel::detectCores() \
+    ); \
+    renv::restore();"
 
 # use build cache for npm packages
 COPY server/package*.json /deploy/server/
@@ -88,4 +100,5 @@ RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/Si
 ARG CACHE_BUST
 COPY . /deploy/
 
+# CMD sleep infinity
 CMD npm start

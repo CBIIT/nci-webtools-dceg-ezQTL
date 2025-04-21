@@ -3,7 +3,7 @@ appDataFolder <- Sys.getenv("APP_DATA_FOLDER")
 bucket <- Sys.getenv("DATA_BUCKET")
 library(jsonlite)
 # increase buffer size in case of large LD files https://github.com/tidyverse/vroom/issues/364
-Sys.setenv(VROOM_CONNECTION_SIZE = "500000")
+Sys.setenv(VROOM_CONNECTION_SIZE = "10000000")
 
 loadAWS <- function() {
   if (Sys.getenv("AWS_ACCESS_KEY_ID") == "") {
