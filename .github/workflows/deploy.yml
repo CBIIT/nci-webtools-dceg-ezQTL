@@ -87,21 +87,33 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Get parameters from AWS SSM
-        uses: dkershner6/aws-ssm-getparameters-action@v2
-        with:
-          parameterPairs: |
-            ${{ env.PARAMETER_PATH }}/ecs_cluster = ECS_CLUSTER,
-            ${{ env.PARAMETER_PATH }}/ecs_web_task = ECS_WEB_TASK,
-            ${{ env.PARAMETER_PATH }}/ecs_web_task_cpu_units = ECS_WEB_TASK_CPU_UNITS,
-            ${{ env.PARAMETER_PATH }}/ecs_web_task_memory_units = ECS_WEB_TASK_MEMORY_UNITS,
-            ${{ env.PARAMETER_PATH }}/ecs_web_service = ECS_WEB_SERVICE,
-            ${{ env.PARAMETER_PATH }}/ecs_worker_task = ECS_WORKER_TASK,
-            ${{ env.PARAMETER_PATH }}/ecs_worker_task_cpu_units = ECS_WORKER_TASK_CPU_UNITS,
-            ${{ env.PARAMETER_PATH }}/ecs_worker_task_memory_units = ECS_WORKER_TASK_MEMORY_UNITS,
-            ${{ env.PARAMETER_PATH }}/role_arn = ROLE_ARN,
-            ${{ env.PARAMETER_PATH }}/efs_filesystem_id = EFS_FILESYSTEM_ID,
-            ${{ env.PARAMETER_PATH }}/efs_access_point_id = EFS_ACCESS_POINT_ID
-          withDecryption: "true"
+        run: |
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
+          declare -A PARAMS=(
+            ["ecs_cluster"]="ECS_CLUSTER"
+            ["ecs_web_task"]="ECS_WEB_TASK"
+            ["ecs_web_task_cpu_units"]="ECS_WEB_TASK_CPU_UNITS"
+            ["ecs_web_task_memory_units"]="ECS_WEB_TASK_MEMORY_UNITS"
+            ["ecs_web_service"]="ECS_WEB_SERVICE"
+            ["ecs_worker_task"]="ECS_WORKER_TASK"
+            ["ecs_worker_task_cpu_units"]="ECS_WORKER_TASK_CPU_UNITS"
+            ["ecs_worker_task_memory_units"]="ECS_WORKER_TASK_MEMORY_UNITS"
+            ["role_arn"]="ROLE_ARN"
+            ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
+            ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
+          )
+
+          # Retrieve each parameter and export to environment
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${{ env.PARAMETER_PATH }}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
 
       - name: Login to Amazon ECR
         id: login-ecr
