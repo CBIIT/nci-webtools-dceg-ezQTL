@@ -1,0 +1,197 @@
+---
+- name: Deploy {{ app }} with Docker.
+  hosts: all
+  become: yes
+  become_method: sudo
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+    DOCKER_BUILDKIT: 1
+  vars:
+    - app: ezqtl
+    - app_folder: "{{ app }}"
+    - datetime: "{{ ansible_date_time.year }}{{ ansible_date_time.month }}{{ ansible_date_time.day }}{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}{{ ansible_date_time.second }}"
+    - image_tier: "{{ (tier in ['prod', 'stage']) | ternary('release', 'development') }}"
+    - image_repository: "{{ docker_registry }}/{{ app }}"
+    - frontend_image: "{{ image_repository }}:{{ image_tier }}-frontend-{{ app_git_tag }}-{{ datetime }}"
+    - backend_image: "{{ image_repository }}:{{ image_tier }}-backend-{{ app_git_tag }}-{{ datetime }}"
+    - frontend_image_latest: "{{ image_repository }}:{{ image_tier }}-frontend-{{ app_git_tag }}-latest"
+    - backend_image_latest: "{{ image_repository }}:{{ image_tier }}-backend-{{ app_git_tag }}-latest"
+    - frontend_container: "{{ tier }}-{{ app }}-frontend"
+    - backend_container: "{{ tier }}-{{ app }}-backend"
+    - frontend_container_port: 80
+    - backend_container_port: 9000
+    - timezone: America/New_York
+    - aws_region: us-east-1
+    - aws_account_tier: "{{ (tier in ['prod', 'stage']) | ternary('prod', 'nonprod') }}"
+    - log_level: "{{ (tier in ['dev']) | ternary('debug', 'info') }}"
+    - s3_data_bucket: "nci-cbiit-dceg-data-{{ aws_account_tier }}"
+    - parameter_path: "/analysistools/{{ tier }}/{{ app }}"
+    - docker_buildkit: '{{ "0" if no_cache == "true" else "1" }}'
+    - task_definition_template_path: "{{ workspace_folder }}/deployment/build-deploy/ecs-task-definitions/{{ app }}"
+    - no_cache: "false"
+
+  tasks:
+    - name: Build and push Docker images
+      block:
+        - name: Retrieve AWS account id
+          shell: aws sts get-caller-identity --query "Account" --output text
+          register: aws_account_result
+
+        - name: Retrieve parameters
+          shell: "aws ssm get-parameters-by-path --path {{ parameter_path }} --output json"
+          register: aws_parameters_result
+
+        - set_fact:
+            ecs_cluster_query: "Parameters[?Name==`{{ parameter_path }}/ecs_cluster`].Value"
+            ecs_web_task_query: "Parameters[?Name==`{{ parameter_path }}/ecs_web_task`].Value"
+            ecs_web_task_cpu_units_query: "Parameters[?Name==`{{ parameter_path }}/ecs_web_task_cpu_units`].Value"
+            ecs_web_task_memory_units_query: "Parameters[?Name==`{{ parameter_path }}/ecs_web_task_memory_units`].Value"
+            ecs_worker_task_query: "Parameters[?Name==`{{ parameter_path }}/ecs_worker_task`].Value"
+            ecs_worker_task_cpu_units_query: "Parameters[?Name==`{{ parameter_path }}/ecs_worker_task_cpu_units`].Value"
+            ecs_worker_task_memory_units_query: "Parameters[?Name==`{{ parameter_path }}/ecs_worker_task_memory_units`].Value"
+            ecs_web_service_query: "Parameters[?Name==`{{ parameter_path }}/ecs_web_service`].Value"
+            role_arn_query: "Parameters[?Name==`{{ parameter_path }}/role_arn`].Value"
+            efs_filesystem_id_query: "Parameters[?Name==`{{ parameter_path }}/efs_filesystem_id`].Value"
+            efs_access_point_id_query: "Parameters[?Name==`{{ parameter_path }}/efs_access_point_id`].Value"
+
+        - set_fact:
+            docker_registry: "{{ aws_account_result.stdout }}.dkr.ecr.{{ aws_region }}.amazonaws.com"
+            ecs_cluster: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_cluster_query) | first }}"
+            ecs_web_task: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_web_task_query) | first }}"
+            ecs_web_task_cpu_units: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_web_task_cpu_units_query) | first }}"
+            ecs_web_task_memory_units: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_web_task_memory_units_query) | first }}"
+            ecs_worker_task: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_worker_task_query) | first }}"
+            ecs_worker_task_cpu_units: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_worker_task_cpu_units_query) | first }}"
+            ecs_worker_task_memory_units: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_worker_task_memory_units_query) | first }}"
+            ecs_web_service: "{{ aws_parameters_result.stdout | from_json | json_query(ecs_web_service_query) | first }}"
+            role_arn: "{{ aws_parameters_result.stdout | from_json | json_query(role_arn_query) | first }}"
+            efs_filesystem_id: "{{ aws_parameters_result.stdout | from_json | json_query(efs_filesystem_id_query) | first }}"
+            efs_access_point_id: "{{ aws_parameters_result.stdout | from_json | json_query(efs_access_point_id_query) | first }}"
+
+        - name: Login to Docker registry
+          shell: aws ecr get-login-password | docker login --username AWS --password-stdin {{ docker_registry }}
+
+        - name: Ensure folders exist on build host
+          file:
+            dest: "{{ item }}"
+            state: directory
+            owner: "{{ ncianalysis_user }}"
+            group: "{{ ncianalysis_group }}"
+          with_items:
+            - "{{ docker_app_root }}"
+            - "{{ docker_app_root }}/{{ docker_app_code_folder }}"
+            - "{{ docker_app_root }}/ecs"
+
+        - name: Copy app source to build host
+          synchronize:
+            src: "{{ workspace_folder }}/{{ app_folder }}/"
+            dest: "{{ docker_app_root }}/{{ docker_app_code_folder }}"
+            delete: yes
+
+        - name: Pull backend image {{ backend_image }}
+          shell: docker pull {{ backend_image_latest }}
+          when: no_cache == 'false'
+
+        # note: docker_image does not support buildkit, so we must build images manually
+        - name: Build backend image {{ backend_image }}
+          shell: >
+            DOCKER_BUILDKIT={{ docker_buildkit }}; \
+            docker build \
+              --pull \
+              -t {{ backend_image }} \
+              -t {{ backend_image_latest }} \
+              --build-arg CACHE_BUST={{ GIT_COMMIT }} \
+              --build-arg BUILDKIT_INLINE_CACHE={{ docker_buildkit }} \
+              {{ '--no-cache' if no_cache == 'true' else '--cache-from ' + backend_image_latest }} \
+              -f {{ docker_app_root }}/{{ docker_app_code_folder }}/docker/backend.dockerfile \
+              {{ docker_app_root }}/{{ docker_app_code_folder }};
+
+            docker push {{ backend_image }};
+            docker push {{ backend_image_latest }};
+          async: 10800
+          poll: 5
+          when: rebuild_backend_image == "true"
+
+        - name: Trivy scan backend image {{ backend_image_latest }}
+          shell: >
+            docker run --rm --name trivy -u root -v /var/run/docker.sock:/var/run/docker.sock bitnami/trivy:latest image --timeout 15m --severity HIGH,CRITICAL {{ backend_image_latest }}
+          async: 10800
+          poll: 5
+          when: trivy_test_scan == "true"
+
+        - name: Pull frontend image {{ frontend_image }}
+          shell: docker pull {{ frontend_image_latest }}
+          when: no_cache == 'false'
+
+        # note: docker_image does not support buildkit, so we must build images manually
+        - name: Build frontend image {{ frontend_image }}
+          shell: >
+            DOCKER_BUILDKIT={{ docker_buildkit }}; \
+            docker build \
+              --pull \
+              -t {{ frontend_image }} \
+              -t {{ frontend_image_latest }} \
+              --build-arg CACHE_BUST={{ GIT_COMMIT }} \
+              --build-arg BUILDKIT_INLINE_CACHE={{ docker_buildkit }} \
+              {{ '--no-cache' if no_cache == 'true' else '--cache-from ' + frontend_image_latest }} \
+              -f {{ docker_app_root }}/{{ docker_app_code_folder }}/docker/frontend.dockerfile \
+              {{ docker_app_root }}/{{ docker_app_code_folder }};
+
+            docker push {{ frontend_image }};
+            docker push {{ frontend_image_latest }};
+          async: 10800
+          poll: 5
+          when: rebuild_frontend_image == "true"
+
+        - name: Trivy scan frontend image {{ frontend_image_latest }}
+          shell: >
+            docker run --rm --name trivy -u root -v /var/run/docker.sock:/var/run/docker.sock bitnami/trivy:latest image --timeout 15m --severity HIGH,CRITICAL {{ frontend_image_latest }}
+          async: 10800
+          poll: 5
+          when: trivy_test_scan == "true"
+
+        - name: Update task definitions from templates
+          ansible.builtin.template:
+            src: "{{ task_definition_template_path }}/{{ item }}"
+            dest: "{{ docker_app_root }}/ecs/{{ item }}"
+          with_items:
+            - web.yml
+            - worker.yml
+
+        - name: Register task definitions
+          shell: "aws ecs register-task-definition --cli-input-yaml file://{{ docker_app_root }}/ecs/{{ item }}"
+          with_items:
+            - web.yml
+            - worker.yml
+
+        - name: Deploy web service
+          shell: >
+            aws ecs update-service \
+              --cluster {{ ecs_cluster }} \
+              --service {{ ecs_web_service }} \
+              --task-definition {{ ecs_web_task }} \
+              --desired-count 1 \
+              --force-new-deployment;
+
+      when: inventory_hostname in groups["build"]
+
+    # apply cron job to efs host to cleanup old input and output files
+    - name: Add cron jobs to efs host
+      block:
+        - name: Create daily cleanup job for input data older than two weeks
+          ansible.builtin.cron:
+            name: Remove old {{ app }} input data
+            minute: "0"
+            hour: "12"
+            user: root
+            job: find /local/content/analysistools_efs/ezqtl/input -mtime +14 -delete
+
+        - name: Create daily cleanup job for output data older than two weeks
+          ansible.builtin.cron:
+            name: Remove old {{ app }} output data
+            minute: "0"
+            hour: "12"
+            user: root
+            job: find /local/content/analysistools_efs/ezqtl/output -mtime +14 -delete
+
+      when: "inventory_hostname in groups['efs']"
