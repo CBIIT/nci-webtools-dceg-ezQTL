@@ -1,9 +1,5 @@
 name: Deploy ezQTL Application
 on:
-  push:
-    branches:
-      - "*_dev"
-      - "*_qa"
   workflow_dispatch:
     inputs:
       tier:
