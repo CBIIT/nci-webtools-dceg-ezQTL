@@ -156,9 +156,6 @@ jobs:
         run: |
           envsubst < .github/${{ env.TASK_DEFINITION_TEMPLATE_PATH }}/web.yml > web.yml
         env:
-          ECS_WEB_TASK: ${{ env.ECS_WEB_TASK }}
-          ECS_WEB_TASK_CPU_UNITS: ${{ env.ECS_WEB_TASK_CPU_UNITS }}
-          ECS_WEB_TASK_MEMORY_UNITS: ${{ env.ECS_WEB_TASK_MEMORY_UNITS }}
           ROLE_ARN: ${{ env.ROLE_ARN }}
           EFS_FILESYSTEM_ID: ${{ env.EFS_FILESYSTEM_ID }}
           EFS_ACCESS_POINT_ID: ${{ env.EFS_ACCESS_POINT_ID }}
@@ -191,11 +188,11 @@ jobs:
             --propagate-tags TASK_DEFINITION \
             --force-new-deployment
 
-      - name: Wait for service stability
-        run: |
-          aws ecs wait services-stable \
-            --cluster ${{ env.ECS_CLUSTER }} \
-            --services ${{ env.ECS_WEB_SERVICE }}
+    #   - name: Wait for service stability
+    #     run: |
+    #       aws ecs wait services-stable \
+    #         --cluster ${{ env.ECS_CLUSTER }} \
+    #         --services ${{ env.ECS_WEB_SERVICE }}
 
       - name: Substitute worker task definition variables
         run: |
