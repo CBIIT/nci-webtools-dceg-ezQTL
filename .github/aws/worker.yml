@@ -1,0 +1,121 @@
+family: "$ECS_WORKER_TASK"
+networkMode: awsvpc
+cpu: "$ECS_WORKER_TASK_CPU_UNITS"
+memory: "$ECS_WORKER_TASK_MEMORY_UNITS"
+executionRoleArn: "$ROLE_ARN"
+taskRoleArn: "$ROLE_ARN"
+requiresCompatibilities:
+  - FARGATE
+volumes:
+  - name: data
+    efsVolumeConfiguration:
+      fileSystemId: "$EFS_FILESYSTEM_ID"
+      authorizationConfig:
+        accessPointId: "$EFS_ACCESS_POINT_ID"
+        iam: ENABLED
+      transitEncryption: ENABLED
+containerDefinitions:
+  - name: logs
+    image: public.ecr.aws/aws-observability/aws-for-fluent-bit:stable
+    firelensConfiguration:
+      type: fluentbit
+    memoryReservation: 50
+    logConfiguration:
+      logDriver: awslogs
+      options:
+        awslogs-group: "/analysistools/$TIER/$APP/worker"
+        awslogs-region: "$AWS_REGION"
+        awslogs-stream-prefix: logs
+
+  - name: "worker"
+    image: "$BACKEND_IMAGE_LATEST"
+    environment:
+      - name: AWS_DEFAULT_REGION
+        value: "$AWS_REGION"
+      - name: APP_NAME
+        value: "$APP"
+      - name: APP_PORT
+        value: "$BACKEND_CONTAINER_PORT"
+      - name: APP_TIER
+        value: "$TIER"
+      - name: WORKER_TYPE
+        value: "fargate"
+      - name: "TZ"
+        value: "$TZ"
+    secrets:
+      - name: APP_BASE_URL
+        valueFrom: "/analysistools/$TIER/$APP/base_url"
+      - name: API_BASE_URL
+        valueFrom: "/analysistools/$TIER/$APP/base_url"
+      - name: LOG_LEVEL
+        valueFrom: "/analysistools/$TIER/datadog/log_level"
+      - name: SERVER_TIMEOUT
+        valueFrom: "/analysistools/$TIER/$APP/server_timeout"
+      - name: APP_DATA_FOLDER
+        valueFrom: "/analysistools/$TIER/$APP/app_data_folder"
+      - name: APP_SCRIPTS
+        valueFrom: "/analysistools/$TIER/$APP/app_scripts"
+      - name: DATA_FOLDER
+        valueFrom: "/analysistools/$TIER/$APP/data_folder"
+      - name: DATA_BUCKET
+        valueFrom: "/analysistools/$TIER/$APP/data_bucket"
+      - name: DATA_BUCKET_PREFIX
+        valueFrom: "/analysistools/$TIER/$APP/data_bucket_prefix"
+      - name: INPUT_FOLDER
+        valueFrom: "/analysistools/$TIER/$APP/input_folder"
+      - name: INPUT_KEY_PREFIX
+        valueFrom: "/analysistools/$TIER/$APP/input_key_prefix"
+      - name: IO_BUCKET
+        valueFrom: "/analysistools/$TIER/$APP/io_bucket"
+      - name: OUTPUT_FOLDER
+        valueFrom: "/analysistools/$TIER/$APP/output_folder"
+      - name: OUTPUT_KEY_PREFIX
+        valueFrom: "/analysistools/$TIER/$APP/output_key_prefix"
+      - name: VPC_ID
+        valueFrom: "/analysistools/$TIER/$APP/vpc_id"
+      - name: SUBNET_IDS
+        valueFrom: "/analysistools/$TIER/$APP/subnet_ids"
+      - name: SECURITY_GROUP_IDS
+        valueFrom: "/analysistools/$TIER/$APP/security_group_ids"
+      - name: ECS_CLUSTER
+        valueFrom: "/analysistools/$TIER/$APP/ecs_cluster"
+      - name: WORKER_TASK_NAME
+        valueFrom: "/analysistools/$TIER/$APP/ecs_worker_task"
+      - name: EMAIL_ADMIN
+        valueFrom: "/analysistools/$TIER/$APP/email_admin"
+      - name: EMAIL_SMTP_HOST
+        valueFrom: "/analysistools/$TIER/$APP/email_smtp_host"
+      - name: EMAIL_SMTP_PORT
+        valueFrom: "/analysistools/$TIER/$APP/email_smtp_port"
+      - name: EMAIL_TECH_SUPPORT
+        valueFrom: "/analysistools/$TIER/$APP/email_tech_support"
+    mountPoints:
+      - sourceVolume: data
+        containerPath: "/data"
+        readOnly: false
+    logConfiguration:
+      logDriver: awsfirelens
+      options:
+        Name: datadog
+        tls: "on"
+        tls.verify: "off"
+        dd_service: "$TIER-$APP-worker"
+        dd_source: "nodejs"
+        dd_tags: "project:$APP tier:$TIER"
+        provider: ecs
+      secretOptions:
+        - name: Host
+          valueFrom: /analysistools/$TIER/datadog/log_endpoint_host
+        - name: apikey
+          valueFrom: /analysistools/$TIER/datadog/api_key
+tags:
+  - key: Project
+    value: "$APP"
+  - key: ResourceName
+    value: "$TIER-$APP-worker-ecs-task"
+  - key: EnvironmentTier
+    value: "$ENVIRONMENT_TIER"
+  - key: ResourceFunction
+    value: compute
+  - key: Creator
+    value: TF

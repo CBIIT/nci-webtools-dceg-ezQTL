@@ -1,0 +1,227 @@
+name: Deploy ezQTL Application
+on:
+  workflow_dispatch:
+    inputs:
+      tier:
+        description: "Tier to deploy to"
+        required: true
+        default: "dev"
+        type: choice
+        options:
+          - dev
+          - qa
+          - stage
+          - prod
+
+permissions:
+  id-token: write
+jobs:
+  Deploy:
+    permissions:
+      contents: "read"
+      id-token: "write"
+    runs-on: ubuntu-latest
+    environment: ${{  inputs.tier || (endsWith(github.ref_name, '_dev') && 'dev' || 'qa') }}
+    env:
+      APP: ezqtl
+      TZ: America/New_York
+      AWS_REGION: us-east-1
+      TASK_DEFINITION_TEMPLATE_PATH: aws
+      DOCKER_BUILDKIT: 1
+      FRONTEND_CONTAINER_PORT: 80
+      BACKEND_CONTAINER_PORT: 9000
+      ECS_WEB_CPU_UNITS: "2 vCPU"
+      ECS_WEB_MEMORY_UNITS: "4 GB"
+      ECS_WORKER_CPU_UNITS: "4 vCPU"
+      ECS_WORKER_MEMORY_UNITS: "16 GB"
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: Set environment variables
+        run: |
+          # Determine deployment tier
+          BRANCH="${{ github.ref_name }}"
+          [[ "${{ github.event_name }}" == "workflow_dispatch" ]] \
+            && TIER="${{ inputs.tier }}" \
+            || TIER="${BRANCH##*_}"
+
+          # Set tier-dependent variables
+          [[ "$TIER" =~ ^(dev|qa)$ ]] && IMAGE_TIER="development" || IMAGE_TIER="release"
+          [[ "$TIER" == "dev" ]] && LOG_LEVEL="debug" || LOG_LEVEL="info"
+
+          # Parse version info from branch name
+          IFS='_' read -r _ VERSION DATE <<< "$BRANCH"
+
+          # Build image tags
+          TIMESTAMP=$(date +"%Y%m%d%H%M%S")
+          REPO="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP"
+
+          # Export environment variables
+          cat << EOF >> $GITHUB_ENV
+          TIER=$TIER
+          IMAGE_TIER=$IMAGE_TIER
+          LOG_LEVEL=$LOG_LEVEL
+          VERSION=${VERSION:-unknown_version}
+          DATE=${DATE:-unknown_date}
+          IMAGE_REPOSITORY=$REPO
+          FRONTEND_IMAGE=$REPO:$IMAGE_TIER-frontend-$BRANCH-$TIMESTAMP
+          BACKEND_IMAGE=$REPO:$IMAGE_TIER-backend-$BRANCH-$TIMESTAMP
+          FRONTEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-frontend-$BRANCH-latest
+          BACKEND_IMAGE_LATEST=$REPO:$IMAGE_TIER-backend-$BRANCH-latest
+          PARAMETER_PATH=/analysistools/$TIER/$APP
+          ENVIRONMENT_TIER=${TIER^^}
+          EOF
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          role-to-assume: ${{ env.CICD_ROLE_ARN }}
+          role-session-name: ${{ env.TIER }}-${{ env.APP }}-deploy-${{ env.BRANCH }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get parameters from AWS SSM
+        run: |
+          # Define parameters to retrieve (SSM name = ENV_VAR_NAME)
+          declare -A PARAMS=(
+            ["ecs_cluster"]="ECS_CLUSTER"
+            ["ecs_web_task"]="ECS_WEB_TASK"
+            ["ecs_web_task_cpu_units"]="ECS_WEB_TASK_CPU_UNITS"
+            ["ecs_web_task_memory_units"]="ECS_WEB_TASK_MEMORY_UNITS"
+            ["ecs_web_service"]="ECS_WEB_SERVICE"
+            ["ecs_worker_task"]="ECS_WORKER_TASK"
+            ["ecs_worker_task_cpu_units"]="ECS_WORKER_TASK_CPU_UNITS"
+            ["ecs_worker_task_memory_units"]="ECS_WORKER_TASK_MEMORY_UNITS"
+            ["role_arn"]="ROLE_ARN"
+            ["efs_filesystem_id"]="EFS_FILESYSTEM_ID"
+            ["efs_access_point_id"]="EFS_ACCESS_POINT_ID"
+          )
+
+          # Retrieve each parameter and export to environment
+          for ssm_name in "${!PARAMS[@]}"; do
+            env_var="${PARAMS[$ssm_name]}"
+            value=$(aws ssm get-parameter \
+              --name "${{ env.PARAMETER_PATH }}/${ssm_name}" \
+              --with-decryption \
+              --query "Parameter.Value" \
+              --output text)
+            echo "${env_var}=${value}" >> $GITHUB_ENV
+            echo "Retrieved ${ssm_name} -> ${env_var}"
+          done
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: true
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create and use a new builder instance
+        run: |
+          docker buildx create --name mybuilder --use
+
+      - name: Build backend image ${{ env.BACKEND_IMAGE }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/backend.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.BACKEND_IMAGE }}
+            ${{ env.BACKEND_IMAGE_LATEST }}
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:backend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      - name: Build frontend image ${{ env.FRONTEND_IMAGE }}
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/frontend.dockerfile
+          pull: true
+          push: true
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}
+            ${{ env.FRONTEND_IMAGE_LATEST }}
+          build-args: |
+            APP_VERSION=${{ github.ref_name }}
+          cache-from: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache
+          cache-to: type=registry,ref=${{ env.IMAGE_REPOSITORY }}:frontend-cache,image-manifest=true,oci-mediatypes=true,mode=max
+
+      - name: Substitute web task definition variables
+        run: |
+          envsubst < .github/${{ env.TASK_DEFINITION_TEMPLATE_PATH }}/web.yml > web.yml
+        env:
+          ROLE_ARN: ${{ env.ROLE_ARN }}
+          EFS_FILESYSTEM_ID: ${{ env.EFS_FILESYSTEM_ID }}
+          EFS_ACCESS_POINT_ID: ${{ env.EFS_ACCESS_POINT_ID }}
+          FRONTEND_CONTAINER_PORT: ${{ env.FRONTEND_CONTAINER_PORT }}
+          BACKEND_CONTAINER_PORT: ${{ env.BACKEND_CONTAINER_PORT }}
+          FRONTEND_IMAGE_LATEST: ${{ env.FRONTEND_IMAGE_LATEST }}
+          BACKEND_IMAGE_LATEST: ${{ env.BACKEND_IMAGE_LATEST }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          TIER: ${{ env.TIER }}
+          APP: ${{ env.APP }}
+          ENVIRONMENT_TIER: ${{ env.ENVIRONMENT_TIER }}
+          TZ: ${{ env.TZ }}
+
+      - name: Print rendered web task definition
+        run: cat web.yml
+
+      - name: Register web task definition
+        id: register-web
+        run: |
+          arn=$(aws ecs register-task-definition --cli-input-yaml file://web.yml --query "taskDefinition.taskDefinitionArn" --output text)
+          echo "WEB_TASK_DEF_ARN=$arn" >> $GITHUB_ENV
+
+      - name: Update web service
+        run: |
+          aws ecs update-service \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --service ${{ env.ECS_WEB_SERVICE }} \
+            --task-definition $WEB_TASK_DEF_ARN \
+            --desired-count 1 \
+            --propagate-tags TASK_DEFINITION \
+            --force-new-deployment
+
+    #   - name: Wait for service stability
+    #     run: |
+    #       aws ecs wait services-stable \
+    #         --cluster ${{ env.ECS_CLUSTER }} \
+    #         --services ${{ env.ECS_WEB_SERVICE }}
+
+      - name: Substitute worker task definition variables
+        run: |
+          envsubst < .github/${{ env.TASK_DEFINITION_TEMPLATE_PATH }}/worker.yml > worker.yml
+        env:
+          ECS_WORKER_TASK: ${{ env.ECS_WORKER_TASK }}
+          ECS_WORKER_TASK_CPU_UNITS: ${{ env.ECS_WORKER_TASK_CPU_UNITS }}
+          ECS_WORKER_TASK_MEMORY_UNITS: ${{ env.ECS_WORKER_TASK_MEMORY_UNITS }}
+          ROLE_ARN: ${{ env.ROLE_ARN }}
+          EFS_FILESYSTEM_ID: ${{ env.EFS_FILESYSTEM_ID }}
+          EFS_ACCESS_POINT_ID: ${{ env.EFS_ACCESS_POINT_ID }}
+          BACKEND_CONTAINER_PORT: ${{ env.BACKEND_CONTAINER_PORT }}
+          BACKEND_IMAGE_LATEST: ${{ env.BACKEND_IMAGE_LATEST }}
+          AWS_REGION: ${{ env.AWS_REGION }}
+          TIER: ${{ env.TIER }}
+          APP: ${{ env.APP }}
+          ENVIRONMENT_TIER: ${{ env.ENVIRONMENT_TIER }}
+          TZ: ${{ env.TZ }}
+
+      - name: Print rendered worker task definition
+        run: cat worker.yml
+
+      - name: Register worker task definition
+        run: aws ecs register-task-definition --cli-input-yaml file://worker.yml
+
+      - name: Remove old task definitions
+        run: |
+          for family in "$ECS_WEB_TASK" "$ECS_WORKER_TASK"; do
+            echo "Pruning old revisions for family: $family"
+            aws ecs list-task-definitions --family-prefix "$family" --sort DESC --query 'taskDefinitionArns[3:]' --output text \
+              | xargs -n1 -r aws ecs deregister-task-definition --task-definition
+          done
