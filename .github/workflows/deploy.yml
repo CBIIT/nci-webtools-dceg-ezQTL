@@ -34,7 +34,7 @@ jobs:
       ECS_WEB_MEMORY_UNITS: "4 GB"
       ECS_WORKER_CPU_UNITS: "4 vCPU"
       ECS_WORKER_MEMORY_UNITS: "16 GB"
-      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/github-actions-cicd
+      CICD_ROLE_ARN: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/power-user-github-actions-cicd
 
 
     steps:
