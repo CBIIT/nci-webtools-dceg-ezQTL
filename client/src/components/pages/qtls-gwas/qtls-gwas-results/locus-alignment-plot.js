@@ -246,13 +246,14 @@ export function LocusAlignmentPlot(params) {
               <div>
                 <a
                   href={
-                    'https://ldlink.nci.nih.gov/?tab=ldpop&var1=' +
+                    'https://ldlink.nih.gov/ldpop&var1=' +
                     tooltip.data.rsnum +
                     '&var2=' +
                     locus_alignment['top']['rsnum'] +
                     '&pop=' +
                     inputs['select_pop'][0].split('+').join('%2B') +
-                    '&r2_d=r2'
+                    '&r2_d=r2' +
+                    '&genome_build=' + genome.value.toLowerCase()
                   }
                   target="_blank"
                   rel="noreferrer"
