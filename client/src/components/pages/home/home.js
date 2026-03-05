@@ -57,7 +57,7 @@ export function Home() {
               of interest. Actions applied to each variant on the LocusZoom plot
               include linking to different databases (e.g.{' '}
               <a
-                href="https://ldlink.nci.nih.gov/"
+                href="https://ldlink.nih.gov/"
                 target="_blank"
                 rel="noreferrer"
               >
