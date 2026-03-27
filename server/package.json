@@ -27,7 +27,7 @@
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
     "multer": "^1.4.2",
-    "nodemailer": "^6.5.0",
+    "nodemailer": "^8.0.4",
     "papaparse": "^5.3.1",
     "pm2": "^5.3.0",
     "r-wrapper": "^1.1.0",
