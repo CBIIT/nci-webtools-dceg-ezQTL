@@ -93,7 +93,7 @@ export function LocusTable() {
       Cell: (row) => (
         <a
           href={
-            'https://ldlink.nih.gov/ldpop&var1=' +
+            'https://ldlink.nih.gov/ldpop?var1=' +
             row.value +
             '&var2=' +
             locus_alignment['top']['rsnum'] +

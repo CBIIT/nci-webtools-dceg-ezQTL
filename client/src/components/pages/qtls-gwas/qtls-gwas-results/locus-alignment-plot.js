@@ -246,7 +246,7 @@ export function LocusAlignmentPlot(params) {
               <div>
                 <a
                   href={
-                    'https://ldlink.nih.gov/ldpop&var1=' +
+                    'https://ldlink.nih.gov/ldpop?var1=' +
                     tooltip.data.rsnum +
                     '&var2=' +
                     locus_alignment['top']['rsnum'] +

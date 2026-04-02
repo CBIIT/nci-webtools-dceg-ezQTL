@@ -59,6 +59,43 @@ export function Documentation() {
         <p>
           <b>Release History</b>
         </p>
+        <i>ezQTL 2.2.0 (04/02/2026)</i>
+        <ul>
+          <li>Updated LDlink - LDpop links</li>
+        </ul>
+        <i>ezQTL 2.1.1 (04/14/2025)</i>
+        <ul>
+          <li>Performance improvements</li>
+        </ul>
+        <i>ezQTL 2.1.0 (10/17/2023)</i>
+        <ul>
+          <li>Replace Queue with Long Running Jobs submission</li>
+          <li>Improve form rehydration for long running jobs</li>
+        </ul>
+        <i>ezQTL 2.0.13 (07/17/2023)</i>
+        <ul>
+          <li>Update form validation</li>
+          <li>Improve queue job reliability</li>
+        </ul>
+        <i>ezQTL 2.0.12 (06/21/2023)</i>
+        <ul>
+          <li>Update form text</li>
+          <li>Improve queue job logging</li>
+        </ul>
+        <i>ezQTL 2.0.11 (05/17/2023)</i>
+        <ul>
+          <li>Rehydrate form data when viewing queue results</li>
+          <li>Bug fixes</li>
+        </ul>
+        <i>ezQTL 2.0.10 (05/01/2023)</i>
+        <ul>
+          <li>Improve queue job reliability</li>
+        </ul>
+        <i>ezQTL 2.0.9 (04/06/2023)</i>
+        <ul>
+          <li>Update app dependencies</li>
+          <li>Update app logging</li>
+        </ul>
         <i>ezQTL 2.0.8 (12/07/2022)</i>
         <ul>
           <li>Fix issue parsing user input data</li>
