@@ -49,9 +49,6 @@ jobs:
       - name: Set dynamic environment variables
         run: |
           BRANCH="${{ github.ref_name }}"
-          IFS='_' read -r _ VERSION DATE <<< "$BRANCH"
-          echo "VERSION=${VERSION:-unknown_version}" >> $GITHUB_ENV
-          echo "DATE=${DATE:-unknown_date}" >> $GITHUB_ENV
 
           TIMESTAMP=$(date +"%Y%m%d%H%M%S")
           REPO="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$APP"
