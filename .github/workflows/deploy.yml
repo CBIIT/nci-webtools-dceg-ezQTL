@@ -111,7 +111,7 @@ jobs:
           docker buildx create --name mybuilder --use
 
       - name: Build backend image ${{ env.BACKEND_IMAGE }}
-        uses: docker/build-push-action@v7.0.0
+        uses: docker/build-push-action@v7.1.0
         with:
           context: .
           file: docker/backend.dockerfile
@@ -124,7 +124,7 @@ jobs:
           cache-to: type=inline
 
       - name: Build frontend image ${{ env.FRONTEND_IMAGE }}
-        uses: docker/build-push-action@v7.0.0
+        uses: docker/build-push-action@v7.1.0
         with:
           context: .
           file: docker/frontend.dockerfile
