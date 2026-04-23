@@ -31,7 +31,7 @@
     "papaparse": "^5.3.1",
     "pm2": "^5.3.0",
     "r-wrapper": "^1.1.0",
-    "uuid": "^8.3.2",
+    "uuid": "^14.0.0",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0",
     "xlsx": "^0.18.5"
