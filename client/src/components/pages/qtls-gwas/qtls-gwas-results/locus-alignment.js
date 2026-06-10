@@ -127,6 +127,7 @@ export function LocusAlignment() {
                         min="0.0"
                         // max="1.0"
                         id="locus-alignment-scatter-threshold-input"
+                        aria-label="-log10 P-value Threshold"
                         disabled={!submitted}
                         value={locus_alignment_gwas_scatter_threshold}
                         onChange={(e) => {
