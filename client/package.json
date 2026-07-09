@@ -22,7 +22,7 @@
     "react-redux": "^7.1.0",
     "react-router-dom": "^5.2.0",
     "react-router-hash-link": "^2.4.3",
-    "react-select": "^4.2.1",
+    "react-select": "^5.10.2",
     "react-table": "^7.7.0",
     "react-zoom-pan-pinch": "^3.0.7",
     "redux": "^4.0.4",
