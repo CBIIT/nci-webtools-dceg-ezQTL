@@ -14,6 +14,7 @@ import { execFile } from 'child_process';
 import template from 'lodash/template.js';
 import { pickBy } from 'lodash-es';
 import Papa from 'papaparse';
+import AdmZip from 'adm-zip';
 
 // promisified executeFile
 export const execFileAsync = promisify(execFile);
@@ -157,4 +158,127 @@ export function parseCSV(filepath) {
       },
     });
   });
+}
+
+/**
+ * Normalizes an ExcelJS cell value to a primitive, matching the output of
+ * xlsx's sheet_to_json (which returns raw numbers/strings/dates).
+ *
+ * Any object shape that cannot be reduced to a primitive resolves to
+ * `undefined` so that a raw ExcelJS object is never leaked into an API
+ * response (xlsx only ever emitted scalars).
+ * @param {*} value
+ */
+function normalizeCellValue(value) {
+  if (value === null || value === undefined) return undefined;
+  if (value instanceof Date) return value;
+  if (typeof value !== 'object') return value;
+
+  // formula cells expose { formula|sharedFormula, result }, but the cached
+  // result is absent when the file was written by a non-Excel producer
+  if ('result' in value) return normalizeCellValue(value.result);
+  if ('richText' in value)
+    return value.richText.map(({ text }) => text).join('');
+  if ('text' in value) return normalizeCellValue(value.text);
+  return undefined;
+}
+
+/**
+ * Converts an ExcelJS worksheet to an array of row objects, replicating the
+ * behavior of `XLSX.utils.sheet_to_json`: the first row of the sheet's used
+ * range supplies the keys, blank cells are omitted, and blank rows are skipped.
+ *
+ * Header naming follows the same algorithm as xlsx, so no column is silently
+ * dropped or overwritten: a blank header becomes `__EMPTY`, and any name that
+ * is already taken gets the next free `_1`/`_2`/... suffix.
+ *
+ * Note: date cells resolve to `Date` objects (serialized as ISO strings) rather
+ * than the raw Excel serial numbers xlsx returned by default.
+ * @param {import('exceljs').Worksheet} worksheet
+ * @returns {object[]}
+ */
+export function sheetToJson(worksheet) {
+  // xlsx reads from the sheet's used range, so leading blank rows and columns
+  // are ignored; exceljs exposes neither bound directly, so derive them.
+  let headerRowNumber;
+  const dataRowNumbers = [];
+  let firstColumn = Infinity;
+
+  worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
+    let rowFirstColumn = Infinity;
+    row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+      if (normalizeCellValue(cell.value) !== undefined)
+        rowFirstColumn = Math.min(rowFirstColumn, colNumber);
+    });
+    if (rowFirstColumn === Infinity) return;
+
+    firstColumn = Math.min(firstColumn, rowFirstColumn);
+    if (headerRowNumber === undefined) headerRowNumber = rowNumber;
+    else dataRowNumbers.push(rowNumber);
+  });
+
+  if (headerRowNumber === undefined) return [];
+
+  const headerRow = worksheet.getRow(headerRowNumber);
+  const headers = [];
+  const taken = new Set();
+
+  for (let colNumber = firstColumn; colNumber <= worksheet.columnCount; colNumber++) {
+    const value = normalizeCellValue(headerRow.getCell(colNumber).value);
+    const name =
+      value === undefined || value === '' ? '__EMPTY' : String(value);
+
+    let candidate = name;
+    let counter = 1;
+    while (taken.has(candidate)) candidate = `${name}_${counter++}`;
+
+    taken.add(candidate);
+    headers[colNumber] = candidate;
+  }
+
+  return dataRowNumbers.map((rowNumber) => {
+    const record = {};
+    worksheet.getRow(rowNumber).eachCell({ includeEmpty: false }, (cell, colNumber) => {
+      const header = headers[colNumber];
+      if (header === undefined) return;
+      const value = normalizeCellValue(cell.value);
+      if (value !== undefined && value !== '') record[header] = value;
+    });
+    return record;
+  }).filter((record) => Object.keys(record).length > 0);
+}
+
+/**
+ * Extracts a zip archive to a target folder, replacing the unmaintained
+ * `decompress` package. Leading path segments can be removed via `strip`
+ * (equivalent to decompress's `strip` option).
+ *
+ * Entries that would resolve outside of `outputFolder` are rejected to guard
+ * against path traversal ("zip slip").
+ *
+ * @param {string} archivePath path to the .zip archive
+ * @param {string} outputFolder destination folder
+ * @param {{strip?: number}} [options]
+ */
+export async function extractZip(archivePath, outputFolder, { strip = 0 } = {}) {
+  const zip = new AdmZip(archivePath);
+  const destination = path.resolve(outputFolder);
+
+  for (const entry of zip.getEntries()) {
+    if (entry.isDirectory) continue;
+
+    const relativePath = entry.entryName.split('/').slice(strip).join('/');
+    if (!relativePath) continue;
+
+    const targetPath = path.resolve(destination, relativePath);
+    if (
+      targetPath !== destination &&
+      !targetPath.startsWith(destination + path.sep)
+    ) {
+      throw new Error(`Refusing to extract entry outside of target directory: ${entry.entryName}`);
+    }
+
+    await mkdir(path.dirname(targetPath), { recursive: true });
+    await writeFile(targetPath, entry.getData());
+  }
 }
