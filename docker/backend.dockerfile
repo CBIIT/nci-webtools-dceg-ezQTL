@@ -5,8 +5,8 @@ RUN dnf -y update \
     gcc-c++ \
     make \
     cmake \
-    nodejs \
-    npm \
+    nodejs24 \
+    nodejs24-npm \
     R-4.3.2 \
     bzip2 \
     bzip2-devel \
