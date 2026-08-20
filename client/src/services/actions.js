@@ -1,3 +1,6 @@
+import axios from 'axios';
+import FormData from 'form-data';
+
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
 export const UPDATE_MULTI_LOCI = 'UPDATE_MULTI_LOCI';
@@ -5,9 +8,6 @@ export const UPDATE_ERROR = 'UPDATE_ERROR';
 export const UPDATE_SUCCESS = 'UPDATE_SUCCESS';
 export const UPDATE_ALERT = 'UPDATE_ALERT';
 export const UPDATE_PUBLICATIONS = 'UPDATE_PUBLICATIONS';
-
-const axios = require('axios');
-const FormData = require('form-data');
 
 export function updateKey(key, data) {
   return { type: UPDATE_KEY, key, data };
