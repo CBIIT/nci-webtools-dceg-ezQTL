@@ -1,5 +1,4 @@
 import axios from 'axios';
-import FormData from 'form-data';
 
 export const UPDATE_KEY = 'UPDATE_KEY';
 export const UPDATE_QTLS_GWAS = 'UPDATE_QTLS_GWAS';
