@@ -161,12 +161,17 @@ export function parseCSV(filepath) {
 }
 
 /**
- * Normalizes an ExcelJS cell value to a primitive, matching the output of
- * xlsx's sheet_to_json (which returns raw numbers/strings/dates).
+ * Normalizes an ExcelJS cell value to a scalar, reducing the object shapes
+ * ExcelJS uses (formula, shared formula, rich text, hyperlink) to the plain
+ * values xlsx's sheet_to_json emitted.
  *
- * Any object shape that cannot be reduced to a primitive resolves to
+ * Any object shape that cannot be reduced to a scalar resolves to
  * `undefined` so that a raw ExcelJS object is never leaked into an API
  * response (xlsx only ever emitted scalars).
+ *
+ * Date cells are deliberately returned as `Date` objects rather than the raw
+ * Excel serial numbers xlsx produced by default; see the note on
+ * {@link sheetToJson} for the rationale and impact.
  * @param {*} value
  */
 function normalizeCellValue(value) {
@@ -192,8 +197,15 @@ function normalizeCellValue(value) {
  * dropped or overwritten: a blank header becomes `__EMPTY`, and any name that
  * is already taken gets the next free `_1`/`_2`/... suffix.
  *
- * Note: date cells resolve to `Date` objects (serialized as ISO strings) rather
- * than the raw Excel serial numbers xlsx returned by default.
+ * Note: date cells resolve to `Date` objects (serialized as ISO strings in an
+ * API response) rather than the raw Excel serial numbers xlsx returned by
+ * default. This divergence is intentional: reproducing xlsx's serials would
+ * require reimplementing Excel's 1900/1904 date systems and its leap-year
+ * quirk, and an ISO string is more useful to callers than an opaque integer.
+ * The only current caller (`/api/getPublicGTEx`, reading
+ * `data/appData/vQTL2_resource.xlsx`) has no date-typed cells, so this is not
+ * observable today — but it is the contract to check if that workbook ever
+ * gains date columns.
  * @param {import('exceljs').Worksheet} worksheet
  * @returns {object[]}
  */
