@@ -181,6 +181,7 @@ export function QTLsGWASResultsForm(props) {
               </Form.Label>
               <ReactSelect
                 isDisabled={!submitted}
+                aria-disabled={!submitted}
                 inputId={'qtls-results-gene-input-' + props.tab}
                 // label=""
                 value={select_gene}
@@ -193,6 +194,11 @@ export function QTLsGWASResultsForm(props) {
                 }
                 styles={{
                   menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                  placeholder: (base) => ({ ...base, color: '#495057' }),
+                  singleValue: (base, state) => ({
+                    ...base,
+                    color: state.isDisabled ? '#495057' : base.color,
+                  }),
                 }}
                 menuPortalTarget={document.body}
                 filterOption={createFilter({ ignoreAccents: false })}
