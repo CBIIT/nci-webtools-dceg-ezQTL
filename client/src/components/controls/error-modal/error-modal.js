@@ -23,9 +23,10 @@ export function ErrorModal(props) {
       show={errorModal.visible}
       onHide={() => handleClose()}
       style={{ zIndex: '999999' }}
+      aria-labelledby="error-modal-title"
     >
       <Modal.Header closeButton>
-        <Modal.Title>Internal Server Error</Modal.Title>
+        <Modal.Title id="error-modal-title">Internal Server Error</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>

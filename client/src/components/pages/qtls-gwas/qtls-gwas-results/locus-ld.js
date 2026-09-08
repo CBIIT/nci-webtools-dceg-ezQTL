@@ -80,6 +80,7 @@ export function LocusLD() {
                       </Form.Label>
                       <ReactSelect
                         isDisabled={!submitted}
+                        aria-disabled={!submitted}
                         aria-labelledby="ld-association-data"
                         inputId="qtls-results-ld-association-data"
                         placeholder="None"
@@ -95,9 +96,10 @@ export function LocusLD() {
                         ]}
                         styles={{
                           menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                        }}
-                        menuPortalTarget={document.body}
-                        filterOption={createFilter({ ignoreAccents: false })}
+                         placeholder: (base) => ({ ...base, color: '#495057' }),
+                       }}
+                       menuPortalTarget={document.body}
+                       filterOption={createFilter({ ignoreAccents: false })}
                       />
                     </div>
                     <div className="col-md-4">
@@ -117,7 +119,9 @@ export function LocusLD() {
                       </Form.Label>
                       <ReactSelect
                         isDisabled={!submitted || ldAssocData.value !== 'QTL'}
+                        aria-disabled={!submitted || ldAssocData.value !== 'QTL'}
                         inputId="qtls-results-ld-gene-input"
+                        aria-label="Trait for QTL"
                         // label=""
                         value={ldAssocData.value === 'QTL' ? select_gene : null}
                         placeholder="None"
@@ -127,9 +131,14 @@ export function LocusLD() {
                         onChange={(option) =>
                           dispatch(updateQTLsGWAS({ select_gene: option }))
                         }
-                        styles={{
-                          menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-                        }}
+                       styles={{
+                         menuPortal: (base) => ({ ...base, zIndex: 9999 }),
+                         placeholder: (base) => ({ ...base, color: '#495057' }),
+                         singleValue: (base, state) => ({
+                           ...base,
+                           color: state.isDisabled ? '#495057' : base.color,
+                         }),
+                       }}
                         menuPortalTarget={document.body}
                         filterOption={createFilter({ ignoreAccents: false })}
                       />
@@ -144,6 +153,7 @@ export function LocusLD() {
                       <Form.Control
                         type="number"
                         aria-labelledby="ld-association-threshold"
+                        aria-disabled={!submitted}
                         step="any"
                         min="0"
                         id="qtls-ld-threshold"

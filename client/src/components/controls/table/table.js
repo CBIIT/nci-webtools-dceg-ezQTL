@@ -215,8 +215,8 @@ export default function Table({
       </Row>
       <Row>
         <Col>
+          <div className="table-responsive" tabIndex="0">
           <BTable
-            responsive
             striped
             bordered
             hover
@@ -298,6 +298,7 @@ export default function Table({
               })}
             </tbody>
           </BTable>
+          </div>
         </Col>
       </Row>
       <Row className="pagination mt-3">

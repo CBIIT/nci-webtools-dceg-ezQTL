@@ -3,12 +3,19 @@ import { check } from 'express-validator';
 import path from 'path';
 import multer from 'multer';
 import fs from 'fs-extra';
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import archiver from 'archiver';
-import decompress from 'decompress';
 import { v1 as uuidv1 } from 'uuid';
 import { handleValidationErrors, logFiles } from './middleware.js';
-import { parseCSV, mkdirs, writeJson, getFiles, readJson } from './utils.js';
+import {
+  parseCSV,
+  mkdirs,
+  writeJson,
+  getFiles,
+  readJson,
+  sheetToJson,
+  extractZip,
+} from './utils.js';
 import {
   qtlsCalculateMain,
   qtlsCalculateLocusAlignmentBoxplots,
@@ -71,14 +78,14 @@ export default function calculationRoutes(env) {
 
   // get list of public data options
   router.post('/getPublicGTEx', async (req, res) => {
-    const workbook = XLSX.readFile(
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.readFile(
       path.resolve(env.APP_DATA_FOLDER, 'vQTL2_resource.xlsx')
     );
-    const sheetNames = workbook.SheetNames;
-    const data = sheetNames.reduce(
-      (acc, sheet) => ({
+    const data = workbook.worksheets.reduce(
+      (acc, worksheet) => ({
         ...acc,
-        [sheet]: XLSX.utils.sheet_to_json(workbook.Sheets[sheet]),
+        [worksheet.name]: sheetToJson(worksheet),
       }),
       {}
     );
@@ -171,7 +178,7 @@ export default function calculationRoutes(env) {
     await mkdirs([outputFolder]);
 
     // extract files
-    await decompress(sampleArchive, outputFolder, { strip: 1 });
+    await extractZip(sampleArchive, outputFolder, { strip: 1 });
 
     // modify state with new request id
     const stateFile = path.resolve(outputFolder, 'state.json');

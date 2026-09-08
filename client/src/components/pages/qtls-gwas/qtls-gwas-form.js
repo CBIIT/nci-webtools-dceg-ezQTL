@@ -1259,7 +1259,7 @@ export function QTLsGWASForm() {
               submitted
                 ? {
                     pointerEvents: 'none',
-                    color: 'gray',
+                    color: '#6c757d',
                   }
                 : {}
             }

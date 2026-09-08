@@ -5,8 +5,8 @@ RUN dnf -y update \
     gcc-c++ \
     httpd \
     make \
-    nodejs \
-    npm \
+    nodejs24 \
+    nodejs24-npm \
  && dnf clean all
 
 # Add custom httpd configuration
