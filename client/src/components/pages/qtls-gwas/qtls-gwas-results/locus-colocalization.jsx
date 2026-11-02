@@ -547,7 +547,7 @@ export function LocusColocalization() {
                     <p>
                       The barplot below shows the colocalization results based
                       on different windows as described above. The green solid
-                      line indicates the suggested threshold (CLPP > 0.01) for
+                      line indicates the suggested threshold (CLPP &gt; 0.01) for
                       the colocalization using eCAVIAR. Any traits that pass
                       this threshold will be highlighted with the best candidate
                       SNP.

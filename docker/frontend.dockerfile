@@ -10,7 +10,7 @@ WORKDIR /client
 
 COPY client/package*.json /client/
 
-RUN npm install --legacy-peer-deps
+RUN npm ci
 
 ARG CACHE_BUST
 COPY client /client/
@@ -27,7 +27,7 @@ RUN dnf -y update \
 # Add custom httpd configuration
 COPY docker/ezqtl.conf /etc/httpd/conf.d/ezqtl.conf
 
-COPY --from=builder /client/build /var/www/html/ezqtl
+COPY --from=builder /client/dist /var/www/html/ezqtl
 
 WORKDIR /var/www/html
 

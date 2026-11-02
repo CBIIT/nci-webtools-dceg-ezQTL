@@ -100,5 +100,7 @@ RUN cd /tmp; git clone https://github.com/xtmgah/SigProfilerPlotting; cp /tmp/Si
 ARG CACHE_BUST
 COPY . /deploy/
 
+RUN touch /deploy/server/.env
+
 # CMD sleep infinity
 CMD npm start

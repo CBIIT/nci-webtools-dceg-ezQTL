@@ -1,7 +1,7 @@
 import React, { createContext } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import * as clonedeep from 'lodash.clonedeep';
+import clonedeep from 'lodash.clonedeep';
 import { getStore } from './services/store';
 import { App } from './app';
 
