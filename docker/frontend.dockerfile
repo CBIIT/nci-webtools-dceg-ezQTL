@@ -1,30 +1,33 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023 AS builder
 
 RUN dnf -y update \
- && dnf -y install \
-    gcc-c++ \
-    httpd \
+    && dnf -y install \
     make \
     nodejs24 \
-    nodejs24-npm \
- && dnf clean all
-
-# Add custom httpd configuration
-COPY docker/ezqtl.conf /etc/httpd/conf.d/ezqtl.conf
-
-RUN mkdir /client
+    && dnf clean all
 
 WORKDIR /client
 
 COPY client/package*.json /client/
 
-RUN npm install --legacy-peer-deps 
+RUN npm install --legacy-peer-deps
 
 ARG CACHE_BUST
 COPY client /client/
 
-RUN npm run build \
-    && mv /client/build /var/www/html/ezqtl
+RUN npm run build
+
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
+
+RUN dnf -y update \
+    && dnf -y install \
+    httpd \
+    && dnf clean all
+
+# Add custom httpd configuration
+COPY docker/ezqtl.conf /etc/httpd/conf.d/ezqtl.conf
+
+COPY --from=builder /client/build /var/www/html/ezqtl
 
 WORKDIR /var/www/html
 
@@ -32,4 +35,4 @@ EXPOSE 80
 EXPOSE 443
 
 CMD rm -rf /run/httpd/* /tmp/httpd* \
- && exec /usr/sbin/httpd -DFOREGROUND
+    && exec /usr/sbin/httpd -DFOREGROUND
